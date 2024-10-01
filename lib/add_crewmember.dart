@@ -1,12 +1,10 @@
 import 'dart:ui';
-
-import 'package:fire_app/add_crewmember.dart';
 import 'package:flutter/material.dart';
 import 'main.dart';
 
 
-class EditCrew extends StatelessWidget {
-  const EditCrew({super.key});
+class AddCrewmember extends StatelessWidget {
+  const AddCrewmember({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +29,8 @@ class EditCrew extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.deepOrangeAccent,
         title: const Text(
-          'Edit Crew',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          'Add Crewmember',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
       body: Column(
@@ -45,12 +43,12 @@ class EditCrew extends StatelessWidget {
 
                 Container(
                   child: ImageFiltered(
-                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                    child: Image.asset('assets/images/logo1.png',
-                      fit: BoxFit.cover, // Cover  entire background
-                      width: double.infinity,
-                      height: double.infinity,
-                    )
+                      imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                      child: Image.asset('assets/images/logo1.png',
+                        fit: BoxFit.cover, // Cover  entire background
+                        width: double.infinity,
+                        height: double.infinity,
+                      )
                   ),
                 ),
                 Container(
@@ -66,27 +64,11 @@ class EditCrew extends StatelessWidget {
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const AddCrewmember()),
-                              );
-                            },
-                            style: style,
-                            child: const Text(
-                                'Add Crewmember',
-                              textAlign: TextAlign.center,
-                            )
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: () {
                               null;
                             },
                             style: style,
                             child: const Text(
-                                'Add Gear',
+                              'Name',
                               textAlign: TextAlign.center,
                             )
                         ),
@@ -96,10 +78,10 @@ class EditCrew extends StatelessWidget {
                         child: ElevatedButton(
                             onPressed: () {
                               null;
-                              },
+                            },
                             style: style,
                             child: const Text(
-                                'Edit Crewmembers',
+                              'Flight Weight',
                               textAlign: TextAlign.center,
                             )
                         ),
@@ -109,10 +91,10 @@ class EditCrew extends StatelessWidget {
                         child: ElevatedButton(
                             onPressed: () {
                               null;
-                              },
+                            },
                             style: style,
                             child: const Text(
-                                'Edit Gear',
+                              'Position(s)',
                               textAlign: TextAlign.center,
                             )
                         ),
@@ -123,7 +105,7 @@ class EditCrew extends StatelessWidget {
               ],
             ),
           ),
-    ],
+        ],
       ),
     );
   }
