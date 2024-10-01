@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'edit_crew.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fire Manifest App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
         useMaterial3: true,
         // for theme based text-> style: Theme.of(context).textTheme.headlineMedium,
       ),
@@ -41,60 +42,36 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  // int _counter = 0;
+  //
+  // void _incrementCounter() {
+  //   setState(() {
+  //     // This call to setState tells the Flutter framework that something has
+  //     // changed in this State, which causes it to rerun the build method below
+  //     // so that the display can reflect the updated values. If we changed
+  //     // _counter without calling setState(), then the build method would not be
+  //     // called again, and so nothing would appear to happen.
+  //     _counter++;
+  //   });
+  // }
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-  void _decrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter--;
-    });
-  }
-  void _zeroCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter = 0;
-    });
-  }
-  void _tenMultiplierCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter = _counter * 10;
-    });
-  }
   @override
   Widget build(BuildContext context) {
 
-    // Style for elevated buttons
+    // Style for elevated buttons. Should probably figure out a way
+    // to make this universal so we don't have to declare it in every page
     final ButtonStyle style =
     ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
-        textStyle: const TextStyle(fontSize: 24),
+        textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         backgroundColor: Colors.deepOrangeAccent,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         //surfaceTintColor: Colors.grey,
-        elevation: 10,
+        elevation: 15,
+        shadowColor: Colors.black,
+        side: const BorderSide(color: Colors.black, width: 2),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12)),
         // Maybe change? Dynamic button size based on screen size
         fixedSize: Size(MediaQuery.of(context).size.width / 2, MediaQuery.of(context).size.height / 12)
     );
@@ -141,10 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   height: double.infinity,
                   color: Colors.white.withOpacity(0.1),
                   child: Column(
-                    // child: Text(
-                    //   '$_counter',
-                    //   style: Theme.of(context).textTheme.headlineMedium,
-                    // ),
+
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
 
@@ -176,8 +150,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
                             onPressed: () {
-                              null;
-                            },
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const EditCrew()),  // Specify the new page here
+                              );                            },
                             style: style,
                             child: const Text(
                                 'Edit Crew'
