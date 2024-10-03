@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'edit_crew.dart';
+import 'add_crewmember.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,24 +38,17 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
+
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // int _counter = 0;
-  //
-  // void _incrementCounter() {
-  //   setState(() {
-  //     // This call to setState tells the Flutter framework that something has
-  //     // changed in this State, which causes it to rerun the build method below
-  //     // so that the display can reflect the updated values. If we changed
-  //     // _counter without calling setState(), then the build method would not be
-  //     // called again, and so nothing would appear to happen.
-  //     _counter++;
-  //   });
-  // }
 
+  // APP FUNCTIONS
+
+  // Home Page UI
   @override
   Widget build(BuildContext context) {
 
@@ -77,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     return Scaffold(
+
       // appBar: AppBar(
       //
       //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
