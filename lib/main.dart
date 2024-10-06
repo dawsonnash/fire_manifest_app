@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'edit_crew.dart';
 import 'add_crewmember.dart';
 
@@ -84,16 +85,20 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           Container(
             width: double.infinity,
-            height: MediaQuery.of(context).size.height / 3, // 1/3 of screen height),
+            height: MediaQuery.of(context).size.height * 0.3, // Scales based on 30% of screen height
             color: Colors.deepOrangeAccent,
             child: const Center(
-              child: Text(
-                'Fire Manifesting App',
-                textAlign: TextAlign.center,
-                // style: Theme.of(context).textTheme.headlineLarge,
-                style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+              // Fitted box automatically scales text based on available space
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  'Fire Manifesting App',
+                  textAlign: TextAlign.center,
+                  // style: Theme.of(context).textTheme.headlineLarge,
+                  style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
 
 
+                ),
               ),
             ),
           ),
@@ -101,9 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Stack(
               children: [
 
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
+                Positioned.fill(
                   child: Image.asset('assets/images/logo1.png',
                     fit: BoxFit.cover,  // Cover  entire background
                   ),

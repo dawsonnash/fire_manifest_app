@@ -73,7 +73,7 @@ class EditCrew extends StatelessWidget {
                             },
                             style: style,
                             child: const Text(
-                                'Add Crewmember',
+                                'Add Crew Member',
                               textAlign: TextAlign.center,
                             )
                         ),

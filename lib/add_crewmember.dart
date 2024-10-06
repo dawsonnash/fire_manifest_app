@@ -10,7 +10,11 @@ enum PositionLabel {
   assistantCrewBoss('Assistant Crew Boss'),
   dig('Dig'),
   medic('Medic'),
-  foreman('Foreman');
+  foreman('Foreman'),
+  sawteam1('Saw Team 1'),
+  sawteam2('Saw Team 2'),
+  sawteam3('Saw Team 3'),
+  sawteam4('Saw Team 4');
 
   const PositionLabel(this.label);
   final String label;
@@ -25,13 +29,14 @@ class AddCrewmember extends StatefulWidget {
 }
   class _AddCrewmemberState extends State<AddCrewmember>{
 
-    final TextEditingController positionController = TextEditingController();
+  // For selecting position
     PositionLabel? selectedPosition;
 
   @override
   Widget build(BuildContext context) {
-    final ButtonStyle style =
-    ElevatedButton.styleFrom(
+
+    // Main theme button style
+    final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
         textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         backgroundColor: Colors.deepOrangeAccent,
@@ -51,12 +56,42 @@ class AddCrewmember extends StatefulWidget {
             .size
             .height / 10)
     );
+    // Black style input field decoration
+    final InputDecorationTheme inputDecorationTheme = InputDecorationTheme(
+      labelStyle: const TextStyle(
+        color: Colors.white,
+        fontSize: 22,
+        fontStyle: FontStyle.italic,
+        //fontWeight: FontWeight.bold,
+      ),
+      filled: true,
+      fillColor: Colors.black.withOpacity(0.9),
+      enabledBorder: OutlineInputBorder(
+        borderSide: const BorderSide(
+          color: Colors.white,
+          // Border color when the TextField is not focused
+          width: 2.0, // Border width
+        ),
+        borderRadius: BorderRadius.circular(
+            12.0), // Rounded corners
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: const BorderSide(
+          color: Colors.black,
+          // Border color when the TextField is focused
+          width: 2.0, // Border width
+        ),
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+
+    );
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,  // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
       appBar: AppBar(
         backgroundColor: Colors.deepOrangeAccent,
         title: const Text(
-          'Add Crewmember',
+          'Add Crew Member',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
@@ -87,13 +122,14 @@ class AddCrewmember extends StatefulWidget {
 
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
+                      const Spacer(flex: 1),
 
                       // Enter Name
                       Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: TextField(
                             decoration: InputDecoration(
-                              labelText: 'Enter last name',
+                              labelText: 'Enter flight weight',
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -178,67 +214,43 @@ class AddCrewmember extends StatefulWidget {
 
                       // Enter Position(s)
                       Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              labelText: 'Enter position(s)',
-                              labelStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontStyle: FontStyle.italic,
-                                //fontWeight: FontWeight.bold,
-                              ),
-                              filled: true,
-                              fillColor: Colors.black.withOpacity(0.9),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.white,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                    12.0), // Rounded corners
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
+                        padding: const EdgeInsets.all(16.0),
+                        child: DropdownMenu<PositionLabel>(
+                          width: double.infinity,
+                          initialSelection: PositionLabel.none,
+                          label: const Text('Position'),
+                          textStyle: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                          ),
+                          // Theme/design for the input field
+                          inputDecorationTheme: inputDecorationTheme,
+                          // Design for the dropdown menu
+                          menuStyle: const MenuStyle(
+                            backgroundColor: WidgetStatePropertyAll<Color>(Colors.deepOrangeAccent),
 
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                            ),
-                          )
-
+                          ),
+                          onSelected: (PositionLabel? position) {
+                            setState(() {
+                              selectedPosition = position;
+                            });
+                          },
+                          dropdownMenuEntries: PositionLabel.values
+                              .map<DropdownMenuEntry<PositionLabel>>(
+                                  (PositionLabel position) {
+                                return DropdownMenuEntry<PositionLabel>(
+                                  value: position,
+                                  label: position.label,
+                                  // Theme for each entry
+                                  style: MenuItemButton.styleFrom(
+                                    foregroundColor: Colors.black, // Default color for positions
+                                    backgroundColor: Colors.white,
+                                  ),
+                                );
+                              }).toList(),
+                        ),
                       ),
-
-                      DropdownMenu<PositionLabel>(
-                        initialSelection: PositionLabel.none,
-                        controller: positionController,
-                        requestFocusOnTap: true,
-                        label: const Text('Position'),
-                        onSelected: (PositionLabel? position) {
-                          setState(() {
-                            selectedPosition = position;
-                          });
-                        },
-                        dropdownMenuEntries: PositionLabel.values
-                            .map<DropdownMenuEntry<PositionLabel>>(
-                                (PositionLabel position) {
-                              return DropdownMenuEntry<PositionLabel>(
-                                value: position,
-                                label: position.label,
-                                style: MenuItemButton.styleFrom(
-                                  foregroundColor: Colors.black, // Default color for positions
-                                ),
-                              );
-                            }).toList(),
-                      ),
+                      const Spacer(flex: 6),
                     ],
                   ),
                 ),
