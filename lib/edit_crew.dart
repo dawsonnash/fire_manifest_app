@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:fire_app/add_crewmember.dart';
+import 'package:fire_app/edit_crewmembers.dart';
+import 'package:fire_app/edit_gear.dart';
 import 'package:flutter/material.dart';
 import 'add_gear.dart';
 import 'main.dart';
@@ -99,8 +101,11 @@ class EditCrew extends StatelessWidget {
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
                             onPressed: () {
-                              null;
-                              },
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const EditCrewmembers()),
+                              );
+                            },
                             style: style,
                             child: const Text(
                                 'Edit Crewmembers',
@@ -112,8 +117,11 @@ class EditCrew extends StatelessWidget {
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
                             onPressed: () {
-                              null;
-                              },
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const EditGear()),
+                              );
+                            },
                             style: style,
                             child: const Text(
                                 'Edit Gear',

@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'Data/crew.dart';
+import 'Data/gear.dart';
 import 'main.dart';
 
 // Tester data
@@ -38,7 +40,7 @@ class _AddGearState extends State<AddGear>{
     });
   }
 
-  // Function to save user input. The contoller automatically tracks/saves the variable from the textfield
+  // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
   void saveData() {
 
     final String gearName = gearNameController.text;
@@ -46,12 +48,11 @@ class _AddGearState extends State<AddGear>{
     // Convert flight weight text to integer
     final int gearWeight = int.parse(gearWeightController.text);
 
-    //final String position = selectedPosition?.label ?? 'None';
+    // Creating a new gear object. Dont have hazmat yet
+    Gear newGearItem= Gear(name: gearName, weight: gearWeight);
 
-    // Debug for LogCat
-    print("Gear Name: $gearName");
-    print("Gear Weight: $gearWeight");
-    //print("Position: $position");
+    // Add the new member to the global crew object
+    crew.addGear(newGearItem);
 
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(
@@ -71,6 +72,10 @@ class _AddGearState extends State<AddGear>{
 
     );
 
+    // Debug for LogCat
+    print("Gear Name: $gearName");
+    print("Gear Weight: $gearWeight");
+    crew.printCrewDetails();
   }
 
   @override

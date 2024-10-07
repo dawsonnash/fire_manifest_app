@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'Data/crew.dart';
+import 'Data/crewmember.dart';
 import 'main.dart';
 
 // Tester data
@@ -19,6 +21,7 @@ enum PositionLabel {
   const PositionLabel(this.label);
   final String label;
 }
+
 class AddCrewmember extends StatefulWidget {
   const AddCrewmember({super.key});
 
@@ -55,9 +58,10 @@ class AddCrewmember extends StatefulWidget {
       });
     }
 
-    // Function to save user input. The contoller automatically tracks/saves the variable from the textfield
+    // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
     void saveData() {
 
+      // Take what the name contrller has saved
       final String name = nameController.text;
 
       // Convert flight weight text to integer
@@ -65,10 +69,11 @@ class AddCrewmember extends StatefulWidget {
 
       //final String position = selectedPosition?.label ?? 'None';
 
-      // Debug for LogCat
-      print("Name: $name");
-      print("Flight Weight: $flightWeight");
-      //print("Position: $position");
+      // Creating a new CrewMember object. Dont have positioin yet
+      CrewMember newCrewMember = CrewMember(name: name, flightWeight: flightWeight);
+
+      // Add the new crewmember to the global crew object
+      crew.addCrewMember(newCrewMember);
 
       // Show successful save popup
       ScaffoldMessenger.of(context).showSnackBar(
@@ -83,11 +88,14 @@ class AddCrewmember extends StatefulWidget {
             ),
           duration: Duration(seconds: 2),
           backgroundColor: Colors.green,
-
         ),
-
       );
 
+      // Debug for LogCat
+      print("Name: $name");
+      print("Flight Weight: $flightWeight");
+      print("--------------------------");
+      crew.printCrewDetails();
     }
 
   @override
@@ -303,7 +311,7 @@ class AddCrewmember extends StatefulWidget {
                                   label: position.label,
                                   // Theme for each entry
                                   style: MenuItemButton.styleFrom(
-                                    foregroundColor: Colors.black, // Default color for positions
+                                    foregroundColor: Colors.black,
                                     backgroundColor: Colors.white,
                                   ),
                                 );
