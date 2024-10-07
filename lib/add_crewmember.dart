@@ -91,6 +91,10 @@ class AddCrewmember extends StatefulWidget {
         ),
       );
 
+      // Clear the text fields (reset them to empty), so you can add more ppl
+      nameController.text = '';
+      flightWeightController.text = '';
+
       // Debug for LogCat
       print("Name: $name");
       print("Flight Weight: $flightWeight");

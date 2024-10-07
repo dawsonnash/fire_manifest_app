@@ -2,58 +2,58 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'Data/crew.dart';
-import 'Data/gear.dart';
+import 'Data/crewmember.dart';
 
 
-class EditGear extends StatefulWidget {
+class EditCrewmember extends StatefulWidget {
 
-  // THis page requires a gear item to be passed to it - to edit it
-  final Gear gear;
+  // THis page requires a crewmember to be passed to it - to edit it
+  final CrewMember crewMember;
   final VoidCallback onUpdate;  // Callback for deletion to update previous page
 
-  const EditGear({
+  const EditCrewmember({
     super.key,
-    required this.gear,
+    required this.crewMember,
     required this.onUpdate,
   });
 
   @override
-  State<EditGear> createState() => _EditGearState();
+  State<EditCrewmember> createState() => _EditCrewmemberState();
 }
-class _EditGearState extends State<EditGear>{
+class _EditCrewmemberState extends State<EditCrewmember>{
 
   // Variables to store user input
-  late TextEditingController gearNameController;
-  late TextEditingController gearWeightController;
+  late TextEditingController nameController;
+  late TextEditingController flightWeightController;
   bool isSaveButtonEnabled = false; // Controls whether saving button is showing
 
-  // Store old gear info for ensuring user only can save if they change data
-  late String oldGearName;
-  late int oldGearWeight;
+  // Store old CrewMember info for ensuring user only can save if they change data
+  late String oldCrewMemberName;
+  late int oldCrewMemberFlightWeight;
 
   @override
   void initState() {
     super.initState();
 
-    // Initializing the controllers with the current gears data to be edited
-    gearNameController = TextEditingController(text: widget.gear.name);
-    gearWeightController = TextEditingController(text: widget.gear.weight.toString());
+    // Initializing the controllers with the current crew member's data to be edited
+    nameController = TextEditingController(text: widget.crewMember.name);
+    flightWeightController = TextEditingController(text: widget.crewMember.flightWeight.toString());
 
-    // Store original gear data
-    oldGearName = widget.gear.name;
-    oldGearWeight = widget.gear.weight;
+    // Store original crewmember data
+    oldCrewMemberName = widget.crewMember.name;
+    oldCrewMemberFlightWeight = widget.crewMember.flightWeight;
 
     // Listeners to the TextControllers
-    gearNameController.addListener(_checkInput);
-    gearWeightController.addListener(_checkInput);
+    nameController.addListener(_checkInput);
+    flightWeightController.addListener(_checkInput);
   }
 
   // Function to check if input is valid and update button state
   void _checkInput() {
-    final isNameValid = gearNameController.text.isNotEmpty;
-    final isFlightWeightValid = gearWeightController.text.isNotEmpty;
-    final isNameChanged = gearNameController.text != oldGearName;
-    final isFlightWeightChanged = gearWeightController.text != oldGearWeight.toString();
+    final isNameValid = nameController.text.isNotEmpty;
+    final isFlightWeightValid = flightWeightController.text.isNotEmpty;
+    final isNameChanged = nameController.text != oldCrewMemberName;
+    final isFlightWeightChanged = flightWeightController.text != oldCrewMemberFlightWeight.toString();
 
     setState(() {
       // Need to adjust for position as well
@@ -66,8 +66,8 @@ class _EditGearState extends State<EditGear>{
   void saveData() {
 
     // Update exisiting data
-    widget.gear.name = gearNameController.text;
-    widget.gear.weight = int.parse(gearWeightController.text);
+    widget.crewMember.name = nameController.text;
+    widget.crewMember.flightWeight = int.parse(flightWeightController.text);
 
     // Callback function, Update previous page UI with setState()
     widget.onUpdate();
@@ -75,7 +75,7 @@ class _EditGearState extends State<EditGear>{
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Gear Updated!',
+        content: Text('Crew Member Updated!',
           // Maybe change look
           style: TextStyle(
             color: Colors.black,
@@ -121,7 +121,7 @@ class _EditGearState extends State<EditGear>{
       appBar: AppBar(
         backgroundColor: Colors.deepOrangeAccent,
         title: const Text(
-          'Edit Gear',
+          'Edit Crew Member',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
@@ -156,9 +156,9 @@ class _EditGearState extends State<EditGear>{
                       Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: TextField(
-                            controller: gearNameController,
+                            controller: nameController,
                             decoration: InputDecoration(
-                              labelText: 'Edit gear name',
+                              labelText: 'Edit name',
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -198,7 +198,7 @@ class _EditGearState extends State<EditGear>{
                       Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: TextField(
-                            controller: gearWeightController,
+                            controller: flightWeightController,
                             keyboardType: TextInputType.number,
                             // Only show numeric keyboard
                             inputFormatters: <TextInputFormatter>[
@@ -206,7 +206,7 @@ class _EditGearState extends State<EditGear>{
                               // Allow only digits
                             ],
                             decoration: InputDecoration(
-                              labelText: 'Edit gear weight',
+                              labelText: 'Edit flight weight',
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -254,21 +254,21 @@ class _EditGearState extends State<EditGear>{
                             const Spacer(flex:2),
 
                             ElevatedButton(
-                                onPressed: isSaveButtonEnabled ? () => saveData() : null,  // Button is only enabled if there is input
-                                style: style, // Main button theme
-                                child: const Text(
-                                    'Save'
-                                )
-                            ),
+                              onPressed: isSaveButtonEnabled ? () => saveData() : null,  // Button is only enabled if there is input
+                              style: style, // Main button theme
+                              child: const Text(
+                                  'Save'
+                              )
+                          ),
 
                             const Spacer(flex:1),
 
                             IconButton(
-                              icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                  size: 32
-                              ),
+                                icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                    size: 32
+                                ),
 
                               onPressed: () {
                                 showDialog(
@@ -276,13 +276,13 @@ class _EditGearState extends State<EditGear>{
                                   builder: (BuildContext context) {
                                     return AlertDialog(
                                       title: Text(
-                                          'Delete $oldGearName?',
-                                          style: const TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                          )
+                                          'Delete $oldCrewMemberName?',
+                                        style: const TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                        )
                                       ),
-                                      content: Text('This gear data ($oldGearName) will be erased!',
+                                      content: Text('This crew member data ($oldCrewMemberName) will be erased!',
                                           style: const TextStyle(
                                             fontSize: 18,
                                           )),
@@ -300,37 +300,37 @@ class _EditGearState extends State<EditGear>{
                                                   )),
                                             ),
                                             TextButton(
-                                              onPressed: () {
-                                                // Remove the crew member
-                                                crew.removeGear(widget.gear);
+                                            onPressed: () {
+                                              // Remove the crew member
+                                              crew.removeCrewMember(widget.crewMember);
 
-                                                widget.onUpdate();            // Callback function to update UI with new data
+                                              widget.onUpdate();            // Callback function to update UI with new data
 
-                                                // Show deletion pop-up
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                   SnackBar(
-                                                    content: Text('$oldGearName Deleted!',
-                                                      // Maybe change look
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 32,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
+                                              // Show deletion pop-up
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text('$oldCrewMemberName Deleted!',
+                                                    // Maybe change look
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 32,
+                                                      fontWeight: FontWeight.bold,
                                                     ),
-                                                    duration: Duration(seconds: 2),
-                                                    backgroundColor: Colors.red,
                                                   ),
-                                                );
+                                                  duration: Duration(seconds: 2),
+                                                  backgroundColor: Colors.red,
+                                                ),
+                                              );
 
-                                                Navigator.of(context).pop();  // Dismiss the dialog
-                                                Navigator.of(context).pop();  // Return to previous screen
-                                              },
-                                              child: const Text('OK',
-                                                  style: TextStyle(
-                                                    fontSize: 22,
-                                                  )),
-                                            ),
-                                          ],
+                                              Navigator.of(context).pop();  // Dismiss the dialog
+                                              Navigator.of(context).pop();  // Return to previous screen
+                                            },
+                                            child: const Text('OK',
+                                                style: TextStyle(
+                                                  fontSize: 22,
+                                                )),
+                                          ),
+                                        ],
                                         ),
                                       ],
                                     );
@@ -338,7 +338,7 @@ class _EditGearState extends State<EditGear>{
                                 );
                               },
                             )
-                          ],
+                        ],
 
                         ),
                       ),

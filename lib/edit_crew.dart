@@ -1,8 +1,8 @@
 import 'dart:ui';
 
 import 'package:fire_app/add_crewmember.dart';
-import 'package:fire_app/edit_crewmembers.dart';
-import 'package:fire_app/edit_gear.dart';
+import 'package:fire_app/crewmembers_view.dart';
+import 'package:fire_app/gear_view.dart';
 import 'package:flutter/material.dart';
 import 'add_gear.dart';
 import 'main.dart';
@@ -39,7 +39,6 @@ class EditCrew extends StatelessWidget {
         ),
       ),
       body: Column(
-
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Expanded( // Takes up all available space
@@ -103,7 +102,7 @@ class EditCrew extends StatelessWidget {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const EditCrewmembers()),
+                                MaterialPageRoute(builder: (context) => const CrewmembersView()),
                               );
                             },
                             style: style,
@@ -119,7 +118,7 @@ class EditCrew extends StatelessWidget {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const EditGear()),
+                                MaterialPageRoute(builder: (context) => const GearView()),
                               );
                             },
                             style: style,

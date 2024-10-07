@@ -9,6 +9,14 @@ class Crew {
     crewMembers.add(member);
   }
 
+  void removeCrewMember(CrewMember member){
+    crewMembers.remove(member);
+  }
+
+  void removeGear(Gear gearItem){
+    gear.remove(gearItem);
+  }
+
   void addGear(Gear gearItem) {
     gear.add(gearItem);
   }
