@@ -311,7 +311,7 @@ class AddCrewmember extends StatefulWidget {
                                   label: position.label,
                                   // Theme for each entry
                                   style: MenuItemButton.styleFrom(
-                                    foregroundColor: Colors.black, // Default color for positions
+                                    foregroundColor: Colors.black,
                                     backgroundColor: Colors.white,
                                   ),
                                 );
