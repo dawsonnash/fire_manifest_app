@@ -4,91 +4,74 @@ import 'package:flutter/services.dart';
 import 'main.dart';
 
 // Tester data
-enum PositionLabel {
-  none('None'),
-  crewboss('Crew Boss'),
-  assistantCrewBoss('Assistant Crew Boss'),
-  dig('Dig'),
-  medic('Medic'),
-  foreman('Foreman'),
-  sawteam1('Saw Team 1'),
-  sawteam2('Saw Team 2'),
-  sawteam3('Saw Team 3'),
-  sawteam4('Saw Team 4');
-
-  const PositionLabel(this.label);
-  final String label;
-}
-class AddCrewmember extends StatefulWidget {
-  const AddCrewmember({super.key});
-
+class AddGear extends StatefulWidget {
+  const AddGear({super.key});
 
 
   @override
-  State<AddCrewmember> createState() => _AddCrewmemberState();
+  State<AddGear> createState() => _AddGearState();
 }
-  class _AddCrewmemberState extends State<AddCrewmember>{
+class _AddGearState extends State<AddGear>{
 
-    // Variables to store user input
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController flightWeightController = TextEditingController();
-    bool isSaveButtonEnabled = false; // Controls whether saving button is showing
-    PositionLabel? selectedPosition = PositionLabel.none;
+  // Variables to store user input
+  final TextEditingController gearNameController = TextEditingController();
+  final TextEditingController gearWeightController = TextEditingController();
+  bool isSaveButtonEnabled = false; // Controls whether saving button is showing
 
-    @override
+  @override
   void initState() {
-      super.initState();
+    super.initState();
 
-      // Listeners to the TextControllers
-      nameController.addListener(_checkInput);
-      flightWeightController.addListener(_checkInput);
-    }
+    // Listeners to the TextControllers
+    gearNameController.addListener(_checkInput);
+    gearWeightController.addListener(_checkInput);
+  }
 
-    // Function to check if input is valid and update button state
-    void _checkInput() {
-      final isNameValid = nameController.text.isNotEmpty;
-      final isFlightWeightValid = flightWeightController.text.isNotEmpty;
+  // Function to check if input is valid and update button state
+  void _checkInput() {
+    final isGearNameValid = gearNameController.text.isNotEmpty;
+    final isGearWeightValid = gearWeightController.text.isNotEmpty;
 
-      setState(() {
-        // Need to adjust for position as well
-        isSaveButtonEnabled = isNameValid && isFlightWeightValid;
-      });
-    }
+    setState(() {
+      // Need to adjust for position as well
+      isSaveButtonEnabled = isGearNameValid && isGearWeightValid;
+    });
+  }
 
-    // Function to save user input. The contoller automatically tracks/saves the variable from the textfield
-    void saveData() {
+  // Function to save user input. The contoller automatically tracks/saves the variable from the textfield
+  void saveData() {
 
-      final String name = nameController.text;
+    final String gearName = gearNameController.text;
 
-      // Convert flight weight text to integer
-      final int flightWeight = int.parse(flightWeightController.text);
+    // Convert flight weight text to integer
+    final int gearWeight = int.parse(gearWeightController.text);
 
-      //final String position = selectedPosition?.label ?? 'None';
+    //final String position = selectedPosition?.label ?? 'None';
 
-      // Debug for LogCat
-      print("Name: $name");
-      print("Flight Weight: $flightWeight");
-      //print("Position: $position");
+    // Debug for LogCat
+    print("Gear Name: $gearName");
+    print("Gear Weight: $gearWeight");
+    //print("Position: $position");
 
-      // Show successful save popup
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Crew Member Saved!',
-              // Maybe change look
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          duration: Duration(seconds: 2),
-          backgroundColor: Colors.green,
-
+    // Show successful save popup
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Gear Saved!',
+          // Maybe change look
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.green,
 
-      );
+      ),
 
-    }
+    );
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +132,7 @@ class AddCrewmember extends StatefulWidget {
       appBar: AppBar(
         backgroundColor: Colors.deepOrangeAccent,
         title: const Text(
-          'Add Crew Member',
+          'Add Gear',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
@@ -186,9 +169,9 @@ class AddCrewmember extends StatefulWidget {
                       Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: TextField(
-                            controller: nameController,
+                            controller: gearNameController,
                             decoration: InputDecoration(
-                              labelText: 'Enter last name',
+                              labelText: 'Enter gear name',
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -228,7 +211,7 @@ class AddCrewmember extends StatefulWidget {
                       Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: TextField(
-                            controller: flightWeightController,
+                            controller: gearWeightController,
                             keyboardType: TextInputType.number,
                             // Only show numeric keyboard
                             inputFormatters: <TextInputFormatter>[
@@ -236,7 +219,7 @@ class AddCrewmember extends StatefulWidget {
                               // Allow only digits
                             ],
                             decoration: InputDecoration(
-                              labelText: 'Enter flight weight',
+                              labelText: 'Enter gear weight',
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -272,44 +255,6 @@ class AddCrewmember extends StatefulWidget {
 
                       ),
 
-                      // Enter Position(s)
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: DropdownMenu<PositionLabel>(
-                          width: double.infinity,
-                          initialSelection: PositionLabel.none,
-                          label: const Text('Position'),
-                          textStyle: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                          ),
-                          // Theme/design for the input field
-                          inputDecorationTheme: inputDecorationTheme,
-                          // Design for the dropdown menu
-                          menuStyle: const MenuStyle(
-                            backgroundColor: WidgetStatePropertyAll<Color>(Colors.deepOrangeAccent),
-
-                          ),
-                          onSelected: (PositionLabel? position) {
-                            setState(() {
-                              selectedPosition = position;
-                            });
-                          },
-                          dropdownMenuEntries: PositionLabel.values
-                              .map<DropdownMenuEntry<PositionLabel>>(
-                                  (PositionLabel position) {
-                                return DropdownMenuEntry<PositionLabel>(
-                                  value: position,
-                                  label: position.label,
-                                  // Theme for each entry
-                                  style: MenuItemButton.styleFrom(
-                                    foregroundColor: Colors.black, // Default color for positions
-                                    backgroundColor: Colors.white,
-                                  ),
-                                );
-                              }).toList(),
-                        ),
-                      ),
                       const Spacer(flex: 6),
 
                       // Save Button
