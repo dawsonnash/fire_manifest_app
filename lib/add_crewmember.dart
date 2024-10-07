@@ -129,7 +129,7 @@ class AddCrewmember extends StatefulWidget {
                           padding: const EdgeInsets.all(16.0),
                           child: TextField(
                             decoration: InputDecoration(
-                              labelText: 'Enter flight weight',
+                              labelText: 'Enter last name',
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
