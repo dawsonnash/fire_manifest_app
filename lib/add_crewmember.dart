@@ -46,6 +46,12 @@ class AddCrewmember extends StatefulWidget {
       nameController.addListener(_checkInput);
       flightWeightController.addListener(_checkInput);
     }
+    @override
+    void dispose() {
+      nameController.dispose();
+      flightWeightController.dispose();
+      super.dispose();
+    }
 
     // Function to check if input is valid and update button state
     void _checkInput() {
@@ -285,43 +291,24 @@ class AddCrewmember extends StatefulWidget {
                       ),
 
                       // Enter Position(s)
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: DropdownMenu<PositionLabel>(
-                          width: double.infinity,
-                          initialSelection: PositionLabel.none,
-                          label: const Text('Position'),
-                          textStyle: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                          ),
-                          // Theme/design for the input field
-                          inputDecorationTheme: inputDecorationTheme,
-                          // Design for the dropdown menu
-                          menuStyle: const MenuStyle(
-                            backgroundColor: WidgetStatePropertyAll<Color>(Colors.deepOrangeAccent),
-
-                          ),
-                          onSelected: (PositionLabel? position) {
-                            setState(() {
-                              selectedPosition = position;
-                            });
-                          },
-                          dropdownMenuEntries: PositionLabel.values
-                              .map<DropdownMenuEntry<PositionLabel>>(
-                                  (PositionLabel position) {
-                                return DropdownMenuEntry<PositionLabel>(
-                                  value: position,
-                                  label: position.label,
-                                  // Theme for each entry
-                                  style: MenuItemButton.styleFrom(
-                                    foregroundColor: Colors.black,
-                                    backgroundColor: Colors.white,
-                                  ),
-                                );
-                              }).toList(),
-                        ),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.all(16.0),
+                      //   child: DropdownButton<PositionLabel>(
+                      //     value: selectedPosition,
+                      //     onChanged: (PositionLabel? position) {
+                      //       setState(() {
+                      //         selectedPosition = position;
+                      //       });
+                      //     },
+                      //     items: PositionLabel.values.map<DropdownMenuItem<PositionLabel>>((PositionLabel position) {
+                      //       return DropdownMenuItem<PositionLabel>(
+                      //         value: position,
+                      //         child: Text(position.label),
+                      //       );
+                      //     }).toList(),
+                      //   ),
+                      //
+                      // ),
                       const Spacer(flex: 6),
 
                       // Save Button

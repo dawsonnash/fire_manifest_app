@@ -29,6 +29,13 @@ class _AddGearState extends State<AddGear>{
     gearWeightController.addListener(_checkInput);
   }
 
+  @override
+  void dispose() {
+    gearNameController.dispose();
+    gearWeightController.dispose();
+    super.dispose();
+  }
+
   // Function to check if input is valid and update button state
   void _checkInput() {
     final isGearNameValid = gearNameController.text.isNotEmpty;

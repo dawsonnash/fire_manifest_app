@@ -48,6 +48,12 @@ class _EditCrewmemberState extends State<EditCrewmember>{
     flightWeightController.addListener(_checkInput);
   }
 
+  @override
+  void dispose() {
+    nameController.dispose();
+    flightWeightController.dispose();
+    super.dispose();
+  }
   // Function to check if input is valid and update button state
   void _checkInput() {
     final isNameValid = nameController.text.isNotEmpty;
