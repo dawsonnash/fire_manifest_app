@@ -29,8 +29,66 @@ class AddCrewmember extends StatefulWidget {
 }
   class _AddCrewmemberState extends State<AddCrewmember>{
 
-  // For selecting position
-    PositionLabel? selectedPosition;
+    // Variables to store user input
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController flightWeightController = TextEditingController();
+    bool isSaveButtonEnabled = false; // Controls whether saving button is showing
+    PositionLabel? selectedPosition = PositionLabel.none;
+
+    @override
+  void initState() {
+      super.initState();
+
+      // Listeners to the TextControllers
+      nameController.addListener(_checkInput);
+      flightWeightController.addListener(_checkInput);
+    }
+
+    // Function to check if input is valid and update button state
+    void _checkInput() {
+      final isNameValid = nameController.text.isNotEmpty;
+      final isFlightWeightValid = flightWeightController.text.isNotEmpty;
+
+      setState(() {
+        // Need to adjust for position as well
+        isSaveButtonEnabled = isNameValid && isFlightWeightValid;
+      });
+    }
+
+    // Function to save user input. The contoller automatically tracks/saves the variable from the textfield
+    void saveData() {
+
+      final String name = nameController.text;
+
+      // Convert flight weight text to integer
+      final int flightWeight = int.parse(flightWeightController.text);
+
+      //final String position = selectedPosition?.label ?? 'None';
+
+      // Debug for LogCat
+      print("Name: $name");
+      print("Flight Weight: $flightWeight");
+      //print("Position: $position");
+
+      // Show successful save popup
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Crew Member Saved!',
+              // Maybe change look
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.green,
+
+        ),
+
+      );
+
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -128,6 +186,7 @@ class AddCrewmember extends StatefulWidget {
                       Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: TextField(
+                            controller: nameController,
                             decoration: InputDecoration(
                               labelText: 'Enter last name',
                               labelStyle: const TextStyle(
@@ -169,6 +228,7 @@ class AddCrewmember extends StatefulWidget {
                       Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: TextField(
+                            controller: flightWeightController,
                             keyboardType: TextInputType.number,
                             // Only show numeric keyboard
                             inputFormatters: <TextInputFormatter>[
@@ -251,6 +311,18 @@ class AddCrewmember extends StatefulWidget {
                         ),
                       ),
                       const Spacer(flex: 6),
+
+                      // Save Button
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: ElevatedButton(
+                            onPressed: isSaveButtonEnabled ? () => saveData() : null,  // Button is only enabled if there is input
+                            style: style, // Main button theme
+                            child: const Text(
+                                'Save'
+                            )
+                        ),
+                      ),
                     ],
                   ),
                 ),
