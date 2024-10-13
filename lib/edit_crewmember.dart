@@ -7,7 +7,7 @@ import 'Data/crewmember.dart';
 
 class EditCrewmember extends StatefulWidget {
 
-  // THis page requires a crewmember to be passed to it - to edit it
+  // This page requires a crewmember to be passed to it - to edit it
   final CrewMember crewMember;
   final VoidCallback onUpdate;  // Callback for deletion to update previous page
 

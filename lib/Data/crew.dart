@@ -1,5 +1,6 @@
 import 'crewmember.dart';
 import 'gear.dart';
+import 'package:hive/hive.dart';
 
 class Crew {
   List<CrewMember> crewMembers = [];
@@ -32,12 +33,23 @@ class Crew {
   }
 
   void removeGear(Gear gearItem){
-    gear.remove(gearItem);
+    var gearBox = Hive.box<Gear>('gearBox');
+
+    final keyToRemove = gearBox.keys.firstWhere( // find which Hive key we want to remove
+          (key) => gearBox.get(key) == gearItem,
+      orElse: () => null,
+    );
+    if (keyToRemove != null) {
+      gearBox.delete(keyToRemove);
+    }
+    gear.remove(gearItem); // removed from in-memory as well
     updateTotalCrewWeight();
   }
 
   void addGear(Gear gearItem) {
+    var gearBox = Hive.box<Gear>('gearBox');
     gear.add(gearItem);
+    gearBox.add(gearItem); // added to in-memory as well
     updateTotalCrewWeight();
   }
 

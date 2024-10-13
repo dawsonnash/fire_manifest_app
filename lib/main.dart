@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'edit_crew.dart';
-import 'add_crewmember.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'Data/gear.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  // Register the Gear adapter generated in gear.g.dart
+  Hive.registerAdapter(GearAdapter());
+  // Open a Hive box to store Gear objects
+  await Hive.openBox<Gear>('gearBox');
   runApp(const MyApp());
 }
 

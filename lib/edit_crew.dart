@@ -5,7 +5,6 @@ import 'package:fire_app/crewmembers_view.dart';
 import 'package:fire_app/gear_view.dart';
 import 'package:flutter/material.dart';
 import 'add_gear.dart';
-import 'main.dart';
 
 
 class EditCrew extends StatelessWidget {

@@ -1,10 +1,7 @@
 import 'dart:ui';
 import 'package:fire_app/edit_crewmember.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'Data/crew.dart';
-import 'Data/crewmember.dart';
-import 'main.dart';
 
 class CrewmembersView extends StatefulWidget {
   const CrewmembersView({super.key});

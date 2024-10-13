@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'Data/crew.dart';
 import 'Data/gear.dart';
-
+import 'package:hive/hive.dart';
 
 class EditGear extends StatefulWidget {
 
@@ -31,9 +31,15 @@ class _EditGearState extends State<EditGear>{
   late String oldGearName;
   late int oldGearWeight;
 
+  // initialize HiveBox for Gear
+  late final Box<Gear> gearBox;
+
   @override
   void initState() {
     super.initState();
+
+    // Initialize the gearBox variable here
+    gearBox = Hive.box<Gear>('gearBox');
 
     // Initializing the controllers with the current gears data to be edited
     gearNameController = TextEditingController(text: widget.gear.name);
@@ -75,6 +81,20 @@ class _EditGearState extends State<EditGear>{
     // Update exisiting data
     widget.gear.name = gearNameController.text;
     widget.gear.weight = int.parse(gearWeightController.text);
+
+    // Find the key for this item, if it's not a new item, update it in Hive
+    final key = gearBox.keys.firstWhere(
+          (key) => gearBox.get(key) == widget.gear,
+      orElse: () => null,
+    );
+
+    if (key != null) {
+      // Update existing Hive item
+      gearBox.put(key, widget.gear);
+    } else {
+      // Add new item to Hive
+      gearBox.add(widget.gear);
+    }
 
     // Callback function, Update previous page UI with setState()
     widget.onUpdate();
@@ -308,7 +328,18 @@ class _EditGearState extends State<EditGear>{
                                             ),
                                             TextButton(
                                               onPressed: () {
-                                                // Remove the crew member
+
+                                                // Remove item from the Hive box
+                                                final keyToRemove = gearBox.keys.firstWhere(
+                                                      (key) => gearBox.get(key) == widget.gear,
+                                                  orElse: () => null,
+                                                );
+
+                                                if (keyToRemove != null) {
+                                                  gearBox.delete(keyToRemove);
+                                                }
+
+                                                // Remove the crew member from local memory
                                                 crew.removeGear(widget.gear);
 
                                                 widget.onUpdate();            // Callback function to update UI with new data
