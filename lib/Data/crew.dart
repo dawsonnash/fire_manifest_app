@@ -23,12 +23,23 @@ class Crew {
 
 
   void addCrewMember(CrewMember member) {
-    crewMembers.add(member);
+    var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
+    crewMembers.add(member); // add to in memory as well
+    crewmemberBox.add(member); // save to hive memory
     updateTotalCrewWeight();
   }
 
   void removeCrewMember(CrewMember member){
-    crewMembers.remove(member);
+    var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
+
+    final keyToRemove = crewmemberBox.keys.firstWhere( // find which Hive key we want to remove
+          (key) => crewmemberBox.get(key) == member,
+      orElse: () => null,
+    );
+    if (keyToRemove != null) {
+      crewmemberBox.delete(keyToRemove);
+    }
+    crewMembers.remove(member); // remove in-memory as well
     updateTotalCrewWeight();
   }
 
@@ -48,8 +59,8 @@ class Crew {
 
   void addGear(Gear gearItem) {
     var gearBox = Hive.box<Gear>('gearBox');
-    gear.add(gearItem);
-    gearBox.add(gearItem); // added to in-memory as well
+    gear.add(gearItem); // added to in-memory as well
+    gearBox.add(gearItem); // save to hive memory
     updateTotalCrewWeight();
   }
 

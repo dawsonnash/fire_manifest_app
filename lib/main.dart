@@ -4,14 +4,19 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'Data/gear.dart';
+import 'Data/crewmember.dart';
 
 void main() async {
+  // Set up for Hive that needs to run before starting app
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  // Register the Gear adapter generated in gear.g.dart
+  // Register the Gear adapters
   Hive.registerAdapter(GearAdapter());
-  // Open a Hive box to store Gear objects
+  Hive.registerAdapter(CrewMemberAdapter());
+  // Open a Hive boxes to store objects
   await Hive.openBox<Gear>('gearBox');
+  await Hive.openBox<CrewMember>('crewmemberBox');
+  // start app
   runApp(const MyApp());
 }
 

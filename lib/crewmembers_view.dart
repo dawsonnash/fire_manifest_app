@@ -1,7 +1,10 @@
 import 'dart:ui';
+import 'package:fire_app/Data/crewmember.dart';
 import 'package:fire_app/edit_crewmember.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'Data/crew.dart';
+
 
 class CrewmembersView extends StatefulWidget {
   const CrewmembersView({super.key});
@@ -12,6 +15,23 @@ class CrewmembersView extends StatefulWidget {
   State<CrewmembersView> createState() => _CrewmembersViewState();
 }
 class _CrewmembersViewState extends State<CrewmembersView>{
+
+  late final Box<CrewMember> crewmemberBox;
+  List<CrewMember> crewmemberList = [];
+  @override
+
+  void initState() {
+    super.initState();
+    // Open the Hive box and load the list of Gear items
+    crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
+    loadCrewMemberList();
+  }
+  // Function to load the list of Gear items from the Hive box
+  void loadCrewMemberList() {
+    setState(() {
+      crewmemberList = crewmemberBox.values.toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +60,10 @@ class _CrewmembersViewState extends State<CrewmembersView>{
           Padding(
           padding: const EdgeInsets.all(8.0),
           child: ListView.builder(
-            itemCount: crew.crewMembers.length,
+            itemCount: crewmemberList.length,
             itemBuilder: (context, index) {
 
-              final crewMember = crew.crewMembers[index];
+              final crewMember = crewmemberList[index];
 
               // Display crewmember data in a scrollable list
               return Card(
@@ -88,9 +108,8 @@ class _CrewmembersViewState extends State<CrewmembersView>{
                               MaterialPageRoute(
                                 builder: (context) => EditCrewmember(
                                     crewMember: crewMember,
-                                  onUpdate: () {
-                                    setState(() {});  // Refresh the list
-                                  },),
+                                  onUpdate: loadCrewMemberList, // refresh list on return
+                                ),
                               ),
                             );                          }
                         )
