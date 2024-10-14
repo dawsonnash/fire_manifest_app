@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'edit_crew.dart';
-import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'Data/gear.dart';
 import 'Data/crewmember.dart';
