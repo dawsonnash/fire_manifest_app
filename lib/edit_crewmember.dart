@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'Data/crew.dart';
 import 'Data/crewmember.dart';
-
+import 'package:hive/hive.dart';
 
 class EditCrewmember extends StatefulWidget {
 
-  // THis page requires a crewmember to be passed to it - to edit it
+  // This page requires a crewmember to be passed to it - to edit it
   final CrewMember crewMember;
   final VoidCallback onUpdate;  // Callback for deletion to update previous page
 
@@ -31,9 +31,15 @@ class _EditCrewmemberState extends State<EditCrewmember>{
   late String oldCrewMemberName;
   late int oldCrewMemberFlightWeight;
 
+  // initialize HiveBox for crewmember
+  late final Box<CrewMember> crewmemberBox;
+
   @override
   void initState() {
     super.initState();
+
+    // Initialize crewmemberBox variable here
+    crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
 
     // Initializing the controllers with the current crew member's data to be edited
     nameController = TextEditingController(text: widget.crewMember.name);
@@ -74,6 +80,19 @@ class _EditCrewmemberState extends State<EditCrewmember>{
     // Update exisiting data
     widget.crewMember.name = nameController.text;
     widget.crewMember.flightWeight = int.parse(flightWeightController.text);
+
+    // Find the key for this item, if it's not a new item, update it in Hive
+    final key = crewmemberBox.keys.firstWhere(
+          (key) => crewmemberBox.get(key) == widget.crewMember,
+      orElse: () => null,
+    );
+    if (key != null) {
+      // Update existing Hive item
+      crewmemberBox.put(key, widget.crewMember);
+    } else {
+      // Add new item to Hive
+      crewmemberBox.add(widget.crewMember);
+    }
 
     // Callback function, Update previous page UI with setState()
     widget.onUpdate();
@@ -307,10 +326,21 @@ class _EditCrewmemberState extends State<EditCrewmember>{
                                             ),
                                             TextButton(
                                             onPressed: () {
+
+                                              // Remove item from the Hive box
+                                              final keyToRemove = crewmemberBox.keys.firstWhere(
+                                                    (key) => crewmemberBox.get(key) == widget.crewMember,
+                                                orElse: () => null,
+                                              );
+
+                                              if (keyToRemove != null) {
+                                                crewmemberBox.delete(keyToRemove);
+                                              }
+
                                               // Remove the crew member
                                               crew.removeCrewMember(widget.crewMember);
 
-                                              widget.onUpdate();            // Callback function to update UI with new data
+                                              widget.onUpdate(); // Callback function to update UI with new data
 
                                               // Show deletion pop-up
                                               ScaffoldMessenger.of(context).showSnackBar(

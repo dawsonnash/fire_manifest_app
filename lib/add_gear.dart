@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'Data/crew.dart';
 import 'Data/gear.dart';
-import 'main.dart';
 
 // Tester data
 class AddGear extends StatefulWidget {
@@ -55,7 +54,7 @@ class _AddGearState extends State<AddGear>{
     // Convert flight weight text to integer
     final int gearWeight = int.parse(gearWeightController.text);
 
-    // Creating a new gear object. Dont have hazmat yet
+    // Creating a new gear object. Don't have hazmat yet
     Gear newGearItem= Gear(name: gearName, weight: gearWeight);
 
     // Add the new member to the global crew object

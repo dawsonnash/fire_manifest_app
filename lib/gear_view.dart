@@ -1,11 +1,10 @@
 import 'dart:ui';
-import 'package:fire_app/edit_crewmember.dart';
 import 'package:fire_app/edit_gear.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'Data/crew.dart';
 import 'Data/gear.dart';
-import 'main.dart';
+
 
 class GearView extends StatefulWidget {
   const GearView({super.key});
@@ -16,6 +15,25 @@ class GearView extends StatefulWidget {
   State<GearView> createState() => _GearViewState();
 }
 class _GearViewState extends State<GearView>{
+
+  late final Box<Gear> gearBox;
+  List<Gear> gearList = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Open the Hive box and load the list of Gear items
+    gearBox = Hive.box<Gear>('gearBox');
+    loadGearList();
+  }
+
+  // Function to load the list of Gear items from the Hive box
+  void loadGearList() {
+    setState(() {
+      gearList = gearBox.values.toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,10 +62,10 @@ class _GearViewState extends State<GearView>{
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ListView.builder(
-              itemCount: crew.gear.length,
+              itemCount: gearList.length,
               itemBuilder: (context, index) {
 
-                final gear = crew.gear[index];
+                final gear = gearList[index];
 
                 // Display gear data in a scrollable list
                 return Card(
@@ -92,9 +110,8 @@ class _GearViewState extends State<GearView>{
                                   MaterialPageRoute(
                                     builder: (context) => EditGear(
                                       gear: gear,
-                                      onUpdate: () {
-                                        setState(() {});  // Refresh the list
-                                      },),
+                                      onUpdate: loadGearList, // Refresh the list on return
+                                    ),
                                   ),
                                 );                          }
                           )
