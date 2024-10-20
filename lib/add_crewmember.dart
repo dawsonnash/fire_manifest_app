@@ -24,8 +24,6 @@ enum PositionLabel {
 class AddCrewmember extends StatefulWidget {
   const AddCrewmember({super.key});
 
-
-
   @override
   State<AddCrewmember> createState() => _AddCrewmemberState();
 }

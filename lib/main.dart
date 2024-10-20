@@ -1,3 +1,5 @@
+import 'package:fire_app/create_new_manifest.dart';
+import 'package:fire_app/trips_view.dart';
 import 'package:flutter/material.dart';
 import 'edit_crew.dart';
 import 'package:hive/hive.dart';
@@ -137,8 +139,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
                             onPressed: () {
-                              null;
-                            },
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const CreateNewManifest()),
+                              );
+                              },
                             style: style,
                             child: const Text(
                                 'Manifest'
@@ -149,7 +154,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
                             onPressed: () {
-                              null;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const TripsView()),
+                              );
                             },
                             style: style,
                             child: const Text(
