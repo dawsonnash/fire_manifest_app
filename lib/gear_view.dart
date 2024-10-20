@@ -61,67 +61,118 @@ class _GearViewState extends State<GearView>{
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ListView.builder(
-              itemCount: gearList.length,
-              itemBuilder: (context, index) {
+            child: Column(
+              children: [
+                Expanded(
+                child: ListView.builder(
+                  itemCount: gearList.length,
+                  itemBuilder: (context, index) {
 
-                final gear = gearList[index];
+                    final gear = gearList[index];
 
-                // Display gear data in a scrollable list
-                return Card(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      // Could change color here
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(9),
-                    ),
-                    child: ListTile(
-                      iconColor: Colors.black,
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    // Display gear data in a scrollable list
+                    return Card(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          // Could change color here
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(9),
+                        ),
+                        child: ListTile(
+                          iconColor: Colors.black,
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                gear.name,
-                                style: const TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold
-                                ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    gear.name,
+                                    style: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold
+                                    ),
+                                  ),
+                                  Text(
+                                    '${gear.weight} lbs',
+                                    style: const TextStyle(
+                                      fontSize:18,
+                                    ),
+                                  )
+                                ],
                               ),
-                              Text(
-                                '${gear.weight} lbs',
-                                style: const TextStyle(
-                                  fontSize:18,
-                                ),
+                              IconButton(
+                                  icon: const Icon(
+                                      Icons.edit,
+                                      color: Colors.black,
+                                      size: 32
+                                  ),
+                                  onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EditGear(
+                                          gear: gear,
+                                          onUpdate: loadGearList, // Refresh the list on return
+                                        ),
+                                      ),
+                                    );                          }
                               )
                             ],
                           ),
-                          IconButton(
-                              icon: const Icon(
-                                  Icons.edit,
-                                  color: Colors.black,
-                                  size: 32
-                              ),
-                              onPressed: (){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EditGear(
-                                      gear: gear,
-                                      onUpdate: loadGearList, // Refresh the list on return
-                                    ),
-                                  ),
-                                );                          }
-                          )
-                        ],
+                          leading: const Icon(Icons.work_outline_outlined),
+                        ),
                       ),
-                      leading: const Icon(Icons.work_outline_outlined),
+                    );
+                  },
+                ),
+              ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.deepOrangeAccent,
+                      border: Border.all(color: Colors.black, width: 2),
+                      borderRadius: BorderRadius.circular(4),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          spreadRadius: 1,
+                          blurRadius: 8,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    //alignment: Alignment.center,
+                    child: Row(
+                      children: [
+                        Text(
+                          'Delete all',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Spacer(),
+                        IconButton(
+                            icon: const Icon(
+                                Icons.delete,
+                                color: Colors.black,
+                                size: 32
+                            ),
+                            onPressed: (){
+                              crew.deleteAllGear();
+                              setState((){});
+                            }
+                        )
+                      ],
                     ),
                   ),
-                );
-              },
+                ),
+    ],
             ),
           ),
 

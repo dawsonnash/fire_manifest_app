@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'Data/crew.dart';
-import 'Data/crewmember.dart';
+import '../Data/crew.dart';
+import '../Data/crewmember.dart';
 import 'package:hive/hive.dart';
 
 class EditCrewmember extends StatefulWidget {

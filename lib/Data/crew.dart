@@ -27,6 +27,7 @@ class Crew {
     crewMembers.add(member); // add to in memory as well
     crewmemberBox.add(member); // save to hive memory
     updateTotalCrewWeight();
+    print('Updated Total Crew Weight: $totalCrewWeight');
   }
 
   void removeCrewMember(CrewMember member){
@@ -40,6 +41,16 @@ class Crew {
       crewmemberBox.delete(keyToRemove);
     }
     crewMembers.remove(member); // remove in-memory as well
+    updateTotalCrewWeight();
+    print('Updated Total Crew Weight: $totalCrewWeight');
+  }
+  void deleteAllCrewMembers() {
+    var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
+    // Clear the in-memory list
+    crewMembers.clear();
+    // Clear the Hive storage
+    crewmemberBox.clear();
+    // Update the total weight
     updateTotalCrewWeight();
   }
 
@@ -55,12 +66,24 @@ class Crew {
     }
     gear.remove(gearItem); // removed from in-memory as well
     updateTotalCrewWeight();
+    print('Updated Total Crew Weight: $totalCrewWeight');
   }
 
   void addGear(Gear gearItem) {
     var gearBox = Hive.box<Gear>('gearBox');
     gear.add(gearItem); // added to in-memory as well
     gearBox.add(gearItem); // save to hive memory
+    updateTotalCrewWeight();
+    print('Updated Total Crew Weight: $totalCrewWeight');
+  }
+
+  void deleteAllGear() {
+    var gearBox = Hive.box<Gear>('gearBox');
+    // Clear the in-memory list
+    gear.clear();
+    // Clear the Hive storage
+    gearBox.clear();
+    // Update the total weight
     updateTotalCrewWeight();
   }
 
@@ -69,6 +92,7 @@ class Crew {
     // Print out crewmebmers
     for (var member in crewMembers) {
       print('Name: ${member.name}, Flight Weight: ${member.flightWeight}');
+      print('Updated Total Crew Weight: $totalCrewWeight');
     }
 
     // Print out all gear
@@ -76,6 +100,24 @@ class Crew {
       print('Name: ${gearItems.name}, Flight Weight: ${gearItems.weight}');
     }
   }
+
+  // This function loads all data stored in the hive for 'Crew' into the local in-memory
+  // Seems to be an easier way to work with data for now.
+  void loadCrewDataFromHive() {
+    var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
+    var gearBox = Hive.box<Gear>('gearBox');
+
+    // Load crew members from Hive into the in-memory list
+    crew.crewMembers = crewmemberBox.values.toList();
+
+    // Load gear from Hive into the in-memory list
+    crew.gear = gearBox.values.toList();
+
+    // Update the total weight after loading the data
+    crew.updateTotalCrewWeight();
+    //print('Crew data loaded from Hive. Total weight: ${crew.totalCrewWeight}');
+  }
+
 }
 
 // Global Crew object. This is THE main crew object that comes inherit to the app

@@ -1,21 +1,31 @@
+import 'package:fire_app/create_new_manifest.dart';
+import 'package:fire_app/saved_trips.dart';
 import 'package:flutter/material.dart';
-import 'edit_crew.dart';
+import '../edit_crew.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'Data/gear.dart';
-import 'Data/crewmember.dart';
+import '../Data/gear.dart';
+import '../Data/crewmember.dart';
+import 'Data/crew.dart';
 
 void main() async {
+
   // Set up for Hive that needs to run before starting app
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+
   // Register the Gear adapters
   Hive.registerAdapter(GearAdapter());
   Hive.registerAdapter(CrewMemberAdapter());
+
   // Open a Hive boxes to store objects
   await Hive.openBox<Gear>('gearBox');
   await Hive.openBox<CrewMember>('crewmemberBox');
+
+  // Load data from Hive
+  crew.loadCrewDataFromHive();
+
   // start app
   runApp(const MyApp());
 }
@@ -137,8 +147,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
                             onPressed: () {
-                              null;
-                            },
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const CreateNewManifest()),
+                              );
+                              },
                             style: style,
                             child: const Text(
                                 'Manifest'
@@ -149,7 +162,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
                             onPressed: () {
-                              null;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const SavedTrips()),
+                              );
                             },
                             style: style,
                             child: const Text(
