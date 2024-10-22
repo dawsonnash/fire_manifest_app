@@ -2,30 +2,32 @@ import 'dart:ui';
 import 'package:fire_app/Data/trip.dart';
 import 'package:fire_app/single_trip_view.dart';
 import 'package:flutter/material.dart';
-//import 'package:hive/hive.dart';
+import 'package:hive/hive.dart';
 
-class SavedTrips extends StatefulWidget {
-  const SavedTrips({super.key});
+class SavedTripsView extends StatefulWidget {
+  const SavedTripsView({super.key});
 
   @override
-  State<SavedTrips> createState() => _SavedTripsState();
+  State<SavedTripsView> createState() => _SavedTripsState();
+
 }
-class _SavedTripsState extends State<SavedTrips>{
 
-  //hive: late final Box<Trip> tripBox;
-  //hive: List<Trip> tripList = [];
+class _SavedTripsState extends State<SavedTripsView>{
+
+  late final Box<Trip> tripBox;
+  List<Trip> tripList = [];
+
   @override
-
   void initState() {
     super.initState();
     // Open the Hive box and load the list of Gear items
-    //hive: tripBox = Hive.box<Trip>('tripBox');
-    //hive: loadTripList();
+    tripBox = Hive.box<Trip>('tripBox');
+    loadTripList();
   }
   // Function to load the list of Gear items from the Hive box
   void loadTripList() {
     setState(() {
-     //hive: tripList = tripBox.values.toList();
+     tripList = tripBox.values.toList();
     });
   }
 
@@ -57,11 +59,12 @@ class _SavedTripsState extends State<SavedTrips>{
             padding: const EdgeInsets.all(8.0),
             child: ListView.builder(
               //hive: itemCount: tripList.length,
-              itemCount: savedTrips.savedTrips.length,
+              itemCount: tripList.length,
+              // itemCount:savedTrips.savedTrips.length -- in memory
               itemBuilder: (context, index) {
 
-                // hive: final trip = tripList[index];
-                final trip = savedTrips.savedTrips[index];
+                final trip = tripList[index];
+                //final trip = savedTrips.savedTrips[index];
 
                 // Display trip data in a scrollable list
                 return Card(
@@ -113,7 +116,8 @@ class _SavedTripsState extends State<SavedTrips>{
                                   ),
                                 );
                                 // For deletion
-                                // savedTrips.removeTrip(trip);
+                                // savedTrips.removeTrip(trip); -- in memory
+                                //tripBox.removeTrip(trip);
                                 //setState(() {});
                               }
                           )

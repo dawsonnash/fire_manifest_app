@@ -1,11 +1,19 @@
+import 'package:hive/hive.dart';
+
 import 'load.dart';
 
-class Trip {
+part 'trip.g.dart';
 
+@HiveType(typeId: 3)
+class Trip extends HiveObject{
+  @HiveField(0)
   String tripName;
+  @HiveField(1)
   int allowable;
 
+  @HiveField(2)
   List<Load> loads = [];
+
 
   Trip({required this.tripName, required this.allowable});
 
@@ -43,21 +51,21 @@ class SavedTrips {
 
 
   void addTrip(Trip newTrip) {
-    // var tripBox = Hive.box<Trip>('tripBox');
+    var tripBox = Hive.box<Trip>('tripBox');
     savedTrips.add(newTrip); // add to in memory as well
-    //tripBox.add(newTrip); // save to hive memory
+    tripBox.add(newTrip); // save to hive memory
   }
 
   void removeTrip(Trip trip){
-    // var tripBox = Hive.box<Trip>('tripBox');
+    var tripBox = Hive.box<Trip>('tripBox');
 
-    // final keyToRemove = tripBox.keys.firstWhere( // find which Hive key we want to remove
-    //       (key) => tripBox.get(key) == member,
-    //   orElse: () => null,
-    // );
-    // if (keyToRemove != null) {
-    //   tripBox.delete(keyToRemove);
-    // }
+    final keyToRemove = tripBox.keys.firstWhere( // find which Hive key we want to remove
+          (key) => tripBox.get(key) == trip,
+      orElse: () => null,
+    );
+    if (keyToRemove != null) {
+      tripBox.delete(keyToRemove);
+    }
     savedTrips.remove(trip); // remove in-memory as well
   }
 

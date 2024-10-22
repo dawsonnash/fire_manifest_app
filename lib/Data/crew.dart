@@ -23,8 +23,8 @@ class Crew {
 
 
   void addCrewMember(CrewMember member) {
-    var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
-    crewMembers.add(member); // add to in memory as well
+    var crewmemberBox = Hive.box<CrewMember>('crewmemberBox'); // assign hive box to variable we can use
+    crewMembers.add(member); // add crewmember in memory as well
     crewmemberBox.add(member); // save to hive memory
     updateTotalCrewWeight();
     print('Updated Total Crew Weight: $totalCrewWeight');
@@ -32,8 +32,7 @@ class Crew {
 
   void removeCrewMember(CrewMember member){
     var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
-
-    final keyToRemove = crewmemberBox.keys.firstWhere( // find which Hive key we want to remove
+    final keyToRemove = crewmemberBox.keys.firstWhere( // find hive key of entry we are removing
           (key) => crewmemberBox.get(key) == member,
       orElse: () => null,
     );
@@ -57,7 +56,7 @@ class Crew {
   void removeGear(Gear gearItem){
     var gearBox = Hive.box<Gear>('gearBox');
 
-    final keyToRemove = gearBox.keys.firstWhere( // find which Hive key we want to remove
+    final keyToRemove = gearBox.keys.firstWhere( // find hive key of entry we are removing
           (key) => gearBox.get(key) == gearItem,
       orElse: () => null,
     );
@@ -119,6 +118,23 @@ class Crew {
   }
 
 }
+
+// Testing purposes:
+  void printCrewDetailsFromHive() {
+    var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
+    var gearBox = Hive.box<Gear>('gearBox');
+    print('tests with hive boxes:');
+    var crewmemberList = crewmemberBox.values.toList();
+    var gearList = gearBox.values.toList();
+
+    for (var member in crewmemberList) {
+      print('Name: ${member.name}, Flight Weight: ${member.flightWeight}');
+    }
+
+    for (var gearItems in gearList) {
+      print('Name: ${gearItems.name}, Flight Weight: ${gearItems.weight}');
+    }
+  }
 
 // Global Crew object. This is THE main crew object that comes inherit to the app
 final Crew crew = Crew();

@@ -2,12 +2,12 @@ import 'package:fire_app/create_new_manifest.dart';
 import 'package:fire_app/saved_trips.dart';
 import 'package:flutter/material.dart';
 import '../edit_crew.dart';
-import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../Data/gear.dart';
 import '../Data/crewmember.dart';
 import 'Data/crew.dart';
+import 'Data/load.dart';
+import 'Data/trip.dart';
 
 void main() async {
 
@@ -18,10 +18,14 @@ void main() async {
   // Register the Gear adapters
   Hive.registerAdapter(GearAdapter());
   Hive.registerAdapter(CrewMemberAdapter());
+  Hive.registerAdapter(LoadAdapter());
+  Hive.registerAdapter(TripAdapter());
 
   // Open a Hive boxes to store objects
   await Hive.openBox<Gear>('gearBox');
   await Hive.openBox<CrewMember>('crewmemberBox');
+  await Hive.openBox<Load>('loadBox');
+  await Hive.openBox<Trip>('tripBox');
 
   // Load data from Hive
   crew.loadCrewDataFromHive();
@@ -164,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const SavedTrips()),
+                                MaterialPageRoute(builder: (context) => const SavedTripsView()),
                               );
                             },
                             style: style,
