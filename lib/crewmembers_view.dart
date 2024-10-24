@@ -91,11 +91,22 @@ class _CrewmembersViewState extends State<CrewmembersView>{
                                   fontWeight: FontWeight.bold
                               ),
                                 ),
-                                Text(
-                                  '${crewMember.flightWeight} lbs',
-                                  style: const TextStyle(
-                                    fontSize:18,
+                                Row(
+                                  children: [
+                                    Text(
+                                    '${crewMember.flightWeight} lbs',
+                                    style: const TextStyle(
+                                      fontSize:18,
+                                    ),
                                   ),
+                                    Spacer(),
+                                    Text(
+                                      'Position: ${positionMap[crewMember.position] ?? 'Unknown Position'}',
+                                      style: const TextStyle(
+                                        fontSize:18,
+                                      ),
+                                    ),
+                                  ],
                                 )
                               ],
                             ),

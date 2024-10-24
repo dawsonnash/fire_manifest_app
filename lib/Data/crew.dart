@@ -111,6 +111,7 @@ class Crew {
 
     // Load gear from Hive into the in-memory list
     crew.gear = gearBox.values.toList();
+    // Maybe need to load Trip data from Hive??
 
     // Update the total weight after loading the data
     crew.updateTotalCrewWeight();

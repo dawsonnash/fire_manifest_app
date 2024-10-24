@@ -77,6 +77,14 @@ class SavedTrips {
       print('Name: ${trip.tripName}, Allowable: ${trip.allowable}');
     }
   }
+
+  void deleteAllTrips() {
+    var tripBox = Hive.box<Trip>('tripBox');
+    // Clear the in-memory list
+    savedTrips.clear();
+    // Clear the Hive storage
+    tripBox.clear();
+  }
 }
 
 

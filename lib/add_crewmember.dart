@@ -4,22 +4,7 @@ import 'package:flutter/services.dart';
 import 'Data/crew.dart';
 import 'Data/crewmember.dart';
 
-// Tester data
-enum PositionLabel {
-  none('None'),
-  crewboss('Crew Boss'),
-  assistantCrewBoss('Assistant Crew Boss'),
-  dig('Dig'),
-  medic('Medic'),
-  foreman('Foreman'),
-  sawteam1('Saw Team 1'),
-  sawteam2('Saw Team 2'),
-  sawteam3('Saw Team 3'),
-  sawteam4('Saw Team 4');
 
-  const PositionLabel(this.label);
-  final String label;
-}
 
 class AddCrewmember extends StatefulWidget {
   const AddCrewmember({super.key});
@@ -33,7 +18,7 @@ class AddCrewmember extends StatefulWidget {
     final TextEditingController nameController = TextEditingController();
     final TextEditingController flightWeightController = TextEditingController();
     bool isSaveButtonEnabled = false; // Controls whether saving button is showing
-    PositionLabel? selectedPosition = PositionLabel.none;
+    //PositionLabel? selectedPosition = PositionLabel.none;
 
     @override
   void initState() {
@@ -73,7 +58,7 @@ class AddCrewmember extends StatefulWidget {
       //final String position = selectedPosition?.label ?? 'None';
 
       // Creating a new CrewMember object. Dont have positioin yet
-      CrewMember newCrewMember = CrewMember(name: name, flightWeight: flightWeight);
+      CrewMember newCrewMember = CrewMember(name: name, flightWeight: flightWeight, position: 0);
 
       // Add the new crewmember to the global crew object
       crew.addCrewMember(newCrewMember);
@@ -101,8 +86,9 @@ class AddCrewmember extends StatefulWidget {
       // Debug for LogCat
       print("Name: $name");
       print("Flight Weight: $flightWeight");
+      print('Position: ${positionMap[newCrewMember.position] ?? 'Unknown Position'}');
       print("--------------------------");
-      crew.printCrewDetails();
+      //crew.printCrewDetails();
     }
 
   @override
