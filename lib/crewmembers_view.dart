@@ -82,23 +82,24 @@ class _CrewmembersViewState extends State<CrewmembersView>{
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                              crewMember.name,
-                              style: const TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold
-                              ),
-                                ),
-                                Text(
-                                  '${crewMember.flightWeight} lbs',
-                                  style: const TextStyle(
-                                    fontSize:18,
-                                  ),
-                                )
-                              ],
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                            '${crewMember.name}, ${crewMember.flightWeight} lbs',
+                            style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold
                             ),
+                              ),
+                              Text(
+                                crewMember.getPositionTitle(crewMember.position),
+
+                                style: const TextStyle(
+                                  fontSize:18,
+                                ),
+                              )
+                            ],
+                                                          ),
                             IconButton(
                               icon: const Icon(
                                   Icons.edit,

@@ -25,11 +25,13 @@ class _EditCrewmemberState extends State<EditCrewmember>{
   // Variables to store user input
   late TextEditingController nameController;
   late TextEditingController flightWeightController;
+  int? selectedPosition;
   bool isSaveButtonEnabled = false; // Controls whether saving button is showing
 
   // Store old CrewMember info for ensuring user only can save if they change data
   late String oldCrewMemberName;
   late int oldCrewMemberFlightWeight;
+  late int oldCrewMemberPosition;
 
   // initialize HiveBox for crewmember
   late final Box<CrewMember> crewmemberBox;
@@ -44,10 +46,12 @@ class _EditCrewmemberState extends State<EditCrewmember>{
     // Initializing the controllers with the current crew member's data to be edited
     nameController = TextEditingController(text: widget.crewMember.name);
     flightWeightController = TextEditingController(text: widget.crewMember.flightWeight.toString());
+    selectedPosition = widget.crewMember.position; // Set initial position
 
     // Store original crewmember data
     oldCrewMemberName = widget.crewMember.name;
     oldCrewMemberFlightWeight = widget.crewMember.flightWeight;
+    oldCrewMemberPosition = widget.crewMember.position;
 
     // Listeners to the TextControllers
     nameController.addListener(_checkInput);
@@ -66,11 +70,12 @@ class _EditCrewmemberState extends State<EditCrewmember>{
     final isFlightWeightValid = flightWeightController.text.isNotEmpty;
     final isNameChanged = nameController.text != oldCrewMemberName;
     final isFlightWeightChanged = flightWeightController.text != oldCrewMemberFlightWeight.toString();
+    final isPositionChanged = selectedPosition != oldCrewMemberPosition;
 
     setState(() {
       // Need to adjust for position as well
       // Only enables saving if name is changed and is not empty
-      isSaveButtonEnabled = (isNameValid && isFlightWeightValid) && (isNameChanged || isFlightWeightChanged);
+      isSaveButtonEnabled = (isNameValid && isFlightWeightValid) && (isNameChanged || isFlightWeightChanged || isPositionChanged);
     });
   }
 
@@ -80,6 +85,7 @@ class _EditCrewmemberState extends State<EditCrewmember>{
     // Update exisiting data
     widget.crewMember.name = nameController.text;
     widget.crewMember.flightWeight = int.parse(flightWeightController.text);
+    widget.crewMember.position = selectedPosition!; // Update position
 
     // Find the key for this item, if it's not a new item, update it in Hive
     final key = crewmemberBox.keys.firstWhere(
@@ -265,6 +271,46 @@ class _EditCrewmemberState extends State<EditCrewmember>{
                             ),
                           )
 
+                      ),
+
+                      // Enter Position(s)
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(12.0),
+                            border: Border.all(color: Colors.white, width: 2.0),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<int>(
+                              value: selectedPosition,
+                              dropdownColor: Colors.black,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontStyle: FontStyle.italic,
+                              ),
+                              iconEnabledColor: Colors.white,
+                              items: positionMap.entries.map((entry) {
+                                return DropdownMenuItem<int>(
+                                  value: entry.key,
+                                  child: Text(entry.value),
+                                );
+                              }).toList(),
+                              onChanged: (int? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    selectedPosition = newValue;
+                                    _checkInput();
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ),
                       ),
 
                       // Enter Position(s)
