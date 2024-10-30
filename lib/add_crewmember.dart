@@ -4,23 +4,6 @@ import 'package:flutter/services.dart';
 import 'Data/crew.dart';
 import 'Data/crewmember.dart';
 
-// Tester data
-enum PositionLabel {
-  none('None'),
-  crewboss('Crew Boss'),
-  assistantCrewBoss('Assistant Crew Boss'),
-  dig('Dig'),
-  medic('Medic'),
-  foreman('Foreman'),
-  sawteam1('Saw Team 1'),
-  sawteam2('Saw Team 2'),
-  sawteam3('Saw Team 3'),
-  sawteam4('Saw Team 4');
-
-  const PositionLabel(this.label);
-  final String label;
-}
-
 class AddCrewmember extends StatefulWidget {
   const AddCrewmember({super.key});
 
@@ -33,7 +16,7 @@ class AddCrewmember extends StatefulWidget {
     final TextEditingController nameController = TextEditingController();
     final TextEditingController flightWeightController = TextEditingController();
     bool isSaveButtonEnabled = false; // Controls whether saving button is showing
-    PositionLabel? selectedPosition = PositionLabel.none;
+    int? selectedPosition;
 
     @override
   void initState() {
@@ -54,10 +37,11 @@ class AddCrewmember extends StatefulWidget {
     void _checkInput() {
       final isNameValid = nameController.text.isNotEmpty;
       final isFlightWeightValid = flightWeightController.text.isNotEmpty;
+      final isPositionSelected = selectedPosition != null;
 
       setState(() {
         // Need to adjust for position as well
-        isSaveButtonEnabled = isNameValid && isFlightWeightValid;
+        isSaveButtonEnabled = isNameValid && isFlightWeightValid && isPositionSelected;
       });
     }
 
@@ -73,7 +57,7 @@ class AddCrewmember extends StatefulWidget {
       //final String position = selectedPosition?.label ?? 'None';
 
       // Creating a new CrewMember object. Dont have positioin yet
-      CrewMember newCrewMember = CrewMember(name: name, flightWeight: flightWeight);
+      CrewMember newCrewMember = CrewMember(name: name, flightWeight: flightWeight, position: selectedPosition ?? 23);
 
       // Add the new crewmember to the global crew object
       crew.addCrewMember(newCrewMember);
@@ -97,6 +81,7 @@ class AddCrewmember extends StatefulWidget {
       // Clear the text fields (reset them to empty), so you can add more ppl
       nameController.text = '';
       flightWeightController.text = '';
+      selectedPosition = null;
 
       // Debug for LogCat
       print("Name: $name");
@@ -288,24 +273,53 @@ class AddCrewmember extends StatefulWidget {
                       ),
 
                       // Enter Position(s)
-                      // Padding(
-                      //   padding: const EdgeInsets.all(16.0),
-                      //   child: DropdownButton<PositionLabel>(
-                      //     value: selectedPosition,
-                      //     onChanged: (PositionLabel? position) {
-                      //       setState(() {
-                      //         selectedPosition = position;
-                      //       });
-                      //     },
-                      //     items: PositionLabel.values.map<DropdownMenuItem<PositionLabel>>((PositionLabel position) {
-                      //       return DropdownMenuItem<PositionLabel>(
-                      //         value: position,
-                      //         child: Text(position.label),
-                      //       );
-                      //     }).toList(),
-                      //   ),
-                      //
-                      // ),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(12.0),
+                            border: Border.all(color: Colors.white, width: 2.0),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<int>(
+                              value: selectedPosition,
+                              hint: const Text(
+                                'Choose position',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                              dropdownColor: Colors.black,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontStyle: FontStyle.italic,
+                              ),
+                              iconEnabledColor: Colors.white,
+                              items: positionMap.entries.map((entry) {
+                                return DropdownMenuItem<int>(
+                                  value: entry.key,
+                                  child: Text(entry.value),
+                                );
+                              }).toList(),
+                              onChanged: (int? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    selectedPosition = newValue;
+                                    _checkInput();
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+
                       const Spacer(flex: 6),
 
                       // Save Button

@@ -19,17 +19,20 @@ class CrewMemberAdapter extends TypeAdapter<CrewMember> {
     return CrewMember(
       name: fields[0] as String,
       flightWeight: fields[1] as int,
+      position: fields[2] as int? ?? 0,
     );
   }
 
   @override
   void write(BinaryWriter writer, CrewMember obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
-      ..write(obj.flightWeight);
+      ..write(obj.flightWeight)
+      ..writeByte(2)
+      ..write(obj.position);
   }
 
   @override
