@@ -112,7 +112,7 @@ class _CrewmembersViewState extends State<CrewmembersView>{
                                   MaterialPageRoute(
                                     builder: (context) => EditCrewmember(
                                         crewMember: crewMember,
-                                      onUpdate: loadCrewMemberList, // refresh list on return
+                                        onUpdate: loadCrewMemberList, // refresh list on return
                                     ),
                                   ),
                                 );                          }

@@ -112,6 +112,7 @@ class _SavedTripsState extends State<SavedTripsView>{
                                   MaterialPageRoute(
                                     builder: (context) => SingleTripView(
                                       trip: trip,
+                                      onUpdate: loadTripList,
                                     ),
                                   ),
                                 );

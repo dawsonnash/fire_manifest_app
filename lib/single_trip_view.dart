@@ -9,12 +9,12 @@ class SingleTripView extends StatefulWidget {
 
   // This page requires a trip to be passed to it
   final Trip trip;
-  //final VoidCallback onUpdate;  // Callback for deletion to update previous page
+  final VoidCallback onUpdate;  // Callback for deletion to update previous page
 
   const SingleTripView({
     super.key,
     required this.trip,
-    //required this.onUpdate,
+    required this.onUpdate,
   });
 
   @override
@@ -167,9 +167,70 @@ class _SingleTripViewState extends State<SingleTripView>{
                               size: 32
                           ),
                           onPressed: (){
-                            savedTrips.removeTrip(widget.trip);
-                            // TODO: update previous page here
-                            // TODO: Add confirmation so people dont accidentally delete trips
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text(
+                                      'Delete ${widget.trip.tripName}?',
+                                      style: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                      )
+                                  ),
+                                  content: Text('This trip (${widget.trip.tripName}) will be erased!',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                      )),
+                                  actions: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();  // Dismiss the dialog
+                                          },
+                                          child: const Text('Cancel',
+                                              style: TextStyle(
+                                                fontSize: 22,
+                                              )),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            // Remove the crew member
+                                            savedTrips.removeTrip(widget.trip);
+                                            widget.onUpdate(); // Callback function to update UI with new data
+
+                                            // Show deletion pop-up
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text('${widget.trip.tripName} Deleted!',
+                                                  // Maybe change look
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 32,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                duration: Duration(seconds: 2),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+
+                                            Navigator.of(context).pop();  // Dismiss the dialog
+                                            Navigator.of(context).pop();  // Return to previous screen
+                                          },
+                                          child: const Text('OK',
+                                              style: TextStyle(
+                                                fontSize: 22,
+                                              )),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           },
                         )
                       ],
