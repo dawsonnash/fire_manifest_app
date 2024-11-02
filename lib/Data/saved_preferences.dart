@@ -2,18 +2,18 @@ import 'crewmember.dart';
 import 'gear.dart';
 
 class SavedPreferences {
-  List<PreferenceLoadout> preferenceLoadouts = [];
+  List<TripPreference> tripPreferences = [];
 
-  void addPreferenceLoadout(PreferenceLoadout newPreferenceLoadout) {
-    // var preferenceLoadoutBox = Hive.box<PreferenceLoadout>('preferenceLoadoutBox');
-    preferenceLoadouts.add(newPreferenceLoadout); // add crewmember in memory as well
+  void addTripPreference(TripPreference newTripPreference) {
+    // var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+    tripPreferences.add(newTripPreference); // add crewmember in memory as well
     //preferenceLoadoutBox.add(newPreferenceLoadout); // save to hive memory
   }
 
-  void deleteAllPreferenceLoadouts() {
+  void deleteAllTripPreferences() {
     // var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
     // Clear the in-memory list
-    savedPreferences.preferenceLoadouts.clear();
+    savedPreferences.tripPreferences.clear();
     // Clear the Hive storage
     //crewmemberBox.clear();
   }
@@ -21,18 +21,18 @@ class SavedPreferences {
   // For testing data. Called in main
   void testDataPreferenceLoadout(){
 
-    PreferenceLoadout newPreference1 = PreferenceLoadout(loadoutName: 'Going to a Fire');
-    PreferenceLoadout newPreference2 = PreferenceLoadout(loadoutName: 'Leaving a Fire');
+    TripPreference newPreference1 = TripPreference(tripPreferenceName: 'Going to a Fire');
+    TripPreference newPreference2 = TripPreference(tripPreferenceName: 'Leaving a Fire');
 
-    savedPreferences.addPreferenceLoadout(newPreference1);
-    savedPreferences.addPreferenceLoadout(newPreference2);
+    savedPreferences.addTripPreference(newPreference1);
+    savedPreferences.addTripPreference(newPreference2);
 
   }
 }
 
-class PreferenceLoadout {
+class TripPreference {
 
-  String loadoutName;                               // Ex. 'Going to a Fire'
+  String tripPreferenceName;                               // Ex. 'Going to a Fire'
   List<CrewMember> loadoutCrewMembers = [];				  // This makes sure users cannot use the same person more than once in there preferences
   List<Gear> loadoutGear = [];							        // This makes sure users cannot use the same item more than once in there preferences
   List<PositionalPreference> positionalPreferences = [];
@@ -43,7 +43,7 @@ class PreferenceLoadout {
   // Maybe multi-object array
   // UI will check to see if priority is taken.
 
-  PreferenceLoadout({required this.loadoutName});
+  TripPreference({required this.tripPreferenceName});
 
 }
 

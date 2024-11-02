@@ -7,16 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 
-class LoadoutView extends StatefulWidget {
-  const LoadoutView({super.key});
+class TripPreferences extends StatefulWidget {
+  const TripPreferences({super.key});
 
   @override
-  State<LoadoutView> createState() => _LoadoutViewState();
+  State<TripPreferences> createState() => _TripPreferencesState();
 }
-class _LoadoutViewState extends State<LoadoutView>{
+class _TripPreferencesState extends State<TripPreferences>{
 
   // late final Box<CrewMember> crewmemberBox;
-  List<PreferenceLoadout> preferenceLoadoutList = [];
+  List<TripPreference> tripPreferenceList = [];
 
   @override
 
@@ -35,7 +35,7 @@ class _LoadoutViewState extends State<LoadoutView>{
   void loadPreferenceDataList() {
     setState(() {
       // crewmemberList = crewmemberBox.values.toList();
-      preferenceLoadoutList = savedPreferences.preferenceLoadouts.toList();
+      tripPreferenceList = savedPreferences.tripPreferences.toList();
 
     });
   }
@@ -60,13 +60,13 @@ class _LoadoutViewState extends State<LoadoutView>{
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12)),
         // Maybe change? Dynamic button size based on screen size
-        fixedSize: Size(MediaQuery.of(context).size.width / 1.6, MediaQuery.of(context).size.height / 11)
+        fixedSize: Size(MediaQuery.of(context).size.width / 1.6, MediaQuery.of(context).size.height / 10)
     );
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Preference Loadouts',
+          'Trip Preferences',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.deepOrangeAccent,
@@ -91,12 +91,12 @@ class _LoadoutViewState extends State<LoadoutView>{
                 Expanded(
                   child:
                   ListView.builder(
-                    itemCount: preferenceLoadoutList.length,
+                    itemCount: tripPreferenceList.length,
                     itemBuilder: (context, index) {
 
-                      final preferenceLoadout = preferenceLoadoutList[index];
+                      final tripPreference = tripPreferenceList[index];
 
-                      // Display PrefLoadout data in a scrollable list
+                      // Display TripPreference data in a scrollable list
                       return Card(
                         child: Container(
                           decoration: BoxDecoration(
@@ -110,7 +110,7 @@ class _LoadoutViewState extends State<LoadoutView>{
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  preferenceLoadout.loadoutName,
+                                  tripPreference.tripPreferenceName,
                                   style: const TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold
@@ -166,9 +166,13 @@ class _LoadoutViewState extends State<LoadoutView>{
                               size: 32
                           ),
 
-                          const Text(
-                            ' Add Preference'
-                        ),
+                          Flexible( // Allows text to be wrapped
+                            child: Text(
+                              'Create Trip Preference',
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                            ),
+                          ),
                       ],
                       ),
                   ),
@@ -211,7 +215,7 @@ class _LoadoutViewState extends State<LoadoutView>{
                                 size: 32
                             ),
                             onPressed: (){
-                              savedPreferences.deleteAllPreferenceLoadouts();
+                              savedPreferences.deleteAllTripPreferences();
                               setState((){});
                             }
                         )

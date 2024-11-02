@@ -4,7 +4,7 @@ import 'package:fire_app/add_crewmember.dart';
 import 'package:fire_app/add_load_preference.dart';
 import 'package:fire_app/crewmembers_view.dart';
 import 'package:fire_app/gear_view.dart';
-import 'package:fire_app/loadout_view.dart';
+import 'package:fire_app/trip_preferences_view.dart';
 import 'add_gear.dart';
 
 // This layout needs work to have dynamically adjusted UI. Needs user-testing
@@ -193,7 +193,7 @@ class EditCrew extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const LoadoutView()),
+                          MaterialPageRoute(builder: (context) => const TripPreferences()),
                         );
                       },
                       style: buttonStyle, // Same style as other buttons
