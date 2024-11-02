@@ -18,8 +18,21 @@ class SavedPreferences {
     //crewmemberBox.clear();
   }
 
-  // For testing data. Called in main
-  void testDataPreferenceLoadout(){
+  void addPostionalPreference(TripPreference tripPreference, PositionalPreference newPreference) {
+    // var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+    tripPreference.positionalPreferences.add(newPreference); // add crewmember in memory as well
+    //preferenceLoadoutBox.add(newPreferenceLoadout); // save to hive memory
+  }
+
+  void addGearPreference(TripPreference tripPreference, GearPreference newPreference) {
+    // var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+    tripPreference.gearPreferences.add(newPreference); // add crewmember in memory as well
+    //preferenceLoadoutBox.add(newPreferenceLoadout); // save to hive memory
+  }
+
+
+
+  void testDataTripPreference(){
 
     TripPreference newPreference1 = TripPreference(tripPreferenceName: 'Going to a Fire');
     TripPreference newPreference2 = TripPreference(tripPreferenceName: 'Leaving a Fire');
@@ -28,6 +41,32 @@ class SavedPreferences {
     savedPreferences.addTripPreference(newPreference2);
 
   }
+
+  // Fake Test data! bruh
+  // void testDataLoadPreference(TripPreference tripPreference){
+  //
+  //   // Populating Postiional Preferences
+  //   PositionalPreference newPreference1 = PositionalPreference(priority: 1, loadPreference: 1 );
+  //   CrewMember crewMember1 = CrewMember(name: "John Cena", flightWeight: 330, position: 0);
+  //   newPreference1.crewMembers.add(crewMember1);
+  //   addPostionalPreference(tripPreference, newPreference1);
+  //
+  //   // Create the GearPreference with priority and loadPreference values
+  //   GearPreference newGearPreference = GearPreference(priority: 2, loadPreference: 0);
+  //   //Gear gearItem1 = Gear(name: "Boxing Gloves", weight: 15);
+  //   Gear gearItem2 = Gear(name: "C-4", weight: 60);
+  //
+  //   // Add Gear items to the GearPreference's gear list
+  //   //newGearPreference.gear.add(gearItem1);
+  //   newGearPreference.gear.add(gearItem2);
+  //
+  //   // Update isMultipleItems based on the number of items in the gear list
+  //   //newGearPreference.isMultipleItems = newGearPreference.gear.length > 1 ? 1 : null;
+  //
+  //   // Now add the GearPreference to tripPreference, assuming this is your desired action
+  //   addGearPreference(tripPreference, newGearPreference);
+  //
+  // }
 }
 
 class TripPreference {
@@ -54,7 +93,7 @@ class PositionalPreference {
   int loadPreference;										        // First, Last, Balanced => 0, 1, 2
   // bool isActive;											        // Enables/Disables preference
 
-  PositionalPreference({required this.priority, required this.loadPreference});
+  PositionalPreference({required this.priority, required this.loadPreference, required this.crewMembers});
 
   // If  there is only 1 crewmember, 'Balanced' load option is disabled
   // implement in ui?

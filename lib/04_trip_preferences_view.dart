@@ -1,8 +1,9 @@
 import 'dart:ui';
+import 'package:fire_app/04_add_trip_preference.dart';
 import 'package:fire_app/Data/crewmember.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
-import 'package:fire_app/add_load_preference.dart';
-import 'package:fire_app/edit_crewmember.dart';
+import 'package:fire_app/04_add_load_preference.dart';
+import 'package:fire_app/02_edit_crewmember.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
@@ -24,15 +25,15 @@ class _TripPreferencesState extends State<TripPreferences>{
     super.initState();
     // Open the Hive box and load the list of Gear items
     // crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
-    loadPreferenceDataList();
+    tripPreferenceDataList();
 
     // Data population for testing
-    savedPreferences.testDataPreferenceLoadout();
+    savedPreferences.testDataTripPreference();
 
 
   }
   // Function to load the list of Gear items from the Hive box
-  void loadPreferenceDataList() {
+  void tripPreferenceDataList() {
     setState(() {
       // crewmemberList = crewmemberBox.values.toList();
       tripPreferenceList = savedPreferences.tripPreferences.toList();
@@ -154,7 +155,7 @@ class _TripPreferencesState extends State<TripPreferences>{
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const AddLoadPreference()),
+                          MaterialPageRoute(builder: (context) => const AddTripPreference()),
                         );
                       },
                       style: style,
@@ -168,7 +169,7 @@ class _TripPreferencesState extends State<TripPreferences>{
 
                           Flexible( // Allows text to be wrapped
                             child: Text(
-                              'Create Trip Preference',
+                              'Trip Preference',
                               textAlign: TextAlign.center,
                               softWrap: true,
                             ),
