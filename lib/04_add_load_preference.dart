@@ -7,7 +7,14 @@ import 'Data/crewmember.dart';
 import 'package:flutter/material.dart';
 
 class AddLoadPreference extends StatefulWidget {
-  const AddLoadPreference({super.key});
+  // This page requires a crewmember to be passed to it - to edit it
+  final TripPreference tripPreference;
+  final VoidCallback onUpdate;  // Callback for deletion to update previous page
+
+  const AddLoadPreference({
+    super.key,
+    required this.tripPreference,
+    required this.onUpdate});
 
   @override
   State<AddLoadPreference> createState() => _AddLoadPreferenceState();
@@ -18,12 +25,9 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
   late final TabController _tabController;
 
   // Variables to store user input
-  // Priority decided as drag & drop
+  // Priority decided as drag & drop in UI
   int? selectedLoadPreference;
-  // CrewMember controller? Or this
-  //List<CrewMember>? selectedCrewMember = [];
-  CrewMember? selectedCrewMember;
-
+  //CrewMember? selectedCrewMember;
   List<CrewMember> selectedCrewMembers = [];
 
   bool isSaveButtonEnabled = false; // Controls whether saving button is showing
@@ -94,8 +98,41 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
   void _checkInput() {
     setState(() {
-      isSaveButtonEnabled = selectedCrewMembers.isNotEmpty;
+      isSaveButtonEnabled = selectedCrewMembers.isNotEmpty && selectedLoadPreference != null;
     });
+  }
+
+  void _saveLoadPreference(TripPreference newTripPreference) {
+    // Implement the save logic here, using selectedCrewMembers
+
+    final newPositionalPreference = PositionalPreference(
+      priority: 1,  // Set the priority as needed
+      loadPreference: selectedLoadPreference!,
+      crewMembers: selectedCrewMembers
+    );
+
+    // Add this new preference to the TripPreference object
+    newTripPreference.positionalPreferences.add(newPositionalPreference);
+
+    // Callback function, Update previous page UI with setState()
+    widget.onUpdate();
+
+    // Show successful save popup
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Preference saved!',
+          // Maybe change look
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.green,
+      ),
+    );
+    Navigator.of(context).pop();  // Return to previous screen
   }
 
   @override
@@ -195,7 +232,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
           children: <Widget>[
 
             // Positional Preference
-// Positional Preference
             Center(
               child: Container(
                 width: double.infinity,
@@ -271,7 +307,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                               if (newValue != null) {
                                 setState(() {
                                   selectedLoadPreference = newValue;
-                                  // _checkInput();
+                                  _checkInput();
                                 });
                               }
                             },
@@ -286,7 +322,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: ElevatedButton(
-                        onPressed: isSaveButtonEnabled ? () => _saveLoadPreference() : null,
+                        onPressed: isSaveButtonEnabled ? () => _saveLoadPreference(widget.tripPreference) : null,
                         style: style,  // Main button theme
                         child: const Text('Save'),
                       ),
@@ -304,13 +340,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
         ),
       ],
       ),
-    );
-  }
-  void _saveLoadPreference() {
-    // Implement the save logic here, using selectedCrewMembers
-    //print('Selected Crew Members: ${selectedCrewMembers.map((e) => e.name).join(', ')}');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Preference saved!')),
     );
   }
 }

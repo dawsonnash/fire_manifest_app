@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:fire_app/Data/trip.dart';
-import 'package:fire_app/single_trip_view.dart';
+import 'package:fire_app/06_single_trip_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 

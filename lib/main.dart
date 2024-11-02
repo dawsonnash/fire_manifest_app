@@ -1,7 +1,7 @@
-import 'package:fire_app/create_new_manifest.dart';
-import 'package:fire_app/saved_trips.dart';
+import 'package:fire_app/05_create_new_manifest.dart';
+import 'package:fire_app/06_saved_trips.dart';
 import 'package:flutter/material.dart';
-import '../edit_crew.dart';
+import '../01_edit_crew.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../Data/gear.dart';
 import '../Data/crewmember.dart';
