@@ -10,10 +10,10 @@ class Trip extends HiveObject{
   String tripName;
   @HiveField(1)
   int allowable;
-
   @HiveField(2)
   List<Load> loads = [];
 
+  //
 
   Trip({required this.tripName, required this.allowable});
 

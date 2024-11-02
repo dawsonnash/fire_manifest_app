@@ -1,11 +1,15 @@
 import 'dart:ui';
 
 import 'package:fire_app/add_crewmember.dart';
+import 'package:fire_app/add_load_preference.dart';
 import 'package:fire_app/crewmembers_view.dart';
 import 'package:fire_app/gear_view.dart';
+import 'package:fire_app/loadout_view.dart';
 import 'package:flutter/material.dart';
 import 'add_gear.dart';
 
+// We should switch to a grid view for all Adding and Editing
+// 3x3 for CrewMember, Gear, and Preferences
 
 class EditCrew extends StatelessWidget {
   const EditCrew({super.key});
@@ -63,6 +67,7 @@ class EditCrew extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
 
+                      // Add Crew Member
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
@@ -79,6 +84,8 @@ class EditCrew extends StatelessWidget {
                             )
                         ),
                       ),
+
+                      // Add Gear
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
@@ -95,6 +102,8 @@ class EditCrew extends StatelessWidget {
                             )
                         ),
                       ),
+
+                      // Edit Crew Members
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
@@ -106,11 +115,13 @@ class EditCrew extends StatelessWidget {
                             },
                             style: style,
                             child: const Text(
-                                'Edit Crewmembers',
+                                'Edit Crew Members',
                               textAlign: TextAlign.center,
                             )
                         ),
                       ),
+
+                      // Edit Gear
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
@@ -123,6 +134,42 @@ class EditCrew extends StatelessWidget {
                             style: style,
                             child: const Text(
                                 'Edit Gear',
+                              textAlign: TextAlign.center,
+                            )
+                        ),
+                      ),
+
+                      // Add Load Preferences
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const AddLoadPreference()),
+                              );
+                            },
+                            style: style,
+                            child: const Text(
+                              'Add Load Preferences',
+                              textAlign: TextAlign.center,
+                            )
+                        ),
+                      ),
+
+                      // Edit Load Preferences
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const LoadoutView()),
+                              );
+                            },
+                            style: style,
+                            child: const Text(
+                              'View Load Preferences',
                               textAlign: TextAlign.center,
                             )
                         ),

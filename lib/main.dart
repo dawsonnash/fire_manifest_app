@@ -29,6 +29,7 @@ void main() async {
 
   // Load data from Hive
   crew.loadCrewDataFromHive();
+  // do we need to load trip data as well?how does that work
 
   // start app
   runApp(const MyApp());
@@ -147,6 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
 
+                      // Manifest
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
@@ -162,6 +164,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             )
                         ),
                       ),
+
+                      // View Trips
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
@@ -177,6 +181,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             )
                         ),
                       ),
+
+                      // Edit Crew
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
@@ -192,6 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             )
                         ),
                       ),
+
                     ],
                   ),
                 ),

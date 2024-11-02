@@ -9,8 +9,6 @@ import 'Data/crew.dart';
 class CrewmembersView extends StatefulWidget {
   const CrewmembersView({super.key});
 
-
-
   @override
   State<CrewmembersView> createState() => _CrewmembersViewState();
 }
@@ -22,11 +20,11 @@ class _CrewmembersViewState extends State<CrewmembersView>{
 
   void initState() {
     super.initState();
-    // Open the Hive box and load the list of Gear items
+    // Open the Hive box and load the list of crewmembers
     crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
     loadCrewMemberList();
   }
-  // Function to load the list of Gear items from the Hive box
+  // Function to load the list of crewmembers from the Hive box
   void loadCrewMemberList() {
     setState(() {
       crewmemberList = crewmemberBox.values.toList();
@@ -126,6 +124,8 @@ class _CrewmembersViewState extends State<CrewmembersView>{
                 },
               ),
             ),
+
+              // Delete all (app testing only)
               Padding(
                 padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
                 child: Container(

@@ -46,7 +46,7 @@ class AddCrewmember extends StatefulWidget {
     }
 
     // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
-    void saveData() {
+    void saveCrewMemberData() {
 
       // Take what the name contrller has saved
       final String name = nameController.text;
@@ -298,7 +298,6 @@ class AddCrewmember extends StatefulWidget {
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
-                                fontStyle: FontStyle.italic,
                               ),
                               iconEnabledColor: Colors.white,
                               items: positionMap.entries.map((entry) {
@@ -326,7 +325,7 @@ class AddCrewmember extends StatefulWidget {
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
-                            onPressed: isSaveButtonEnabled ? () => saveData() : null,  // Button is only enabled if there is input
+                            onPressed: isSaveButtonEnabled ? () => saveCrewMemberData() : null,  // Button is only enabled if there is input
                             style: style, // Main button theme
                             child: const Text(
                                 'Save'

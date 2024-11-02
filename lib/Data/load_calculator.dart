@@ -8,6 +8,8 @@ import 'gear.dart';
 // In the future, if we want to do a more balanced load approach,
 // It will be slightly more complex - like a 'greedy balancing/backtracking' algo,
 // where it finds the lightest load, and places the object there
+//
+// For Saw Team smart loading - just make sure both individuals on SawTeam1, 2, 3, etc., all go on same load
 void loadCalculator(Trip trip) {
   // Get the number of loads based on allowable, rounding up
   int numLoads = (crew.totalCrewWeight / trip.allowable).ceil();
