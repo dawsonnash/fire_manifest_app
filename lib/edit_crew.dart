@@ -1,15 +1,13 @@
 import 'dart:ui';
-
+import 'package:flutter/material.dart';
 import 'package:fire_app/add_crewmember.dart';
 import 'package:fire_app/add_load_preference.dart';
 import 'package:fire_app/crewmembers_view.dart';
 import 'package:fire_app/gear_view.dart';
 import 'package:fire_app/loadout_view.dart';
-import 'package:flutter/material.dart';
 import 'add_gear.dart';
 
-// We should switch to a grid view for all Adding and Editing
-// 3x3 for CrewMember, Gear, and Preferences
+// This layout needs work to have dynamically adjusted UI. Needs user-testing
 
 class EditCrew extends StatelessWidget {
   const EditCrew({super.key});
@@ -17,20 +15,25 @@ class EditCrew extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final ButtonStyle style =
-    ElevatedButton.styleFrom(
-        foregroundColor: Colors.black,
-        textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        backgroundColor: Colors.deepOrangeAccent,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        //surfaceTintColor: Colors.grey,
-        elevation: 15,
-        shadowColor: Colors.black,
-        side: const BorderSide(color: Colors.black, width: 2),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12)),
-        // Maybe change? Dynamic button size based on screen size
-        fixedSize: Size(MediaQuery.of(context).size.width / 2, MediaQuery.of(context).size.height / 10)
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    final double buttonWidth = screenWidth / 2 - 24;
+    final double buttonHeight = screenHeight * 0.1;
+
+    // Button style for all buttons
+    final ButtonStyle buttonStyle = ElevatedButton.styleFrom(
+      foregroundColor: Colors.black,
+      textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      backgroundColor: Colors.deepOrangeAccent,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      elevation: 15,
+      shadowColor: Colors.black,
+      side: const BorderSide(color: Colors.black, width: 2),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(6),
+      ),
+      fixedSize: Size(buttonWidth, buttonHeight),
     );
 
     return Scaffold(
@@ -38,149 +41,188 @@ class EditCrew extends StatelessWidget {
         backgroundColor: Colors.deepOrangeAccent,
         title: const Text(
           'Edit Crew',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+      body: Stack(
         children: [
-          Expanded( // Takes up all available space
-            child: Stack(
+          // Background image
+          Container(
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: Image.asset(
+                'assets/images/logo1.png',
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+              ),
+            ),
+          ),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
-                Container(
-                  child: ImageFiltered(
-                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                    child: Image.asset('assets/images/logo1.png',
-                      fit: BoxFit.cover, // Cover  entire background
-                      width: double.infinity,
-                      height: double.infinity,
-                    )
-                  ),
+                SizedBox(
+                  height: screenHeight * 0.05,
                 ),
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.white.withOpacity(0.1),
-                  child: Column(
-
-                    mainAxisAlignment: MainAxisAlignment.center,
+                Expanded(
+                  child: GridView.count(
+                    padding: const EdgeInsets.all(16.0),
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
                     children: [
-
-                      // Add Crew Member
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const AddCrewmember()),
-                              );
-                            },
-                            style: style,
-                            child: const Text(
-                                'Add Crew Member',
-                              textAlign: TextAlign.center,
-                            )
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const AddCrewmember()),
+                          );
+                        },
+                        style: buttonStyle,
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.add,
+                              color: Colors.black,
+                              size: 32,
+                            ),
+                            //const SizedBox(width: 8),
+                            Flexible( // Allows text to be wrapped
+                              child: Text(
+                                'Crew Member',
+                                textAlign: TextAlign.center,
+                                softWrap: true,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 
-                      // Add Gear
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const AddGear()),
-                              );
-                              },
-                            style: style,
-                            child: const Text(
-                                'Add Gear',
-                              textAlign: TextAlign.center,
-                            )
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const CrewmembersView()),
+                          );
+                        },
+                        style: buttonStyle,
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.edit,
+                              color: Colors.black,
+                              size: 32,
+                            ),
+                            //const SizedBox(width: 8),
+                            Flexible( // Allows text to be wrapped
+                              child: Text(
+                                'Crew Members',
+                                textAlign: TextAlign.center,
+                                softWrap: true,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 
-                      // Edit Crew Members
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const CrewmembersView()),
-                              );
-                            },
-                            style: style,
-                            child: const Text(
-                                'Edit Crew Members',
-                              textAlign: TextAlign.center,
-                            )
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const AddGear()),
+                          );
+                        },
+                        style: buttonStyle,
+                        child: Row(
+                          //mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.add,
+                              color: Colors.black,
+                              size: 32,
+                            ),
+                            const SizedBox(width: 8),
+                            Flexible( // Allows text to be wrapped
+                              child: Text(
+                                'Gear',
+                                textAlign: TextAlign.center,
+                                softWrap: true,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 
-                      // Edit Gear
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const GearView()),
-                              );
-                            },
-                            style: style,
-                            child: const Text(
-                                'Edit Gear',
-                              textAlign: TextAlign.center,
-                            )
-                        ),
-                      ),
-
-                      // Add Load Preferences
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const AddLoadPreference()),
-                              );
-                            },
-                            style: style,
-                            child: const Text(
-                              'Add Load Preferences',
-                              textAlign: TextAlign.center,
-                            )
-                        ),
-                      ),
-
-                      // Edit Load Preferences
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const LoadoutView()),
-                              );
-                            },
-                            style: style,
-                            child: const Text(
-                              'View Load Preferences',
-                              textAlign: TextAlign.center,
-                            )
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const GearView()),
+                          );
+                        },
+                        style: buttonStyle,
+                        child: Row(
+                          //mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.edit,
+                              color: Colors.black,
+                              size: 32,
+                            ),
+                            const SizedBox(width: 8),
+                            Flexible( // Allows text to be wrapped
+                              child: Text(
+                                'Gear',
+                                textAlign: TextAlign.center,
+                                softWrap: true,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
+                SizedBox(
+                  width: screenWidth * 0.9, // 90% of screen width
+                  height: buttonHeight * 2.2, // This 2.2 was just trialed and errored until it matched the height. Could be a downfall matching multiple device aspect ratios
+                  child: Padding(
+                    padding: const EdgeInsets.only(top:16.0, bottom: 16.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const LoadoutView()),
+                        );
+                      },
+                      style: buttonStyle, // Same style as other buttons
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.settings,
+                            color: Colors.black,
+                            size: 32,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                          'Trip Preferences',
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: screenHeight * 0.05,
+                ),
+
               ],
             ),
           ),
-    ],
+        ],
       ),
     );
   }
