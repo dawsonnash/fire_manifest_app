@@ -15,6 +15,7 @@ class SavedPreferences {
     tripPreferences.remove(tripPreference); // add crewmember in memory as well
     //preferenceLoadoutBox.add(newPreferenceLoadout); // save to hive memory
   }
+
   void deleteAllTripPreferences() {
     // var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
     // Clear the in-memory list
@@ -82,7 +83,7 @@ class GearPreference{
   int loadPreference;										        // First, Last, Balanced => 0, 1, 2
   // bool isActive;											        // Enables/Disables preference
 
-  GearPreference({required this.priority, required this.loadPreference}){
+  GearPreference({required this.priority, required this.loadPreference, required this.gear}){
     {
       isMultipleItems = gear.length > 1 ? 1 : null; // This will be used in algorithm instead of quantity
     }

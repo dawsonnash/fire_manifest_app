@@ -259,51 +259,52 @@ class _TripPreferencesState extends State<TripPreferences>{
                   ),
                 ),
 
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.deepOrangeAccent,
-                      border: Border.all(color: Colors.black, width: 2),
-                      borderRadius: BorderRadius.circular(4),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          spreadRadius: 1,
-                          blurRadius: 8,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    //alignment: Alignment.center,
-                    child: Row(
-                      children: [
-                        Text(
-                          'Delete all',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Spacer(),
-                        IconButton(
-                            icon: const Icon(
-                                Icons.delete,
-                                color: Colors.black,
-                                size: 32
-                            ),
-                            onPressed: (){
-                              savedPreferences.deleteAllTripPreferences();
-                              loadTripPreferenceList();
-                            }
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+                // Delete All Button
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                //   child: Container(
+                //     width: double.infinity,
+                //     decoration: BoxDecoration(
+                //       color: Colors.deepOrangeAccent,
+                //       border: Border.all(color: Colors.black, width: 2),
+                //       borderRadius: BorderRadius.circular(4),
+                //       boxShadow: [
+                //         BoxShadow(
+                //           color: Colors.black.withOpacity(0.5),
+                //           spreadRadius: 1,
+                //           blurRadius: 8,
+                //           offset: Offset(0, 3),
+                //         ),
+                //       ],
+                //     ),
+                //     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                //     //alignment: Alignment.center,
+                //     child: Row(
+                //       children: [
+                //         Text(
+                //           'Delete all',
+                //           style: const TextStyle(
+                //             fontSize: 24,
+                //             fontWeight: FontWeight.bold,
+                //             color: Colors.black,
+                //           ),
+                //         ),
+                //         Spacer(),
+                //         IconButton(
+                //             icon: const Icon(
+                //                 Icons.delete,
+                //                 color: Colors.black,
+                //                 size: 32
+                //             ),
+                //             onPressed: (){
+                //               savedPreferences.deleteAllTripPreferences();
+                //               loadTripPreferenceList();
+                //             }
+                //         )
+                //       ],
+                //     ),
+                //   ),
+                // ),
 
               ],
             ),

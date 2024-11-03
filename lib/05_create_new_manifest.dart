@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../Data/trip.dart';
@@ -15,6 +16,8 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
   // Variables to store user input
   final TextEditingController tripNameController = TextEditingController();
   final TextEditingController allowableController = TextEditingController();
+  TripPreference? selectedTripPreference;
+
   bool isCalculateButtonEnabled =
       false; // Controls whether saving button is showing
 
@@ -210,6 +213,8 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                           child: TextField(
                             controller: tripNameController,
                             decoration: InputDecoration(
+                              // hintText: 'Enter trip name',
+                              // hintStyle: TextStyle(color: Colors.black),
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.9),
                               enabledBorder: OutlineInputBorder(
@@ -232,10 +237,95 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                             ),
                             style: const TextStyle(
                               color: Colors.black,
-                              fontSize: 32,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
                           )),
+
+                      // Choose Trip Preference text box
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0, bottom: 5.0),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.deepOrangeAccent,
+                            border: Border.all(color: Colors.black, width: 2),
+                            borderRadius: BorderRadius.circular(4),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.5),
+                                spreadRadius: 1,
+                                blurRadius: 8,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          //alignment: Alignment.center,
+                          child: Text(
+                            'Choose Trip Preference',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Choose Trip Preference
+
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0, bottom: 5.0),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(12.0),
+                            border: Border.all(color: Colors.black, width: 2.0),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<TripPreference?>(
+                              value: selectedTripPreference,
+                              hint: const Text(
+                                'Choose Trip Preference',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 22,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                              dropdownColor: Colors.white,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              iconEnabledColor: Colors.black,
+                              items: [
+                                DropdownMenuItem<TripPreference?>(
+                                  value: null, // Represents the "None" option
+                                  child: const Text("None"),
+                                ),
+                                ...savedPreferences.tripPreferences.map((entry) {
+                                  return DropdownMenuItem<TripPreference>(
+                                    value: entry,
+                                    child: Text(entry.tripPreferenceName),
+                                  );
+                                }).toList(),
+                              ],
+                              onChanged: (TripPreference? newValue) {
+                                setState(() {
+                                  selectedTripPreference = newValue;
+                                  _checkInput();
+                                });
+                              },
+                            )
+
+                          ),
+                        ),
+                      ),
 
                       // Choose allowable text box
                       Padding(
@@ -349,7 +439,6 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                           ],
                         ),
                       ),
-
 
                       const Spacer(flex: 6),
 

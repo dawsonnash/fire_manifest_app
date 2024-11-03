@@ -2,12 +2,13 @@ import 'dart:ui';
 import 'package:flutter/services.dart';
 
 import 'Data/crew.dart';
+import 'Data/gear.dart';
 import 'Data/saved_preferences.dart';
 import 'Data/crewmember.dart';
 import 'package:flutter/material.dart';
 
 class AddLoadPreference extends StatefulWidget {
-  // This page requires a crewmember to be passed to it - to edit it
+  // This page requires a Trip Preference object to be passed to it - to edit it
   final TripPreference tripPreference;
   final VoidCallback onUpdate;  // Callback for deletion to update previous page
 
@@ -26,11 +27,15 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
   // Variables to store user input
   // Priority decided as drag & drop in UI
-  int? selectedLoadPreference;
-  //CrewMember? selectedCrewMember;
+  int? selectedPositionalLoadPreference;
   List<CrewMember> selectedCrewMembers = [];
 
-  bool isSaveButtonEnabled = false; // Controls whether saving button is showing
+  int? selectedGearLoadPreference;
+  List<Gear> selectedGear = [];
+
+  bool isPositionalSaveButtonEnabled = false; // Controls whether saving button is showing
+  bool isGearSaveButtonEnabled = false; // Controls whether saving button is showing
+
 
   @override
   void initState() {
@@ -44,7 +49,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     super.dispose();
   }
 
-  // Function to open the multi-select dialog
+  // Functions to open the multi-select dialog for crewmembers/gear
   void _showCrewMemberSelectionDialog() async {
     final List<CrewMember>? result = await showDialog(
       context: context,
@@ -91,24 +96,80 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     if (result != null) {
       setState(() {
         selectedCrewMembers = result;
-        _checkInput(); // Update button state
+        _checkPositionalInput(); // Update button state
       });
     }
   }
 
-  void _checkInput() {
+  void _showGearSelectionDialog() async {
+    final List<Gear>? result = await showDialog(
+      context: context,
+      builder: (context) {
+        List<Gear> tempSelectedGear = List.from(selectedGear);
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Select Gear'),
+              content: SingleChildScrollView(
+                child: Column(
+                  children: crew.gear.map((crew) {
+                    return CheckboxListTile(
+                      title: Text(crew.name),
+                      value: tempSelectedGear.contains(crew),
+                      onChanged: (bool? isChecked) {
+                        setState(() {
+                          if (isChecked == true) {
+                            tempSelectedGear.add(crew);
+                          } else {
+                            tempSelectedGear.remove(crew);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(tempSelectedGear);
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (result != null) {
+      setState(() {
+        selectedGear = result;
+        _checkGearInput(); // Update button state
+      });
+    }
+  }
+
+  void _checkPositionalInput() {
     setState(() {
-      isSaveButtonEnabled = selectedCrewMembers.isNotEmpty && selectedLoadPreference != null;
+      isPositionalSaveButtonEnabled = selectedCrewMembers.isNotEmpty && selectedPositionalLoadPreference != null;
     });
   }
 
-  void _saveLoadPreference(TripPreference newTripPreference) {
-    // Implement the save logic here, using selectedCrewMembers
+  void _checkGearInput() {
+    setState(() {
+      isGearSaveButtonEnabled = selectedGear.isNotEmpty && selectedGearLoadPreference != null;
+    });
+  }
+
+  void savePositionalLoadPreference(TripPreference newTripPreference) {
 
     final newPositionalPreference = PositionalPreference(
-      priority: 1,  // Set the priority as needed
-      loadPreference: selectedLoadPreference!,
-      crewMembers: selectedCrewMembers
+        priority: 1,  // TO be changed and updated via UI drag n drop
+        loadPreference: selectedPositionalLoadPreference!,
+        crewMembers: selectedCrewMembers
     );
 
     // Add this new preference to the TripPreference object
@@ -134,6 +195,39 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     );
     Navigator.of(context).pop();  // Return to previous screen
   }
+
+  void saveGearLoadPreference(TripPreference newTripPreference) {
+
+    final newGearPreference = GearPreference(
+        priority: 1,  // To be changed and updated via UI drag n drop
+        loadPreference: selectedGearLoadPreference!,
+        gear: selectedGear,
+    );
+
+    // Add this new preference to the TripPreference object
+    newTripPreference.gearPreferences.add(newGearPreference);
+
+    // Callback function, Update previous page UI with setState()
+    widget.onUpdate();
+
+    // Show successful save popup
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Preference saved!',
+          // Maybe change look
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.green,
+      ),
+    );
+    Navigator.of(context).pop();  // Return to previous screen
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -242,7 +336,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                   children: [
                     const Spacer(flex: 1),
 
-                    // Choose Crew Member(s) with GestureDetector for multi-select dialog
+                    // Choose Crew Member(s)
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: GestureDetector(
@@ -282,7 +376,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<int>(
-                            value: selectedLoadPreference,
+                            value: selectedPositionalLoadPreference,
                             hint: const Text(
                               'Choose load preference',
                               style: TextStyle(
@@ -306,8 +400,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                             onChanged: (int? newValue) {
                               if (newValue != null) {
                                 setState(() {
-                                  selectedLoadPreference = newValue;
-                                  _checkInput();
+                                  selectedPositionalLoadPreference = newValue;
+                                  _checkPositionalInput();
                                 });
                               }
                             },
@@ -322,7 +416,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: ElevatedButton(
-                        onPressed: isSaveButtonEnabled ? () => _saveLoadPreference(widget.tripPreference) : null,
+                        onPressed: isPositionalSaveButtonEnabled ? () => savePositionalLoadPreference(widget.tripPreference) : null,
                         style: style,  // Main button theme
                         child: const Text('Save'),
                       ),
@@ -333,8 +427,104 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
             ),
 
             // Gear Preference
-            const Center(
-              child: Text("It's rainy here"),
+            Center(
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: Colors.white.withOpacity(0.1),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Spacer(flex: 1),
+
+                    // Choose Gear
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: GestureDetector(
+                        onTap: _showGearSelectionDialog,  // Trigger dialog on tap
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(12.0),
+                            border: Border.all(color: Colors.white, width: 2.0),
+                          ),
+                          child: Text(
+                            selectedGear.isEmpty
+                                ? 'Choose gear'
+                                : selectedGear.map((e) => e.name).join(', '),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // Enter Load Preference
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(12.0),
+                          border: Border.all(color: Colors.white, width: 2.0),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<int>(
+                            value: selectedGearLoadPreference,
+                            hint: const Text(
+                              'Choose load preference',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                            dropdownColor: Colors.black,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                            ),
+                            iconEnabledColor: Colors.white,
+                            items: loadPreferenceMap.entries.map((entry) {
+                              return DropdownMenuItem<int>(
+                                value: entry.key,
+                                child: Text(entry.value),
+                              );
+                            }).toList(),
+                            onChanged: (int? newValue) {
+                              if (newValue != null) {
+                                setState(() {
+                                  selectedGearLoadPreference = newValue;
+                                  _checkGearInput();
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const Spacer(flex: 6),
+
+                    // Save Button
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ElevatedButton(
+                        onPressed: isGearSaveButtonEnabled ? () => saveGearLoadPreference(widget.tripPreference) : null,
+                        style: style,  // Main button theme
+                        child: const Text('Save'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
