@@ -7,6 +7,8 @@ import 'package:fire_app/02_edit_crewmember.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
+import '04_edit_trip_preference.dart';
+
 
 class TripPreferences extends StatefulWidget {
   const TripPreferences({super.key});
@@ -116,22 +118,101 @@ class _TripPreferencesState extends State<TripPreferences>{
                                         color: Colors.black,
                                         size: 32
                                     ),
-                                    onPressed: (){
-                                      null;
-                                      // Navigator.push(
-                                      //   context,
-                                      //   MaterialPageRoute(
-                                      //     builder: (context) => EditCrewmember(
-                                      //       crewMember: crewMember,
-                                      //       onUpdate: loadCrewMemberList, // refresh list on return
-                                      //     ),
-                                      //   ),
-                                      // );
-                                    }
+                                  onPressed: () async {
+                                    // Awaits the result from the next page so it updates in real time
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EditTripPreference(tripPreference: tripPreference, onUpdate: loadTripPreferenceList),
+                                      ),
+                                    );
+                                    // Calls the update function after returning from AddTripPreference
+                                    loadTripPreferenceList();
+                                  },
                                 )
                               ],
                             ),
                             leading: Icon(Icons.south_america_sharp),
+                            trailing: IconButton(
+                              icon: Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text(
+                                          'Delete ${tripPreference.tripPreferenceName}?',
+                                          style: const TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                          )
+                                      ),
+                                      content: Text('This trip preference data (${tripPreference.tripPreferenceName}) will be erased!',
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                          )),
+                                      actions: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();  // Dismiss the dialog
+                                              },
+                                              child: const Text('Cancel',
+                                                  style: TextStyle(
+                                                    fontSize: 22,
+                                                  )),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+
+                                                // // Remove item from the Hive box
+                                                // final keyToRemove = crewmemberBox.keys.firstWhere(
+                                                //       (key) => crewmemberBox.get(key) == widget.crewMember,
+                                                //   orElse: () => null,
+                                                // );
+                                                //
+                                                // if (keyToRemove != null) {
+                                                //   crewmemberBox.delete(keyToRemove);
+                                                // }
+
+                                                // Remove the crew member
+                                                savedPreferences.deleteTripPreference(tripPreference);
+
+                                                // Show deletion pop-up
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text('Trip Preference Deleted!',
+                                                      // Maybe change look
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 32,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    duration: Duration(seconds: 2),
+                                                    backgroundColor: Colors.red,
+                                                  ),
+                                                );
+
+                                                Navigator.of(context).pop();  // Dismiss the dialog
+                                                loadTripPreferenceList();
+                                              },
+                                              child: const Text('OK',
+                                                  style: TextStyle(
+                                                    fontSize: 22,
+                                                  )),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+
+                            ),
                           ),
                         ),
                       );
@@ -216,7 +297,7 @@ class _TripPreferencesState extends State<TripPreferences>{
                             ),
                             onPressed: (){
                               savedPreferences.deleteAllTripPreferences();
-                              setState((){});
+                              loadTripPreferenceList();
                             }
                         )
                       ],
