@@ -5,31 +5,79 @@ import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/04_add_load_preference.dart';
 
 class AddTripPreference extends StatefulWidget {
-  const AddTripPreference({super.key});
+
+  final VoidCallback onUpdate;  // Callback to update previous page
+
+  const AddTripPreference({
+    required this.onUpdate,
+    super.key});
 
   @override
   State<AddTripPreference> createState() => _AddTripPreferenceState();
 }
 
 class _AddTripPreferenceState extends State<AddTripPreference> {
+
   // New TripPreference object
   late TripPreference tripPreference;
   List<PositionalPreference> positionalPreferenceList = [];
-
+  //List Gear
 
   @override
   void initState() {
     super.initState();
 
     // Initialize the TripPreference object with a default name
+    // Should add an option that if they click the back arrow and its still 'Untitled' They will lose all data
     tripPreference = TripPreference(tripPreferenceName: 'Untitled');
+    // Add the new tripPreference to savedPreferences.tripPreferences
+    savedPreferences.tripPreferences.add(tripPreference);
 
   }
+  // Function to edit title
+  void _editTitle() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController titleController = TextEditingController(text: tripPreference.tripPreferenceName);
+
+        return AlertDialog(
+          title: const Text("Edit Trip Preference Name"),
+          content: TextField(
+            controller: titleController,
+            decoration: const InputDecoration(labelText: "Trip Preference Name"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss  dialog
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  tripPreference.tripPreferenceName = titleController.text;
+                });
+                Navigator.of(context).pop(); // Dismiss dialog
+                //widget.onUpdate();
+              },
+              child: const Text("Save"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Loads all preferences upon screen opening or after creating new one
   void loadPositionalPreferenceList() {
     setState(() {
       positionalPreferenceList = tripPreference.positionalPreferences.toList();
     });
   }
+
+
   @override
   Widget build(BuildContext context) {
     final ButtonStyle style = ElevatedButton.styleFrom(
@@ -46,9 +94,19 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          tripPreference.tripPreferenceName,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                tripPreference.tripPreferenceName,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: _editTitle,
+            ),
+          ],
         ),
         backgroundColor: Colors.deepOrangeAccent,
       ),
@@ -106,15 +164,21 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                         child: ListTile(
-                          title: Text("Priority: ${posPref.priority}"),
+                          leading: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Priority"),
+                              Text(posPref.priority.toString()),
+                            ],
+                          ),
+                          title: Text(
+                            posPref.crewMembers.map((member) => member.name).join(', '),
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text("Load Preference: ${loadPreferenceMap[posPref.loadPreference]}"),
-                              Text(
-                                "Crew Members: ${posPref.crewMembers.map((member) => member.name).join(', ')}",
-                                style: TextStyle(color: Colors.grey[700]),
-                              ),
                             ],
                           ),
                           trailing: IconButton(

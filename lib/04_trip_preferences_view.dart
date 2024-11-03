@@ -20,24 +20,17 @@ class _TripPreferencesState extends State<TripPreferences>{
   List<TripPreference> tripPreferenceList = [];
 
   @override
-
   void initState() {
     super.initState();
     // Open the Hive box and load the list of Gear items
     // crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
-    tripPreferenceDataList();
-
-    // Data population for testing
-    savedPreferences.testDataTripPreference();
-
-
+    loadTripPreferenceList();
   }
-  // Function to load the list of Gear items from the Hive box
-  void tripPreferenceDataList() {
-    setState(() {
-      // crewmemberList = crewmemberBox.values.toList();
-      tripPreferenceList = savedPreferences.tripPreferences.toList();
 
+  // Function to load all trip preferences upon screen opening
+  void loadTripPreferenceList() {
+    setState(() {
+      tripPreferenceList = savedPreferences.tripPreferences.toList();
     });
   }
 
@@ -152,13 +145,19 @@ class _TripPreferencesState extends State<TripPreferences>{
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const AddTripPreference()),
-                        );
-                      },
-                      style: style,
+                    onPressed: () async {
+                      // Awaits the result from the next page so it updates in real time
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddTripPreference(onUpdate: loadTripPreferenceList),
+                        ),
+                      );
+                      // Calls the update function after returning from AddTripPreference
+                      loadTripPreferenceList();
+                    },
+
+                    style: style,
                       child: Row(
                         children: [
                           const Icon(
