@@ -55,81 +55,138 @@ class _SavedTripsState extends State<SavedTripsView>{
                 )
             ),
           ),
+
+          // Saved Trips list
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ListView.builder(
-              //hive: itemCount: tripList.length,
-              itemCount: tripList.length,
-              // itemCount:savedTrips.savedTrips.length -- in memory
-              itemBuilder: (context, index) {
+            child: Column(
+              children: [
+                Expanded(
+                child: ListView.builder(
+                  //hive: itemCount: tripList.length,
+                  itemCount: tripList.length,
+                  // itemCount:savedTrips.savedTrips.length -- in memory
+                  itemBuilder: (context, index) {
 
-                final trip = tripList[index];
-                //final trip = savedTrips.savedTrips[index];
+                    final trip = tripList[index];
+                    //final trip = savedTrips.savedTrips[index];
 
-                // Display trip data in a scrollable list
-                return Card(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      // Could change color here
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(9),
-                    ),
-                    child: ListTile(
-                      iconColor: Colors.black,
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    // Display trip data in a scrollable list
+                    return Card(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          // Could change color here
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(9),
+                        ),
+                        child: ListTile(
+                          iconColor: Colors.black,
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                trip.tripName,
-                                style: const TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold
-                                ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    trip.tripName,
+                                    style: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold
+                                    ),
+                                  ),
+                                  Text(
+                                    'Allowable: ${trip.allowable} lbs',
+                                    style: const TextStyle(
+                                      fontSize:18,
+                                    ),
+                                  )
+                                ],
                               ),
-                              Text(
-                                'Allowable: ${trip.allowable} lbs',
-                                style: const TextStyle(
-                                  fontSize:18,
-                                ),
+                              // Set up to delete right now, not edit. Change later
+                              IconButton(
+                                  icon: const Icon(
+                                      Icons.arrow_forward_ios,
+                                      //Icons.edit,
+                                      color: Colors.black,
+                                      size: 32
+                                  ),
+                                  onPressed: (){
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SingleTripView(
+                                          trip: trip,
+                                        ),
+                                      ),
+                                    );
+                                    // For deletion
+                                    // savedTrips.removeTrip(trip); -- in memory
+                                    //tripBox.removeTrip(trip);
+                                    //setState(() {});
+                                  }
                               )
                             ],
                           ),
-                          // Set up to delete right now, not edit. Change later
-                          IconButton(
-                              icon: const Icon(
-                                  Icons.arrow_forward_ios,
-                                  //Icons.edit,
-                                  color: Colors.black,
-                                  size: 32
-                              ),
-                              onPressed: (){
-
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SingleTripView(
-                                      trip: trip,
-                                    ),
-                                  ),
-                                );
-                                // For deletion
-                                // savedTrips.removeTrip(trip); -- in memory
-                                //tripBox.removeTrip(trip);
-                                //setState(() {});
-                              }
-                          )
-                        ],
+                          leading: Icon(Icons.flight),
+                        ),
                       ),
-                      leading: Icon(Icons.flight),
+                    );
+                  },
+                ),
+              ),
+
+                // Temporary delete All Button
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.deepOrangeAccent,
+                      border: Border.all(color: Colors.black, width: 2),
+                      borderRadius: BorderRadius.circular(4),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          spreadRadius: 1,
+                          blurRadius: 8,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    //alignment: Alignment.center,
+                    child: Row(
+                      children: [
+                        Text(
+                          'Delete all',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Spacer(),
+                        IconButton(
+                            icon: const Icon(
+                                Icons.delete,
+                                color: Colors.black,
+                                size: 32
+                            ),
+                          onPressed: () {
+                              savedTrips.deleteAllTrips();
+                              loadTripList(); // Reset tripList after deletion, but for some reason doesn't work
+                          },
+
+                        )
+                      ],
                     ),
                   ),
-                );
-              },
+                ),
+    ],
             ),
           ),
+
 
         ],
       ),

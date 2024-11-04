@@ -9,9 +9,169 @@ import 'saved_preferences.dart';
 // In the future, if we want to do a more balanced load approach,
 // It will be slightly more complex - like a 'greedy balancing/backtracking' algo,
 // where it finds the lightest load, and places the object there
-//
 // For Saw Team smart loading - just make sure both individuals on SawTeam1, 2, 3, etc., all go on same load
+
+// TripPreference based sorting algorithm
 void loadCalculator(Trip trip, TripPreference? tripPreference) {
+
+  // Get the number of loads based on allowable, rounding up
+  int numLoads = (crew.totalCrewWeight / trip.allowable).ceil();
+  int maxLoadWeight = trip.allowable;
+
+  // Create copies of crew and gear
+  // List.from() creates a new list with exact same elements as OG.
+  var crewMembersCopy = List.from(crew.crewMembers);
+  var gearCopy = List.from(crew.gear);
+
+  // Initialize all Loads
+  List<Load> loads = List.generate(numLoads, (index) => Load(
+    loadNumber: index + 1,
+    weight: 0,
+    loadPersonnel: [],
+    loadGear: [],
+  ));
+
+  // TripPreference can be "None", i.e., null
+  if (tripPreference != null) {
+    // Loop through all Positional Preferences, not based on Priority yet
+    for (var posPref in tripPreference.positionalPreferences) {
+      // Different cases based on Load Preference: First, Last, Balanced
+      switch (posPref.loadPreference) {
+        case 0: // First load preference
+          for (var crewMember in posPref.crewMembers) {
+            for (var load in loads) {
+              if (load.weight + crewMember.flightWeight <= maxLoadWeight) {
+                load.loadPersonnel.add(crewMember);
+                load.weight += crewMember.flightWeight;
+                crewMembersCopy.remove(crewMember); // Remove from list
+                break; // Move to next crew member
+              }
+            }
+          }
+          break;
+
+        case 1: // Last load preference -  if weight exceeds last load weight, place in second to last and so on
+          for (var crewMember in posPref.crewMembers) {
+            for (var load in loads.reversed) {
+              if (load.weight + crewMember.flightWeight <= maxLoadWeight) {
+                load.loadPersonnel.add(crewMember);
+                load.weight += crewMember.flightWeight;
+                crewMembersCopy.remove(crewMember);
+                break;
+              }
+            }
+          }
+          break;
+
+        case 2: // Balanced load preference
+          int loadIndex = 0;
+          for (var crewMember in posPref.crewMembers) {
+            while (loadIndex < loads.length) {
+              var load = loads[loadIndex];
+              if (load.weight + crewMember.flightWeight <= maxLoadWeight) {
+                load.loadPersonnel.add(crewMember);
+                load.weight += crewMember.flightWeight;
+                crewMembersCopy.remove(crewMember);
+                loadIndex = (loadIndex + 1) % loads.length; // Loop through loads
+                break;
+              }
+              loadIndex = (loadIndex + 1) % loads.length;
+            }
+          }
+          break;
+      }
+    }
+
+    // Loop through all Gear Preferences, not based on Priority yet
+    for (var gearPref in tripPreference.gearPreferences) {
+      // Different cases based on Load Preference: First, Last, Balanced
+      switch (gearPref.loadPreference) {
+        case 0: // First load preference
+          for (var gear in gearPref.gear) {
+            for (var load in loads) {
+              if (load.weight + gear.weight <= maxLoadWeight) {
+                load.loadGear.add(gear);
+                load.weight += gear.weight;
+                gearCopy.remove(gear); // Remove from list
+                break; // Move to next gear item
+              }
+            }
+          }
+          break;
+
+        case 1: // Last load preference -  if weight exceeds last load weight, place in second to last and so on
+          for (var gear in gearPref.gear) {
+            for (var load in loads.reversed) {
+              if (load.weight + gear.weight <= maxLoadWeight) {
+                load.loadGear.add(gear);
+                load.weight += gear.weight;
+                gearCopy.remove(gear);
+                break;
+              }
+            }
+          }
+          break;
+
+        case 2: // Balanced load preference
+          int loadIndex = 0;
+          for (var gear in gearPref.gear) {
+            while (loadIndex < loads.length) {
+              var load = loads[loadIndex];
+              if (load.weight + gear.weight <= maxLoadWeight) {
+                load.loadGear.add(gear);
+                load.weight += gear.weight;
+                gearCopy.remove(gear);
+                loadIndex = (loadIndex + 1) % loads.length; // Loop through loads
+                break;
+              }
+              loadIndex = (loadIndex + 1) % loads.length;
+            }
+          }
+          break;
+      }
+    }
+  }
+
+  // Fill the remaining space in loads with crew members and gear
+  for (int i = 0; i < loads.length; i++) {
+    Load currentLoad = loads[i];
+    num currentLoadWeight = currentLoad.weight;
+
+    while (currentLoadWeight < maxLoadWeight) {
+      bool itemAdded = false;
+
+      // Add remaining crew members not covered by positional preferences
+      if (crewMembersCopy.isNotEmpty &&
+          currentLoadWeight + crewMembersCopy.first.flightWeight <= maxLoadWeight) {
+        var firstCrewMember = crewMembersCopy.first;
+        currentLoadWeight += firstCrewMember.flightWeight;
+        currentLoad.loadPersonnel.add(firstCrewMember);
+        crewMembersCopy.removeAt(0);
+        itemAdded = true;
+      }
+
+      // Add gear if space allows
+      if (gearCopy.isNotEmpty &&
+          currentLoadWeight + gearCopy.first.weight <= maxLoadWeight) {
+        currentLoadWeight += gearCopy.first.weight;
+        currentLoad.loadGear.add(gearCopy.first);
+        gearCopy.removeAt(0);
+        itemAdded = true;
+      }
+
+      if (!itemAdded || (crewMembersCopy.isEmpty && gearCopy.isEmpty)) {
+        break;
+      }
+    }
+
+    // Update load weight
+    currentLoad.weight = currentLoadWeight.toInt();
+    trip.addLoad(trip, currentLoad);
+  }
+}
+
+// OG sorting algorithm
+void loadCalculatorOG(Trip trip, TripPreference? tripPreference) {
   // Get the number of loads based on allowable, rounding up
   int numLoads = (crew.totalCrewWeight / trip.allowable).ceil();
   int maxLoadWeight = trip.allowable;

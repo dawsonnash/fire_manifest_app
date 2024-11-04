@@ -69,6 +69,13 @@ class SavedTrips {
     savedTrips.remove(trip); // remove in-memory as well
   }
 
+  void deleteAllTrips() {
+    var tripBox = Hive.box<Trip>('tripBox');
+    // Clear the in-memory list
+    savedTrips.clear();
+    // Clear the Hive storage
+    tripBox.clear();
+  }
   // For LogCat testing purposes
   void printTripDetails() {
     // Print out Trip info
