@@ -51,6 +51,36 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
   // Functions to open the multi-select dialog for crewmembers/gear
   void _showCrewMemberSelectionDialog() async {
+
+    // Gets crew members already used in existing PositionalPreferences
+    final usedCrewMembers = widget.tripPreference.positionalPreferences
+        .expand((posPref) => posPref.crewMembers)
+        .toSet();  // Convert to Set to avoid duplicates
+
+    // Filters out used crew members for selection list
+    final availableCrewMembers = crew.crewMembers
+        .where((crewMember) => !usedCrewMembers.contains(crewMember))
+        .toList();
+
+    // If no crew members available, show a message
+    if (availableCrewMembers.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No more crew members available',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     final List<CrewMember>? result = await showDialog(
       context: context,
       builder: (context) {
@@ -62,7 +92,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
               title: const Text('Select Crew Members'),
               content: SingleChildScrollView(
                 child: Column(
-                  children: crew.crewMembers.map((crew) {
+                  children: availableCrewMembers.map((crew) {
                     return CheckboxListTile(
                       title: Text(crew.name),
                       value: tempSelectedCrew.contains(crew),
@@ -101,7 +131,38 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     }
   }
 
+  // Functions to open the multi-select dialog for crewmembers/gear
   void _showGearSelectionDialog() async {
+
+    // Gets gear already used in existing GearPreferences
+    final usedGear = widget.tripPreference.gearPreferences
+        .expand((posPref) => posPref.gear)
+        .toSet();  // Convert to Set to avoid duplicates
+
+    // Filters out used gear for selection list
+    final availableGear = crew.gear
+        .where((gear) => !usedGear.contains(gear))
+        .toList();
+
+    // If no gear available, show a message
+    if (availableGear.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No more gear available',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     final List<Gear>? result = await showDialog(
       context: context,
       builder: (context) {
@@ -110,19 +171,19 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Select Gear'),
+              title: const Text('Select Gears'),
               content: SingleChildScrollView(
                 child: Column(
-                  children: crew.gear.map((crew) {
+                  children: availableGear.map((gear) {
                     return CheckboxListTile(
-                      title: Text(crew.name),
-                      value: tempSelectedGear.contains(crew),
+                      title: Text(gear.name),
+                      value: tempSelectedGear.contains(gear),
                       onChanged: (bool? isChecked) {
                         setState(() {
                           if (isChecked == true) {
-                            tempSelectedGear.add(crew);
+                            tempSelectedGear.add(gear);
                           } else {
-                            tempSelectedGear.remove(crew);
+                            tempSelectedGear.remove(gear);
                           }
                         });
                       },
@@ -214,7 +275,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Preference saved!',
-          // Maybe change look
           style: TextStyle(
             color: Colors.black,
             fontSize: 32,
@@ -252,35 +312,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
             .of(context)
             .size
             .height / 10)
-    );
-    // Black style input field decoration
-    final InputDecorationTheme blackInputFieldTheme = InputDecorationTheme(
-      labelStyle: const TextStyle(
-        color: Colors.white,
-        fontSize: 22,
-        fontStyle: FontStyle.italic,
-        //fontWeight: FontWeight.bold,
-      ),
-      filled: true,
-      fillColor: Colors.black.withOpacity(0.9),
-      enabledBorder: OutlineInputBorder(
-        borderSide: const BorderSide(
-          color: Colors.white,
-          // Border color when the TextField is not focused
-          width: 2.0, // Border width
-        ),
-        borderRadius: BorderRadius.circular(
-            12.0), // Rounded corners
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: const BorderSide(
-          color: Colors.black,
-          // Border color when the TextField is focused
-          width: 2.0, // Border width
-        ),
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-
     );
 
     return Scaffold(

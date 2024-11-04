@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:fire_app/Data/crewmember.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/04_add_load_preference.dart';
 
@@ -130,7 +129,10 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 20),
+
                 tripPreference.positionalPreferences.isEmpty
+
+                // Container for if user has no preferences
                     ? Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
@@ -146,7 +148,8 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
                   child: const Text(
                     'No preferences added...',
                     style: TextStyle(
@@ -158,39 +161,87 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                 )
                     : Expanded(
                   child: ListView.builder(
-                    itemCount: tripPreference.positionalPreferences.length,
+                    itemCount: tripPreference.positionalPreferences.length +
+                        tripPreference.gearPreferences.length,
                     itemBuilder: (context, index) {
-                      final posPref = tripPreference.positionalPreferences[index];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                        child: ListTile(
-                          leading: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Priority"),
-                              Text(posPref.priority.toString()),
-                            ],
+                      // If index is within the positionalPreferences range
+                      // This approach may not work if we are doing drag n drop
+                      if (index <
+                          tripPreference.positionalPreferences
+                              .length) {
+                        final posPref = tripPreference.positionalPreferences[index];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 16.0),
+                          child: ListTile(
+                            leading: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text("Priority"),
+                                Text(posPref.priority.toString()),
+                              ],
+                            ),
+                            title: Text(
+                              posPref.crewMembers
+                                  .map((member) => member.name)
+                                  .join(', '),
+                              style:
+                              TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(
+                                "Load Preference: ${loadPreferenceMap[posPref.loadPreference]}"),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete,
+                                  color: Colors.red),
+                              onPressed: () {
+                                setState(() {tripPreference
+                                      .positionalPreferences
+                                      .removeAt(index);
+                                });
+                              },
+                            ),
                           ),
-                          title: Text(
-                            posPref.crewMembers.map((member) => member.name).join(', '),
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Load Preference: ${loadPreferenceMap[posPref.loadPreference]}"),
-                            ],
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
+                        );
+                      }
+                      // Otherwise, handle gearPreferences
+                      else {
+                        final gearIndex = index -
+                            tripPreference.positionalPreferences
+                                .length;
+                        final gearPref = tripPreference.gearPreferences[gearIndex];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 16.0),
+                          child: ListTile(
+                            leading: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text("Priority"),
+                                Text(gearPref.priority.toString()),
+                              ],
+                            ),
+                            title: Text(
+                              gearPref.gear
+                                  .map((member) => member.name)
+                                  .join(', '),
+                              style:
+                              TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle:
+                            Text(
+                                "Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}"),                                  trailing: IconButton(
+                            icon: const Icon(Icons.delete,
+                                color: Colors.red),
                             onPressed: () {
                               setState(() {
-                                tripPreference.positionalPreferences.removeAt(index);
+                                tripPreference.gearPreferences
+                                    .removeAt(gearIndex);
                               });
                             },
                           ),
-                        ),
-                      );
+                          ),
+                        );
+                      }
                     },
                   ),
                 ),
@@ -205,14 +256,15 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                         MaterialPageRoute(
                           builder: (context) => AddLoadPreference(
                             tripPreference: tripPreference,
-                            onUpdate: loadPositionalPreferenceList, // refresh list on return
-
+                            onUpdate:
+                            loadPositionalPreferenceList, // refresh list on return
                           ),
                         ),
                       );
                       if (result != null) {
                         setState(() {
-                          tripPreference.positionalPreferences.add(result);
+                          tripPreference.positionalPreferences
+                              .add(result);
                         });
                       }
                     },

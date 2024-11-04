@@ -40,8 +40,6 @@ class SavedPreferences {
 class TripPreference {
 
   String tripPreferenceName;                               // Ex. 'Going to a Fire'
-  List<CrewMember> loadoutCrewMembers = [];				  // This makes sure users cannot use the same person more than once in there preferences
-  List<Gear> loadoutGear = [];							        // This makes sure users cannot use the same item more than once in there preferences
   List<PositionalPreference> positionalPreferences = [];
   List<GearPreference> gearPreferences = [];
 

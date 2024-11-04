@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:fire_app/Data/crewmember.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/04_add_load_preference.dart';
 
@@ -132,7 +131,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 20),
-                // Edit for gear too
+
                 widget.tripPreference.positionalPreferences.isEmpty
 
                 // Container for if user has no preferences
