@@ -3,6 +3,7 @@ import 'load.dart';
 import 'crew.dart';
 import 'crewmember.dart';
 import 'gear.dart';
+import 'saved_preferences.dart';
 
 // Currently, this algorithm follows a heaviest loads first approach
 // In the future, if we want to do a more balanced load approach,
@@ -10,7 +11,7 @@ import 'gear.dart';
 // where it finds the lightest load, and places the object there
 //
 // For Saw Team smart loading - just make sure both individuals on SawTeam1, 2, 3, etc., all go on same load
-void loadCalculator(Trip trip) {
+void loadCalculator(Trip trip, TripPreference? tripPreference) {
   // Get the number of loads based on allowable, rounding up
   int numLoads = (crew.totalCrewWeight / trip.allowable).ceil();
   int maxLoadWeight = trip.allowable;
@@ -73,5 +74,5 @@ void loadCalculator(Trip trip) {
     trip.addLoad(trip, newLoad);
   }
 
-  trip.printLoadDetails();
+  //trip.printLoadDetails();
 }

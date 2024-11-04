@@ -6,7 +6,7 @@ import 'package:fire_app/04_add_load_preference.dart';
 import 'package:fire_app/02_edit_crewmember.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '04_edit_trip_preference.dart';
 
 
@@ -132,7 +132,7 @@ class _TripPreferencesState extends State<TripPreferences>{
                                 )
                               ],
                             ),
-                            leading: Icon(Icons.south_america_sharp),
+                            leading: FaIcon(FontAwesomeIcons.helicopter),
                             trailing: IconButton(
                               icon: Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
@@ -157,7 +157,7 @@ class _TripPreferencesState extends State<TripPreferences>{
                                           children: [
                                             TextButton(
                                               onPressed: () {
-                                                Navigator.of(context).pop();  // Dismiss the dialog
+                                                Navigator.of(context).pop();  // Dismiss dialog
                                               },
                                               child: const Text('Cancel',
                                                   style: TextStyle(

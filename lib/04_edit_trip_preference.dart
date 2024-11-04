@@ -208,7 +208,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                 ),
                               );
                             }
-                            // Otherwise, handle gearPreferences
+                            //Handle gearPreferences
                             else {
                               final gearIndex = index -
                                   widget.tripPreference.positionalPreferences

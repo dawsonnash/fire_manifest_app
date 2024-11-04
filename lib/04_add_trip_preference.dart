@@ -203,7 +203,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                           ),
                         );
                       }
-                      // Otherwise, handle gearPreferences
+                      // Handle gearPreferences
                       else {
                         final gearIndex = index -
                             tripPreference.positionalPreferences

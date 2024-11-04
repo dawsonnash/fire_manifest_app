@@ -16,6 +16,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
   // Variables to store user input
   final TextEditingController tripNameController = TextEditingController();
   final TextEditingController allowableController = TextEditingController();
+  // Can be null as a "None" option is available where user doesn't select a Load Preference
   TripPreference? selectedTripPreference;
 
   bool isCalculateButtonEnabled =
@@ -65,7 +66,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
     savedTrips.addTrip(newTrip);
 
     // Manifest that load, baby
-    loadCalculator(newTrip);
+    loadCalculator(newTrip, selectedTripPreference);
 
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(
@@ -94,12 +95,12 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
     });
 
 
-    // Debug for LogCat
-    print("--------------------------");
-    print("Trip Name: $tripName");
-    print("Allowable: $allowable");
-    print("--------------------------");
-    savedTrips.printTripDetails();
+    // // Debug for LogCat
+    // print("--------------------------");
+    // print("Trip Name: $tripName");
+    // print("Allowable: $allowable");
+    // print("--------------------------");
+    // savedTrips.printTripDetails();
 
 
   }
