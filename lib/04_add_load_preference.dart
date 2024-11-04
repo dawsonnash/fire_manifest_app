@@ -94,7 +94,18 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                 child: Column(
                   children: availableCrewMembers.map((crew) {
                     return CheckboxListTile(
-                      title: Text(crew.name),
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                        Text(crew.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),),
+                        Text(crew.getPositionTitle(crew.position),
+                        style: TextStyle(fontSize: 12),),
+
+                      ],
+                      ),
                       value: tempSelectedCrew.contains(crew),
                       onChanged: (bool? isChecked) {
                         setState(() {

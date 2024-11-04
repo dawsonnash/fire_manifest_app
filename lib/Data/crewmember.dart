@@ -32,7 +32,7 @@ const Map<int, String> positionMap = {
   4: 'Lead Firefighter',
   5: 'Senior Firefighter',
   6: 'Air Ops',
-  7: 'Medic',
+  7: 'Medic/EMT',
   8: 'Saw Boss',
   9: 'Saw Team 1',
   10: 'Saw Team 2',
@@ -48,5 +48,8 @@ const Map<int, String> positionMap = {
   20: 'Fuel',
   21: 'Vehicles',
   22: 'Camp/Facilities',
-  23: 'Other',      // User defined
+  23: 'Supply',
+  24: 'Tool Manager',
+  25: '6-man',
+  26: 'Other',      // User defined
 };

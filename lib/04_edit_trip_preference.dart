@@ -185,15 +185,39 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                       Text(posPref.priority.toString()),
                                     ],
                                   ),
-                                  title: Text(
-                                    posPref.crewMembers
-                                        .map((member) => member.name)
-                                        .join(', '),
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                  title: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                      posPref.crewMembers
+                                          .map((member) => member.name)
+                                          .join(', '),
+                                      style:
+                                          TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                      const Divider(
+                                        color: Colors.black,
+                                        thickness: 1,
+                                        height: 8,
+                                        endIndent: 0,
+                                      ),
+                                      Text(
+                                        posPref.crewMembers
+                                            .map((member) => member.getPositionTitle(member.position))
+                                            .join(', '),
+                                       style: TextStyle(fontSize: 12,fontStyle: FontStyle.italic),
+                                      ),
+                                      const Divider(
+                                        color: Colors.black,
+                                        thickness: 1,
+                                        height: 8,
+                                        endIndent: 0,
+                                      ),
+                            ],
                                   ),
                                   subtitle: Text(
-                                      "Load Preference: ${loadPreferenceMap[posPref.loadPreference]}"),
+                                      "${loadPreferenceMap[posPref.loadPreference]} loads",
+                                  style: TextStyle(color: Colors.black),),
                                   trailing: IconButton(
                                     icon: const Icon(Icons.delete,
                                         color: Colors.red),
@@ -226,16 +250,29 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                       Text(gearPref.priority.toString()),
                                     ],
                                   ),
-                                  title: Text(
-                                    gearPref.gear
-                                        .map((member) => member.name)
-                                        .join(', '),
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                  title: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                      gearPref.gear
+                                          .map((member) => member.name)
+                                          .join(', '),
+                                      style:
+                                          TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                      const Divider(
+                                        color: Colors.black,
+                                        thickness: 1,
+                                        height: 8,
+                                        endIndent: 0,
+                                      ),
+                            ],
                                   ),
+
                                   subtitle:
                                   Text(
-                                      "Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}"),                                  trailing: IconButton(
+                                      "${loadPreferenceMap[gearPref.loadPreference]} loads",
+                                  style: TextStyle(color: Colors.black)),                                  trailing: IconButton(
                                     icon: const Icon(Icons.delete,
                                         color: Colors.red),
                                     onPressed: () {

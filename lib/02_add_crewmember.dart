@@ -57,7 +57,7 @@ class AddCrewmember extends StatefulWidget {
       //final String position = selectedPosition?.label ?? 'None';
 
       // Creating a new CrewMember object. Dont have positioin yet
-      CrewMember newCrewMember = CrewMember(name: name, flightWeight: flightWeight, position: selectedPosition ?? 23);
+      CrewMember newCrewMember = CrewMember(name: name, flightWeight: flightWeight, position: selectedPosition ?? 26);
 
       // Add the new crewmember to the global crew object
       crew.addCrewMember(newCrewMember);
