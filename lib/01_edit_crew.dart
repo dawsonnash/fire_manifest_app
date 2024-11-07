@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:fire_app/02_add_crewmember.dart';
-import 'package:fire_app/04_add_load_preference.dart';
 import 'package:fire_app/02_crewmembers_view.dart';
 import 'package:fire_app/03_gear_view.dart';
 import 'package:fire_app/04_trip_preferences_view.dart';

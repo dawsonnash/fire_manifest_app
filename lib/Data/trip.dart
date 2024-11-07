@@ -11,11 +11,13 @@ class Trip extends HiveObject{
   @HiveField(1)
   int allowable;
   @HiveField(2)
+  int availableSeats;
+  @HiveField(3)
   List<Load> loads = [];
 
   //
 
-  Trip({required this.tripName, required this.allowable});
+  Trip({required this.tripName, required this.allowable, required this.availableSeats});
 
   void addLoad(Trip trip, Load newLoad) {
     trip.loads.add(newLoad); //

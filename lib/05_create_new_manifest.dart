@@ -16,6 +16,8 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
   // Variables to store user input
   final TextEditingController tripNameController = TextEditingController();
   final TextEditingController allowableController = TextEditingController();
+  final TextEditingController availableSeatsController = TextEditingController();
+
   // Can be null as a "None" option is available where user doesn't select a Load Preference
   TripPreference? selectedTripPreference;
 
@@ -29,38 +31,43 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
     // Listeners to the TextControllers
     tripNameController.addListener(_checkInput);
     allowableController.addListener(_checkInput);
+    availableSeatsController.addListener(_checkInput);
+
   }
 
   @override
   void dispose() {
     tripNameController.dispose();
     allowableController.dispose();
+    availableSeatsController.dispose();
     super.dispose();
   }
 
   // Function to check if input is valid and update button state
   void _checkInput() {
     final isTripNameValid = tripNameController.text.isNotEmpty;
-    final isAllowableValid =
-        allowableController.text.isNotEmpty && allowableController.text != '0';
+    final isAllowableValid = allowableController.text.isNotEmpty && allowableController.text != '0';
+    final isAvailableSeatsValid = availableSeatsController.text.isNotEmpty && availableSeatsController.text != '0';
 
     setState(() {
       // Need to adjust for position as well
-      isCalculateButtonEnabled = isTripNameValid && isAllowableValid;
+      isCalculateButtonEnabled = isTripNameValid && isAllowableValid && isAvailableSeatsValid;
     });
   }
 
   // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
   void saveTripData() {
+
     // Take what the trip name contrller has saved
     final String tripName = tripNameController.text;
-
     // Convert flight weight text to integer
     final int allowable = int.parse(allowableController.text);
+    // Convert available seats text to integer
+    final int availableSeats = int.parse(availableSeatsController.text);
 
     // Creating a new Trip object
     Trip newTrip =
-        Trip(tripName: tripName, allowable: allowable);
+        Trip(tripName: tripName, allowable: allowable, availableSeats: availableSeats);
 
     // Add the new trip to the global crew object
     savedTrips.addTrip(newTrip);
@@ -87,6 +94,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
 
     // Clear the text fields (reset them to empty), so we can add more trips
     tripNameController.text = '';
+    availableSeatsController.text = '';
 
     // Reset the slider value back to 0
     setState(() {
@@ -179,7 +187,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
 
                       // Enter Trip Name text box
                       Padding(
-                        padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0, bottom: 5.0),
+                        padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0, bottom: 0.0),
                         child: Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
@@ -195,12 +203,12 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                               ),
                             ],
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                           //alignment: Alignment.center,
                           child: Text(
                             'Enter Trip Name',
                             style: const TextStyle(
-                              fontSize: 24,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
@@ -225,7 +233,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                   width: 2.0, // Border width
                                 ),
                                 borderRadius: BorderRadius.circular(
-                                    8.0), // Rounded corners
+                                    4.0), // Rounded corners
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: const BorderSide(
@@ -233,7 +241,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                   // Border color when the TextField is focused
                                   width: 2.0, // Border width
                                 ),
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(4.0),
                               ),
                             ),
                             style: const TextStyle(
@@ -245,7 +253,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
 
                       // Choose Trip Preference text box
                       Padding(
-                        padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0, bottom: 5.0),
+                        padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0, bottom: 0.0),
                         child: Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
@@ -261,12 +269,12 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                               ),
                             ],
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                           //alignment: Alignment.center,
                           child: Text(
                             'Choose Trip Preference',
                             style: const TextStyle(
-                              fontSize: 24,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
@@ -275,32 +283,23 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                       ),
 
                       // Choose Trip Preference
-
                       Padding(
-                        padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0, bottom: 5.0),
+                        padding: const EdgeInsets.only(top: 0.0, left: 16.0, right: 16.0, bottom: 5.0),
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(4.0),
                             border: Border.all(color: Colors.black, width: 2.0),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<TripPreference?>(
                               value: selectedTripPreference,
-                              hint: const Text(
-                                'Choose Trip Preference',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 22,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
                               dropdownColor: Colors.white,
                               style: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 22,
+                                fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
                               iconEnabledColor: Colors.black,
@@ -314,7 +313,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                     value: entry,
                                     child: Text(entry.tripPreferenceName),
                                   );
-                                }).toList(),
+                                }),
                               ],
                               onChanged: (TripPreference? newValue) {
                                 setState(() {
@@ -328,9 +327,9 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                         ),
                       ),
 
-                      // Choose allowable text box
+                      // Enter Available Seats text box
                       Padding(
-                        padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                        padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0, bottom: 0.0),
                         child: Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
@@ -346,12 +345,84 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                               ),
                             ],
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                          //alignment: Alignment.center,
+                          child: Text(
+                            'Enter # of Available Seats',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Available Seats input field
+                      Padding(
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
+                          child: TextField(
+                            controller: availableSeatsController,
+                            keyboardType: TextInputType.number,
+                            // Only show numeric keyboard
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly,
+                              // Allow only digits
+                            ],
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white.withOpacity(0.9),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: Colors.black,
+                                  // Border color when the TextField is not focused
+                                  width: 2.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                    4.0), // Rounded corners
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: Colors.black,
+                                  // Border color when the TextField is focused
+                                  width: 2.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                            ),
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+
+                      ),
+
+                      // Choose allowable text box
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.deepOrangeAccent,
+                            border: Border.all(color: Colors.black, width: 2),
+                            borderRadius: BorderRadius.circular(4),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.5),
+                                spreadRadius: 1,
+                                blurRadius: 8,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                           //alignment: Alignment.center,
                           child: Text(
                             'Choose Allowable',
                             style: const TextStyle(
-                              fontSize: 24,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
@@ -361,7 +432,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
 
                       // Allowable Slider
                       Padding(
-                        padding: const EdgeInsets.only(top: 5.0, right: 16.0, left: 16.0),
+                        padding: const EdgeInsets.only(top: 0.0, right: 16.0, left: 16.0),
                         child: Stack(
                           children: [
                             // Background container with white background, black outline, and rounded corners
@@ -443,9 +514,9 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
 
                       const Spacer(flex: 6),
 
-                      // Save Button
+                      // Calculate Button
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 5.0),
                         child: ElevatedButton(
                           onPressed: isCalculateButtonEnabled
                               ? () {

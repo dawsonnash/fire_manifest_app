@@ -1,11 +1,7 @@
 import 'dart:ui';
 import 'package:fire_app/04_add_trip_preference.dart';
-import 'package:fire_app/Data/crewmember.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
-import 'package:fire_app/04_add_load_preference.dart';
-import 'package:fire_app/02_edit_crewmember.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '04_edit_trip_preference.dart';
 

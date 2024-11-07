@@ -19,7 +19,7 @@ class CrewMemberAdapter extends TypeAdapter<CrewMember> {
     return CrewMember(
       name: fields[0] as String,
       flightWeight: fields[1] as int,
-      position: fields[2] as int? ?? 26,
+      position: fields[2] as int,
     );
   }
 

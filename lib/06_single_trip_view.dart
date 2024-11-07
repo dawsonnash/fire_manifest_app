@@ -3,7 +3,6 @@ import 'package:fire_app/06_single_load_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../Data/trip.dart';
-import 'package:hive/hive.dart';
 
 class SingleTripView extends StatefulWidget {
 

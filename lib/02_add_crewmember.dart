@@ -114,35 +114,6 @@ class AddCrewmember extends StatefulWidget {
             .size
             .height / 10)
     );
-    // Black style input field decoration
-    final InputDecorationTheme inputDecorationTheme = InputDecorationTheme(
-      labelStyle: const TextStyle(
-        color: Colors.white,
-        fontSize: 22,
-        fontStyle: FontStyle.italic,
-        //fontWeight: FontWeight.bold,
-      ),
-      filled: true,
-      fillColor: Colors.black.withOpacity(0.9),
-      enabledBorder: OutlineInputBorder(
-        borderSide: const BorderSide(
-          color: Colors.white,
-          // Border color when the TextField is not focused
-          width: 2.0, // Border width
-        ),
-        borderRadius: BorderRadius.circular(
-            12.0), // Rounded corners
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: const BorderSide(
-          color: Colors.black,
-          // Border color when the TextField is focused
-          width: 2.0, // Border width
-        ),
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-
-    );
 
     return Scaffold(
       resizeToAvoidBottomInset: false,  // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
