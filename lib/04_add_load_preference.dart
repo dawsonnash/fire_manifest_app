@@ -28,7 +28,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
   // Variables to store user input
   // Priority decided as drag & drop in UI
   int? selectedPositionalLoadPreference;
-  List<CrewMember> selectedCrewMembers = [];
+  List<dynamic> selectedCrewMembers = [];
 
   int? selectedGearLoadPreference;
   List<Gear> selectedGear = [];
@@ -49,24 +49,53 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     super.dispose();
   }
 
-  // Functions to open the multi-select dialog for crewmembers/gear
+  // Function to open the multi-select dialog for crew members
+  // overly logically complex - do not try to understand
   void _showCrewMemberSelectionDialog() async {
+    List<Map<String, dynamic>> sawTeamOptions = [];
+    List<Map<String, dynamic>> individualOptions = [];
 
-    // Gets crew members already used in existing PositionalPreferences
     final usedCrewMembers = widget.tripPreference.positionalPreferences
-        .expand((posPref) => posPref.crewMembers)
-        .toSet();  // Convert to Set to avoid duplicates
+        .expand((posPref) => posPref.crewMembersDynamic)
+        .toSet();
 
-    // Filters out used crew members for selection list
+    // Populate Saw Team options
+    for (int i = 1; i <= 6; i++) {
+      List<CrewMember> sawTeam = crew.getSawTeam(i);
+      if (sawTeam.isNotEmpty &&
+          !sawTeam.every(usedCrewMembers.contains) &&
+          !sawTeam.every((member) => selectedCrewMembers.contains(member))) {
+        sawTeamOptions.add({'name': 'Saw Team $i', 'members': sawTeam});
+      }
+    }
+
+    // Populate individual crew member options
     final availableCrewMembers = crew.crewMembers
         .where((crewMember) => !usedCrewMembers.contains(crewMember))
         .toList();
 
-    // If no crew members available, show a message
-    if (availableCrewMembers.isEmpty) {
+    for (var member in availableCrewMembers) {
+      bool isPartOfSelectedSawTeam = false;
+
+      for (int i = 1; i <= 6; i++) {
+        List<CrewMember> sawTeam = crew.getSawTeam(i);
+        if (sawTeam.contains(member) &&
+            selectedCrewMembers.any((item) => item is Map && item['name'] == 'Saw Team $i')) {
+          isPartOfSelectedSawTeam = true;
+          break;
+        }
+      }
+
+      if (!isPartOfSelectedSawTeam) {
+        individualOptions.add({'name': member.name, 'members': [member]});
+      }
+    }
+
+    if (sawTeamOptions.isEmpty && individualOptions.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('No more crew members available',
+          content: Text(
+            'No crew members available',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.black,
@@ -81,49 +110,112 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
       return;
     }
 
-    final List<CrewMember>? result = await showDialog(
+    await showDialog(
       context: context,
       builder: (context) {
-        List<CrewMember> tempSelectedCrew = List.from(selectedCrewMembers);
-
         return StatefulBuilder(
           builder: (context, setState) {
+            void updateSelection() {
+              // Remove Saw Team if all individual members are selected
+              sawTeamOptions.removeWhere((option) {
+                List<CrewMember> members = option['members'];
+                return members.every((member) => selectedCrewMembers.contains(member));
+              });
+
+              // Re-add Saw Team if any member of the team is deselected
+              for (int i = 1; i <= 6; i++) {
+                List<CrewMember> sawTeam = crew.getSawTeam(i);
+                if (sawTeam.isNotEmpty &&
+                    sawTeam.any((member) => !selectedCrewMembers.contains(member)) &&
+                    !sawTeamOptions.any((option) => option['name'] == 'Saw Team $i')) {
+                  sawTeamOptions.add({'name': 'Saw Team $i', 'members': sawTeam});
+                }
+              }
+
+              // Regenerate individual options based on current selection
+              individualOptions.clear();
+              final availableCrewMembers = crew.crewMembers
+                  .where((crewMember) => !usedCrewMembers.contains(crewMember))
+                  .toList();
+
+              for (var member in availableCrewMembers) {
+                bool isPartOfSelectedSawTeam = false;
+
+                for (int i = 1; i <= 6; i++) {
+                  List<CrewMember> sawTeam = crew.getSawTeam(i);
+                  if (sawTeam.contains(member) &&
+                      selectedCrewMembers.any((item) => item is Map && item['name'] == 'Saw Team $i')) {
+                    isPartOfSelectedSawTeam = true;
+                    break;
+                  }
+                }
+
+                if (!isPartOfSelectedSawTeam) {
+                  individualOptions.add({'name': member.name, 'members': [member]});
+                }
+              }
+            }
+
             return AlertDialog(
               title: const Text('Select Crew Members'),
               content: SingleChildScrollView(
                 child: Column(
-                  children: availableCrewMembers.map((crew) {
-                    return CheckboxListTile(
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                        Text(crew.name,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),),
-                        Text(crew.getPositionTitle(crew.position),
-                        style: TextStyle(fontSize: 12),),
+                  children: [
+                    // Saw Team options
+                    ...sawTeamOptions.map((option) {
+                      bool isSelected = selectedCrewMembers
+                          .any((item) => item is Map && item['name'] == option['name']);
+                      return CheckboxListTile(
+                        title: Text(option['name']),
+                        value: isSelected,
+                        onChanged: (bool? isChecked) {
+                          setState(() {
+                            if (isChecked == true) {
+                              // Add Saw Team and remove individual members
+                              selectedCrewMembers.add(option);
+                              for (var member in option['members']) {
+                                selectedCrewMembers.remove(member);
+                              }
+                            } else {
+                              // Remove Saw Team
+                              selectedCrewMembers.removeWhere(
+                                      (item) => item is Map && item['name'] == option['name']);
+                            }
+                            updateSelection(); // Update the individual options
+                          });
+                        },
+                      );
+                    }).toList(),
 
-                      ],
-                      ),
-                      value: tempSelectedCrew.contains(crew),
-                      onChanged: (bool? isChecked) {
-                        setState(() {
-                          if (isChecked == true) {
-                            tempSelectedCrew.add(crew);
-                          } else {
-                            tempSelectedCrew.remove(crew);
-                          }
-                        });
-                      },
-                    );
-                  }).toList(),
+                    // Divider between Saw Teams and Individuals
+                    if (sawTeamOptions.isNotEmpty && individualOptions.isNotEmpty)
+                      const Divider(color: Colors.black, thickness: 1),
+
+                    // Individual crew member options
+                    ...individualOptions.map((option) {
+                      bool isSelected = selectedCrewMembers.contains(option['members'].first);
+                      return CheckboxListTile(
+                        title: Text(option['name']),
+                        value: isSelected,
+                        onChanged: (bool? isChecked) {
+                          setState(() {
+                            if (isChecked == true) {
+                              selectedCrewMembers.add(option['members'].first);
+                            } else {
+                              selectedCrewMembers.remove(option['members'].first);
+                            }
+                            updateSelection(); // Check if all members of a Saw Team are selected
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ],
                 ),
               ),
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(tempSelectedCrew);
+                    Navigator.of(context).pop();
                   },
                   child: const Text('Save'),
                 ),
@@ -134,15 +226,12 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
       },
     );
 
-    if (result != null) {
-      setState(() {
-        selectedCrewMembers = result;
-        _checkPositionalInput(); // Update button state
-      });
-    }
+    setState(() {
+      _checkPositionalInput();
+    });
   }
 
-  // Functions to open the multi-select dialog for crewmembers/gear
+  // Functions to open the multi-select dialog for gear
   void _showGearSelectionDialog() async {
 
     // Gets gear already used in existing GearPreferences
@@ -159,7 +248,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     if (availableGear.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('No more gear available',
+          content: Text('No gear available',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.black,
@@ -237,24 +326,38 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
   }
 
   void savePositionalLoadPreference(TripPreference newTripPreference) {
+    // Create a new list to store crew members dynamically
+    List<dynamic> crewMembersToSave = [];
 
+    // Loop through selectedCrewMembers and add either individual members or entire Saw Teams
+    for (var member in selectedCrewMembers) {
+      if (member is Map && member.containsKey('members')) {
+        // Add the Saw Team as a List<CrewMember>
+        crewMembersToSave.add(member['members']);
+      } else if (member is CrewMember) {
+        // Add the individual Crew Member directly
+        crewMembersToSave.add(member);
+      }
+    }
+
+    // Create a new PositionalPreference with the updated crew members list
     final newPositionalPreference = PositionalPreference(
-        priority: 1,  // TO be changed and updated via UI drag n drop
-        loadPreference: selectedPositionalLoadPreference!,
-        crewMembers: selectedCrewMembers
+      priority: 1,  // Adjusted later through UI
+      loadPreference: selectedPositionalLoadPreference!,
+      crewMembersDynamic: crewMembersToSave,
     );
 
-    // Add this new preference to the TripPreference object
+    // Add the new preference to the TripPreference object
     newTripPreference.positionalPreferences.add(newPositionalPreference);
 
-    // Callback function, Update previous page UI with setState()
+    // Trigger the update callback
     widget.onUpdate();
 
-    // Show successful save popup
+    // Show a success message
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Preference saved!',
-          // Maybe change look
+        content: Text(
+          'Preference saved!',
           style: TextStyle(
             color: Colors.black,
             fontSize: 32,
@@ -265,8 +368,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
         backgroundColor: Colors.green,
       ),
     );
-    Navigator.of(context).pop();  // Return to previous screen
+
+    Navigator.of(context).pop();  // Return to the previous screen
   }
+
 
   void saveGearLoadPreference(TripPreference newTripPreference) {
 
@@ -382,7 +487,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: GestureDetector(
-                        onTap: _showCrewMemberSelectionDialog,  // Trigger dialog on tap
+                        onTap: _showCrewMemberSelectionDialog, // Trigger dialog on tap
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
@@ -394,13 +499,24 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                           child: Text(
                             selectedCrewMembers.isEmpty
                                 ? 'Choose crew member(s)'
-                                : selectedCrewMembers.map((e) => e.name).join(', '),
+                                : selectedCrewMembers.map((e) {
+                              if (e is Map && e.containsKey('name') && e['name'].startsWith('Saw Team')) {
+                                return e['name']; // Display "Saw Team i"
+                              } else if (e is CrewMember) {
+                                return e.name;  // Display individual crew member name
+                              }
+                              return '';
+                            }).join(', '),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 22,
                               fontStyle: FontStyle.italic,
                             ),
                           ),
+
+
+
+
                         ),
                       ),
                     ),
@@ -436,7 +552,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                             items: loadPreferenceMap.entries.map((entry) {
                               return DropdownMenuItem<int>(
                                 value: entry.key,
-                                child: Text(entry.value),
+                                child: Text(entry.value), // Add info icon that tells what the load preference option does, e.g., 'Balanced distributes evenly from first to last load
                               );
                             }).toList(),
                             onChanged: (int? newValue) {

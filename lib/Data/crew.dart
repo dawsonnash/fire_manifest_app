@@ -3,10 +3,22 @@ import 'gear.dart';
 import 'package:hive/hive.dart';
 
 class Crew {
-  List<CrewMember> crewMembers = [];
+  List<CrewMember> crewMembers = [];        // Contains all crew members
   List<Gear> gear = [];
   double totalCrewWeight = 0.0;
 
+  // Helper function to get saw teams
+  List<CrewMember> getSawTeam(int teamNumber) {
+    switch (teamNumber) {
+      case 1: return crewMembers.where((member) => member.position == 9).toList();
+      case 2: return crewMembers.where((member) => member.position == 10).toList();
+      case 3: return crewMembers.where((member) => member.position == 11).toList();
+      case 4: return crewMembers.where((member) => member.position == 12).toList();
+      case 5: return crewMembers.where((member) => member.position == 13).toList();
+      case 6: return crewMembers.where((member) => member.position == 14).toList();
+      default: return [];
+    }
+  }
   void updateTotalCrewWeight() {
     double crewWeight = 0.0;
     for (var member in crewMembers) {

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/04_add_load_preference.dart';
 
+import 'Data/crew.dart';
+import 'Data/crewmember.dart';
+
 class AddTripPreference extends StatefulWidget {
 
   final VoidCallback onUpdate;  // Callback to update previous page
@@ -160,58 +163,77 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                   ),
                 )
                     : Expanded(
-                  child: ListView.builder(
-                    itemCount: tripPreference.positionalPreferences.length +
-                        tripPreference.gearPreferences.length,
-                    itemBuilder: (context, index) {
-                      // If index is within the positionalPreferences range
-                      // This approach may not work if we are doing drag n drop
-                      if (index <
-                          tripPreference.positionalPreferences
-                              .length) {
-                        final posPref = tripPreference.positionalPreferences[index];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 16.0),
-                          child: ListTile(
-                            leading: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text("Priority"),
-                                Text(posPref.priority.toString()),
-                              ],
+                    child: ListView.builder(
+                      itemCount: tripPreference.positionalPreferences.length +
+                          tripPreference.gearPreferences.length,
+                      itemBuilder: (context, index) {
+                        // If index is within the positionalPreferences range
+                        if (index < tripPreference.positionalPreferences.length) {
+                          final posPref = tripPreference.positionalPreferences[index];
+
+                          // Dynacmic title - individual or saw teams
+                          String titleText = posPref.crewMembersDynamic.map((member) {
+                            if (member is CrewMember) {
+                              return member.name; // Single crew member
+                            } else if (member is List<CrewMember>) {
+                              // Check which saw team this list matches and return the appropriate name
+                              if (member == crew.getSawTeam(1)) return 'Saw Team 1';
+                              if (member == crew.getSawTeam(2)) return 'Saw Team 2';
+                              if (member == crew.getSawTeam(3)) return 'Saw Team 3';
+                              if (member == crew.getSawTeam(4)) return 'Saw Team 4';
+                              if (member == crew.getSawTeam(5)) return 'Saw Team 5';
+                              if (member == crew.getSawTeam(6)) return 'Saw Team 6';
+                            }
+                            return '';
+                          }).join(', ');
+
+                          return Card(
+                            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                            child: ListTile(
+                              leading: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("Priority"),
+                                  Text(posPref.priority.toString()),
+                                ],
+                              ),
+                              title: Text(
+                                posPref.crewMembersDynamic.map((item) {
+                                  if (item is CrewMember) {
+                                    return item.name;  // Display individual crew member name
+                                  } else if (item is List<CrewMember>) {
+                                    // Check which Saw Team the list matches and return the appropriate Saw Team name
+                                    for (int i = 1; i <= 6; i++) {
+                                      List<CrewMember> sawTeam = crew.getSawTeam(i);
+                                      if (sawTeam.every((member) => item.contains(member)) && item.length == sawTeam.length) {
+                                        return 'Saw Team $i';  // Return Saw Team name
+                                      }
+                                    }
+                                  }
+                                  return '';
+                                }).join(', '),
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+
+
+                              subtitle: Text(
+                                  "Load Preference: ${loadPreferenceMap[posPref.loadPreference]}"),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  setState(() {
+                                    tripPreference.positionalPreferences.removeAt(index);
+                                  });
+                                },
+                              ),
                             ),
-                            title: Text(
-                              posPref.crewMembers
-                                  .map((member) => member.name)
-                                  .join(', '),
-                              style:
-                              TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text(
-                                "Load Preference: ${loadPreferenceMap[posPref.loadPreference]}"),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete,
-                                  color: Colors.red),
-                              onPressed: () {
-                                setState(() {tripPreference
-                                      .positionalPreferences
-                                      .removeAt(index);
-                                });
-                              },
-                            ),
-                          ),
-                        );
-                      }
-                      // Handle gearPreferences
-                      else {
-                        final gearIndex = index -
-                            tripPreference.positionalPreferences
-                                .length;
+                          );
+                        }
+                        // Handle gear preferences
+                        final gearIndex = index - tripPreference.positionalPreferences.length;
                         final gearPref = tripPreference.gearPreferences[gearIndex];
                         return Card(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 16.0),
+                          margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                           child: ListTile(
                             leading: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -221,29 +243,23 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                               ],
                             ),
                             title: Text(
-                              gearPref.gear
-                                  .map((member) => member.name)
-                                  .join(', '),
-                              style:
-                              TextStyle(fontWeight: FontWeight.bold),
+                              gearPref.gear.map((item) => item.name).join(', '),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            subtitle:
-                            Text(
-                                "Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}"),                                  trailing: IconButton(
-                            icon: const Icon(Icons.delete,
-                                color: Colors.red),
-                            onPressed: () {
-                              setState(() {
-                                tripPreference.gearPreferences
-                                    .removeAt(gearIndex);
-                              });
-                            },
-                          ),
+                            subtitle: Text(
+                                "Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}"),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                setState(() {
+                                  tripPreference.gearPreferences.removeAt(gearIndex);
+                                });
+                              },
+                            ),
                           ),
                         );
-                      }
-                    },
-                  ),
+                      },
+                    ),
                 ),
 
                 // Add Load Preference Button

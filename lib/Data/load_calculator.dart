@@ -45,47 +45,95 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
       // Different cases based on Load Preference: First (0), Last (1), Balanced (2)
       switch (posPref.loadPreference) {
         case 0: // First load preference
-          for (var crewMember in posPref.crewMembers) {
-            for (var load in loads) {
-              if (load.weight + crewMember.flightWeight <= maxLoadWeight &&     // Checks whether load is still under allowable, and whether there is enough seats
-                  load.loadPersonnel.length < availableSeats) {
-                load.loadPersonnel.add(crewMember);                             // Add crew member to load
-                load.weight += crewMember.flightWeight;                         // Update load weight
-                crewMembersCopy.remove(crewMember);                             // Remove from available crew member list
-                break;                                                           // Move to next crew member
+          for (var crewMembersDynamic in posPref.crewMembersDynamic) {
+            // If it's just an individual crew member
+            if (crewMembersDynamic is CrewMember) {
+              for (var load in loads) {
+                // If the new Crew Member's flight weight is less than the allowable load weight and there are enough seats available
+                if (load.weight + crewMembersDynamic.flightWeight <= maxLoadWeight &&
+                    load.loadPersonnel.length < availableSeats) {
+                  load.loadPersonnel.add(crewMembersDynamic);
+                  load.weight += crewMembersDynamic.flightWeight;
+                  crewMembersCopy.remove(crewMembersDynamic);
+                  break;
+                }
+              }
+            }
+            // If it's a group of crew members, i.e., a Saw Team
+            else if (crewMembersDynamic is List<CrewMember>) {
+              // Take the total weight of all crew member's in the group (saw team). Cannot be a double
+              int totalGroupWeight = crewMembersDynamic.fold(0, (sum, member) => sum + member.flightWeight);
+              for (var load in loads) {
+                if (load.weight + totalGroupWeight <= maxLoadWeight &&
+                    load.loadPersonnel.length + crewMembersDynamic.length <= availableSeats) {
+                  load.loadPersonnel.addAll(crewMembersDynamic);
+                  load.weight += totalGroupWeight;
+                  crewMembersCopy.removeWhere((member) => crewMembersDynamic.contains(member));
+                  break;
+                }
+              }
+            }
+          }
+
+          break;
+
+        case 1: // Last load preference - if weight exceeds last load place in second to last and so on
+          for (var crewMembersDynamic in posPref.crewMembersDynamic) {
+            if (crewMembersDynamic is CrewMember) {
+              for (var load in loads.reversed) {
+                if (load.weight + crewMembersDynamic.flightWeight <= maxLoadWeight &&
+                    load.loadPersonnel.length < availableSeats) {
+                  load.loadPersonnel.add(crewMembersDynamic);
+                  load.weight += crewMembersDynamic.flightWeight;
+                  crewMembersCopy.remove(crewMembersDynamic);
+                  break;
+                }
+              }
+            } else if (crewMembersDynamic is List<CrewMember>) {
+              int totalGroupWeight = crewMembersDynamic.fold(0, (sum, member) => sum + member.flightWeight);
+              for (var load in loads.reversed) {
+                if (load.weight + totalGroupWeight <= maxLoadWeight &&
+                    load.loadPersonnel.length + crewMembersDynamic.length <= availableSeats) {
+                  load.loadPersonnel.addAll(crewMembersDynamic);
+                  load.weight += totalGroupWeight;
+                  crewMembersCopy.removeWhere((member) => crewMembersDynamic.contains(member));
+                  break;
+                }
               }
             }
           }
           break;
 
-        case 1: // Last load preference -  if weight exceeds last load weight, place in second to last and so on
-          for (var crewMember in posPref.crewMembers) {
-            for (var load in loads.reversed) {
-              if (load.weight + crewMember.flightWeight <= maxLoadWeight &&     // Checks whether load is still under allowable, and whether there is enough seats
-                  load.loadPersonnel.length < availableSeats) {
-                load.loadPersonnel.add(crewMember);
-                load.weight += crewMember.flightWeight;
-                crewMembersCopy.remove(crewMember);
-                break;
-              }
-            }
-          }
-          break;
-
-        case 2: // Balanced load preference
+        case 2: // Balanced load preference - places cyclically first through last
           int loadIndex = 0;
-          for (var crewMember in posPref.crewMembers) {
-            while (loadIndex < loads.length) {
-              var load = loads[loadIndex];
-              if (load.weight + crewMember.flightWeight <= maxLoadWeight &&     // Checks whether load is still under allowable, and whether there is enough seats
-                  load.loadPersonnel.length < availableSeats) {
-                load.loadPersonnel.add(crewMember);
-                load.weight += crewMember.flightWeight;
-                crewMembersCopy.remove(crewMember);
-                loadIndex = (loadIndex + 1) % loads.length; // Loop through loads
-                break;
+          for (var crewMembersDynamic in posPref.crewMembersDynamic) {
+            if (crewMembersDynamic is CrewMember) {
+              while (loadIndex < loads.length) {
+                var load = loads[loadIndex];
+                if (load.weight + crewMembersDynamic.flightWeight <= maxLoadWeight &&
+                    load.loadPersonnel.length < availableSeats) {
+                  load.loadPersonnel.add(crewMembersDynamic);
+                  load.weight += crewMembersDynamic.flightWeight;
+                  crewMembersCopy.remove(crewMembersDynamic);
+                  loadIndex = (loadIndex + 1) % loads.length;
+                  break;
+                }
+                loadIndex = (loadIndex + 1) % loads.length;
               }
-              loadIndex = (loadIndex + 1) % loads.length;
+            } else if (crewMembersDynamic is List<CrewMember>) {
+              int totalGroupWeight = crewMembersDynamic.fold(0, (sum, member) => sum + member.flightWeight);
+              while (loadIndex < loads.length) {
+                var load = loads[loadIndex];
+                if (load.weight + totalGroupWeight <= maxLoadWeight &&
+                    load.loadPersonnel.length + crewMembersDynamic.length <= availableSeats) {
+                  load.loadPersonnel.addAll(crewMembersDynamic);
+                  load.weight += totalGroupWeight;
+                  crewMembersCopy.removeWhere((member) => crewMembersDynamic.contains(member));
+                  loadIndex = (loadIndex + 1) % loads.length;     // Loop through loads cyclically
+                  break;
+                }
+                loadIndex = (loadIndex + 1) % loads.length;
+              }
             }
           }
           break;

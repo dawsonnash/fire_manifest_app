@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/04_add_load_preference.dart';
 
+import 'Data/crew.dart';
+import 'Data/crewmember.dart';
+
 class EditTripPreference extends StatefulWidget {
   final TripPreference tripPreference;
   final VoidCallback onUpdate; // Callback to update previous page
@@ -162,131 +165,136 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                         ),
                       )
                     : Expanded(
-                        child: ListView.builder(
-                          itemCount: widget
-                                  .tripPreference.positionalPreferences.length +
-                              widget.tripPreference.gearPreferences.length,
-                          itemBuilder: (context, index) {
-                            // If index is within the positionalPreferences range
-                            // This approach may not work if we are doing drag n drop
-                            if (index <
-                                widget.tripPreference.positionalPreferences
-                                    .length) {
-                              final posPref = widget
-                                  .tripPreference.positionalPreferences[index];
-                              return Card(
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 16.0),
-                                child: ListTile(
-                                  leading: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("Priority"),
-                                      Text(posPref.priority.toString()),
-                                    ],
-                                  ),
-                                  title: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                      posPref.crewMembers
-                                          .map((member) => member.name)
-                                          .join(', '),
-                                      style:
-                                          TextStyle(fontWeight: FontWeight.bold),
-                                    ),
-                                      const Divider(
-                                        color: Colors.black,
-                                        thickness: 1,
-                                        height: 8,
-                                        endIndent: 0,
-                                      ),
-                                      Text(
-                                        posPref.crewMembers
-                                            .map((member) => member.getPositionTitle(member.position))
-                                            .join(', '),
-                                       style: TextStyle(fontSize: 12,fontStyle: FontStyle.italic),
-                                      ),
-                                      const Divider(
-                                        color: Colors.black,
-                                        thickness: 1,
-                                        height: 8,
-                                        endIndent: 0,
-                                      ),
-                            ],
-                                  ),
-                                  subtitle: Text(
-                                      "${loadPreferenceMap[posPref.loadPreference]} loads",
-                                  style: TextStyle(color: Colors.black),),
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.delete,
-                                        color: Colors.red),
-                                    onPressed: () {
-                                      setState(() {
-                                        widget.tripPreference
-                                            .positionalPreferences
-                                            .removeAt(index);
-                                      });
-                                    },
-                                  ),
-                                ),
-                              );
-                            }
-                            //Handle gearPreferences
-                            else {
-                              final gearIndex = index -
-                                  widget.tripPreference.positionalPreferences
-                                      .length;
-                              final gearPref = widget
-                                  .tripPreference.gearPreferences[gearIndex];
-                              return Card(
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 16.0),
-                                child: ListTile(
-                                  leading: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("Priority"),
-                                      Text(gearPref.priority.toString()),
-                                    ],
-                                  ),
-                                  title: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                      gearPref.gear
-                                          .map((member) => member.name)
-                                          .join(', '),
-                                      style:
-                                          TextStyle(fontWeight: FontWeight.bold),
-                                    ),
-                                      const Divider(
-                                        color: Colors.black,
-                                        thickness: 1,
-                                        height: 8,
-                                        endIndent: 0,
-                                      ),
-                            ],
-                                  ),
+                    child: ListView.builder(
+                      itemCount: widget.tripPreference.positionalPreferences.length +
+                          widget.tripPreference.gearPreferences.length,
+                      itemBuilder: (context, index) {
+                        // If index is within the positionalPreferences range
+                        if (index < widget.tripPreference.positionalPreferences.length) {
+                          final posPref = widget.tripPreference.positionalPreferences[index];
 
-                                  subtitle:
-                                  Text(
-                                      "${loadPreferenceMap[gearPref.loadPreference]} loads",
-                                  style: TextStyle(color: Colors.black)),                                  trailing: IconButton(
-                                    icon: const Icon(Icons.delete,
-                                        color: Colors.red),
-                                    onPressed: () {
-                                      setState(() {
-                                        widget.tripPreference.gearPreferences
-                                            .removeAt(gearIndex);
-                                      });
-                                    },
-                                  ),
-                                ),
-                              );
+                          // Construct the display text for crew members or groups
+                          String crewDisplayText = posPref.crewMembersDynamic.map((member) {
+                            if (member is CrewMember) {
+                              return member.name; // Single crew member
+                            } else if (member is List<CrewMember>) {
+                              // Check for matching saw teams
+                              if (member == crew.getSawTeam(1)) return 'Saw Team 1';
+                              if (member == crew.getSawTeam(2)) return 'Saw Team 2';
+                              if (member == crew.getSawTeam(3)) return 'Saw Team 3';
+                              if (member == crew.getSawTeam(4)) return 'Saw Team 4';
+                              if (member == crew.getSawTeam(5)) return 'Saw Team 5';
+                              if (member == crew.getSawTeam(6)) return 'Saw Team 6';
                             }
-                          },
-                        ),
+                            return '';
+                          }).join(', ');
+
+                          // Construct the display text for positions
+                          String positionDisplayText = posPref.crewMembersDynamic.map((member) {
+                            if (member is CrewMember) {
+                              return member.getPositionTitle(member.position);
+                            } else if (member is List<CrewMember>) {
+                              // For Saw Teams, return a general label or details
+                              return 'Saw Team Members';
+                            }
+                            return '';
+                          }).join(', ');
+
+                          return Card(
+                            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                            child: ListTile(
+                              leading: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("Priority"),
+                                  Text(posPref.priority.toString()),
+                                ],
+                              ),
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    crewDisplayText,
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  const Divider(
+                                    color: Colors.black,
+                                    thickness: 1,
+                                    height: 8,
+                                    endIndent: 0,
+                                  ),
+                                  Text(
+                                    positionDisplayText,
+                                    style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                                  ),
+                                  const Divider(
+                                    color: Colors.black,
+                                    thickness: 1,
+                                    height: 8,
+                                    endIndent: 0,
+                                  ),
+                                ],
+                              ),
+                              subtitle: Text(
+                                "${loadPreferenceMap[posPref.loadPreference]} load",
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  setState(() {
+                                    widget.tripPreference.positionalPreferences.removeAt(index);
+                                  });
+                                },
+                              ),
+                            ),
+                          );
+                        }
+
+                        // Handle gearPreferences
+                        final gearIndex = index - widget.tripPreference.positionalPreferences.length;
+                        final gearPref = widget.tripPreference.gearPreferences[gearIndex];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                          child: ListTile(
+                            leading: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text("Priority"),
+                                Text(gearPref.priority.toString()),
+                              ],
+                            ),
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  gearPref.gear.map((item) => item.name).join(', '),
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                const Divider(
+                                  color: Colors.black,
+                                  thickness: 1,
+                                  height: 8,
+                                  endIndent: 0,
+                                ),
+                              ],
+                            ),
+                            subtitle: Text(
+                              "${loadPreferenceMap[gearPref.loadPreference]} loads",
+                              style: const TextStyle(color: Colors.black),
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                setState(() {
+                                  widget.tripPreference.gearPreferences.removeAt(gearIndex);
+                                });
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                       ),
 
                 // Add Load Preference Button
