@@ -3,12 +3,205 @@ import 'load.dart';
 import 'crew.dart';
 import 'crewmember.dart';
 import 'gear.dart';
+import 'saved_preferences.dart';
 
 // Currently, this algorithm follows a heaviest loads first approach
 // In the future, if we want to do a more balanced load approach,
 // It will be slightly more complex - like a 'greedy balancing/backtracking' algo,
 // where it finds the lightest load, and places the object there
-void loadCalculator(Trip trip) {
+// For Saw Team smart loading - just make sure both individuals on SawTeam1, 2, 3, etc., all go on same load
+
+// TripPreference based sorting algorithm
+void loadCalculator(Trip trip, TripPreference? tripPreference) {
+
+  int availableSeats = trip.availableSeats;
+  int maxLoadWeight = trip.allowable;
+
+  // Get  number of loads based on allowable
+  int numLoadsByAllowable = (crew.totalCrewWeight / trip.allowable).ceil();
+  // Get number of loads based on seats available in the helicopter
+  int numLoadsBySeat = (crew.crewMembers.length / trip.availableSeats).ceil();
+
+  // Whichever number is greater is the actual number of loads required
+  int numLoads = numLoadsByAllowable > numLoadsBySeat ? numLoadsByAllowable : numLoadsBySeat;
+
+  // Create copies of crew and gear
+  // List.from() creates a new list with exact same elements as OG.
+  var crewMembersCopy = List.from(crew.crewMembers);
+  var gearCopy = List.from(crew.gear);
+
+  // Initialize all Loads
+  List<Load> loads = List.generate(numLoads, (index) => Load(
+    loadNumber: index + 1,
+    weight: 0,
+    loadPersonnel: [],
+    loadGear: [],
+  ));
+
+  // TripPreference can be "None", i.e., null
+  if (tripPreference != null) {
+    // Loop through all Positional Preferences, not based on Priority yet
+    for (var posPref in tripPreference.positionalPreferences) {
+      // Different cases based on Load Preference: First (0), Last (1), Balanced (2)
+      switch (posPref.loadPreference) {
+        case 0: // First load preference
+          for (var crewMember in posPref.crewMembers) {
+            for (var load in loads) {
+              if (load.weight + crewMember.flightWeight <= maxLoadWeight &&     // Checks whether load is still under allowable, and whether there is enough seats
+                  load.loadPersonnel.length < availableSeats) {
+                load.loadPersonnel.add(crewMember);                             // Add crew member to load
+                load.weight += crewMember.flightWeight;                         // Update load weight
+                crewMembersCopy.remove(crewMember);                             // Remove from available crew member list
+                break;                                                           // Move to next crew member
+              }
+            }
+          }
+          break;
+
+        case 1: // Last load preference -  if weight exceeds last load weight, place in second to last and so on
+          for (var crewMember in posPref.crewMembers) {
+            for (var load in loads.reversed) {
+              if (load.weight + crewMember.flightWeight <= maxLoadWeight &&     // Checks whether load is still under allowable, and whether there is enough seats
+                  load.loadPersonnel.length < availableSeats) {
+                load.loadPersonnel.add(crewMember);
+                load.weight += crewMember.flightWeight;
+                crewMembersCopy.remove(crewMember);
+                break;
+              }
+            }
+          }
+          break;
+
+        case 2: // Balanced load preference
+          int loadIndex = 0;
+          for (var crewMember in posPref.crewMembers) {
+            while (loadIndex < loads.length) {
+              var load = loads[loadIndex];
+              if (load.weight + crewMember.flightWeight <= maxLoadWeight &&     // Checks whether load is still under allowable, and whether there is enough seats
+                  load.loadPersonnel.length < availableSeats) {
+                load.loadPersonnel.add(crewMember);
+                load.weight += crewMember.flightWeight;
+                crewMembersCopy.remove(crewMember);
+                loadIndex = (loadIndex + 1) % loads.length; // Loop through loads
+                break;
+              }
+              loadIndex = (loadIndex + 1) % loads.length;
+            }
+          }
+          break;
+      }
+    }
+
+    // Loop through all Gear Preferences, not based on Priority yet
+    for (var gearPref in tripPreference.gearPreferences) {
+      // Different cases based on Load Preference: First, Last, Balanced
+      switch (gearPref.loadPreference) {
+        case 0: // First load preference
+          for (var gear in gearPref.gear) {
+            for (var load in loads) {
+              if (load.weight + gear.weight <= maxLoadWeight) {
+                load.loadGear.add(gear);
+                load.weight += gear.weight;
+                gearCopy.remove(gear); // Remove from list
+                break; // Move to next gear item
+              }
+            }
+          }
+          break;
+
+        case 1: // Last load preference -  if weight exceeds last load weight, place in second to last and so on
+          for (var gear in gearPref.gear) {
+            for (var load in loads.reversed) {
+              if (load.weight + gear.weight <= maxLoadWeight) {
+                load.loadGear.add(gear);
+                load.weight += gear.weight;
+                gearCopy.remove(gear);
+                break;
+              }
+            }
+          }
+          break;
+
+        case 2: // Balanced load preference
+          int loadIndex = 0;
+          for (var gear in gearPref.gear) {
+            while (loadIndex < loads.length) {
+              var load = loads[loadIndex];
+              if (load.weight + gear.weight <= maxLoadWeight) {
+                load.loadGear.add(gear);
+                load.weight += gear.weight;
+                gearCopy.remove(gear);
+                loadIndex = (loadIndex + 1) % loads.length; // Loop through loads
+                break;
+              }
+              loadIndex = (loadIndex + 1) % loads.length;
+            }
+          }
+          break;
+      }
+    }
+  }
+
+  // Fill the remaining space in loads with crew members and gear
+  for (int i = 0; i < loads.length; i++) {
+    Load currentLoad = loads[i];
+    num currentLoadWeight = currentLoad.weight;
+
+    while (currentLoadWeight < maxLoadWeight) {
+      bool itemAdded = false;
+
+      // Add remaining crew members not covered by positional preferences
+      // Eventually to be replaced by "Smart Loading"
+      if (crewMembersCopy.isNotEmpty &&
+          currentLoadWeight + crewMembersCopy.first.flightWeight <= maxLoadWeight &&
+          currentLoad.loadPersonnel.length < availableSeats) {
+        var firstCrewMember = crewMembersCopy.first;
+        currentLoadWeight += firstCrewMember.flightWeight;
+        currentLoad.loadPersonnel.add(firstCrewMember);
+        crewMembersCopy.removeAt(0);
+        itemAdded = true;
+      }
+
+      // Add gear if space allows
+      if (gearCopy.isNotEmpty &&
+          currentLoadWeight + gearCopy.first.weight <= maxLoadWeight) {
+        currentLoadWeight += gearCopy.first.weight;
+        currentLoad.loadGear.add(gearCopy.first);
+        gearCopy.removeAt(0);
+        itemAdded = true;
+      }
+
+      if (!itemAdded || (crewMembersCopy.isEmpty && gearCopy.isEmpty)) {
+        break;
+      }
+    }
+
+    // Update load weight
+
+    currentLoad.weight = currentLoadWeight.toInt();
+    trip.addLoad(trip, currentLoad);
+  }
+  // Error check to see if all Crew Members / Gear were allocated to loads
+  if (crewMembersCopy.isNotEmpty || gearCopy.isNotEmpty) {
+    print("Error: Not all crew members or gear items were allocated to a load.");
+    if (crewMembersCopy.isNotEmpty) {
+      print("Remaining crew members: ${crewMembersCopy.map((member) => member.name).join(', ')}");
+    }
+    if (gearCopy.isNotEmpty) {
+      print("Remaining gear items: ${gearCopy.map((item) => item.name).join(', ')}");
+    }
+  }
+
+  if (crewMembersCopy.isEmpty || gearCopy.isEmpty) {
+    print("Success! All crew members and gear allocated to loads");
+  }
+
+
+
+}
+
+// OG sorting algorithm
+void loadCalculatorOG(Trip trip, TripPreference? tripPreference) {
   // Get the number of loads based on allowable, rounding up
   int numLoads = (crew.totalCrewWeight / trip.allowable).ceil();
   int maxLoadWeight = trip.allowable;
@@ -71,5 +264,5 @@ void loadCalculator(Trip trip) {
     trip.addLoad(trip, newLoad);
   }
 
-  trip.printLoadDetails();
+  //trip.printLoadDetails();
 }

@@ -1,3 +1,4 @@
+
 import 'package:hive/hive.dart';
 part 'crewmember.g.dart';
 
@@ -8,7 +9,47 @@ class CrewMember extends HiveObject{
   String name;
   @HiveField(1)// needs to be unique ID across class
   int flightWeight;
-  // int positions[];
+  @HiveField(2)
+  // Had to add a potential null field in crewmember.g, else would not build
+  // position: fields[2] as int? ?? 0,
+  int position; // New field to store the position code
 
-  CrewMember({required this.name, required this.flightWeight});
+  CrewMember({required this.name, required this.flightWeight, required this.position});
+
+  String getPositionTitle(int positionCode) {
+    return positionMap[positionCode] ?? 'Unknown Position';
+  }
+
+
 }
+
+// Position Mapping
+const Map<int, String> positionMap = {
+  0: 'Superintendent',
+  1: 'Asst. Superintendent',
+  2: 'Foreman',
+  3: 'Captain',
+  4: 'Lead Firefighter',
+  5: 'Senior Firefighter',
+  6: 'Air Ops',
+  7: 'Medic/EMT',
+  8: 'Saw Boss',
+  9: 'Saw Team 1',
+  10: 'Saw Team 2',
+  11: 'Saw Team 3',
+  12: 'Saw Team 4',
+  13: 'Saw Team 5',
+  14: 'Saw Team 6',
+  15: 'Lead P',
+  16: 'Dig',
+  17: 'Maps',
+  18: 'Communications',
+  19: 'Weather',
+  20: 'Fuel',
+  21: 'Vehicles',
+  22: 'Camp/Facilities',
+  23: 'Supply',
+  24: 'Tool Manager',
+  25: '6-man',
+  26: 'Other',      // User defined
+};

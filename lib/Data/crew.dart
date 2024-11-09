@@ -21,7 +21,6 @@ class Crew {
     totalCrewWeight = crewWeight + gearWeight;
   }
 
-
   void addCrewMember(CrewMember member) {
     var crewmemberBox = Hive.box<CrewMember>('crewmemberBox'); // assign hive box to variable we can use
     crewMembers.add(member); // add crewmember in memory as well
@@ -43,6 +42,7 @@ class Crew {
     updateTotalCrewWeight();
     print('Updated Total Crew Weight: $totalCrewWeight');
   }
+
   void deleteAllCrewMembers() {
     var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
     // Clear the in-memory list
@@ -138,3 +138,4 @@ class Crew {
 
 // Global Crew object. This is THE main crew object that comes inherit to the app
 final Crew crew = Crew();
+

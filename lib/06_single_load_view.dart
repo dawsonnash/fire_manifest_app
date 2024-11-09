@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../Data/load.dart';
-import 'package:hive/hive.dart';
 
 class SingleLoadView extends StatefulWidget {
   // This page requires a trip to be passed to it

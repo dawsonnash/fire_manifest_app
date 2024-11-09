@@ -1,46 +1,44 @@
 import 'dart:ui';
-import 'package:fire_app/Data/trip.dart';
-import 'package:fire_app/single_trip_view.dart';
+import 'package:fire_app/06_single_load_view.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter/services.dart';
+import '../Data/trip.dart';
 
-class SavedTripsView extends StatefulWidget {
-  const SavedTripsView({super.key});
+class SingleTripView extends StatefulWidget {
+
+  // This page requires a trip to be passed to it
+  final Trip trip;
+  //final VoidCallback onUpdate;  // Callback for deletion to update previous page
+
+  const SingleTripView({
+    super.key,
+    required this.trip,
+    //required this.onUpdate,
+  });
 
   @override
-  State<SavedTripsView> createState() => _SavedTripsState();
-
+  State<SingleTripView> createState() => _SingleTripViewState();
 }
-
-class _SavedTripsState extends State<SavedTripsView>{
-
-  late final Box<Trip> tripBox;
-  List<Trip> tripList = [];
+class _SingleTripViewState extends State<SingleTripView>{
 
   @override
   void initState() {
     super.initState();
-    // Open the Hive box and load the list of Gear items
-    tripBox = Hive.box<Trip>('tripBox');
-    loadTripList();
-  }
-  // Function to load the list of Gear items from the Hive box
-  void loadTripList() {
-    setState(() {
-     tripList = tripBox.values.toList();
-    });
+    print('Number of loads: ${widget.trip.loads.length}');
+
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+      resizeToAvoidBottomInset: false,  // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
       appBar: AppBar(
-        title: const Text(
-          'Saved Trips',
+        backgroundColor: Colors.deepOrangeAccent,
+        title: Text(
+          widget.trip.tripName,
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.deepOrangeAccent,
-
       ),
       body: Stack(
         children: [
@@ -59,12 +57,11 @@ class _SavedTripsState extends State<SavedTripsView>{
             padding: const EdgeInsets.all(8.0),
             child: ListView.builder(
               //hive: itemCount: tripList.length,
-              itemCount: tripList.length,
-              // itemCount:savedTrips.savedTrips.length -- in memory
+              itemCount: widget.trip.loads.length,
               itemBuilder: (context, index) {
 
-                final trip = tripList[index];
-                //final trip = savedTrips.savedTrips[index];
+                // hive: final trip = tripList[index];
+                final load = widget.trip.loads[index];
 
                 // Display trip data in a scrollable list
                 return Card(
@@ -83,21 +80,20 @@ class _SavedTripsState extends State<SavedTripsView>{
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                trip.tripName,
+                                'Load ${load.loadNumber.toString()}',
                                 style: const TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold
                                 ),
                               ),
                               Text(
-                                'Allowable: ${trip.allowable} lbs',
+                                'Weight: ${load.weight} lbs',
                                 style: const TextStyle(
                                   fontSize:18,
                                 ),
                               )
                             ],
                           ),
-                          // Set up to delete right now, not edit. Change later
                           IconButton(
                               icon: const Icon(
                                   Icons.arrow_forward_ios,
@@ -110,15 +106,11 @@ class _SavedTripsState extends State<SavedTripsView>{
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => SingleTripView(
-                                      trip: trip,
+                                    builder: (context) => SingleLoadView(
+                                      load: load,
                                     ),
                                   ),
                                 );
-                                // For deletion
-                                // savedTrips.removeTrip(trip); -- in memory
-                                //tripBox.removeTrip(trip);
-                                //setState(() {});
                               }
                           )
                         ],
