@@ -135,7 +135,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
               children: [
                 const SizedBox(height: 20),
 
-                widget.tripPreference.positionalPreferences.isEmpty
+                widget.tripPreference.positionalPreferences.isEmpty && widget.tripPreference.gearPreferences.isEmpty
 
                 // Container for if user has no preferences
                     ? Container(
@@ -200,8 +200,6 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                               }).join(', '),
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-
-
                             subtitle: Text(
                                 "Load Preference: ${loadPreferenceMap[posPref.loadPreference]}"),
                             trailing: IconButton(
@@ -216,6 +214,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                         );
                       }
                       // Handle gear preferences
+
                       final gearIndex = index - widget.tripPreference.positionalPreferences.length;
                       final gearPref = widget.tripPreference.gearPreferences[gearIndex];
                       return Card(
