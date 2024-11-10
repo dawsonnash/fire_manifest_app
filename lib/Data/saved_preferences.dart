@@ -1,4 +1,3 @@
-import 'crewmember.dart';
 import 'gear.dart';
 
 class SavedPreferences {
@@ -56,7 +55,7 @@ class PositionalPreference {
   // Priority will be dealt with on UI side through drag and drop
   int priority;											            // Sorting Priority
   int loadPreference;										        // First, Last, Balanced => 0, 1, 2
-  List<dynamic> crewMembersDynamic = [];						    // Can hold either individual crew member(s), or entire groups of crew members (like saw teams)
+  List<dynamic> crewMembersDynamic = [];			  // Can hold either individual crew member(s), or entire groups of crew members (like saw teams)
 
   PositionalPreference({required this.priority, required this.loadPreference, required this.crewMembersDynamic});
 

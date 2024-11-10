@@ -258,7 +258,7 @@ class AddCrewmember extends StatefulWidget {
                             child: DropdownButton<int>(
                               value: selectedPosition,
                               hint: const Text(
-                                'Choose position',
+                                'Choose primary position',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 22,

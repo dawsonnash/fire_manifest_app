@@ -10,12 +10,10 @@ import 'package:flutter/material.dart';
 class AddLoadPreference extends StatefulWidget {
   // This page requires a Trip Preference object to be passed to it - to edit it
   final TripPreference tripPreference;
-  final VoidCallback onUpdate;  // Callback for deletion to update previous page
+  final VoidCallback onUpdate; // Callback for deletion to update previous page
 
-  const AddLoadPreference({
-    super.key,
-    required this.tripPreference,
-    required this.onUpdate});
+  const AddLoadPreference(
+      {super.key, required this.tripPreference, required this.onUpdate});
 
   @override
   State<AddLoadPreference> createState() => _AddLoadPreferenceState();
@@ -33,9 +31,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
   int? selectedGearLoadPreference;
   List<Gear> selectedGear = [];
 
-  bool isPositionalSaveButtonEnabled = false; // Controls whether saving button is showing
-  bool isGearSaveButtonEnabled = false; // Controls whether saving button is showing
-
+  bool isPositionalSaveButtonEnabled =
+      false; // Controls whether saving button is showing
+  bool isGearSaveButtonEnabled =
+      false; // Controls whether saving button is showing
 
   @override
   void initState() {
@@ -61,7 +60,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
         .expand((member) => member is List<CrewMember> ? member : [member])
         .toSet();
 
-    // Populate Saw Team options
+    // Populate saw team options
     for (int i = 1; i <= 6; i++) {
       List<CrewMember> sawTeam = crew.getSawTeam(i);
       if (sawTeam.isNotEmpty &&
@@ -71,25 +70,29 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
       }
     }
 
-    // Populate individual crew member options
-    final availableCrewMembers = crew.crewMembers
-        .where((crewMember) => !usedCrewMembers.contains(crewMember))
-        .toList();
+    // Populate individual crew member options, so they remain visible and checked if selected
+    for (var member in crew.crewMembers) {
+      if (!usedCrewMembers.contains(member)) { // only consider members not in usedCrewMembers
+        bool isPartOfSelectedSawTeam = false;
 
-    for (var member in availableCrewMembers) {
-      bool isPartOfSelectedSawTeam = false;
-
-      for (int i = 1; i <= 6; i++) {
-        List<CrewMember> sawTeam = crew.getSawTeam(i);
-        if (sawTeam.contains(member) &&
-            selectedCrewMembers.any((item) => item is Map && item['name'] == 'Saw Team $i')) {
-          isPartOfSelectedSawTeam = true;
-          break;
+        // Check if the member is part of a fully selected Saw Team
+        for (int i = 1; i <= 6; i++) {
+          List<CrewMember> sawTeam = crew.getSawTeam(i);
+          if (sawTeam.contains(member) &&
+              selectedCrewMembers.any((item) => item is Map && item['name'] == 'Saw Team $i')) {
+            isPartOfSelectedSawTeam = true;
+            break;
+          }
         }
-      }
 
-      if (!isPartOfSelectedSawTeam) {
-        individualOptions.add({'name': member.name, 'members': [member]});
+        // Add the crew member to individual options if they're not part of a fully selected Saw Team
+        if (!isPartOfSelectedSawTeam) {
+          individualOptions.add({
+            'name': member.name,
+            'members': [member],
+            'isSelected': selectedCrewMembers.contains(member) // Check if the member is already selected
+          });
+        }
       }
     }
 
@@ -112,39 +115,39 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
       return;
     }
 
+    // Show the selection dialog
     await showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
             void updateSelection() {
-              // Clear all options and re-populate based on the current selection
+              // clear and repopulate options based on the current selection
               sawTeamOptions.clear();
               individualOptions.clear();
 
-              // Collect all used crew members (both individuals and members of saw teams)
+              // Collect all used crew members again
               final usedCrewMembers = widget.tripPreference.positionalPreferences
                   .expand((posPref) => posPref.crewMembersDynamic)
                   .expand((member) => member is List<CrewMember> ? member : [member])
                   .toSet();
 
-              // Populate saw team options only if they are not entirely selected or previously added
+              // Repopulate Saw Team options
               for (int i = 1; i <= 6; i++) {
                 List<CrewMember> sawTeam = crew.getSawTeam(i);
-
-                // Add Saw Team only if at least one member is not in usedCrewMembers and the whole team isn't selected
                 if (sawTeam.isNotEmpty &&
-                    !sawTeam.every(usedCrewMembers.contains) && // Ensure the team isn't entirely used
-                    !sawTeam.every((member) => selectedCrewMembers.contains(member))) { // Ensure the team isn't entirely selected
+                    !sawTeam.every(usedCrewMembers.contains) &&
+                    !sawTeam.every((member) => selectedCrewMembers.contains(member))) {
                   sawTeamOptions.add({'name': 'Saw Team $i', 'members': sawTeam});
                 }
               }
 
-              // Populate individual crew member options, so they remain visible and checked if selected
+              // Repopulate individual crew member options
               for (var member in crew.crewMembers) {
-                if (!usedCrewMembers.contains(member)) { // Only consider members not in usedCrewMembers
+                if (!usedCrewMembers.contains(member)) {
                   bool isPartOfSelectedSawTeam = false;
 
+                  // Check if the member is part of a fully selected Saw Team
                   for (int i = 1; i <= 6; i++) {
                     List<CrewMember> sawTeam = crew.getSawTeam(i);
                     if (sawTeam.contains(member) &&
@@ -154,12 +157,11 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                     }
                   }
 
-                  // Add crew member to individual options if they're not part of a fully selected saw teams
                   if (!isPartOfSelectedSawTeam) {
                     individualOptions.add({
                       'name': member.name,
                       'members': [member],
-                      'isSelected': selectedCrewMembers.contains(member) // Track if crew member is selected
+                      'isSelected': selectedCrewMembers.contains(member)
                     });
                   }
                 }
@@ -167,54 +169,70 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
             }
 
             return AlertDialog(
-              title: const Text('Select Crew Members'),
+              title: const Text(
+                'Select Crew Members',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   children: [
-                    // Saw Team options
                     ...sawTeamOptions.map((option) {
-                      bool isSelected = selectedCrewMembers
-                          .any((item) => item is Map && item['name'] == option['name']);
+                      bool isSelected = selectedCrewMembers.any(
+                              (item) => item is Map && item['name'] == option['name']);
                       return CheckboxListTile(
                         title: Text(option['name']),
                         value: isSelected,
                         onChanged: (bool? isChecked) {
                           setState(() {
                             if (isChecked == true) {
-                              // Add Saw Team and remove individual members
                               selectedCrewMembers.add(option);
                               for (var member in option['members']) {
                                 selectedCrewMembers.remove(member);
                               }
                             } else {
-                              // Remove Saw Team
                               selectedCrewMembers.removeWhere(
                                       (item) => item is Map && item['name'] == option['name']);
                             }
-                            updateSelection(); // Update individual options
+                            updateSelection();
                           });
                         },
                       );
                     }).toList(),
 
-                    // Divider between saw teams and individuals
                     if (sawTeamOptions.isNotEmpty && individualOptions.isNotEmpty)
                       const Divider(color: Colors.black, thickness: 1),
 
-                    // Individual crew member options
                     ...individualOptions.map((option) {
-                      bool isSelected = option['isSelected'] ?? false; // Use the 'isSelected' flag
+                      bool isSelected = option['isSelected'] ?? false;
+                      CrewMember member = option['members'].first;
+
                       return CheckboxListTile(
-                        title: Text(option['name']),
+                        title: Text(
+                          member.name,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Text(
+                          member.getPositionTitle(member.position),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
                         value: isSelected,
                         onChanged: (bool? isChecked) {
                           setState(() {
                             if (isChecked == true) {
-                              selectedCrewMembers.add(option['members'].first);
+                              selectedCrewMembers.add(member);
                             } else {
-                              selectedCrewMembers.remove(option['members'].first);
+                              selectedCrewMembers.remove(member);
                             }
-                            updateSelection(); // Check if all members of saw teeam are selected
+                            updateSelection();
                           });
                         },
                       );
@@ -243,22 +261,21 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
   // Functions to open the multi-select dialog for gear
   void _showGearSelectionDialog() async {
-
     // Gets gear already used in existing GearPreferences
     final usedGear = widget.tripPreference.gearPreferences
         .expand((posPref) => posPref.gear)
-        .toSet();  // Convert to Set to avoid duplicates
+        .toSet(); // Convert to Set to avoid duplicates
 
     // Filters out used gear for selection list
-    final availableGear = crew.gear
-        .where((gear) => !usedGear.contains(gear))
-        .toList();
+    final availableGear =
+        crew.gear.where((gear) => !usedGear.contains(gear)).toList();
 
     // If no gear available, show a message
     if (availableGear.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('No gear available',
+          content: Text(
+            'No gear available',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.black,
@@ -325,13 +342,15 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
   void _checkPositionalInput() {
     setState(() {
-      isPositionalSaveButtonEnabled = selectedCrewMembers.isNotEmpty && selectedPositionalLoadPreference != null;
+      isPositionalSaveButtonEnabled = selectedCrewMembers.isNotEmpty &&
+          selectedPositionalLoadPreference != null;
     });
   }
 
   void _checkGearInput() {
     setState(() {
-      isGearSaveButtonEnabled = selectedGear.isNotEmpty && selectedGearLoadPreference != null;
+      isGearSaveButtonEnabled =
+          selectedGear.isNotEmpty && selectedGearLoadPreference != null;
     });
   }
 
@@ -352,7 +371,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
     // Create a new PositionalPreference with the updated crew members list
     final newPositionalPreference = PositionalPreference(
-      priority: 1,  // Adjusted later through UI
+      priority: 1, // Adjusted later through UI
       loadPreference: selectedPositionalLoadPreference!,
       crewMembersDynamic: crewMembersToSave,
     );
@@ -390,16 +409,14 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
       ),
     );
 
-    Navigator.of(context).pop();  // Return to the previous screen
+    Navigator.of(context).pop(); // Return to the previous screen
   }
 
-
   void saveGearLoadPreference(TripPreference newTripPreference) {
-
     final newGearPreference = GearPreference(
-        priority: 1,  // To be changed and updated via UI drag n drop
-        loadPreference: selectedGearLoadPreference!,
-        gear: selectedGear,
+      priority: 1, // To be changed and updated via UI drag n drop
+      loadPreference: selectedGearLoadPreference!,
+      gear: selectedGear,
     );
 
     // Add this new preference to the TripPreference object
@@ -411,7 +428,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Preference saved!',
+        content: Text(
+          'Preference saved!',
           style: TextStyle(
             color: Colors.black,
             fontSize: 32,
@@ -422,13 +440,11 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
         backgroundColor: Colors.green,
       ),
     );
-    Navigator.of(context).pop();  // Return to previous screen
+    Navigator.of(context).pop(); // Return to previous screen
   }
-
 
   @override
   Widget build(BuildContext context) {
-
     // Main theme button style
     final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
@@ -439,20 +455,14 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
         elevation: 15,
         shadowColor: Colors.black,
         side: const BorderSide(color: Colors.black, width: 2),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         // Maybe change? Dynamic button size based on screen size
-        fixedSize: Size(MediaQuery
-            .of(context)
-            .size
-            .width / 2, MediaQuery
-            .of(context)
-            .size
-            .height / 10)
-    );
+        fixedSize: Size(MediaQuery.of(context).size.width / 2,
+            MediaQuery.of(context).size.height / 10));
 
     return Scaffold(
-      resizeToAvoidBottomInset: false, // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
+      resizeToAvoidBottomInset: false,
+      // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
       appBar: AppBar(
         backgroundColor: Colors.deepOrangeAccent,
         title: const Text(
@@ -469,10 +479,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
               icon: Icon(Icons.person),
               text: 'Positional',
             ),
-            Tab(
-              icon: Icon(Icons.work_outline_outlined),
-              text: 'Gear'
-            ),
+            Tab(icon: Icon(Icons.work_outline_outlined), text: 'Gear'),
           ],
         ),
       ),
@@ -482,233 +489,333 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
             child: ImageFiltered(
                 imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                 // Blur effect
-                child: Image.asset('assets/images/logo1.png',
+                child: Image.asset(
+                  'assets/images/logo1.png',
                   fit: BoxFit.cover, // Cover  entire background
                   width: double.infinity,
                   height: double.infinity,
-                )
-            ),
+                )),
           ),
           TabBarView(
-          controller: _tabController,
-          children: <Widget>[
+            controller: _tabController,
+            children: <Widget>[
+              // Positional Preference
+              Center(
+                child: Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: Colors.white.withOpacity(0.1),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Spacer(flex: 1),
 
-            // Positional Preference
-            Center(
-              child: Container(
-                width: double.infinity,
-                height: double.infinity,
-                color: Colors.white.withOpacity(0.1),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const Spacer(flex: 1),
-
-                    // Choose Crew Member(s)
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: GestureDetector(
-                        onTap: _showCrewMemberSelectionDialog, // Trigger dialog on tap
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(12.0),
-                            border: Border.all(color: Colors.white, width: 2.0),
-                          ),
-                          child: Text(
-                            selectedCrewMembers.isEmpty
-                                ? 'Choose crew member(s)'
-                                : selectedCrewMembers.map((e) {
-                              if (e is Map && e.containsKey('name') && e['name'].startsWith('Saw Team')) {
-                                return e['name']; // Display "Saw Team i"
-                              } else if (e is CrewMember) {
-                                return e.name;  // Display individual crew member name
-                              }
-                              return '';
-                            }).join(', '),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontStyle: FontStyle.italic,
+                      // Choose Crew Member(s)
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: GestureDetector(
+                          onTap: _showCrewMemberSelectionDialog,
+                          // Trigger dialog on tap
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.9),
+                              borderRadius: BorderRadius.circular(12.0),
+                              border:
+                                  Border.all(color: Colors.white, width: 2.0),
                             ),
-                          ),
-
-
-
-
-                        ),
-                      ),
-                    ),
-
-                    // Enter Load Preference
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(12.0),
-                          border: Border.all(color: Colors.white, width: 2.0),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<int>(
-                            value: selectedPositionalLoadPreference,
-                            hint: const Text(
-                              'Choose load preference',
-                              style: TextStyle(
+                            child: Text(
+                              selectedCrewMembers.isEmpty
+                                  ? 'Choose crew member(s)'
+                                  : selectedCrewMembers.map((e) {
+                                      if (e is Map &&
+                                          e.containsKey('name') &&
+                                          e['name'].startsWith('Saw Team')) {
+                                        return e[
+                                            'name']; // Display "Saw Team i"
+                                      } else if (e is CrewMember) {
+                                        return e
+                                            .name; // Display individual crew member name
+                                      }
+                                      return '';
+                                    }).join(', '),
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
                                 fontStyle: FontStyle.italic,
                               ),
                             ),
-                            dropdownColor: Colors.black,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                            ),
-                            iconEnabledColor: Colors.white,
-                            items: loadPreferenceMap.entries.map((entry) {
-                              return DropdownMenuItem<int>(
-                                value: entry.key,
-                                child: Text(entry.value), // Add info icon that tells what the load preference option does, e.g., 'Balanced distributes evenly from first to last load
-                              );
-                            }).toList(),
-                            onChanged: (int? newValue) {
-                              if (newValue != null) {
-                                setState(() {
-                                  selectedPositionalLoadPreference = newValue;
-                                  _checkPositionalInput();
-                                });
-                              }
-                            },
                           ),
                         ),
                       ),
-                    ),
 
-                    const Spacer(flex: 6),
-
-                    // Save Button
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: ElevatedButton(
-                        onPressed: isPositionalSaveButtonEnabled ? () => savePositionalLoadPreference(widget.tripPreference) : null,
-                        style: style,  // Main button theme
-                        child: const Text('Save'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Gear Preference
-            Center(
-              child: Container(
-                width: double.infinity,
-                height: double.infinity,
-                color: Colors.white.withOpacity(0.1),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const Spacer(flex: 1),
-
-                    // Choose Gear
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: GestureDetector(
-                        onTap: _showGearSelectionDialog,  // Trigger dialog on tap
+                      // Choose Load Preference
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
                         child: Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
                             color: Colors.black.withOpacity(0.9),
                             borderRadius: BorderRadius.circular(12.0),
                             border: Border.all(color: Colors.white, width: 2.0),
                           ),
-                          child: Text(
-                            selectedGear.isEmpty
-                                ? 'Choose gear'
-                                : selectedGear.map((e) => e.name).join(', '),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontStyle: FontStyle.italic,
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<int>(
+                              value: selectedPositionalLoadPreference,
+                              hint: const Text(
+                                'Choose load preference',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                              dropdownColor: Colors.black,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                              ),
+                              iconEnabledColor: Colors.white,
+                              items: loadPreferenceMap.entries.map((entry) {
+                                return DropdownMenuItem<int>(
+                                  value: entry.key,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(entry.value),
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.info_outline,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                        onPressed: () {
+                                          // Info dialog with loadpref explanation
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text('${entry.value} Load Preference',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                )),
+                                                content: Text(
+                                                  getPreferenceInfo(entry.key), //Load Preference explanation
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: const Text('Close'),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (int? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    selectedPositionalLoadPreference = newValue;
+                                    _checkPositionalInput();
+                                  });
+                                }
+                              },
                             ),
                           ),
                         ),
                       ),
-                    ),
 
-                    // Enter Load Preference
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(12.0),
-                          border: Border.all(color: Colors.white, width: 2.0),
+
+                      const Spacer(flex: 6),
+
+                      // Save Button
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: ElevatedButton(
+                          onPressed: isPositionalSaveButtonEnabled
+                              ? () => savePositionalLoadPreference(
+                                  widget.tripPreference)
+                              : null,
+                          style: style, // Main button theme
+                          child: const Text('Save'),
                         ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<int>(
-                            value: selectedGearLoadPreference,
-                            hint: const Text(
-                              'Choose load preference',
-                              style: TextStyle(
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Gear Preference
+              Center(
+                child: Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: Colors.white.withOpacity(0.1),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Spacer(flex: 1),
+
+                      // Choose Gear
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: GestureDetector(
+                          onTap: _showGearSelectionDialog,
+                          // Trigger dialog on tap
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.9),
+                              borderRadius: BorderRadius.circular(12.0),
+                              border:
+                                  Border.all(color: Colors.white, width: 2.0),
+                            ),
+                            child: Text(
+                              selectedGear.isEmpty
+                                  ? 'Choose gear'
+                                  : selectedGear.map((e) => e.name).join(', '),
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
                                 fontStyle: FontStyle.italic,
                               ),
                             ),
-                            dropdownColor: Colors.black,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                            ),
-                            iconEnabledColor: Colors.white,
-                            items: loadPreferenceMap.entries.map((entry) {
-                              return DropdownMenuItem<int>(
-                                value: entry.key,
-                                child: Text(entry.value),
-                              );
-                            }).toList(),
-                            onChanged: (int? newValue) {
-                              if (newValue != null) {
-                                setState(() {
-                                  selectedGearLoadPreference = newValue;
-                                  _checkGearInput();
-                                });
-                              }
-                            },
                           ),
                         ),
                       ),
-                    ),
 
-                    const Spacer(flex: 6),
+                      // Enter Load Preference
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(12.0),
+                            border: Border.all(color: Colors.white, width: 2.0),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<int>(
+                              value: selectedGearLoadPreference,
+                              hint: const Text(
+                                'Choose load preference',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                              dropdownColor: Colors.black,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                              ),
+                              iconEnabledColor: Colors.white,
+                              items: loadPreferenceMap.entries.map((entry) {
+                                return DropdownMenuItem<int>(
+                                  value: entry.key,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(entry.value),
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.info_outline,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                        onPressed: () {
+                                          // Info dialog with loadpref explanation
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text('${entry.value} Load Preference',
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                    )),
+                                                content: Text(
+                                                  getPreferenceInfo(entry.key), //Load Preference explanation
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: const Text('Close'),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
 
-                    // Save Button
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: ElevatedButton(
-                        onPressed: isGearSaveButtonEnabled ? () => saveGearLoadPreference(widget.tripPreference) : null,
-                        style: style,  // Main button theme
-                        child: const Text('Save'),
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );                              }).toList(),
+                              onChanged: (int? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    selectedGearLoadPreference = newValue;
+                                    _checkGearInput();
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+
+                      const Spacer(flex: 6),
+
+                      // Save Button
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: ElevatedButton(
+                          onPressed: isGearSaveButtonEnabled
+                              ? () =>
+                                  saveGearLoadPreference(widget.tripPreference)
+                              : null,
+                          style: style, // Main button theme
+                          child: const Text('Save'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
       ),
     );
+  }
+}
+
+String getPreferenceInfo(int? preference) {
+  switch (preference) {
+    case 0:
+      return "Places crew members/gear into the first load based on the order selected. If a crew member's or gear's weight exceeds the allowable load weight, they will be placed into the next available load.";
+    case 1:
+      return "Places crew members/gear into the last load based on the order selected. If a crew member's or gear's weight exceeds the allowable load weight, they will be placed in the next available load, working backward from the last load to the first.";
+    case 2:
+      return 'Distributes selected crew members/gear evenly across loads, working from the first load to the last.';
+    default:
+      return 'Select a preference to see more information.';
   }
 }
