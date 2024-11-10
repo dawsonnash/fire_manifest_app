@@ -79,6 +79,7 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
 
         case 1: // Last load preference - if weight exceeds last load place in second to last and so on
           for (var crewMembersDynamic in posPref.crewMembersDynamic) {
+            // If individual crew members are being sorted
             if (crewMembersDynamic is CrewMember) {
               for (var load in loads.reversed) {
                 if (load.weight + crewMembersDynamic.flightWeight <= maxLoadWeight &&
@@ -89,7 +90,8 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
                   break;
                 }
               }
-            } else if (crewMembersDynamic is List<CrewMember>) {
+            } // If groups of crew members are being sorted (i.e., saw teams)
+            else if (crewMembersDynamic is List<CrewMember>) {
               int totalGroupWeight = crewMembersDynamic.fold(0, (sum, member) => sum + member.flightWeight);
               for (var load in loads.reversed) {
                 if (load.weight + totalGroupWeight <= maxLoadWeight &&
@@ -241,8 +243,6 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
   if (crewMembersCopy.isEmpty || gearCopy.isEmpty) {
     print("Success! All crew members and gear allocated to loads");
   }
-
-
 
 }
 
