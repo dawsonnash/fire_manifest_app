@@ -55,8 +55,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     List<Map<String, dynamic>> sawTeamOptions = [];
     List<Map<String, dynamic>> individualOptions = [];
 
+    // Collect all used crew members (both individuals and members of Saw Teams)
     final usedCrewMembers = widget.tripPreference.positionalPreferences
         .expand((posPref) => posPref.crewMembersDynamic)
+        .expand((member) => member is List<CrewMember> ? member : [member])
         .toSet();
 
     // Populate Saw Team options
@@ -116,42 +118,50 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
         return StatefulBuilder(
           builder: (context, setState) {
             void updateSelection() {
-              // Remove Saw Team if all individual members are selected
-              sawTeamOptions.removeWhere((option) {
-                List<CrewMember> members = option['members'];
-                return members.every((member) => selectedCrewMembers.contains(member));
-              });
+              // Clear all options and re-populate based on the current selection
+              sawTeamOptions.clear();
+              individualOptions.clear();
 
-              // Re-add Saw Team if any member of the team is deselected
+              // Collect all used crew members (both individuals and members of saw teams)
+              final usedCrewMembers = widget.tripPreference.positionalPreferences
+                  .expand((posPref) => posPref.crewMembersDynamic)
+                  .expand((member) => member is List<CrewMember> ? member : [member])
+                  .toSet();
+
+              // Populate saw team options only if they are not entirely selected or previously added
               for (int i = 1; i <= 6; i++) {
                 List<CrewMember> sawTeam = crew.getSawTeam(i);
+
+                // Add Saw Team only if at least one member is not in usedCrewMembers and the whole team isn't selected
                 if (sawTeam.isNotEmpty &&
-                    sawTeam.any((member) => !selectedCrewMembers.contains(member)) &&
-                    !sawTeamOptions.any((option) => option['name'] == 'Saw Team $i')) {
+                    !sawTeam.every(usedCrewMembers.contains) && // Ensure the team isn't entirely used
+                    !sawTeam.every((member) => selectedCrewMembers.contains(member))) { // Ensure the team isn't entirely selected
                   sawTeamOptions.add({'name': 'Saw Team $i', 'members': sawTeam});
                 }
               }
 
-              // Regenerate individual options based on current selection
-              individualOptions.clear();
-              final availableCrewMembers = crew.crewMembers
-                  .where((crewMember) => !usedCrewMembers.contains(crewMember))
-                  .toList();
+              // Populate individual crew member options, so they remain visible and checked if selected
+              for (var member in crew.crewMembers) {
+                if (!usedCrewMembers.contains(member)) { // Only consider members not in usedCrewMembers
+                  bool isPartOfSelectedSawTeam = false;
 
-              for (var member in availableCrewMembers) {
-                bool isPartOfSelectedSawTeam = false;
-
-                for (int i = 1; i <= 6; i++) {
-                  List<CrewMember> sawTeam = crew.getSawTeam(i);
-                  if (sawTeam.contains(member) &&
-                      selectedCrewMembers.any((item) => item is Map && item['name'] == 'Saw Team $i')) {
-                    isPartOfSelectedSawTeam = true;
-                    break;
+                  for (int i = 1; i <= 6; i++) {
+                    List<CrewMember> sawTeam = crew.getSawTeam(i);
+                    if (sawTeam.contains(member) &&
+                        selectedCrewMembers.any((item) => item is Map && item['name'] == 'Saw Team $i')) {
+                      isPartOfSelectedSawTeam = true;
+                      break;
+                    }
                   }
-                }
 
-                if (!isPartOfSelectedSawTeam) {
-                  individualOptions.add({'name': member.name, 'members': [member]});
+                  // Add crew member to individual options if they're not part of a fully selected saw teams
+                  if (!isPartOfSelectedSawTeam) {
+                    individualOptions.add({
+                      'name': member.name,
+                      'members': [member],
+                      'isSelected': selectedCrewMembers.contains(member) // Track if crew member is selected
+                    });
+                  }
                 }
               }
             }
@@ -181,19 +191,19 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                               selectedCrewMembers.removeWhere(
                                       (item) => item is Map && item['name'] == option['name']);
                             }
-                            updateSelection(); // Update the individual options
+                            updateSelection(); // Update individual options
                           });
                         },
                       );
                     }).toList(),
 
-                    // Divider between Saw Teams and Individuals
+                    // Divider between saw teams and individuals
                     if (sawTeamOptions.isNotEmpty && individualOptions.isNotEmpty)
                       const Divider(color: Colors.black, thickness: 1),
 
                     // Individual crew member options
                     ...individualOptions.map((option) {
-                      bool isSelected = selectedCrewMembers.contains(option['members'].first);
+                      bool isSelected = option['isSelected'] ?? false; // Use the 'isSelected' flag
                       return CheckboxListTile(
                         title: Text(option['name']),
                         value: isSelected,
@@ -204,7 +214,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                             } else {
                               selectedCrewMembers.remove(option['members'].first);
                             }
-                            updateSelection(); // Check if all members of a Saw Team are selected
+                            updateSelection(); // Check if all members of saw teeam are selected
                           });
                         },
                       );
@@ -349,6 +359,17 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
     // Add the new preference to the TripPreference object
     newTripPreference.positionalPreferences.add(newPositionalPreference);
+
+    // Debugging `crewMembersDynamic`
+    // widget.tripPreference.positionalPreferences.forEach((posPref) {
+    //   posPref.crewMembersDynamic.forEach((item) {
+    //     if (item is CrewMember) {
+    //       print('Individual: ${item.name}');
+    //     } else if (item is List<CrewMember>) {
+    //       print('Saw Team: ${item.map((member) => member.name).join(', ')}');
+    //     }
+    //   });
+    // });
 
     // Trigger the update callback
     widget.onUpdate();

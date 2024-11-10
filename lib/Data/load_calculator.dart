@@ -225,11 +225,10 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
     }
 
     // Update load weight
-
     currentLoad.weight = currentLoadWeight.toInt();
     trip.addLoad(trip, currentLoad);
   }
-  // Error check to see if all Crew Members / Gear were allocated to loads
+  // Error checks to see if all Crew Members / Gear were allocated to loads
   if (crewMembersCopy.isNotEmpty || gearCopy.isNotEmpty) {
     print("Error: Not all crew members or gear items were allocated to a load.");
     if (crewMembersCopy.isNotEmpty) {
@@ -239,7 +238,6 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
       print("Remaining gear items: ${gearCopy.map((item) => item.name).join(', ')}");
     }
   }
-
   if (crewMembersCopy.isEmpty || gearCopy.isEmpty) {
     print("Success! All crew members and gear allocated to loads");
   }
@@ -314,3 +312,4 @@ void loadCalculatorOG(Trip trip, TripPreference? tripPreference) {
 
   //trip.printLoadDetails();
 }
+
