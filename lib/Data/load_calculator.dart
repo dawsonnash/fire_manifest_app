@@ -50,10 +50,11 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
             if (crewMembersDynamic is CrewMember) {
               for (var load in loads) {
                 // If the new Crew Member's flight weight is less than the allowable load weight and there are enough seats available
-                if (load.weight + crewMembersDynamic.flightWeight <= maxLoadWeight &&
+                if (load.weight + crewMembersDynamic.totalCrewMemberWeight <= maxLoadWeight &&
                     load.loadPersonnel.length < availableSeats) {
                   load.loadPersonnel.add(crewMembersDynamic);
-                  load.weight += crewMembersDynamic.flightWeight;
+                  load.loadGear.addAll(crewMembersDynamic.personalTools as Iterable<Gear>);
+                  load.weight += crewMembersDynamic.totalCrewMemberWeight;
                   crewMembersCopy.remove(crewMembersDynamic);
                   break;
                 }
@@ -62,11 +63,15 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
             // If it's a group of crew members, i.e., a Saw Team
             else if (crewMembersDynamic is List<CrewMember>) {
               // Take the total weight of all crew member's in the group (saw team). Cannot be a double
-              int totalGroupWeight = crewMembersDynamic.fold(0, (sum, member) => sum + member.flightWeight);
+              int totalGroupWeight = crewMembersDynamic.fold(0, (sum, member) => sum + member.totalCrewMemberWeight);
               for (var load in loads) {
                 if (load.weight + totalGroupWeight <= maxLoadWeight &&
                     load.loadPersonnel.length + crewMembersDynamic.length <= availableSeats) {
                   load.loadPersonnel.addAll(crewMembersDynamic);
+                  // Add all personal tools
+                  crewMembersDynamic.forEach((member) {
+                    load.loadGear.addAll(member.personalTools as Iterable<Gear>);
+                  });
                   load.weight += totalGroupWeight;
                   crewMembersCopy.removeWhere((member) => crewMembersDynamic.contains(member));
                   break;
@@ -82,21 +87,25 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
             // If individual crew members are being sorted
             if (crewMembersDynamic is CrewMember) {
               for (var load in loads.reversed) {
-                if (load.weight + crewMembersDynamic.flightWeight <= maxLoadWeight &&
+                if (load.weight + crewMembersDynamic.totalCrewMemberWeight <= maxLoadWeight &&
                     load.loadPersonnel.length < availableSeats) {
                   load.loadPersonnel.add(crewMembersDynamic);
-                  load.weight += crewMembersDynamic.flightWeight;
+                  load.loadGear.addAll(crewMembersDynamic.personalTools as Iterable<Gear>);
+                  load.weight += crewMembersDynamic.totalCrewMemberWeight;
                   crewMembersCopy.remove(crewMembersDynamic);
                   break;
                 }
               }
             } // If groups of crew members are being sorted (i.e., saw teams)
             else if (crewMembersDynamic is List<CrewMember>) {
-              int totalGroupWeight = crewMembersDynamic.fold(0, (sum, member) => sum + member.flightWeight);
+              int totalGroupWeight = crewMembersDynamic.fold(0, (sum, member) => sum + member.totalCrewMemberWeight);
               for (var load in loads.reversed) {
                 if (load.weight + totalGroupWeight <= maxLoadWeight &&
                     load.loadPersonnel.length + crewMembersDynamic.length <= availableSeats) {
                   load.loadPersonnel.addAll(crewMembersDynamic);
+                  crewMembersDynamic.forEach((member) {
+                    load.loadGear.addAll(member.personalTools as Iterable<Gear>);
+                  });
                   load.weight += totalGroupWeight;
                   crewMembersCopy.removeWhere((member) => crewMembersDynamic.contains(member));
                   break;
@@ -112,10 +121,11 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
             if (crewMembersDynamic is CrewMember) {
               while (loadIndex < loads.length) {
                 var load = loads[loadIndex];
-                if (load.weight + crewMembersDynamic.flightWeight <= maxLoadWeight &&
+                if (load.weight + crewMembersDynamic.totalCrewMemberWeight <= maxLoadWeight &&
                     load.loadPersonnel.length < availableSeats) {
                   load.loadPersonnel.add(crewMembersDynamic);
-                  load.weight += crewMembersDynamic.flightWeight;
+                  load.loadGear.addAll(crewMembersDynamic.personalTools as Iterable<Gear>);
+                  load.weight += crewMembersDynamic.totalCrewMemberWeight;
                   crewMembersCopy.remove(crewMembersDynamic);
                   loadIndex = (loadIndex + 1) % loads.length;
                   break;
@@ -123,12 +133,15 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
                 loadIndex = (loadIndex + 1) % loads.length;
               }
             } else if (crewMembersDynamic is List<CrewMember>) {
-              int totalGroupWeight = crewMembersDynamic.fold(0, (sum, member) => sum + member.flightWeight);
+              int totalGroupWeight = crewMembersDynamic.fold(0, (sum, member) => sum + member.totalCrewMemberWeight);
               while (loadIndex < loads.length) {
                 var load = loads[loadIndex];
                 if (load.weight + totalGroupWeight <= maxLoadWeight &&
                     load.loadPersonnel.length + crewMembersDynamic.length <= availableSeats) {
                   load.loadPersonnel.addAll(crewMembersDynamic);
+                  crewMembersDynamic.forEach((member) {
+                    load.loadGear.addAll(member.personalTools as Iterable<Gear>);
+                  });
                   load.weight += totalGroupWeight;
                   crewMembersCopy.removeWhere((member) => crewMembersDynamic.contains(member));
                   loadIndex = (loadIndex + 1) % loads.length;     // Loop through loads cyclically
@@ -203,11 +216,12 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
       // Add remaining crew members not covered by positional preferences
       // Eventually to be replaced by "Smart Loading"
       if (crewMembersCopy.isNotEmpty &&
-          currentLoadWeight + crewMembersCopy.first.flightWeight <= maxLoadWeight &&
+          currentLoadWeight + crewMembersCopy.first.totalCrewMemberWeight <= maxLoadWeight &&
           currentLoad.loadPersonnel.length < availableSeats) {
         var firstCrewMember = crewMembersCopy.first;
-        currentLoadWeight += firstCrewMember.flightWeight;
+        currentLoadWeight += firstCrewMember.totalCrewMemberWeight;
         currentLoad.loadPersonnel.add(firstCrewMember);
+        currentLoad.loadGear.addAll(firstCrewMember.personalTools as Iterable<Gear>);
         crewMembersCopy.removeAt(0);
         itemAdded = true;
       }
@@ -245,8 +259,20 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
   }
 
 }
-
-// OG sorting algorithm
+// void printLoadGear(Load load) {
+//   print('Gear in Load ${load.loadNumber}:');
+//   for (var gearItem in load.loadGear) {
+//     print('  - ${gearItem.name}: ${gearItem.weight} lbs');
+//   }
+// }
+//
+// // Assuming you have a Trip class with a list of loads
+// void printAllLoadGear(Trip trip) {
+//   for (var load in trip.loads) {
+//     printLoadGear(load);
+//   }
+// }
+// OG sorting algorithm: just heaviest first, sequential sorting
 void loadCalculatorOG(Trip trip, TripPreference? tripPreference) {
   // Get the number of loads based on allowable, rounding up
   int numLoads = (crew.totalCrewWeight / trip.allowable).ceil();
