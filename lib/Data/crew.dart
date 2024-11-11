@@ -20,9 +20,19 @@ class Crew {
     }
   }
   void updateTotalCrewWeight() {
+
     double crewWeight = 0.0;
     for (var member in crewMembers) {
       crewWeight += member.flightWeight;
+    }
+
+    double personalToolWeight = 0.0;
+    for (var member in crewMembers){
+      if (member.personalTools != null) {
+        for (var tools in member.personalTools!) {
+            personalToolWeight += tools.weight;
+        }
+      }
     }
 
     double gearWeight = 0.0;
@@ -30,7 +40,7 @@ class Crew {
       gearWeight += gearItem.weight;
     }
 
-    totalCrewWeight = crewWeight + gearWeight;
+    totalCrewWeight = crewWeight + personalToolWeight + gearWeight;
   }
 
   addCrewMember(CrewMember member) {

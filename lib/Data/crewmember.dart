@@ -21,6 +21,17 @@ class CrewMember extends HiveObject{
   List<Gear>? personalTools;
 
 
+  // Getter function to calculate totalCrewMemberWeight: flightweight + all personal tools
+  int get totalCrewMemberWeight {
+    int totalWeight = flightWeight;
+    if (personalTools != null) {
+      for (var tool in personalTools!) {
+        totalWeight += tool.weight;
+      }
+    }
+    return totalWeight;
+  }
+
   CrewMember({required this.name, required this.flightWeight, required this.position, this.personalTools});
 
   String getPositionTitle(int positionCode) {
