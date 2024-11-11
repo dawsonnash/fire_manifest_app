@@ -33,10 +33,10 @@ class Crew {
     totalCrewWeight = crewWeight + gearWeight;
   }
 
-  void addCrewMember(CrewMember member) {
+  Future<void> addCrewMember(CrewMember member) async {
     var crewmemberBox = Hive.box<CrewMember>('crewmemberBox'); // assign hive box to variable we can use
     crewMembers.add(member); // add crewmember in memory as well
-    crewmemberBox.add(member); // save to hive memory
+    await crewmemberBox.add(member); // save to hive memory
     updateTotalCrewWeight();
     print('Updated Total Crew Weight: $totalCrewWeight');
   }
