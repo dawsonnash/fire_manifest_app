@@ -68,7 +68,7 @@ class AddCrewmember extends StatefulWidget {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please enter valid tool details.'),
+            content: Text('Please enter all tool info'),
             backgroundColor: Colors.red,
           ),
         );
@@ -405,9 +405,9 @@ class AddCrewmember extends StatefulWidget {
                             itemCount: addedTools?.length,
                             itemBuilder: (context, index) {
                               final tool = addedTools?[index];
-                              return Card( // Wrapping in a Card gives a more structured look
-                                elevation: 4, // Adds a shadow for depth
-                                color: Colors.black, // White background
+                              return Card(
+                                elevation: 4,
+                                color: Colors.black,
                                 child: ListTile(
                                   title: Text(
                                     tool!.name,

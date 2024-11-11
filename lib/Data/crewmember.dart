@@ -20,6 +20,7 @@ class CrewMember extends HiveObject{
   @HiveField(3)
   List<Gear>? personalTools;
 
+
   CrewMember({required this.name, required this.flightWeight, required this.position, this.personalTools});
 
   String getPositionTitle(int positionCode) {
