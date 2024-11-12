@@ -9,28 +9,34 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:intl/intl.dart';
 
-// Function to generate the PDF
+// Generates PDF
 Future<Uint8List> generatePDF(Load load) async {
   final pdf = pw.Document();
 
   // Load the image of the NWCG form
+  // Need to edit form. Currently it says everyone is male -> 'M'
   final imageBytes = await rootBundle.load('assets/images/crew_manifest_form.png');
   final backgroundImage = pw.MemoryImage(imageBytes.buffer.asUint8List());
 
-  // Add content to the PDF with the image as the background
   pdf.addPage(
     pw.Page(
+      pageFormat: PdfPageFormat.letter,
+      margin: pw.EdgeInsets.all(0),
       build: (pw.Context context) {
         return pw.Stack(
           children: [
-            // Background image
-            pw.Positioned.fill(
-              child: pw.Image(backgroundImage, fit: pw.BoxFit.fitWidth),
+            pw.Container(
+              width: double.infinity,
+              height: double.infinity,
+              child: pw.Image(
+                backgroundImage,
+                fit: pw.BoxFit.cover, // Ensures image covers entire page
+              ),
             ),
-            // Overlay form fields
             pw.Padding(
-              padding: const pw.EdgeInsets.all(4),
+              padding: const pw.EdgeInsets.all(32),
               child: fillFormFields(load),
             ),
           ],
@@ -39,39 +45,121 @@ Future<Uint8List> generatePDF(Load load) async {
     ),
   );
 
-  // Save the PDF and return it as Uint8List
+  // Save PDF and return it as Uint8List
   return pdf.save();
 }
 
-// Function to display the PDF preview
+// Display PDF preview
 void previewPDF(BuildContext context, Load load) async {
   final pdfBytes = await generatePDF(load);
 
-  // Use the Printing package to show the PDF preview
   await Printing.layoutPdf(
     onLayout: (PdfPageFormat format) async => pdfBytes,
   );
 }
 
 pw.Widget fillFormFields(Load load) {
-  return pw.Column(
-    crossAxisAlignment: pw.CrossAxisAlignment.start,
-    children: [
-      // Example: Placing crew member data into the form
-      for (var i = 0; i < load.loadPersonnel.length; i++)
-        pw.Text(
-          "${i + 1}. ${load.loadPersonnel[i].name} - ${load.loadPersonnel[i].totalCrewMemberWeight} lbs",
-          style: pw.TextStyle(fontSize: 12),
-        ),
-      pw.SizedBox(height: 10), // Space between sections
+  const double yOffset = 65; // Adjust this value to move everything down
+  const double itemSpacing = 15; // Adjust this value to control spacing between items
 
-      // Example: Placing gear data into the form
-      pw.Text("Gear Items:", style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
-      for (var gear in load.loadGear)
-        pw.Text(
-          "${gear.name} - ${gear.weight} lbs",
+  int subtotalCrewMemberWeight = load.loadPersonnel.fold(0, (sum, crewMember) => sum + crewMember.flightWeight);
+  int subtotalGearWeight = load.loadGear.fold(0, (sum, gear) => sum + gear.weight);
+  DateTime today = DateTime.now();
+  String formattedDate = DateFormat('MM/dd/yyyy').format(today);
+
+  return pw.Stack(
+    children: [
+      // Crew Members
+      for (var i = 0; i < load.loadPersonnel.length; i++)
+        pw.Positioned(
+          left: 18,
+          top: yOffset + 150 + (i * itemSpacing),
+          child: pw.Text(
+            "${load.loadPersonnel[i].name}",
+            style: pw.TextStyle(fontSize: 12),
+          ),
+        ),
+      // Gear
+      for (var j = 0; j < load.loadGear.length; j++)
+        pw.Positioned(
+          left: 18,
+          top: yOffset + 150 + ((load.loadPersonnel.length + j) * itemSpacing),
+          child: pw.Text(
+            "${load.loadGear[j].name}",
+            style: pw.TextStyle(fontSize: 12),
+          ),
+        ),
+
+      // CrewMember Weights
+      for (var i = 0; i < load.loadPersonnel.length; i++)
+        pw.Positioned(
+          left: 267,
+          top: yOffset + 150 + (i * itemSpacing),
+          child: pw.Text(
+            "${load.loadPersonnel[i].flightWeight} lbs",
+            style: pw.TextStyle(fontSize: 12),
+          ),
+        ),
+      // Gear Weights
+      for (var j = 0; j < load.loadGear.length; j++)
+        pw.Positioned(
+          left: 323,
+          top: yOffset + 150 + ((load.loadPersonnel.length + j) * itemSpacing),
+          child: pw.Text(
+            "${load.loadGear[j].weight} lbs",
+            style: pw.TextStyle(fontSize: 12),
+          ),
+        ),
+
+      // Total Load Weight
+      pw.Positioned(
+        left: 494,
+        top: yOffset + 545,
+        child: pw.Text(
+        '${load.weight.toString()} lbs',
+        style: pw.TextStyle(fontSize: 12),
+      ),
+      ),
+
+      // # of passengers on page
+      pw.Positioned(
+        left: 110,
+        top: yOffset + 545,
+        child: pw.Text(
+          load.loadPersonnel.length.toString(),
           style: pw.TextStyle(fontSize: 12),
         ),
+      ),
+
+      // Weight subtotals: CrewMembers
+      pw.Positioned(
+        left: 260,
+        top: yOffset + 545,
+        child: pw.Text(
+          '${subtotalCrewMemberWeight.toString()} lbs',
+          style: pw.TextStyle(fontSize: 12),
+        ),
+      ),
+
+      // Weight subtotals: Gear
+      pw.Positioned(
+        left: 320,
+        top: yOffset + 545,
+        child: pw.Text(
+          '${subtotalGearWeight.toString()} lbs',
+          style: pw.TextStyle(fontSize: 12),
+        ),
+      ),
+
+      // Current date
+      pw.Positioned(
+        left: 390,
+        top: yOffset + 580,
+        child: pw.Text(
+          formattedDate.toString(),
+          style: pw.TextStyle(fontSize: 12),
+        ),
+      ),
     ],
   );
 }
