@@ -1,7 +1,80 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
 import '../Data/load.dart';
+// For exporting to pdf
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
+
+// Function to generate the PDF
+Future<Uint8List> generatePDF(Load load) async {
+  final pdf = pw.Document();
+
+  // Load the image of the NWCG form
+  final imageBytes = await rootBundle.load('assets/images/crew_manifest_form.png');
+  final backgroundImage = pw.MemoryImage(imageBytes.buffer.asUint8List());
+
+  // Add content to the PDF with the image as the background
+  pdf.addPage(
+    pw.Page(
+      build: (pw.Context context) {
+        return pw.Stack(
+          children: [
+            // Background image
+            pw.Positioned.fill(
+              child: pw.Image(backgroundImage, fit: pw.BoxFit.fitWidth),
+            ),
+            // Overlay form fields
+            pw.Padding(
+              padding: const pw.EdgeInsets.all(4),
+              child: fillFormFields(load),
+            ),
+          ],
+        );
+      },
+    ),
+  );
+
+  // Save the PDF and return it as Uint8List
+  return pdf.save();
+}
+
+// Function to display the PDF preview
+void previewPDF(BuildContext context, Load load) async {
+  final pdfBytes = await generatePDF(load);
+
+  // Use the Printing package to show the PDF preview
+  await Printing.layoutPdf(
+    onLayout: (PdfPageFormat format) async => pdfBytes,
+  );
+}
+
+pw.Widget fillFormFields(Load load) {
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.start,
+    children: [
+      // Example: Placing crew member data into the form
+      for (var i = 0; i < load.loadPersonnel.length; i++)
+        pw.Text(
+          "${i + 1}. ${load.loadPersonnel[i].name} - ${load.loadPersonnel[i].totalCrewMemberWeight} lbs",
+          style: pw.TextStyle(fontSize: 12),
+        ),
+      pw.SizedBox(height: 10), // Space between sections
+
+      // Example: Placing gear data into the form
+      pw.Text("Gear Items:", style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
+      for (var gear in load.loadGear)
+        pw.Text(
+          "${gear.name} - ${gear.weight} lbs",
+          style: pw.TextStyle(fontSize: 12),
+        ),
+    ],
+  );
+}
 
 class SingleLoadView extends StatefulWidget {
   // This page requires a trip to be passed to it
@@ -31,9 +104,22 @@ class _SingleLoadViewState extends State<SingleLoadView> {
           false, // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
       appBar: AppBar(
         backgroundColor: Colors.deepOrangeAccent,
-        title: Text(
-          'Load ${widget.load.loadNumber}',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+            'Load ${widget.load.loadNumber}',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+            IconButton(
+              icon: Icon(Icons.ios_share, size: 28,),    // Does this work for android, i dont know
+              onPressed: () {
+                previewPDF(context, widget.load);
+              },
+              tooltip: 'Export to NWCG Crew Manifest Form',
+            ),
+
+        ],
         ),
       ),
       body: Stack(
