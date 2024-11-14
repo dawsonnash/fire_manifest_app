@@ -16,7 +16,6 @@ Future<Uint8List> generatePDF(Load load) async {
   final pdf = pw.Document();
 
   // Load the image of the NWCG form
-  // Need to edit form. Currently it says everyone is male -> 'M'
   final imageBytes = await rootBundle.load('assets/images/crew_manifest_form.png');
   final backgroundImage = pw.MemoryImage(imageBytes.buffer.asUint8List());
 
@@ -48,9 +47,8 @@ Future<Uint8List> generatePDF(Load load) async {
   // Save PDF and return it as Uint8List
   return pdf.save();
 }
-
 // Display PDF preview
-void previewPDF(BuildContext context, Load load) async {
+void previewLoadPDF(BuildContext context, Load load) async {
   final pdfBytes = await generatePDF(load);
 
   await Printing.layoutPdf(
@@ -202,9 +200,9 @@ class _SingleLoadViewState extends State<SingleLoadView> {
             IconButton(
               icon: Icon(Icons.ios_share, size: 28,),    // Does this work for android, i dont know
               onPressed: () {
-                previewPDF(context, widget.load);
+                previewLoadPDF(context, widget.load);
               },
-              tooltip: 'Export to NWCG Crew Manifest Form',
+              tooltip: 'Export load to NWCG Crew Manifest Form',
             ),
 
         ],
