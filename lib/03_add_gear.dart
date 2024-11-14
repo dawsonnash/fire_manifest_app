@@ -87,11 +87,12 @@ class _AddGearState extends State<AddGear>{
     // Clear the text fields (reset them to empty), so you can add more ppl
     gearNameController.text = '';
     gearWeightController.text = '';
+    gearQuantityController.text = '1';
 
     // Debug for LogCat
-    print("Gear Name: $gearName");
-    print("Gear Weight: $gearWeight");
-    crew.printCrewDetails();
+    // print("Gear Name: $gearName");
+    //print("Gear Weight: $gearWeight");
+    //crew.printCrewDetails();
   }
 
   @override
