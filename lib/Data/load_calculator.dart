@@ -9,8 +9,8 @@ import 'saved_preferences.dart';
 // In the future, if we want to do a more balanced load approach,
 // It will be slightly more complex - like a 'greedy balancing/backtracking' algo,
 // where it finds the lightest load, and places the object there
-// For Saw Team smart loading - just make sure both individuals on SawTeam1, 2, 3, etc., all go on same load
-
+// For Saw Team smart loading - just make sure both individuals on SawTeam 1, 2, 3, etc., all go on same load
+// break statements?
 // TripPreference based sorting algorithm
 void loadCalculator(Trip trip, TripPreference? tripPreference) {
 
@@ -50,8 +50,7 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
             if (crewMembersDynamic is CrewMember) {
               for (var load in loads) {
                 // If the new Crew Member's flight weight is less than the allowable load weight and there are enough seats available
-                if (load.weight + crewMembersDynamic.totalCrewMemberWeight <= maxLoadWeight &&
-                    load.loadPersonnel.length < availableSeats) {
+                if (load.weight + crewMembersDynamic.totalCrewMemberWeight <= maxLoadWeight && load.loadPersonnel.length < availableSeats) {
                   load.loadPersonnel.add(crewMembersDynamic);
                   load.loadGear.addAll(crewMembersDynamic.personalTools as Iterable<Gear>);
                   load.weight += crewMembersDynamic.totalCrewMemberWeight;

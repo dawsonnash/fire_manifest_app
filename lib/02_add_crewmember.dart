@@ -60,7 +60,7 @@ class AddCrewmember extends StatefulWidget {
 
       if (toolName.isNotEmpty && toolWeight > 0) {
         setState(() {
-          addedTools?.add(Gear(name: toolName, weight: toolWeight));
+          addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1));
           toolNameController.clear();
           toolWeightController.clear();
           setState(() {});
