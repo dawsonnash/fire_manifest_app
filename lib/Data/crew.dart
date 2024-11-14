@@ -21,11 +21,13 @@ class Crew {
   }
   void updateTotalCrewWeight() {
 
+    // Get all flight weight
     double crewWeight = 0.0;
     for (var member in crewMembers) {
       crewWeight += member.flightWeight;
     }
 
+    // Get all personal tool weight
     double personalToolWeight = 0.0;
     for (var member in crewMembers){
       if (member.personalTools != null) {
@@ -35,9 +37,10 @@ class Crew {
       }
     }
 
+    // Get all gear weight
     double gearWeight = 0.0;
     for (var gearItem in gear) {
-      gearWeight += gearItem.weight;
+      gearWeight += gearItem.totalGearWeight;
     }
 
     totalCrewWeight = crewWeight + personalToolWeight + gearWeight;

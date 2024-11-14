@@ -5,6 +5,7 @@ import 'package:fire_app/02_crewmembers_view.dart';
 import 'package:fire_app/03_gear_view.dart';
 import 'package:fire_app/04_trip_preferences_view.dart';
 import '03_add_gear.dart';
+import 'Data/crew.dart';
 
 // This layout needs work to have dynamically adjusted UI. Needs user-testing
 
@@ -38,9 +39,18 @@ class EditCrew extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepOrangeAccent,
-        title: const Text(
-          'Edit Crew',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+            'Edit Crew',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+            Text(
+              ' ${crew.totalCrewWeight.toInt().toString()} lbs',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+        ],
         ),
       ),
       body: Stack(

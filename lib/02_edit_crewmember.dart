@@ -103,7 +103,7 @@ class _EditCrewmemberState extends State<EditCrewmember>{
 
     if (toolName.isNotEmpty && toolWeight != null && toolWeight > 0) {
       setState(() {
-        addedTools?.add(Gear(name: toolName, weight: toolWeight));
+        addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1));
         toolNameControllers.add(TextEditingController(text: toolName));
         toolWeightControllers.add(TextEditingController(text: toolWeight.toString()));
         newToolNameController.clear();
@@ -175,6 +175,7 @@ class _EditCrewmemberState extends State<EditCrewmember>{
       return Gear(
         name: toolNameControllers[entry.key].text,
         weight: int.parse(toolWeightControllers[entry.key].text),
+        quantity: 1 // To be changed
       );
     }).toList() ?? [];
     widget.crewMember.personalTools = updatedTools;
