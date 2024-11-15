@@ -31,9 +31,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
   int? selectedGearLoadPreference;
   List<Gear> selectedGear = [];
-  // Initialize quantity map with default quantity of 1 for each gear
-  late Map<Gear, int> gearQuantities;
-
 
   bool isPositionalSaveButtonEnabled =
       false; // Controls whether saving button is showing
@@ -268,13 +265,11 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     // Gets gear already used in existing GearPreferences
     final usedGear = widget.tripPreference.gearPreferences
         .expand((posPref) => posPref.gear)
-        .toSet(); // Convert to Set to avoid duplicates
+        .toSet();
 
     // Filters out used gear for selection list
-    final availableGear =
-        crew.gear.where((gear) => !usedGear.contains(gear)).toList();
+    final availableGear = crew.gear.where((gear) => !usedGear.contains(gear)).toList();
 
-    // If no gear available, show a message
     if (availableGear.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -293,7 +288,11 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
       );
       return;
     }
-   gearQuantities = { for (var gear in availableGear) gear: 1 };
+
+    // Map to store selected quantities for gear
+    Map<Gear, int> selectedGearQuantities = {
+      for (var gear in selectedGear) gear: gear.quantity
+    };
 
     final List<Gear>? result = await showDialog(
       context: context,
@@ -315,24 +314,13 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          flex: 2, // Adjusts space taken by gear name
-                          child: Row(
-                            children: [
-                              Text(
-                              gear.name,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
+                          flex: 2,
+                          child: Text(
+                            gear.name,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
                             ),
-                              Text(
-                                ' (x${gear.quantity})',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                      ],
                           ),
                         ),
                         if (tempSelectedGear.contains(gear))
@@ -344,17 +332,18 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                   return AlertDialog(
                                     title: Text('Select Quantity for ${gear.name}'),
                                     content: Container(
-                                      height: 150, // Height of picker
+                                      height: 150,
                                       child: CupertinoPicker(
                                         scrollController: FixedExtentScrollController(
-                                            initialItem: gearQuantities[gear]! - 1),
+                                            initialItem: (selectedGearQuantities[gear] ?? 1) - 1),
                                         itemExtent: 32.0,
                                         onSelectedItemChanged: (int value) {
                                           setState(() {
-                                            gearQuantities[gear] = value + 1;
+                                            selectedGearQuantities[gear] = value + 1;
                                           });
                                         },
-                                        children: List<Widget>.generate(gear.quantity, (int index) {
+                                        children: List<Widget>.generate(
+                                            gear.quantity, (int index) {
                                           return Center(
                                             child: Text(
                                               '${index + 1}',
@@ -377,10 +366,9 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                               );
                             },
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start, // Aligns to the left
                               children: [
                                 Text(
-                                  'Qty: ${gearQuantities[gear]}',
+                                  'Qty: ${selectedGearQuantities[gear] ?? 1}',
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: Colors.black,
@@ -399,8 +387,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                             setState(() {
                               if (isChecked == true) {
                                 tempSelectedGear.add(gear);
+                                selectedGearQuantities[gear] = 1; // Default quantity
                               } else {
                                 tempSelectedGear.remove(gear);
+                                selectedGearQuantities.remove(gear);
                               }
                             });
                           },
@@ -413,6 +403,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
               actions: [
                 TextButton(
                   onPressed: () {
+                    // Update selectedGear quantities before closing
+                    tempSelectedGear.forEach((gear) {
+                      gear.quantity = selectedGearQuantities[gear] ?? 1;
+                    });
                     Navigator.of(context).pop(tempSelectedGear);
                   },
                   child: const Text('Save'),
@@ -427,9 +421,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     if (result != null) {
       setState(() {
         selectedGear = result;
-        selectedGear.forEach((gear) {
-          gear.quantity = gearQuantities[gear] ?? 1;
-        });
         _checkGearInput();
       });
     }
@@ -782,7 +773,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                               selectedGear.isEmpty
                                   ? 'Choose gear'
                                   : selectedGear.map((e) {
-                                final quantity = gearQuantities[e] ?? 1;
+                                final quantity = e.quantity;
                                 return '${e.name} (x$quantity)';
                               }).join(', '),
                               style: const TextStyle(
