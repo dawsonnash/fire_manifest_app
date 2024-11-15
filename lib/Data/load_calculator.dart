@@ -11,6 +11,7 @@ import 'saved_preferences.dart';
 // where it finds the lightest load, and places the object there
 // For Saw Team smart loading - just make sure both individuals on SawTeam 1, 2, 3, etc., all go on same load
 // break statements?
+
 // TripPreference based sorting algorithm
 void loadCalculator(Trip trip, TripPreference? tripPreference) {
 
@@ -258,19 +259,7 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
   }
 
 }
-// void printLoadGear(Load load) {
-//   print('Gear in Load ${load.loadNumber}:');
-//   for (var gearItem in load.loadGear) {
-//     print('  - ${gearItem.name}: ${gearItem.weight} lbs');
-//   }
-// }
-//
-// // Assuming you have a Trip class with a list of loads
-// void printAllLoadGear(Trip trip) {
-//   for (var load in trip.loads) {
-//     printLoadGear(load);
-//   }
-// }
+
 // OG sorting algorithm: just heaviest first, sequential sorting
 void loadCalculatorOG(Trip trip, TripPreference? tripPreference) {
   // Get the number of loads based on allowable, rounding up

@@ -192,7 +192,7 @@ class _EditCrewmemberState extends State<EditCrewmember>{
       // Add new item to Hive
       crewmemberBox.add(widget.crewMember);
     }
-
+    crew.updateTotalCrewWeight();
     // Callback function, Update previous page UI with setState()
     widget.onUpdate();
 

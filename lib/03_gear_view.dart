@@ -70,7 +70,7 @@ class _GearViewState extends State<GearView>{
 
                     final gear = gearList[index];
 
-                    // Display gear data in a scrollable list
+                    // Display gear data
                     return Card(
                       child: Container(
                         decoration: BoxDecoration(
@@ -94,7 +94,7 @@ class _GearViewState extends State<GearView>{
                                     ),
                                   ),
                                   Text(
-                                    '${gear.weight} lbs',
+                                    '${gear.weight} lbs x ${gear.quantity}',
                                     style: const TextStyle(
                                       fontSize:18,
                                     ),
@@ -127,6 +127,8 @@ class _GearViewState extends State<GearView>{
                   },
                 ),
               ),
+
+                // Delete All
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
                   child: Container(
