@@ -11,6 +11,7 @@ import 'saved_preferences.dart';
 // where it finds the lightest load, and places the object there
 // For Saw Team smart loading - just make sure both individuals on SawTeam 1, 2, 3, etc., all go on same load
 // break statements?
+// Algo does not account for anyone/thing that weighs more than maxLoadWeight.. Not that it would ever happen, buuut..
 
 // TripPreference based sorting algorithm
 void loadCalculator(Trip trip, TripPreference? tripPreference) {

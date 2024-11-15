@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 import 'Data/crew.dart';
@@ -30,6 +31,9 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
   int? selectedGearLoadPreference;
   List<Gear> selectedGear = [];
+  // Initialize quantity map with default quantity of 1 for each gear
+  late Map<Gear, int> gearQuantities;
+
 
   bool isPositionalSaveButtonEnabled =
       false; // Controls whether saving button is showing
@@ -289,6 +293,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
       );
       return;
     }
+   gearQuantities = { for (var gear in availableGear) gear: 1 };
 
     final List<Gear>? result = await showDialog(
       context: context,
@@ -298,22 +303,109 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Select Gears'),
+              title: const Text(
+                'Select Gear',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   children: availableGear.map((gear) {
-                    return CheckboxListTile(
-                      title: Text(gear.name),
-                      value: tempSelectedGear.contains(gear),
-                      onChanged: (bool? isChecked) {
-                        setState(() {
-                          if (isChecked == true) {
-                            tempSelectedGear.add(gear);
-                          } else {
-                            tempSelectedGear.remove(gear);
-                          }
-                        });
-                      },
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          flex: 2, // Adjusts space taken by gear name
+                          child: Row(
+                            children: [
+                              Text(
+                              gear.name,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
+                            ),
+                              Text(
+                                ' (x${gear.quantity})',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                      ],
+                          ),
+                        ),
+                        if (tempSelectedGear.contains(gear))
+                          GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('Select Quantity for ${gear.name}'),
+                                    content: Container(
+                                      height: 150, // Height of picker
+                                      child: CupertinoPicker(
+                                        scrollController: FixedExtentScrollController(
+                                            initialItem: gearQuantities[gear]! - 1),
+                                        itemExtent: 32.0,
+                                        onSelectedItemChanged: (int value) {
+                                          setState(() {
+                                            gearQuantities[gear] = value + 1;
+                                          });
+                                        },
+                                        children: List<Widget>.generate(gear.quantity, (int index) {
+                                          return Center(
+                                            child: Text(
+                                              '${index + 1}',
+                                              style: TextStyle(fontSize: 20),
+                                            ),
+                                          );
+                                        }),
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('Close'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start, // Aligns to the left
+                              children: [
+                                Text(
+                                  'Qty: ${gearQuantities[gear]}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.arrow_drop_down,
+                                  color: Colors.black,
+                                ),
+                              ],
+                            ),
+                          ),
+                        Checkbox(
+                          value: tempSelectedGear.contains(gear),
+                          onChanged: (bool? isChecked) {
+                            setState(() {
+                              if (isChecked == true) {
+                                tempSelectedGear.add(gear);
+                              } else {
+                                tempSelectedGear.remove(gear);
+                              }
+                            });
+                          },
+                        ),
+                      ],
                     );
                   }).toList(),
                 ),
@@ -335,7 +427,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     if (result != null) {
       setState(() {
         selectedGear = result;
-        _checkGearInput(); // Update button state
+        selectedGear.forEach((gear) {
+          gear.quantity = gearQuantities[gear] ?? 1;
+        });
+        _checkGearInput();
       });
     }
   }
@@ -686,7 +781,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                             child: Text(
                               selectedGear.isEmpty
                                   ? 'Choose gear'
-                                  : selectedGear.map((e) => e.name).join(', '),
+                                  : selectedGear.map((e) {
+                                final quantity = gearQuantities[e] ?? 1;
+                                return '${e.name} (x$quantity)';
+                              }).join(', '),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
