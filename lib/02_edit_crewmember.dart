@@ -166,10 +166,39 @@ class _EditCrewmemberState extends State<EditCrewmember>{
   // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
   void saveData() {
 
+    // Get updated crew member name
+    final String newCrewMemberName = nameController.text;
+    final String originalCrewMemberName = widget.crewMember.name;
+
+    // Check if new crew member name already exists in the crew list, but ignore current crew member's original name
+    bool crewMemberNameExists = crew.crewMembers.any(
+          (member) => member.name == newCrewMemberName && member.name != originalCrewMemberName,
+    );
+
+    if (crewMemberNameExists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Crew member name already used!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return; // Exit function if the crew member name is already used
+    }
+
     // Update exisiting data
     widget.crewMember.name = nameController.text;
     widget.crewMember.flightWeight = int.parse(flightWeightController.text);
     widget.crewMember.position = selectedPosition!; // Update position
+
     // Update all personal tools
     List<Gear> updatedTools = addedTools?.asMap().entries.map((entry) {
       return Gear(

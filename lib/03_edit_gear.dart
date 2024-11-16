@@ -87,8 +87,37 @@ class _EditGearState extends State<EditGear>{
   // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
   void saveData() {
 
-    // Update existing data
-    widget.gear.name = gearNameController.text;
+    // Get  updated gear name from the TextField
+    final String newGearName = gearNameController.text;
+    final String originalGearName = widget.gear.name;
+
+    // Check if the new gear name already exists in the crew's gear list,
+    // but ignore the current gear's original name
+    bool gearNameExists = crew.gear.any(
+          (gear) => gear.name == newGearName && gear.name != originalGearName,
+    );
+
+    if (gearNameExists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Gear name already used!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return; // Exit function if the gear name is already used
+    }
+
+    // Update the gear's attributes
+    widget.gear.name = newGearName;
     widget.gear.weight = int.parse(gearWeightController.text);
     widget.gear.quantity = int.parse(gearQuantityController.text);
 
@@ -113,8 +142,8 @@ class _EditGearState extends State<EditGear>{
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Gear Updated!',
-          // Maybe change look
+        content: Text(
+          'Gear Updated!',
           style: TextStyle(
             color: Colors.black,
             fontSize: 32,
@@ -125,7 +154,7 @@ class _EditGearState extends State<EditGear>{
         backgroundColor: Colors.green,
       ),
     );
-    Navigator.of(context).pop();  // Return to previous screen
+    Navigator.of(context).pop(); // Return to previous screen
   }
 
   @override
