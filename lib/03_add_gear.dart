@@ -56,6 +56,27 @@ class _AddGearState extends State<AddGear>{
 
     final String gearName = gearNameController.text;
 
+    // Check if gear name already exists
+    bool gearNameExists = crew.gear.any((gear) => gear.name == gearName);
+
+    if (gearNameExists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Gear name already used!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return; // Exit function if the gear name is already used
+    }
     // Convert gear weight text to integer
     final int gearWeight = int.parse(gearWeightController.text);
     final int gearQuantity = int.parse(gearQuantityController.text);

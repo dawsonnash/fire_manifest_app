@@ -92,6 +92,27 @@ class AddCrewmember extends StatefulWidget {
       // Take what the name contrller has saved
       final String name = nameController.text;
 
+      // Check if crew member name already exists
+      bool crewMemberNameExists = crew.crewMembers.any((member) => member.name == name);
+
+      if (crewMemberNameExists) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Crew member name already used!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            duration: Duration(seconds: 2),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return; // Exit function if the gear name is already used
+      }
       // Convert flight weight text to integer
       final int flightWeight = int.parse(flightWeightController.text);
 
