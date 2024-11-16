@@ -30,8 +30,14 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
   // Create copies of crew and gear
   // List.from() creates a new list with exact same elements as OG.
   var crewMembersCopy = List.from(crew.crewMembers);
-  var gearCopy = List.from(crew.gear);
-
+  // This treats quantities as individual items
+  var gearCopy = <Gear>[];
+  for (var gear in crew.gear) {
+    for (int i = 0; i < gear.quantity; i++) {
+      // Create copy of gear item for each quantity
+      gearCopy.add(Gear(name: gear.name, weight: gear.weight, quantity: 1));
+    }
+  }
   // Initialize all Loads
   List<Load> loads = List.generate(numLoads, (index) => Load(
     loadNumber: index + 1,
@@ -158,30 +164,49 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
 
     // Loop through all Gear Preferences, not based on Priority yet
     for (var gearPref in tripPreference.gearPreferences) {
-      // Different cases based on Load Preference: First, Last, Balanced
       switch (gearPref.loadPreference) {
         case 0: // First load preference
           for (var gear in gearPref.gear) {
+            int quantityToAdd = gear.quantity;
+            int addedQuantity = 0;
+
+            // Loop through loads to distribute gear based on the quantity
             for (var load in loads) {
-              if (load.weight + gear.weight <= maxLoadWeight) {
-                load.loadGear.add(gear);
-                load.weight += gear.weight;
-                gearCopy.remove(gear); // Remove from list
-                break; // Move to next gear item
+              while (addedQuantity < quantityToAdd) {
+                if (gearCopy.isNotEmpty && load.weight + gear.weight <= maxLoadWeight) {
+                  // Add the gear item to the load
+                  load.loadGear.add(Gear(name: gear.name, weight: gear.weight, quantity: 1));
+                  load.weight += gear.weight;
+                  addedQuantity++;
+                  // Remove one instance of the gear from gearCopy
+                  gearCopy.removeAt(gearCopy.indexWhere((item) => item.name == gear.name));
+                } else {
+                  break;
+                }
               }
+              if (addedQuantity >= quantityToAdd) break;
             }
           }
           break;
 
-        case 1: // Last load preference -  if weight exceeds last load weight, place in second to last and so on
+        case 1: // Last load preference
           for (var gear in gearPref.gear) {
+            int quantityToAdd = gear.quantity;
+            int addedQuantity = 0;
+
+            // Loop through loads in reverse order to distribute gear
             for (var load in loads.reversed) {
-              if (load.weight + gear.weight <= maxLoadWeight) {
-                load.loadGear.add(gear);
-                load.weight += gear.weight;
-                gearCopy.remove(gear);
-                break;
+              while (addedQuantity < quantityToAdd) {
+                if (gearCopy.isNotEmpty && load.weight + gear.weight <= maxLoadWeight) {
+                  load.loadGear.add(Gear(name: gear.name, weight: gear.weight, quantity: 1));
+                  load.weight += gear.weight;
+                  addedQuantity++;
+                  gearCopy.removeAt(gearCopy.indexWhere((item) => item.name == gear.name));
+                } else {
+                  break;
+                }
               }
+              if (addedQuantity >= quantityToAdd) break;
             }
           }
           break;
@@ -189,19 +214,32 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
         case 2: // Balanced load preference
           int loadIndex = 0;
           for (var gear in gearPref.gear) {
-            while (loadIndex < loads.length) {
+            int quantityToAdd = gear.quantity;
+            int addedQuantity = 0;
+
+            // Loop through loads cyclically to distribute gear
+            while (addedQuantity < quantityToAdd) {
               var load = loads[loadIndex];
-              if (load.weight + gear.weight <= maxLoadWeight) {
-                load.loadGear.add(gear);
+              int quantityForThisLoad = 0;
+
+              // Calculate how many items can be added to this load without exceeding the weight limit
+              while (addedQuantity < quantityToAdd &&
+                  load.weight + gear.weight <= maxLoadWeight) {
+                load.loadGear.add(Gear(name: gear.name, weight: gear.weight, quantity: 1));
                 load.weight += gear.weight;
-                gearCopy.remove(gear);
-                loadIndex = (loadIndex + 1) % loads.length; // Loop through loads
-                break;
+                addedQuantity++;
+                quantityForThisLoad++;
+                // Remove one instance of the gear from gearCopy
+                gearCopy.removeAt(gearCopy.indexWhere((item) => item.name == gear.name));
               }
-              loadIndex = (loadIndex + 1) % loads.length;
+              // Move to the next load only if the current load is full or we have placed the entire quantity
+              if (quantityForThisLoad == 0 || addedQuantity >= quantityToAdd) {
+                loadIndex = (loadIndex + 1) % loads.length;
+              }
             }
           }
           break;
+
       }
     }
   }
