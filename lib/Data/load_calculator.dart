@@ -5,13 +5,6 @@ import 'crewmember.dart';
 import 'gear.dart';
 import 'saved_preferences.dart';
 
-// Currently, this algorithm follows a heaviest loads first approach
-// In the future, if we want to do a more balanced load approach,
-// It will be slightly more complex - like a 'greedy balancing/backtracking' algo,
-// where it finds the lightest load, and places the object there
-// For Saw Team smart loading - just make sure both individuals on SawTeam 1, 2, 3, etc., all go on same load
-// break statements?
-// Algo does not account for anyone/thing that weighs more than maxLoadWeight.. Not that it would ever happen, buuut..
 
 // TripPreference based sorting algorithm
 void loadCalculator(Trip trip, TripPreference? tripPreference) {
@@ -213,32 +206,44 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
 
         case 2: // Balanced load preference
           int loadIndex = 0;
+
+          // Loop through each gear item in the gear preference
           for (var gear in gearPref.gear) {
-            int quantityToAdd = gear.quantity;
-            int addedQuantity = 0;
+            // Continue until there are no more items of this specific gear type in gearCopy
+            while (gearCopy.any((item) => item.name == gear.name)) {
+              int quantityToAdd = gear.quantity;
+              int addedQuantity = 0;
 
-            // Loop through loads cyclically to distribute gear
-            while (addedQuantity < quantityToAdd) {
-              var load = loads[loadIndex];
-              int quantityForThisLoad = 0;
+              // Continue placing gear items on loads until the preferred quantity is added
+              while (addedQuantity < quantityToAdd) {
+                var load = loads[loadIndex];
+                int quantityForThisLoad = 0;
 
-              // Calculate how many items can be added to this load without exceeding the weight limit
-              while (addedQuantity < quantityToAdd &&
-                  load.weight + gear.weight <= maxLoadWeight) {
-                load.loadGear.add(Gear(name: gear.name, weight: gear.weight, quantity: 1));
-                load.weight += gear.weight;
-                addedQuantity++;
-                quantityForThisLoad++;
-                // Remove one instance of the gear from gearCopy
-                gearCopy.removeAt(gearCopy.indexWhere((item) => item.name == gear.name));
-              }
-              // Move to the next load only if the current load is full or we have placed the entire quantity
-              if (quantityForThisLoad == 0 || addedQuantity >= quantityToAdd) {
+                // Try to add as many items of this specific gear type as possible
+                while (addedQuantity < quantityToAdd &&
+                    load.weight + gear.weight <= maxLoadWeight &&
+                    gearCopy.any((item) => item.name == gear.name)) {
+                  // Add one item of this specific gear type to the current load
+                  load.loadGear.add(Gear(name: gear.name, weight: gear.weight, quantity: 1));
+                  load.weight += gear.weight;
+                  addedQuantity++;
+                  quantityForThisLoad++;
+
+                  // Remove one instance of this specific gear type from gearCopy
+                  int indexToRemove = gearCopy.indexWhere((item) => item.name == gear.name);
+                  if (indexToRemove != -1) {
+                    gearCopy.removeAt(indexToRemove);
+                  }
+                }
+
+                // Move to the next load after placing the preferred quantity (or as much as possible)
                 loadIndex = (loadIndex + 1) % loads.length;
               }
             }
           }
           break;
+
+
 
       }
     }
@@ -298,71 +303,3 @@ void loadCalculator(Trip trip, TripPreference? tripPreference) {
   }
 
 }
-
-// OG sorting algorithm: just heaviest first, sequential sorting
-void loadCalculatorOG(Trip trip, TripPreference? tripPreference) {
-  // Get the number of loads based on allowable, rounding up
-  int numLoads = (crew.totalCrewWeight / trip.allowable).ceil();
-  int maxLoadWeight = trip.allowable;
-
-  // Create copies of crew and gear
-  // List.from() creates a new list with exact same elements as OG.
-  var crewMembersCopy = List.from(crew.crewMembers);
-  var gearCopy = List.from(crew.gear);
-
-  for (int i = 1; i <= numLoads; i++) {
-    num currentLoadWeight = 0;
-    List<CrewMember> thisLoadPersonnel = [];
-    List<Gear> thisLoadGear = [];
-
-    // Less than or equal to??
-    while (currentLoadWeight < maxLoadWeight) {
-      bool itemAdded = false;
-
-      // Check if the first crew member can be added
-      // If so add them, then remove them from the copied list
-      if (crewMembersCopy.isNotEmpty &&
-          currentLoadWeight + crewMembersCopy.first.flightWeight <=
-              maxLoadWeight) {
-        var firstCrewMember = crewMembersCopy.first;
-        currentLoadWeight += firstCrewMember.flightWeight;
-        thisLoadPersonnel.add(crewMembersCopy.first);
-        crewMembersCopy
-            .removeAt(0); // Remove the first crew member from the list
-        itemAdded = true;
-      }
-
-      // Check if the first gear item can be added
-      if (gearCopy.isNotEmpty &&
-          currentLoadWeight + gearCopy.first.weight <= maxLoadWeight) {
-        currentLoadWeight += gearCopy.first.weight;
-        thisLoadGear.add(gearCopy.first);
-        gearCopy.removeAt(0); // Remove the first gear item from the list
-        itemAdded = true;
-      }
-
-      // If no more items can be added or both lists are empty, break the loop
-      if (crewMembersCopy.isEmpty && gearCopy.isEmpty) {
-        break;
-      }
-
-      if (!itemAdded) {
-        break;
-      }
-    }
-
-    int loadNumber = i;
-
-    Load newLoad = Load(
-      loadNumber: loadNumber,
-      weight: currentLoadWeight.toInt(),
-      loadPersonnel: thisLoadPersonnel,
-      loadGear: thisLoadGear,
-    );
-
-    trip.addLoad(trip, newLoad);
-  }
-
-  //trip.printLoadDetails();
-}
-

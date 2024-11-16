@@ -74,14 +74,16 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
     // Populate individual crew member options, so they remain visible and checked if selected
     for (var member in crew.crewMembers) {
-      if (!usedCrewMembers.contains(member)) { // only consider members not in usedCrewMembers
+      if (!usedCrewMembers.contains(member)) {
+        // only consider members not in usedCrewMembers
         bool isPartOfSelectedSawTeam = false;
 
         // Check if the member is part of a fully selected Saw Team
         for (int i = 1; i <= 6; i++) {
           List<CrewMember> sawTeam = crew.getSawTeam(i);
           if (sawTeam.contains(member) &&
-              selectedCrewMembers.any((item) => item is Map && item['name'] == 'Saw Team $i')) {
+              selectedCrewMembers.any(
+                  (item) => item is Map && item['name'] == 'Saw Team $i')) {
             isPartOfSelectedSawTeam = true;
             break;
           }
@@ -92,7 +94,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
           individualOptions.add({
             'name': member.name,
             'members': [member],
-            'isSelected': selectedCrewMembers.contains(member) // Check if the member is already selected
+            'isSelected': selectedCrewMembers.contains(member)
+            // Check if the member is already selected
           });
         }
       }
@@ -129,9 +132,11 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
               individualOptions.clear();
 
               // Collect all used crew members again
-              final usedCrewMembers = widget.tripPreference.positionalPreferences
+              final usedCrewMembers = widget
+                  .tripPreference.positionalPreferences
                   .expand((posPref) => posPref.crewMembersDynamic)
-                  .expand((member) => member is List<CrewMember> ? member : [member])
+                  .expand((member) =>
+                      member is List<CrewMember> ? member : [member])
                   .toSet();
 
               // Repopulate Saw Team options
@@ -139,8 +144,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                 List<CrewMember> sawTeam = crew.getSawTeam(i);
                 if (sawTeam.isNotEmpty &&
                     !sawTeam.every(usedCrewMembers.contains) &&
-                    !sawTeam.every((member) => selectedCrewMembers.contains(member))) {
-                  sawTeamOptions.add({'name': 'Saw Team $i', 'members': sawTeam});
+                    !sawTeam.every(
+                        (member) => selectedCrewMembers.contains(member))) {
+                  sawTeamOptions
+                      .add({'name': 'Saw Team $i', 'members': sawTeam});
                 }
               }
 
@@ -153,7 +160,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                   for (int i = 1; i <= 6; i++) {
                     List<CrewMember> sawTeam = crew.getSawTeam(i);
                     if (sawTeam.contains(member) &&
-                        selectedCrewMembers.any((item) => item is Map && item['name'] == 'Saw Team $i')) {
+                        selectedCrewMembers.any((item) =>
+                            item is Map && item['name'] == 'Saw Team $i')) {
                       isPartOfSelectedSawTeam = true;
                       break;
                     }
@@ -182,8 +190,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                 child: Column(
                   children: [
                     ...sawTeamOptions.map((option) {
-                      bool isSelected = selectedCrewMembers.any(
-                              (item) => item is Map && item['name'] == option['name']);
+                      bool isSelected = selectedCrewMembers.any((item) =>
+                          item is Map && item['name'] == option['name']);
                       return CheckboxListTile(
                         title: Text(option['name']),
                         value: isSelected,
@@ -195,18 +203,18 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                 selectedCrewMembers.remove(member);
                               }
                             } else {
-                              selectedCrewMembers.removeWhere(
-                                      (item) => item is Map && item['name'] == option['name']);
+                              selectedCrewMembers.removeWhere((item) =>
+                                  item is Map &&
+                                  item['name'] == option['name']);
                             }
                             updateSelection();
                           });
                         },
                       );
                     }).toList(),
-
-                    if (sawTeamOptions.isNotEmpty && individualOptions.isNotEmpty)
+                    if (sawTeamOptions.isNotEmpty &&
+                        individualOptions.isNotEmpty)
                       const Divider(color: Colors.black, thickness: 1),
-
                     ...individualOptions.map((option) {
                       bool isSelected = option['isSelected'] ?? false;
                       CrewMember member = option['members'].first;
@@ -265,7 +273,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
   void _showGearSelectionDialog() async {
     // Map to track the total used quantities for each gear item
     Map<String, int> totalQuantities = {
-      for (var gear in crew.gear) gear.name: 0, // Use gear.name. Coudl make a unique key
+      for (var gear in crew.gear) gear.name: 0,
+      // Use gear.name. Coudl make a unique key
     };
 
     // Calculate total used quantities from all existing gear preferences
@@ -333,15 +342,19 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                           flex: 2,
                           child: Row(
                             children: [
-                              Text(
-                                gear.name,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
+                              Flexible(
+                                child: Text(
+                                  gear.name,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                  ),
+                                  overflow: TextOverflow
+                                      .ellipsis, // Use ellipsis if text is too long
                                 ),
                               ),
                               Text(
-                                ' (x$remainingQuantity)',
+                                ' (x$remainingQuantity)  ',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -352,66 +365,72 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                           ),
                         ),
                         if (tempSelectedGear.contains(gear))
-                          GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text('Select Quantity for ${gear.name}'),
-                                    content: Container(
-                                      height: 150,
-                                      child: CupertinoPicker(
-                                        scrollController:
-                                        FixedExtentScrollController(
-                                            initialItem:
-                                            (selectedGearQuantities[gear] ?? 1) - 1),
-                                        itemExtent: 32.0, // Height of each item
-                                        onSelectedItemChanged: (int value) {
-                                          setState(() {
-                                            selectedGearQuantities[gear] =
-                                                value + 1;
-                                          });
-                                        },
-                                        children: List<Widget>.generate(
-                                            remainingQuantity, (int index) {
-                                          return Center(
-                                            child: Text(
-                                              '${index + 1}',
-                                              style: TextStyle(fontSize: 20),
-                                            ),
-                                          );
-                                        }),
+                          if (remainingQuantity > 1)
+                            GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text(
+                                          'Select Quantity for ${gear.name}'),
+                                      content: Container(
+                                        height: 150,
+                                        child: CupertinoPicker(
+                                          scrollController:
+                                              FixedExtentScrollController(
+                                                  initialItem:
+                                                      (selectedGearQuantities[
+                                                                  gear] ??
+                                                              1) -
+                                                          1),
+                                          itemExtent: 32.0,
+                                          // Height of each item
+                                          onSelectedItemChanged: (int value) {
+                                            setState(() {
+                                              selectedGearQuantities[gear] =
+                                                  value + 1;
+                                            });
+                                          },
+                                          children: List<Widget>.generate(
+                                              remainingQuantity, (int index) {
+                                            return Center(
+                                              child: Text(
+                                                '${index + 1}',
+                                                style: TextStyle(fontSize: 20),
+                                              ),
+                                            );
+                                          }),
+                                        ),
                                       ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text('Close'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Qty: ${selectedGearQuantities[gear] ?? 1}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black,
                                     ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text('Close'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Qty: ${selectedGearQuantities[gear] ?? 1}',
-                                  style: TextStyle(
-                                    fontSize: 16,
+                                  ),
+                                  Icon(
+                                    Icons.arrow_drop_down,
                                     color: Colors.black,
                                   ),
-                                ),
-                                Icon(
-                                  Icons.arrow_drop_down,
-                                  color: Colors.black,
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
                         Checkbox(
                           value: tempSelectedGear.contains(gear),
                           onChanged: (bool? isChecked) {
@@ -530,7 +549,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
   }
 
   void saveGearLoadPreference(TripPreference newTripPreference) {
-
     // New list of Gear objects with updated quantities
     List<Gear> copiedSelectedGear = selectedGear.map((gear) {
       return gear.copyWith(quantity: selectedGearQuantities[gear] ?? 1);
@@ -714,7 +732,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                 return DropdownMenuItem<int>(
                                   value: entry.key,
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(entry.value),
                                       IconButton(
@@ -729,17 +748,21 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                             context: context,
                                             builder: (BuildContext context) {
                                               return AlertDialog(
-                                                title: Text('${entry.value} Load Preference',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                )),
+                                                title: Text(
+                                                    '${entry.value} Load Preference',
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    )),
                                                 content: Text(
-                                                  getPreferenceInfo(entry.key), //Load Preference explanation
+                                                  getPreferenceInfo(entry
+                                                      .key), //Load Preference explanation
                                                 ),
                                                 actions: [
                                                   TextButton(
                                                     onPressed: () {
-                                                      Navigator.of(context).pop();
+                                                      Navigator.of(context)
+                                                          .pop();
                                                     },
                                                     child: const Text('Close'),
                                                   ),
@@ -747,7 +770,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                               );
                                             },
                                           );
-
                                         },
                                       ),
                                     ],
@@ -766,7 +788,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                           ),
                         ),
                       ),
-
 
                       const Spacer(flex: 6),
 
@@ -818,9 +839,11 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                               selectedGear.isEmpty
                                   ? 'Choose gear'
                                   : selectedGear.map((e) {
-                                final quantity = selectedGearQuantities[e] ?? 1; // Use selected quantity
-                                return '${e.name} (x$quantity)';
-                              }).join(', '),
+                                      final quantity =
+                                          selectedGearQuantities[e] ??
+                                              1; // Use selected quantity
+                                      return '${e.name} (x$quantity)';
+                                    }).join(', '),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -863,7 +886,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                 return DropdownMenuItem<int>(
                                   value: entry.key,
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(entry.value),
                                       IconButton(
@@ -878,17 +902,21 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                             context: context,
                                             builder: (BuildContext context) {
                                               return AlertDialog(
-                                                title: Text('${entry.value} Load Preference',
+                                                title: Text(
+                                                    '${entry.value} Load Preference',
                                                     style: TextStyle(
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     )),
                                                 content: Text(
-                                                  getPreferenceInfo(entry.key), //Load Preference explanation
+                                                  getPreferenceInfo(entry
+                                                      .key), //Load Preference explanation
                                                 ),
                                                 actions: [
                                                   TextButton(
                                                     onPressed: () {
-                                                      Navigator.of(context).pop();
+                                                      Navigator.of(context)
+                                                          .pop();
                                                     },
                                                     child: const Text('Close'),
                                                   ),
@@ -896,12 +924,12 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                               );
                                             },
                                           );
-
                                         },
                                       ),
                                     ],
                                   ),
-                                );                              }).toList(),
+                                );
+                              }).toList(),
                               onChanged: (int? newValue) {
                                 if (newValue != null) {
                                   setState(() {
