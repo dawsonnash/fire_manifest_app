@@ -19,5 +19,14 @@ class Gear extends HiveObject{
     return totalWeight;
   }
 
+  // Function to create a copy of the Gear object with updated attributes - for quantity copies in Gear Preferences
+  Gear copyWith({int? quantity}) {
+    return Gear(
+      name: this.name,
+      quantity: quantity ?? this.quantity,
+      weight: this.weight,
+    );
+  }
+
   Gear({required this.name, required this.weight, required this.quantity});
 }

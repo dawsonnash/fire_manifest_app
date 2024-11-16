@@ -242,9 +242,8 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                               ],
                             ),
                             title: Text(
-                              gearPref.gear.map((item) => item.name).join(', '),
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
+                              gearPref.gear.map((item) => '${item.name} (x${item.quantity})').join(', '),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             subtitle: Text(
                                 "Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}"),
