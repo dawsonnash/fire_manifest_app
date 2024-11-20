@@ -7,7 +7,26 @@ class Gear extends HiveObject{
   String name;
   @HiveField(1)
   int weight;
+
+  @HiveField(2)
+  int quantity;
+
   // bool hazmat;
 
-  Gear({required this.name, required this.weight});
+  // Getter function to calculate totalGearWeight: weight * quantity
+  int get totalGearWeight {
+    int totalWeight = weight * quantity;
+    return totalWeight;
+  }
+
+  // Function to create a copy of the Gear object with updated attributes - for quantity copies in Gear Preferences
+  Gear copyWith({int? quantity}) {
+    return Gear(
+      name: this.name,
+      quantity: quantity ?? this.quantity,
+      weight: this.weight,
+    );
+  }
+
+  Gear({required this.name, required this.weight, required this.quantity});
 }

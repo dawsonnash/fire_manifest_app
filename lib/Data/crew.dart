@@ -3,25 +3,50 @@ import 'gear.dart';
 import 'package:hive/hive.dart';
 
 class Crew {
-  List<CrewMember> crewMembers = [];
+  List<CrewMember> crewMembers = [];        // Contains all crew members
   List<Gear> gear = [];
   double totalCrewWeight = 0.0;
 
+  // Helper function to get saw teams
+  List<CrewMember> getSawTeam(int teamNumber) {
+    switch (teamNumber) {
+      case 1: return crewMembers.where((member) => member.position == 9).toList();
+      case 2: return crewMembers.where((member) => member.position == 10).toList();
+      case 3: return crewMembers.where((member) => member.position == 11).toList();
+      case 4: return crewMembers.where((member) => member.position == 12).toList();
+      case 5: return crewMembers.where((member) => member.position == 13).toList();
+      case 6: return crewMembers.where((member) => member.position == 14).toList();
+      default: return [];
+    }
+  }
   void updateTotalCrewWeight() {
+
+    // Get all flight weight
     double crewWeight = 0.0;
     for (var member in crewMembers) {
       crewWeight += member.flightWeight;
     }
 
-    double gearWeight = 0.0;
-    for (var gearItem in gear) {
-      gearWeight += gearItem.weight;
+    // Get all personal tool weight
+    double personalToolWeight = 0.0;
+    for (var member in crewMembers){
+      if (member.personalTools != null) {
+        for (var tools in member.personalTools!) {
+            personalToolWeight += tools.weight;
+        }
+      }
     }
 
-    totalCrewWeight = crewWeight + gearWeight;
+    // Get all gear weight
+    double gearWeight = 0.0;
+    for (var gearItem in gear) {
+      gearWeight += gearItem.totalGearWeight;
+    }
+
+    totalCrewWeight = crewWeight + personalToolWeight + gearWeight;
   }
 
-  void addCrewMember(CrewMember member) {
+  addCrewMember(CrewMember member) {
     var crewmemberBox = Hive.box<CrewMember>('crewmemberBox'); // assign hive box to variable we can use
     crewMembers.add(member); // add crewmember in memory as well
     crewmemberBox.add(member); // save to hive memory

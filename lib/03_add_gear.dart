@@ -17,6 +17,7 @@ class _AddGearState extends State<AddGear>{
   // Variables to store user input
   final TextEditingController gearNameController = TextEditingController();
   final TextEditingController gearWeightController = TextEditingController();
+  final TextEditingController gearQuantityController = TextEditingController(text: '1');
   bool isSaveButtonEnabled = false; // Controls whether saving button is showing
 
   @override
@@ -26,12 +27,15 @@ class _AddGearState extends State<AddGear>{
     // Listeners to the TextControllers
     gearNameController.addListener(_checkInput);
     gearWeightController.addListener(_checkInput);
+    gearQuantityController.addListener(_checkInput);
+
   }
 
   @override
   void dispose() {
     gearNameController.dispose();
     gearWeightController.dispose();
+    gearQuantityController.dispose();
     super.dispose();
   }
 
@@ -39,23 +43,46 @@ class _AddGearState extends State<AddGear>{
   void _checkInput() {
     final isGearNameValid = gearNameController.text.isNotEmpty;
     final isGearWeightValid = gearWeightController.text.isNotEmpty;
+    final isGearQuantityValid = int.parse(gearQuantityController.text) >= 1;
 
     setState(() {
       // Need to adjust for position as well
-      isSaveButtonEnabled = isGearNameValid && isGearWeightValid;
+      isSaveButtonEnabled = isGearNameValid && isGearWeightValid && isGearQuantityValid;
     });
   }
 
   // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
-  void saveData() {
+  void saveGearData() {
 
     final String gearName = gearNameController.text;
 
-    // Convert flight weight text to integer
+    // Check if gear name already exists
+    bool gearNameExists = crew.gear.any((gear) => gear.name == gearName);
+
+    if (gearNameExists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Gear name already used!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return; // Exit function if the gear name is already used
+    }
+    // Convert gear weight text to integer
     final int gearWeight = int.parse(gearWeightController.text);
+    final int gearQuantity = int.parse(gearQuantityController.text);
 
     // Creating a new gear object. Don't have hazmat yet
-    Gear newGearItem= Gear(name: gearName, weight: gearWeight);
+    Gear newGearItem= Gear(name: gearName, weight: gearWeight, quantity: gearQuantity);
 
     // Add the new member to the global crew object
     crew.addGear(newGearItem);
@@ -81,11 +108,12 @@ class _AddGearState extends State<AddGear>{
     // Clear the text fields (reset them to empty), so you can add more ppl
     gearNameController.text = '';
     gearWeightController.text = '';
+    gearQuantityController.text = '1';
 
     // Debug for LogCat
-    print("Gear Name: $gearName");
-    print("Gear Weight: $gearWeight");
-    crew.printCrewDetails();
+    // print("Gear Name: $gearName");
+    //print("Gear Weight: $gearWeight");
+    //crew.printCrewDetails();
   }
 
   @override
@@ -157,7 +185,7 @@ class _AddGearState extends State<AddGear>{
                           child: TextField(
                             controller: gearNameController,
                             decoration: InputDecoration(
-                              labelText: 'Enter gear name',
+                              labelText: 'Gear Name',
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -193,7 +221,7 @@ class _AddGearState extends State<AddGear>{
 
                       ),
 
-                      // Enter Flight Weight
+                      // Enter Gear Weight
                       Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: TextField(
@@ -205,7 +233,55 @@ class _AddGearState extends State<AddGear>{
                               // Allow only digits
                             ],
                             decoration: InputDecoration(
-                              labelText: 'Enter gear weight',
+                              labelText: 'Weight',
+                              labelStyle: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontStyle: FontStyle.italic,
+                                //fontWeight: FontWeight.bold,
+                              ),
+                              filled: true,
+                              fillColor: Colors.black.withOpacity(0.9),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: Colors.white,
+                                  // Border color when the TextField is not focused
+                                  width: 2.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                    12.0), // Rounded corners
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: Colors.black,
+                                  // Border color when the TextField is focused
+                                  width: 2.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+
+                            ),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 28,
+                            ),
+                          )
+
+                      ),
+
+                      // Enter quantity
+                      Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: TextField(
+                            controller: gearQuantityController,
+                            keyboardType: TextInputType.number,
+                            // Only show numeric keyboard
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly,
+                              // Allow only digits
+                            ],
+                            decoration: InputDecoration(
+                              labelText: 'Quantity',
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -247,7 +323,7 @@ class _AddGearState extends State<AddGear>{
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
-                            onPressed: isSaveButtonEnabled ? () => saveData() : null,  // Button is only enabled if there is input
+                            onPressed: isSaveButtonEnabled ? () => saveGearData() : null,  // Button is only enabled if there is input
                             style: style, // Main button theme
                             child: const Text(
                                 'Save'

@@ -1,4 +1,3 @@
-import 'crewmember.dart';
 import 'gear.dart';
 
 class SavedPreferences {
@@ -55,14 +54,11 @@ class TripPreference {
 class PositionalPreference {
   // Priority will be dealt with on UI side through drag and drop
   int priority;											            // Sorting Priority
-  List<CrewMember> crewMembers = [];						// Can be 1 or more CrewMembers
   int loadPreference;										        // First, Last, Balanced => 0, 1, 2
-  // bool isActive;											        // Enables/Disables preference
+  List<dynamic> crewMembersDynamic = [];			  // Can hold either individual crew member(s), or entire groups of crew members (like saw teams)
 
-  PositionalPreference({required this.priority, required this.loadPreference, required this.crewMembers});
+  PositionalPreference({required this.priority, required this.loadPreference, required this.crewMembersDynamic});
 
-  // If  there is only 1 crewmember, 'Balanced' load option is disabled
-  // implement in ui?
 
 }
 
@@ -76,16 +72,10 @@ class GearPreference{
 
   int priority;											            // Sorting Priority
   List<Gear> gear = [];									        // Can be 1 or more Gear Items
-  int? quantity;											          // Based on crew inventory. Only really need for like water or MREs
-  int? isMultipleItems;
   int loadPreference;										        // First, Last, Balanced => 0, 1, 2
   // bool isActive;											        // Enables/Disables preference
 
-  GearPreference({required this.priority, required this.loadPreference, required this.gear}){
-    {
-      isMultipleItems = gear.length > 1 ? 1 : null; // This will be used in algorithm instead of quantity
-    }
-  }
+  GearPreference({required this.priority, required this.loadPreference, required this.gear});
 
   // If  there are more than 1 items, quantity is disabled in UI.
   // If quantity is 1, then 'Balanced' load option is turned off in UI.

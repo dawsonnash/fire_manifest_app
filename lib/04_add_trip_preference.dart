@@ -3,23 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/04_add_load_preference.dart';
 
+import 'Data/crew.dart';
+import 'Data/crewmember.dart';
+
 class AddTripPreference extends StatefulWidget {
+  final VoidCallback onUpdate; // Callback to update previous page
 
-  final VoidCallback onUpdate;  // Callback to update previous page
-
-  const AddTripPreference({
-    required this.onUpdate,
-    super.key});
+  const AddTripPreference({required this.onUpdate, super.key});
 
   @override
   State<AddTripPreference> createState() => _AddTripPreferenceState();
 }
 
 class _AddTripPreferenceState extends State<AddTripPreference> {
-
   // New TripPreference object
   late TripPreference tripPreference;
   List<PositionalPreference> positionalPreferenceList = [];
+
   //List Gear
 
   @override
@@ -31,20 +31,22 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
     tripPreference = TripPreference(tripPreferenceName: 'Untitled');
     // Add the new tripPreference to savedPreferences.tripPreferences
     savedPreferences.tripPreferences.add(tripPreference);
-
   }
+
   // Function to edit title
   void _editTitle() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        TextEditingController titleController = TextEditingController(text: tripPreference.tripPreferenceName);
+        TextEditingController titleController =
+            TextEditingController(text: tripPreference.tripPreferenceName);
 
         return AlertDialog(
           title: const Text("Edit Trip Preference Name"),
           content: TextField(
             controller: titleController,
-            decoration: const InputDecoration(labelText: "Trip Preference Name"),
+            decoration:
+                const InputDecoration(labelText: "Trip Preference Name"),
           ),
           actions: [
             TextButton(
@@ -76,7 +78,6 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     final ButtonStyle style = ElevatedButton.styleFrom(
@@ -88,7 +89,8 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
       shadowColor: Colors.black,
       side: const BorderSide(color: Colors.black, width: 2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      fixedSize: Size(MediaQuery.of(context).size.width / 1.6, MediaQuery.of(context).size.height / 10),
+      fixedSize: Size(MediaQuery.of(context).size.width / 1.6,
+          MediaQuery.of(context).size.height / 10),
     );
 
     return Scaffold(
@@ -98,7 +100,8 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
             Expanded(
               child: Text(
                 tripPreference.tripPreferenceName,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
             IconButton(
@@ -130,46 +133,69 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
               children: [
                 const SizedBox(height: 20),
 
-                tripPreference.positionalPreferences.isEmpty
+                if (tripPreference.positionalPreferences.isEmpty &&
+                    tripPreference.gearPreferences.isEmpty)
 
-                // Container for if user has no preferences
-                    ? Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.black, width: 2),
-                    borderRadius: BorderRadius.circular(4),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
-                        spreadRadius: 1,
-                        blurRadius: 8,
-                        offset: Offset(0, 3),
+                  // Container for if user has no preferences
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.black, width: 2),
+                      borderRadius: BorderRadius.circular(4),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          spreadRadius: 1,
+                          blurRadius: 8,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    child: const Text(
+                      'No preferences added...',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
-                  child: const Text(
-                    'No preferences added...',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
                     ),
                   ),
-                )
-                    : Expanded(
+                Expanded(
                   child: ListView.builder(
                     itemCount: tripPreference.positionalPreferences.length +
                         tripPreference.gearPreferences.length,
                     itemBuilder: (context, index) {
                       // If index is within the positionalPreferences range
-                      // This approach may not work if we are doing drag n drop
-                      if (index <
-                          tripPreference.positionalPreferences
-                              .length) {
-                        final posPref = tripPreference.positionalPreferences[index];
+                      if (index < tripPreference.positionalPreferences.length) {
+                        final posPref =
+                            tripPreference.positionalPreferences[index];
+
+                        // Dynacmic title - individual or saw teams
+                        String titleText =
+                            posPref.crewMembersDynamic.map((member) {
+                          if (member is CrewMember) {
+                            return member.name; // Single crew member
+                          } else if (member is List<CrewMember>) {
+                            // Check which saw team this list matches and return the appropriate name
+                            if (member == crew.getSawTeam(1))
+                              return 'Saw Team 1';
+                            if (member == crew.getSawTeam(2))
+                              return 'Saw Team 2';
+                            if (member == crew.getSawTeam(3))
+                              return 'Saw Team 3';
+                            if (member == crew.getSawTeam(4))
+                              return 'Saw Team 4';
+                            if (member == crew.getSawTeam(5))
+                              return 'Saw Team 5';
+                            if (member == crew.getSawTeam(6))
+                              return 'Saw Team 6';
+                          }
+                          return '';
+                        }).join(', ');
+
                         return Card(
                           margin: const EdgeInsets.symmetric(
                               vertical: 8.0, horizontal: 16.0),
@@ -182,20 +208,34 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                               ],
                             ),
                             title: Text(
-                              posPref.crewMembers
-                                  .map((member) => member.name)
-                                  .join(', '),
+                              posPref.crewMembersDynamic.map((item) {
+                                if (item is CrewMember) {
+                                  return item
+                                      .name; // Display individual crew member name
+                                } else if (item is List<CrewMember>) {
+                                  // Check which Saw Team the list matches and return the appropriate Saw Team name
+                                  for (int i = 1; i <= 6; i++) {
+                                    List<CrewMember> sawTeam =
+                                        crew.getSawTeam(i);
+                                    if (sawTeam.every((member) =>
+                                            item.contains(member)) &&
+                                        item.length == sawTeam.length) {
+                                      return 'Saw Team $i'; // Return Saw Team name
+                                    }
+                                  }
+                                }
+                                return '';
+                              }).join(', '),
                               style:
-                              TextStyle(fontWeight: FontWeight.bold),
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             subtitle: Text(
                                 "Load Preference: ${loadPreferenceMap[posPref.loadPreference]}"),
                             trailing: IconButton(
-                              icon: const Icon(Icons.delete,
-                                  color: Colors.red),
+                              icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
-                                setState(() {tripPreference
-                                      .positionalPreferences
+                                setState(() {
+                                  tripPreference.positionalPreferences
                                       .removeAt(index);
                                 });
                               },
@@ -203,35 +243,33 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                           ),
                         );
                       }
-                      // Handle gearPreferences
-                      else {
-                        final gearIndex = index -
-                            tripPreference.positionalPreferences
-                                .length;
-                        final gearPref = tripPreference.gearPreferences[gearIndex];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 16.0),
-                          child: ListTile(
-                            leading: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text("Priority"),
-                                Text(gearPref.priority.toString()),
-                              ],
-                            ),
-                            title: Text(
-                              gearPref.gear
-                                  .map((member) => member.name)
-                                  .join(', '),
-                              style:
-                              TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            subtitle:
-                            Text(
-                                "Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}"),                                  trailing: IconButton(
-                            icon: const Icon(Icons.delete,
-                                color: Colors.red),
+                      // Handle gear preferences
+                      final gearIndex =
+                          index - tripPreference.positionalPreferences.length;
+                      final gearPref =
+                          tripPreference.gearPreferences[gearIndex];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 16.0),
+                        child: ListTile(
+                          leading: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Priority"),
+                              Text(gearPref.priority.toString()),
+                            ],
+                          ),
+                          title: Text(
+                            gearPref.gear
+                                .map((item) =>
+                                    '${item.name} (x${item.quantity})')
+                                .join(', '),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                              "Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}"),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () {
                               setState(() {
                                 tripPreference.gearPreferences
@@ -239,9 +277,8 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                               });
                             },
                           ),
-                          ),
-                        );
-                      }
+                        ),
+                      );
                     },
                   ),
                 ),
@@ -257,14 +294,13 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                           builder: (context) => AddLoadPreference(
                             tripPreference: tripPreference,
                             onUpdate:
-                            loadPositionalPreferenceList, // refresh list on return
+                                loadPositionalPreferenceList, // refresh list on return
                           ),
                         ),
                       );
                       if (result != null) {
                         setState(() {
-                          tripPreference.positionalPreferences
-                              .add(result);
+                          tripPreference.positionalPreferences.add(result);
                         });
                       }
                     },

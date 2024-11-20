@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'Data/crew.dart';
 import 'Data/crewmember.dart';
+import 'Data/gear.dart';
 
 class AddCrewmember extends StatefulWidget {
   const AddCrewmember({super.key});
@@ -15,8 +16,12 @@ class AddCrewmember extends StatefulWidget {
     // Variables to store user input
     final TextEditingController nameController = TextEditingController();
     final TextEditingController flightWeightController = TextEditingController();
+    final TextEditingController toolNameController = TextEditingController();
+    final TextEditingController toolWeightController = TextEditingController();
     bool isSaveButtonEnabled = false; // Controls whether saving button is showing
     int? selectedPosition;
+    List<Gear>? addedTools = []; // List to hold added Gear objects, i.e., personal tools
+
 
     @override
   void initState() {
@@ -25,11 +30,15 @@ class AddCrewmember extends StatefulWidget {
       // Listeners to the TextControllers
       nameController.addListener(_checkInput);
       flightWeightController.addListener(_checkInput);
+      toolNameController.addListener(_checkInput);
+      toolWeightController.addListener(_checkInput);
     }
     @override
     void dispose() {
       nameController.dispose();
       flightWeightController.dispose();
+      toolNameController.dispose();
+      toolWeightController.dispose();
       super.dispose();
     }
 
@@ -45,19 +54,72 @@ class AddCrewmember extends StatefulWidget {
       });
     }
 
+    void addTool() {
+      final String toolName = toolNameController.text;
+      final int toolWeight = int.parse(toolWeightController.text);
+
+      if (toolName.isNotEmpty && toolWeight > 0) {
+        setState(() {
+          addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1));
+          toolNameController.clear();
+          toolWeightController.clear();
+          setState(() {});
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please enter all tool info'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      print('Saved Tools');
+      for (var tools in addedTools!){
+        print('${tools.name}, ${tools.weight}');
+      }
+    }
+
+    void removeTool(int index) {
+      setState(() {
+        addedTools?.removeAt(index);
+      });
+    }
+
+
     // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
     void saveCrewMemberData() {
 
       // Take what the name contrller has saved
       final String name = nameController.text;
 
+      // Check if crew member name already exists
+      bool crewMemberNameExists = crew.crewMembers.any((member) => member.name == name);
+
+      if (crewMemberNameExists) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Crew member name already used!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            duration: Duration(seconds: 2),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return; // Exit function if the gear name is already used
+      }
       // Convert flight weight text to integer
       final int flightWeight = int.parse(flightWeightController.text);
 
-      //final String position = selectedPosition?.label ?? 'None';
+      final List<Gear> personalTools = List.from(addedTools!);
 
       // Creating a new CrewMember object. Dont have positioin yet
-      CrewMember newCrewMember = CrewMember(name: name, flightWeight: flightWeight, position: selectedPosition ?? 26);
+      CrewMember newCrewMember = CrewMember(name: name, flightWeight: flightWeight, position: selectedPosition ?? 26, personalTools: personalTools);
 
       // Add the new crewmember to the global crew object
       crew.addCrewMember(newCrewMember);
@@ -78,16 +140,19 @@ class AddCrewmember extends StatefulWidget {
         ),
       );
 
-      // Clear the text fields (reset them to empty), so you can add more ppl
+      // Clear all input fields (reset them to empty), so you can add more ppl
+      clearInputs();
+    }
+
+    void clearInputs() {
       nameController.text = '';
       flightWeightController.text = '';
+      toolNameController.text = '';
+      toolWeightController.text = '';
       selectedPosition = null;
-
-      // Debug for LogCat
-      print("Name: $name");
-      print("Flight Weight: $flightWeight");
-      print("--------------------------");
-      crew.printCrewDetails();
+      // THis destroys everything
+      addedTools?.clear();
+      setState(() {}); // Rebuild UI to reflect changes
     }
 
   @override
@@ -151,15 +216,14 @@ class AddCrewmember extends StatefulWidget {
 
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      const Spacer(flex: 1),
 
                       // Enter Name
                       Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.only(top:16.0, bottom: 4.0, left: 16.0, right:16.0),
                           child: TextField(
                             controller: nameController,
                             decoration: InputDecoration(
-                              labelText: 'Enter last name',
+                              labelText: 'Last Name',
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -197,7 +261,7 @@ class AddCrewmember extends StatefulWidget {
 
                       // Enter Flight Weight
                       Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.only(top:4.0, bottom: 4.0, left: 16.0, right:16.0),
                           child: TextField(
                             controller: flightWeightController,
                             keyboardType: TextInputType.number,
@@ -207,7 +271,7 @@ class AddCrewmember extends StatefulWidget {
                               // Allow only digits
                             ],
                             decoration: InputDecoration(
-                              labelText: 'Enter flight weight',
+                              labelText: 'Flight Weight',
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -245,7 +309,7 @@ class AddCrewmember extends StatefulWidget {
 
                       // Enter Position(s)
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.only(top:4.0, bottom: 4.0, left: 16.0, right:16.0),
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -258,7 +322,7 @@ class AddCrewmember extends StatefulWidget {
                             child: DropdownButton<int>(
                               value: selectedPosition,
                               hint: const Text(
-                                'Choose position',
+                                'Primary Position',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 22,
@@ -290,17 +354,114 @@ class AddCrewmember extends StatefulWidget {
                         ),
                       ),
 
-                      const Spacer(flex: 6),
+                      // Enter tool(s) & weight
+                      Padding(
+                        padding: const EdgeInsets.only(top:4.0, bottom: 4.0, left: 16.0, right:16.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: toolNameController,
+                                decoration: InputDecoration(
+                                  labelText: 'Tool Name',
+                                  labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
+                                  filled: true,
+                                  fillColor: Colors.black.withOpacity(0.9),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(color: Colors.white, width: 2.0),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(color: Colors.black, width: 2.0),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                ),
+                                style: const TextStyle(color: Colors.white, fontSize: 28),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: TextField(
+                                controller: toolWeightController,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                decoration: InputDecoration(
+                                  labelText: 'Tool Weight',
+                                  labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
+                                  filled: true,
+                                  fillColor: Colors.black.withOpacity(0.9),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(color: Colors.white, width: 2.0),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(color: Colors.black, width: 2.0),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                ),
+                                style: const TextStyle(color: Colors.white, fontSize: 28),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Container(
+                                padding: const EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.black),
+                                ),
+                                child: const Icon(Icons.add, color: Colors.black, size: 24),
+                              ),
+                              onPressed: addTool,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Display added tools
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                          child: ListView.builder(
+                            itemCount: addedTools?.length,
+                            itemBuilder: (context, index) {
+                              final tool = addedTools?[index];
+                              return Card(
+                                elevation: 4,
+                                color: Colors.black,
+                                child: ListTile(
+                                  title: Text(
+                                    tool!.name,
+                                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Text(
+                                    '${tool.weight} lbs',
+                                    style: const TextStyle(color: Colors.white, fontSize: 20),
+                                  ),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red, size: 28),
+                                    onPressed: () => removeTool(index),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+
 
                       // Save Button
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: isSaveButtonEnabled ? () => saveCrewMemberData() : null,  // Button is only enabled if there is input
-                            style: style, // Main button theme
-                            child: const Text(
-                                'Save'
-                            )
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: ElevatedButton(
+                              onPressed: isSaveButtonEnabled ? () => saveCrewMemberData() : null,  // Button is only enabled if there is input
+                              style: style, // Main button theme
+                              child: const Text(
+                                  'Save'
+                              )
+                          ),
                         ),
                       ),
                     ],

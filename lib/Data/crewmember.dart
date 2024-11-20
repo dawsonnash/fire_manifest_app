@@ -1,5 +1,8 @@
 
 import 'package:hive/hive.dart';
+
+import 'crew.dart';
+import 'gear.dart';
 part 'crewmember.g.dart';
 
 
@@ -14,13 +17,35 @@ class CrewMember extends HiveObject{
   // position: fields[2] as int? ?? 0,
   int position; // New field to store the position code
 
-  CrewMember({required this.name, required this.flightWeight, required this.position});
+  @HiveField(3)
+  List<Gear>? personalTools;
+
+
+  // Getter function to calculate totalCrewMemberWeight: flightweight + all personal tools
+  int get totalCrewMemberWeight {
+    int totalWeight = flightWeight;
+    if (personalTools != null) {
+      for (var tool in personalTools!) {
+        totalWeight += tool.weight;
+      }
+    }
+    return totalWeight;
+  }
+
+  CrewMember({required this.name, required this.flightWeight, required this.position, this.personalTools});
 
   String getPositionTitle(int positionCode) {
     return positionMap[positionCode] ?? 'Unknown Position';
   }
 
 
+}
+List<Gear> getAllGearItems() {
+  List<Gear> allGear = [];
+  for (var crewMember in crew.crewMembers) {
+    allGear.addAll(crewMember.personalTools ?? []);
+  }
+  return allGear;
 }
 
 // Position Mapping

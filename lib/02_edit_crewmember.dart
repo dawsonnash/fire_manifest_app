@@ -5,6 +5,8 @@ import '../Data/crew.dart';
 import '../Data/crewmember.dart';
 import 'package:hive/hive.dart';
 
+import 'Data/gear.dart';
+
 class EditCrewmember extends StatefulWidget {
 
   // This page requires a crewmember to be passed to it - to edit it
@@ -25,13 +27,22 @@ class _EditCrewmemberState extends State<EditCrewmember>{
   // Variables to store user input
   late TextEditingController nameController;
   late TextEditingController flightWeightController;
+
+  late List<TextEditingController> toolNameControllers = [];
+  late List<TextEditingController> toolWeightControllers = [];
+  late TextEditingController newToolNameController;
+  late TextEditingController newToolWeightController;
+
   int? selectedPosition;
+  List<Gear>? addedTools = [];
+
   bool isSaveButtonEnabled = false; // Controls whether saving button is showing
 
   // Store old CrewMember info for ensuring user only can save if they change data
   late String oldCrewMemberName;
   late int oldCrewMemberFlightWeight;
   late int oldCrewMemberPosition;
+  late List oldCrewMemberTools = List.from(widget.crewMember.personalTools ?? []); // Store old tools
 
   // initialize HiveBox for crewmember
   late final Box<CrewMember> crewmemberBox;
@@ -47,6 +58,12 @@ class _EditCrewmemberState extends State<EditCrewmember>{
     nameController = TextEditingController(text: widget.crewMember.name);
     flightWeightController = TextEditingController(text: widget.crewMember.flightWeight.toString());
     selectedPosition = widget.crewMember.position; // Set initial position
+    // Initialize tool controllers with each of the existing tools
+    widget.crewMember.personalTools?.forEach((gearItem) {
+      toolNameControllers.add(TextEditingController(text: gearItem.name));
+      toolWeightControllers.add(TextEditingController(text: gearItem.weight.toString()));
+    });
+
 
     // Store original crewmember data
     oldCrewMemberName = widget.crewMember.name;
@@ -56,36 +73,141 @@ class _EditCrewmemberState extends State<EditCrewmember>{
     // Listeners to the TextControllers
     nameController.addListener(_checkInput);
     flightWeightController.addListener(_checkInput);
+    toolNameControllers.forEach((controller) => controller.addListener(_checkInput));
+    toolWeightControllers.forEach((controller) => controller.addListener(_checkInput));
+
+    // Initialize separate controllers for adding new tools
+    newToolNameController = TextEditingController();
+    newToolWeightController = TextEditingController();
+    newToolNameController.addListener(_checkInput);
+    newToolWeightController.addListener(_checkInput);
+
+    addedTools = List.from(widget.crewMember.personalTools ?? []);
+
   }
 
   @override
   void dispose() {
     nameController.dispose();
     flightWeightController.dispose();
+    toolNameControllers.forEach((controller) => controller.dispose());
+    toolWeightControllers.forEach((controller) => controller.dispose());
+    newToolNameController.dispose();
+    newToolWeightController.dispose();
     super.dispose();
   }
-  // Function to check if input is valid and update button state
-  void _checkInput() {
-    final isNameValid = nameController.text.isNotEmpty;
-    final isFlightWeightValid = flightWeightController.text.isNotEmpty;
-    final isNameChanged = nameController.text != oldCrewMemberName;
-    final isFlightWeightChanged = flightWeightController.text != oldCrewMemberFlightWeight.toString();
-    final isPositionChanged = selectedPosition != oldCrewMemberPosition;
 
-    setState(() {
-      // Need to adjust for position as well
-      // Only enables saving if name is changed and is not empty
-      isSaveButtonEnabled = (isNameValid && isFlightWeightValid) && (isNameChanged || isFlightWeightChanged || isPositionChanged);
-    });
+  void addTool() {
+    final String toolName = newToolNameController.text;
+    final int? toolWeight = int.tryParse(newToolWeightController.text);
+
+    if (toolName.isNotEmpty && toolWeight != null && toolWeight > 0) {
+      setState(() {
+        addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1));
+        toolNameControllers.add(TextEditingController(text: toolName));
+        toolWeightControllers.add(TextEditingController(text: toolWeight.toString()));
+        newToolNameController.clear();
+        newToolWeightController.clear();
+      });
+      _checkInput(); // Call _checkInput() to update the button state
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Enter a new tool', style: TextStyle(fontWeight: FontWeight.bold,
+          fontSize: 28),),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
+
+  void removeTool(int index) {
+    setState(() {
+      addedTools?.removeAt(index);
+      toolNameControllers[index].dispose();
+      toolWeightControllers[index].dispose();
+      toolNameControllers.removeAt(index);
+      toolWeightControllers.removeAt(index);
+      _checkInput();
+    });
+
+  }
+  // Function to check if input is valid and update button state
+  bool compareLists(List<Gear>? list1, List<Gear>? list2) {
+    if (list1 == null && list2 == null) return true; // Both are null, so they are the same
+    if (list1 == null || list2 == null) return false; // One is null, the other isn't
+    if (list1.length != list2.length) return false; // Different lengths, so they are different
+
+    for (int i = 0; i < list1.length; i++) {
+      if (list1[i].name != list2[i].name || list1[i].weight != list2[i].weight) {
+        return false; // Lists differ
+      }
+    }
+    return true; // Lists are the same
+  }
+
+
+
+  void _checkInput() {
+    final isNameValid = nameController.text.isNotEmpty;
+    final isFlightWeightValid = flightWeightController.text.isNotEmpty && int.tryParse(flightWeightController.text) != null;
+    final isNameChanged = nameController.text != oldCrewMemberName;
+    final isFlightWeightChanged = int.parse(flightWeightController.text) != oldCrewMemberFlightWeight;
+    final isPositionChanged = (selectedPosition ?? -1) != oldCrewMemberPosition;  // Assuming -1 as an invalid/initial value
+
+    final areToolsChanged = !compareLists(oldCrewMemberTools.cast<Gear>(), addedTools);
+
+    setState(() {
+      isSaveButtonEnabled =
+          (isNameValid && isFlightWeightValid) && (isNameChanged || isFlightWeightChanged || isPositionChanged || areToolsChanged);
+    });
+  }
   // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
   void saveData() {
+
+    // Get updated crew member name
+    final String newCrewMemberName = nameController.text;
+    final String originalCrewMemberName = widget.crewMember.name;
+
+    // Check if new crew member name already exists in the crew list, but ignore current crew member's original name
+    bool crewMemberNameExists = crew.crewMembers.any(
+          (member) => member.name == newCrewMemberName && member.name != originalCrewMemberName,
+    );
+
+    if (crewMemberNameExists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Crew member name already used!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return; // Exit function if the crew member name is already used
+    }
 
     // Update exisiting data
     widget.crewMember.name = nameController.text;
     widget.crewMember.flightWeight = int.parse(flightWeightController.text);
     widget.crewMember.position = selectedPosition!; // Update position
+
+    // Update all personal tools
+    List<Gear> updatedTools = addedTools?.asMap().entries.map((entry) {
+      return Gear(
+        name: toolNameControllers[entry.key].text,
+        weight: int.parse(toolWeightControllers[entry.key].text),
+        quantity: 1 // To be changed
+      );
+    }).toList() ?? [];
+    widget.crewMember.personalTools = updatedTools;
 
     // Find the key for this item, if it's not a new item, update it in Hive
     final key = crewmemberBox.keys.firstWhere(
@@ -99,7 +221,7 @@ class _EditCrewmemberState extends State<EditCrewmember>{
       // Add new item to Hive
       crewmemberBox.add(widget.crewMember);
     }
-
+    crew.updateTotalCrewWeight();
     // Callback function, Update previous page UI with setState()
     widget.onUpdate();
 
@@ -181,11 +303,9 @@ class _EditCrewmemberState extends State<EditCrewmember>{
 
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      const Spacer(flex: 1),
-
                       // Edit Name
                       Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.only(top:16.0, bottom: 4.0, left: 16.0, right:16.0),
                           child: TextField(
                             controller: nameController,
                             decoration: InputDecoration(
@@ -227,7 +347,7 @@ class _EditCrewmemberState extends State<EditCrewmember>{
 
                       // Edit Flight Weight
                       Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.only(top:8.0, bottom: 4.0, left: 16.0, right:16.0),
                           child: TextField(
                             controller: flightWeightController,
                             keyboardType: TextInputType.number,
@@ -275,7 +395,7 @@ class _EditCrewmemberState extends State<EditCrewmember>{
 
                       // Enter Position(s)
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.only(top:8.0, bottom: 4.0, left: 16.0, right:16.0),
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -313,8 +433,101 @@ class _EditCrewmemberState extends State<EditCrewmember>{
                         ),
                       ),
 
-                      // Enter Position(s)
-                      const Spacer(flex: 6),
+                      // Enter tool(s) & weight
+                      Padding(
+                        padding: const EdgeInsets.only(top:4.0, bottom: 4.0, left: 16.0, right:16.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: newToolNameController,
+                                decoration: InputDecoration(
+                                  labelText: 'Tool Name',
+                                  labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
+                                  filled: true,
+                                  fillColor: Colors.black.withOpacity(0.9),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(color: Colors.white, width: 2.0),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(color: Colors.black, width: 2.0),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                ),
+                                style: const TextStyle(color: Colors.white, fontSize: 28),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: TextField(
+                                controller: newToolWeightController,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                decoration: InputDecoration(
+                                  labelText: 'Tool Weight',
+                                  labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
+                                  filled: true,
+                                  fillColor: Colors.black.withOpacity(0.9),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(color: Colors.white, width: 2.0),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(color: Colors.black, width: 2.0),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                ),
+                                style: const TextStyle(color: Colors.white, fontSize: 28),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Container(
+                                padding: const EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.black),
+                                ),
+                                child: const Icon(Icons.add, color: Colors.black, size: 24),
+                              ),
+                              onPressed: addTool,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Display added tools
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                          child: ListView.builder(
+                            itemCount: addedTools?.length,
+                            itemBuilder: (context, index) {
+                              final tool = addedTools?[index];
+                              return Card(
+                                elevation: 4,
+                                color: Colors.black,
+                                child: ListTile(
+                                  title: Text(
+                                    tool!.name,
+                                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Text(
+                                    '${tool.weight} lbs',
+                                    style: const TextStyle(color: Colors.white, fontSize: 20),
+                                  ),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red, size: 28),
+                                    onPressed: (){removeTool(index);
+                                    _checkInput();},
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
 
                       // Save Button
                       Padding(

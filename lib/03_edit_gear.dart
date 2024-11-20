@@ -25,11 +25,14 @@ class _EditGearState extends State<EditGear>{
   // Variables to store user input
   late TextEditingController gearNameController;
   late TextEditingController gearWeightController;
+  late TextEditingController gearQuantityController;
+
   bool isSaveButtonEnabled = false; // Controls whether saving button is showing
 
   // Store old gear info for ensuring user only can save if they change data
   late String oldGearName;
   late int oldGearWeight;
+  late int oldGearQuantity;
 
   // initialize HiveBox for Gear
   late final Box<Gear> gearBox;
@@ -44,20 +47,24 @@ class _EditGearState extends State<EditGear>{
     // Initializing the controllers with the current gears data to be edited
     gearNameController = TextEditingController(text: widget.gear.name);
     gearWeightController = TextEditingController(text: widget.gear.weight.toString());
+    gearQuantityController = TextEditingController(text: widget.gear.quantity.toString());
 
     // Store original gear data
     oldGearName = widget.gear.name;
     oldGearWeight = widget.gear.weight;
+    oldGearQuantity = widget.gear.quantity;
 
     // Listeners to the TextControllers
     gearNameController.addListener(_checkInput);
     gearWeightController.addListener(_checkInput);
+    gearQuantityController.addListener(_checkInput);
   }
 
   @override
   void dispose() {
     gearNameController.dispose();
     gearWeightController.dispose();
+    gearQuantityController.dispose();
     super.dispose();
   }
 
@@ -67,20 +74,52 @@ class _EditGearState extends State<EditGear>{
     final isFlightWeightValid = gearWeightController.text.isNotEmpty;
     final isNameChanged = gearNameController.text != oldGearName;
     final isFlightWeightChanged = gearWeightController.text != oldGearWeight.toString();
+    final isGearQuantityValid = int.parse(gearQuantityController.text) >= 1;
+    final isGearQuantityChanged = gearQuantityController.text != oldGearQuantity.toString();
 
     setState(() {
       // Need to adjust for position as well
       // Only enables saving if name is changed and is not empty
-      isSaveButtonEnabled = (isNameValid && isFlightWeightValid) && (isNameChanged || isFlightWeightChanged);
+      isSaveButtonEnabled = (isNameValid && isFlightWeightValid && isGearQuantityValid) && (isNameChanged || isFlightWeightChanged || isGearQuantityChanged);
     });
   }
 
   // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
   void saveData() {
 
-    // Update exisiting data
-    widget.gear.name = gearNameController.text;
+    // Get  updated gear name from the TextField
+    final String newGearName = gearNameController.text;
+    final String originalGearName = widget.gear.name;
+
+    // Check if the new gear name already exists in the crew's gear list,
+    // but ignore the current gear's original name
+    bool gearNameExists = crew.gear.any(
+          (gear) => gear.name == newGearName && gear.name != originalGearName,
+    );
+
+    if (gearNameExists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Gear name already used!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return; // Exit function if the gear name is already used
+    }
+
+    // Update the gear's attributes
+    widget.gear.name = newGearName;
     widget.gear.weight = int.parse(gearWeightController.text);
+    widget.gear.quantity = int.parse(gearQuantityController.text);
 
     // Find the key for this item, if it's not a new item, update it in Hive
     final key = gearBox.keys.firstWhere(
@@ -96,14 +135,15 @@ class _EditGearState extends State<EditGear>{
       gearBox.add(widget.gear);
     }
 
+    crew.updateTotalCrewWeight();
     // Callback function, Update previous page UI with setState()
     widget.onUpdate();
 
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Gear Updated!',
-          // Maybe change look
+        content: Text(
+          'Gear Updated!',
           style: TextStyle(
             color: Colors.black,
             fontSize: 32,
@@ -114,7 +154,7 @@ class _EditGearState extends State<EditGear>{
         backgroundColor: Colors.green,
       ),
     );
-    Navigator.of(context).pop();  // Return to previous screen
+    Navigator.of(context).pop(); // Return to previous screen
   }
 
   @override
@@ -221,7 +261,7 @@ class _EditGearState extends State<EditGear>{
 
                       ),
 
-                      // Edit Flight Weight
+                      // Edit Weight
                       Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: TextField(
@@ -233,7 +273,7 @@ class _EditGearState extends State<EditGear>{
                               // Allow only digits
                             ],
                             decoration: InputDecoration(
-                              labelText: 'Edit gear weight',
+                              labelText: 'Edit weight',
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -269,7 +309,54 @@ class _EditGearState extends State<EditGear>{
 
                       ),
 
-                      // Enter Position(s)
+                      // Edit Quantity
+                      Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: TextField(
+                            controller: gearQuantityController,
+                            keyboardType: TextInputType.number,
+                            // Only show numeric keyboard
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly,
+                              // Allow only digits
+                            ],
+                            decoration: InputDecoration(
+                              labelText: 'Edit quantity',
+                              labelStyle: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontStyle: FontStyle.italic,
+                                //fontWeight: FontWeight.bold,
+                              ),
+                              filled: true,
+                              fillColor: Colors.black.withOpacity(0.9),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: Colors.white,
+                                  // Border color when the TextField is not focused
+                                  width: 2.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                    12.0), // Rounded corners
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: Colors.black,
+                                  // Border color when the TextField is focused
+                                  width: 2.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+
+                            ),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 28,
+                            ),
+                          )
+
+                      ),
+
                       const Spacer(flex: 6),
 
                       // Save Button

@@ -2,7 +2,61 @@ import 'dart:ui';
 import 'package:fire_app/06_single_load_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pdf/pdf.dart';
 import '../Data/trip.dart';
+// For exporting to pdf
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:intl/intl.dart';
+
+// Generates PDF
+Future<Uint8List> generateTripPDF(Trip trip) async {
+  final pdf = pw.Document();
+
+  // Load the image of the NWCG form
+  final imageBytes = await rootBundle.load('assets/images/crew_manifest_form.png');
+  final backgroundImage = pw.MemoryImage(imageBytes.buffer.asUint8List());
+
+  for (var load in trip.loads) {
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.letter,
+        margin: pw.EdgeInsets.all(0),
+        build: (pw.Context context) {
+          return pw.Stack(
+            children: [
+              pw.Container(
+                width: double.infinity,
+                height: double.infinity,
+                child: pw.Image(
+                  backgroundImage,
+                  fit: pw.BoxFit.cover, // Ensures image covers entire page
+                ),
+              ),
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(32),
+                child: fillFormFields(load),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+}
+
+  // Save PDF and return it as Uint8List
+  return pdf.save();
+}
+// Display PDF preview
+void previewTripPDF(BuildContext context, Trip trip) async {
+  final pdfBytes = await generateTripPDF(trip);
+
+  await Printing.layoutPdf(
+    onLayout: (PdfPageFormat format) async => pdfBytes,
+  );
+}
 
 class SingleTripView extends StatefulWidget {
 
@@ -24,7 +78,7 @@ class _SingleTripViewState extends State<SingleTripView>{
   @override
   void initState() {
     super.initState();
-    print('Number of loads: ${widget.trip.loads.length}');
+    // print('Number of loads: ${widget.trip.loads.length}');
 
   }
 
@@ -35,9 +89,21 @@ class _SingleTripViewState extends State<SingleTripView>{
       resizeToAvoidBottomInset: false,  // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
       appBar: AppBar(
         backgroundColor: Colors.deepOrangeAccent,
-        title: Text(
-          widget.trip.tripName,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+            widget.trip.tripName,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+            IconButton(
+              icon: Icon(Icons.ios_share, size: 28,),    // Does this work for android, i dont know
+              onPressed: () {
+                previewTripPDF(context, widget.trip);
+              },
+              tooltip: 'Export all loads to NWCG Crew Manifest Form',
+            ),
+        ],
         ),
       ),
       body: Stack(
