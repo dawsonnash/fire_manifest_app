@@ -73,7 +73,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
     savedTrips.addTrip(newTrip);
 
     // Manifest that load, baby
-    loadCalculator(newTrip, selectedTripPreference);
+    loadCalculator(context, newTrip, selectedTripPreference);
 
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(

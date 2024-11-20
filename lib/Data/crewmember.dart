@@ -26,11 +26,12 @@ class CrewMember extends HiveObject{
     int totalWeight = flightWeight;
     if (personalTools != null) {
       for (var tool in personalTools!) {
-        totalWeight += tool.weight;
+        totalWeight += tool.weight.toInt(); // Ensure tool.weight is treated as int
       }
     }
-    return totalWeight;
+    return totalWeight; // Explicitly returning an int
   }
+
 
   CrewMember({required this.name, required this.flightWeight, required this.position, this.personalTools});
 
