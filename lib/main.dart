@@ -1,4 +1,4 @@
-import 'package:fire_app/05_create_new_manifest.dart';
+import 'package:fire_app/05_manifest.dart';
 import 'package:fire_app/06_saved_trips.dart';
 import 'package:flutter/material.dart';
 import '../01_edit_crew.dart';
@@ -155,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const CreateNewManifest()),
+                                MaterialPageRoute(builder: (context) => const ManifestHome()),
                               );
                               },
                             style: style,
