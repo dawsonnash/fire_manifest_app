@@ -96,7 +96,7 @@ class _GearViewState extends State<GearView>{
                                   Text(
                                     '${gear.weight} lbs x ${gear.quantity}',
                                     style: const TextStyle(
-                                      fontSize:18,
+                                      fontSize:16,
                                     ),
                                   )
                                 ],
