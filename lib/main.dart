@@ -31,6 +31,9 @@ void main() async {
   crew.loadCrewDataFromHive();
   // do we need to load trip data as well?how does that work
 
+  // Test data for user testing
+  initializeTestData();
+
   // start app
   runApp(const MyApp());
 }
@@ -41,6 +44,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'Fire Manifest App',
       theme: ThemeData(
