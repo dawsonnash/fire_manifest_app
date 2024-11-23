@@ -91,12 +91,12 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                         Text(
                                           ' ${crewMember.getPositionTitle(crewMember.position)} - ',
                                           style: const TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 14,
                                           ),
                                         ),
                                         Text(
                                           (crewMember.personalTools ?? []).map((gearItem) => gearItem.name).join(', '),
-                                          style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+                                          style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
