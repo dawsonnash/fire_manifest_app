@@ -3,6 +3,7 @@ import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../Data/trip.dart';
+import 'Data/trip_preferences.dart';
 import 'Data/load_calculator.dart';
 
 class CreateNewManifest extends StatefulWidget {

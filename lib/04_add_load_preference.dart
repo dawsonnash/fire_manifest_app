@@ -5,6 +5,9 @@ import 'package:flutter/services.dart';
 import 'Data/crew.dart';
 import 'Data/gear.dart';
 import 'Data/saved_preferences.dart';
+import 'Data/positional_preferences.dart';
+import 'Data/gear_preferences.dart';
+import 'Data/trip_preferences.dart';
 import 'Data/crewmember.dart';
 import 'package:flutter/material.dart';
 

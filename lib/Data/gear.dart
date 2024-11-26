@@ -5,6 +5,7 @@ part 'gear.g.dart';
 class Gear extends HiveObject{
   @HiveField(0) // needs to be unique ID across class
   String name;
+
   @HiveField(1)
   int weight;
 

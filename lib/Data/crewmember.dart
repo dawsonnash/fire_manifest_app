@@ -13,8 +13,6 @@ class CrewMember extends HiveObject{
   @HiveField(1)// needs to be unique ID across class
   int flightWeight;
   @HiveField(2)
-  // Had to add a potential null field in crewmember.g, else would not build
-  // position: fields[2] as int? ?? 0,
   int position; // New field to store the position code
 
   @HiveField(3)

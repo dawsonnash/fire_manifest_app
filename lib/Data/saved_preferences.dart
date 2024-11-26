@@ -1,65 +1,57 @@
+import 'package:fire_app/Data/trip.dart';
+import 'package:hive/hive.dart';
+
 import 'gear.dart';
+import 'positional_preferences.dart';
+import 'gear_preferences.dart';
+import 'trip_preferences.dart';
 
 class SavedPreferences {
   List<TripPreference> tripPreferences = [];
 
   void addTripPreference(TripPreference newTripPreference) {
-    // var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
-    tripPreferences.add(newTripPreference); // add crewmember in memory as well
-    //preferenceLoadoutBox.add(newPreferenceLoadout); // save to hive memory
+    var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+    tripPreferences.add(newTripPreference);
+    tripPreferenceBox.add(newTripPreference); // save to hive memory
   }
 
   void deleteTripPreference(TripPreference tripPreference) {
-    // var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
-    tripPreferences.remove(tripPreference); // add crewmember in memory as well
-    //preferenceLoadoutBox.add(newPreferenceLoadout); // save to hive memory
+    var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+    final keyToRemove = tripPreferenceBox.keys.firstWhere( // find hive key of entry we are removing
+          (key) => tripPreferenceBox.get(key) == tripPreference,
+      orElse: () => null,
+    );
+    if (keyToRemove != null) {
+      tripPreferenceBox.delete(keyToRemove);
+    }
+    tripPreferences.remove(tripPreference);
   }
 
   void deleteAllTripPreferences() {
-    // var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
-    // Clear the in-memory list
-    savedPreferences.tripPreferences.clear();
+    var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
     // Clear the Hive storage
-    //crewmemberBox.clear();
+    tripPreferenceBox.clear();
+    savedPreferences.tripPreferences.clear();
+
   }
 
   void addPostionalPreference(TripPreference tripPreference, PositionalPreference newPreference) {
-    // var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
-    tripPreference.positionalPreferences.add(newPreference); // add crewmember in memory as well
-    //preferenceLoadoutBox.add(newPreferenceLoadout); // save to hive memory
+    tripPreference.positionalPreferences.add(newPreference);
+
   }
 
   void addGearPreference(TripPreference tripPreference, GearPreference newPreference) {
-    // var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
     tripPreference.gearPreferences.add(newPreference); // add crewmember in memory as well
-    //preferenceLoadoutBox.add(newPreferenceLoadout); // save to hive memory
   }
-}
 
-class TripPreference {
+  // This function loads all data stored in the hive for 'Crew' into the local in-memory
+  // Seems to be an easier way to work with data for now.
+  void loadSavedPreferenceDataFromHive() {
+    var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
 
-  String tripPreferenceName;                               // Ex. 'Going to a Fire'
-  List<PositionalPreference> positionalPreferences = [];
-  List<GearPreference> gearPreferences = [];
-
-  //PriorityMap
-  // of whatevertype. Maps preferences to a priority number across positional & gear
-  // Maybe multi-object array
-  // UI will check to see if priority is taken.
-
-  TripPreference({required this.tripPreferenceName});
-
-}
-
-class PositionalPreference {
-  // Priority will be dealt with on UI side through drag and drop
-  int priority;											            // Sorting Priority
-  int loadPreference;										        // First, Last, Balanced => 0, 1, 2
-  List<dynamic> crewMembersDynamic = [];			  // Can hold either individual crew member(s), or entire groups of crew members (like saw teams)
-
-  PositionalPreference({required this.priority, required this.loadPreference, required this.crewMembersDynamic});
-
-
+    // Load crew members from Hive into the in-memory list
+    savedPreferences.tripPreferences = tripPreferenceBox.values.toList();
+  }
 }
 
 Map<int, String> loadPreferenceMap = {
@@ -67,20 +59,6 @@ Map<int, String> loadPreferenceMap = {
   1: 'Last',
   2: 'Balanced',
 };
-
-class GearPreference{
-
-  int priority;											            // Sorting Priority
-  List<Gear> gear = [];									        // Can be 1 or more Gear Items
-  int loadPreference;										        // First, Last, Balanced => 0, 1, 2
-  // bool isActive;											        // Enables/Disables preference
-
-  GearPreference({required this.priority, required this.loadPreference, required this.gear});
-
-  // If  there are more than 1 items, quantity is disabled in UI.
-  // If quantity is 1, then 'Balanced' load option is turned off in UI.
-}
-
 
 // Global SavedPreferences object
 final SavedPreferences savedPreferences = SavedPreferences();

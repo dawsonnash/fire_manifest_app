@@ -1,6 +1,9 @@
 import 'dart:ui';
 import 'package:fire_app/04_add_trip_preference.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
+import 'package:fire_app/Data/trip.dart';
+import 'package:hive/hive.dart';
+import 'Data/trip_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '04_edit_trip_preference.dart';
@@ -14,21 +17,23 @@ class TripPreferences extends StatefulWidget {
 }
 class _TripPreferencesState extends State<TripPreferences>{
 
-  // late final Box<CrewMember> crewmemberBox;
+  late final Box<TripPreference> tripPreferenceBox;
   List<TripPreference> tripPreferenceList = [];
 
   @override
   void initState() {
     super.initState();
-    // Open the Hive box and load the list of Gear items
-    // crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
+    // Open the Hive box and load the list of Trip Preferences
+    tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
     loadTripPreferenceList();
   }
 
-  // Function to load all trip preferences upon screen opening
+  // Function to load the list of crewmembers from the Hive box
   void loadTripPreferenceList() {
+    print('TripPreference keys: ${tripPreferenceBox.keys}');
+    print('TripPreference values: ${tripPreferenceBox.values}');
     setState(() {
-      tripPreferenceList = savedPreferences.tripPreferences.toList();
+      tripPreferenceList = tripPreferenceBox.values.toList();
     });
   }
 

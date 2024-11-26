@@ -1,11 +1,15 @@
 import 'package:fire_app/05_manifest.dart';
 import 'package:fire_app/06_saved_trips.dart';
+import 'package:fire_app/Data/positional_preferences.dart';
+import 'package:fire_app/Data/saved_preferences.dart';
+import 'package:fire_app/Data/trip_preferences.dart';
 import 'package:flutter/material.dart';
 import '../01_edit_crew.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../Data/gear.dart';
 import '../Data/crewmember.dart';
 import 'Data/crew.dart';
+import 'Data/gear_preferences.dart';
 import 'Data/load.dart';
 import 'Data/trip.dart';
 
@@ -20,15 +24,22 @@ void main() async {
   Hive.registerAdapter(CrewMemberAdapter());
   Hive.registerAdapter(LoadAdapter());
   Hive.registerAdapter(TripAdapter());
+  Hive.registerAdapter(TripPreferenceAdapter());
+  Hive.registerAdapter(PositionalPreferenceAdapter());
+  Hive.registerAdapter(GearPreferenceAdapter());
 
   // Open a Hive boxes to store objects
   await Hive.openBox<Gear>('gearBox');
   await Hive.openBox<CrewMember>('crewmemberBox');
   await Hive.openBox<Load>('loadBox');
   await Hive.openBox<Trip>('tripBox');
+  await Hive.openBox<TripPreference>('tripPreferenceBox');
+  await Hive.openBox<PositionalPreference>('positionalPreferenceBox');
+  await Hive.openBox<GearPreference>('gearPreferenceBox');
 
   // Load data from Hive
   crew.loadCrewDataFromHive();
+  savedPreferences.loadSavedPreferenceDataFromHive();
   // do we need to load trip data as well?how does that work
 
   // Test data for user testing

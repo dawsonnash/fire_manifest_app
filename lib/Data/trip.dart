@@ -90,5 +90,4 @@ class SavedTrips {
 
 
 // Global object for all saved trips. All created trips will be stored here
-// Until hive implementation
 final SavedTrips savedTrips = SavedTrips();

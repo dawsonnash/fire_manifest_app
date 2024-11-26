@@ -1,6 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
+import 'Data/positional_preferences.dart';
+import 'Data/gear_preferences.dart';
+import 'Data/trip_preferences.dart';
 import 'package:fire_app/04_add_load_preference.dart';
 
 import 'Data/crew.dart';
