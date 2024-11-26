@@ -32,7 +32,9 @@ void main() async {
   // do we need to load trip data as well?how does that work
 
   // Test data for user testing
-  initializeTestData();
+  if (crew.crewMembers.isEmpty && crew.gear.isEmpty) {
+    initializeTestData();
+  }
 
   // start app
   runApp(const MyApp());
