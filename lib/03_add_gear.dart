@@ -184,6 +184,7 @@ class _AddGearState extends State<AddGear>{
                           padding: const EdgeInsets.all(16.0),
                           child: TextField(
                             controller: gearNameController,
+                            textCapitalization: TextCapitalization.words,
                             decoration: InputDecoration(
                               labelText: 'Gear Name',
                               labelStyle: const TextStyle(

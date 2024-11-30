@@ -224,6 +224,7 @@ class _EditGearState extends State<EditGear>{
                           padding: const EdgeInsets.all(16.0),
                           child: TextField(
                             controller: gearNameController,
+                            textCapitalization: TextCapitalization.words,
                             decoration: InputDecoration(
                               labelText: 'Edit gear name',
                               labelStyle: const TextStyle(

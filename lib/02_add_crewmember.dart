@@ -222,6 +222,7 @@ class AddCrewmember extends StatefulWidget {
                           padding: const EdgeInsets.only(top:16.0, bottom: 4.0, left: 16.0, right:16.0),
                           child: TextField(
                             controller: nameController,
+                            textCapitalization: TextCapitalization.words,
                             decoration: InputDecoration(
                               labelText: 'Last Name',
                               labelStyle: const TextStyle(
@@ -362,6 +363,7 @@ class AddCrewmember extends StatefulWidget {
                             Expanded(
                               child: TextField(
                                 controller: toolNameController,
+                                textCapitalization: TextCapitalization.words,
                                 decoration: InputDecoration(
                                   labelText: 'Tool Name',
                                   labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),

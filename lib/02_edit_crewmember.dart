@@ -308,6 +308,7 @@ class _EditCrewmemberState extends State<EditCrewmember>{
                           padding: const EdgeInsets.only(top:16.0, bottom: 4.0, left: 16.0, right:16.0),
                           child: TextField(
                             controller: nameController,
+                            textCapitalization: TextCapitalization.words,
                             decoration: InputDecoration(
                               labelText: 'Edit name',
                               labelStyle: const TextStyle(
@@ -441,6 +442,7 @@ class _EditCrewmemberState extends State<EditCrewmember>{
                             Expanded(
                               child: TextField(
                                 controller: newToolNameController,
+                                textCapitalization: TextCapitalization.words,
                                 decoration: InputDecoration(
                                   labelText: 'Tool Name',
                                   labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),

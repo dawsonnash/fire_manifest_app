@@ -45,6 +45,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
           title: const Text("Edit Trip Preference Name"),
           content: TextField(
             controller: titleController,
+            textCapitalization: TextCapitalization.words,
             decoration:
                 const InputDecoration(labelText: "Trip Preference Name"),
           ),

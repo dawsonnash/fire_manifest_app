@@ -38,6 +38,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
           title: const Text("Edit Trip Preference Name"),
           content: TextField(
             controller: titleController,
+            textCapitalization: TextCapitalization.words,
             decoration:
                 const InputDecoration(labelText: "Trip Preference Name"),
           ),
