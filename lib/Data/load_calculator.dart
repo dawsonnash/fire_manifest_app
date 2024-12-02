@@ -324,6 +324,25 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
     }
   }
 
+  // Ensure all identical gear items are combined within each load, i,e, removes identical items and increases quantity
+  for (var load in loads) {
+    List<Gear> consolidatedGear = [];
+
+    for (var gear in load.loadGear) {
+      var existingGear = consolidatedGear.firstWhere(
+            (item) => item.name == gear.name,
+        orElse: () => Gear(name: gear.name, weight: gear.weight, quantity: 0),
+      );
+
+      if (existingGear.quantity == 0) {
+        consolidatedGear.add(existingGear);
+      }
+      existingGear.quantity += gear.quantity;
+    }
+
+    load.loadGear = consolidatedGear;
+  }
+
   // Ensure the trip object reflects the updated loads
   for (var load in loads) {
     trip.addLoad(trip, load);

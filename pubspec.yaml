@@ -82,6 +82,7 @@ flutter:
     - assets/images/logo1.png
     - assets/images/crew_manifest_form.png
     - assets/pdfs/crew_manifest_form.pdf
+    - assets/images/helicopter_manifest_form.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
