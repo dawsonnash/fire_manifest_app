@@ -24,7 +24,7 @@ class EditCrew extends StatelessWidget {
     // Button style for all buttons
     final ButtonStyle buttonStyle = ElevatedButton.styleFrom(
       foregroundColor: Colors.black,
-      textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold), // temp fix, should make dynamic
       backgroundColor: Colors.deepOrangeAccent,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       elevation: 15,
