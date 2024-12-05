@@ -246,13 +246,6 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                         margin: const EdgeInsets.symmetric(
                             vertical: 8.0, horizontal: 16.0),
                         child: ListTile(
-                          leading: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Priority"),
-                              Text(gearPref.priority.toString()),
-                            ],
-                          ),
                           title: Text(
                             gearPref.gear
                                 .map((item) =>
