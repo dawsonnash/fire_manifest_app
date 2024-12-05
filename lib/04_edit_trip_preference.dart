@@ -181,13 +181,6 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                             margin: const EdgeInsets.symmetric(
                                 vertical: 8.0, horizontal: 16.0),
                             child: ListTile(
-                              leading: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text("Priority"),
-                                  Text(posPref.priority.toString()),
-                                ],
-                              ),
                               title: Text(
                                 posPref.crewMembersDynamic.map((item) {
                                   if (item is CrewMember) {
