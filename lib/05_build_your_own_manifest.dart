@@ -400,9 +400,29 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
   // Function to load the list of Gear and CrewMember items from Hive boxes
   void loadItems() {
     setState(() {
-      gearList = gearBox.values.toList();
-      crewList = crewmemberBox.values.toList();
+      // Create deep copies of the gear and crew member data
+      gearList = gearBox.values.map((gear) {
+        return Gear(
+          name: gear.name,
+          quantity: gear.quantity,
+          weight: gear.weight,
+        );
+      }).toList();
+
+      crewList = crewmemberBox.values.map((crew) {
+        return CrewMember(
+          name: crew.name,
+          flightWeight: crew.flightWeight,
+          position: crew.position,
+        );
+      }).toList();
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    loadItems(); // Reload original data from Hive on back navigation
   }
 
   void _saveTrip() {
