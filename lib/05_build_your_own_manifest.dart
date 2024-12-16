@@ -382,6 +382,35 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                         } else if (item is CrewMember) {
                           // Add crew member directly
                           loads[selectedLoadIndex].add(item);
+
+                          // Loop through and add all personal tools
+                          if (item.personalTools != null) {
+                            for (var tool in item.personalTools!) {
+                              final index = loads[selectedLoadIndex].indexWhere(
+                                (loadItem) =>
+                                    loadItem is Gear &&
+                                    loadItem.name == tool.name,
+                              );
+
+                              if (index != -1) {
+                                // Update the existing tool's quantity
+                                (loads[selectedLoadIndex][index] as Gear)
+                                    .quantity += tool.quantity;
+                                (loads[selectedLoadIndex][index] as Gear).weight += tool.weight * tool.quantity;
+
+
+                      } else {
+                                loads[selectedLoadIndex].add(
+                                  Gear(
+                                    name: tool.name,
+                                    quantity: tool.quantity,
+                                    weight: tool.weight,
+                                  ),
+                                );
+                              }
+                            }
+                          }
+
                           crewList.remove(item);
                         }
                       }
@@ -414,6 +443,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
           name: crew.name,
           flightWeight: crew.flightWeight,
           position: crew.position,
+          personalTools: crew.personalTools, // Ensure personalTools is included
         );
       }).toList();
     });
