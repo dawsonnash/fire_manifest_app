@@ -383,7 +383,6 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
   }
 }
 
-
 void shuffleCrewMembers(List<dynamic> crewMembersCopy) {
 
   // Step 1: Group crew members by their positions

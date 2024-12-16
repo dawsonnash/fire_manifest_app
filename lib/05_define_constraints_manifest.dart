@@ -139,6 +139,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: TextField(
                           controller: tripNameController,
+                          textCapitalization: TextCapitalization.words,
                           decoration: _inputDecoration(),
                           style: _textStyle(),
                         ),

@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'Data/gear.dart';
@@ -39,6 +40,363 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
     loadItems();
   }
 
+  void _showSelectionDialog(int selectedLoadIndex) async {
+    Map<Gear, int> selectedGearQuantities = {};
+    List<dynamic> selectedItems = [];
+
+    bool isCrewExpanded = false;
+    bool isGearExpanded = false;
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, dialogSetState) {
+            return AlertDialog(
+              title: const Text(
+                'Select Crew Members and Gear',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+              contentPadding: const EdgeInsets.all(16),
+              content: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.7,
+                ),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // Crew Dropdown
+                        ExpansionPanelList(
+                          elevation: 8,
+                          expandedHeaderPadding: const EdgeInsets.all(0),
+                          expansionCallback: (int index, bool isExpanded) {
+                            dialogSetState(() {
+                              isCrewExpanded = !isCrewExpanded;
+                            });
+                          },
+                          children: [
+                            ExpansionPanel(
+                              isExpanded: isCrewExpanded,
+                              backgroundColor: Colors.deepOrangeAccent,
+                              // Set background color
+                              headerBuilder: (context, isExpanded) {
+                                return Container(
+                                  child: ListTile(
+                                    title: const Text(
+                                      'Crew Members',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                );
+                              },
+                              body: Column(
+                                children: crewList.map((crew) {
+                                  return Container(
+                                    //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(0.0),
+                                      // Rounded corners
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.8),
+                                          spreadRadius: 1,
+                                          blurRadius: 5,
+                                          offset:
+                                              Offset(0, 3), // Shadow position
+                                        ),
+                                      ],
+                                    ),
+                                    child: CheckboxListTile(
+                                      title: Text(
+                                        crew.name,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      subtitle: Text(
+                                        crew.getPositionTitle(crew.position),
+                                        style: const TextStyle(
+                                            fontStyle: FontStyle.italic),
+                                      ),
+                                      value: selectedItems.contains(crew),
+                                      onChanged: (bool? isChecked) {
+                                        dialogSetState(() {
+                                          if (isChecked == true) {
+                                            selectedItems.add(crew);
+                                          } else {
+                                            selectedItems.remove(crew);
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Gear Dropdown
+                        ExpansionPanelList(
+                          elevation: 8,
+                          expandedHeaderPadding: const EdgeInsets.all(0),
+                          expansionCallback: (int index, bool isExpanded) {
+                            dialogSetState(() {
+                              isGearExpanded = !isGearExpanded;
+                            });
+                          },
+                          children: [
+                            ExpansionPanel(
+                              isExpanded: isGearExpanded,
+                              backgroundColor: Colors.deepOrangeAccent,
+                              // Set background color
+                              headerBuilder: (context, isExpanded) {
+                                return Container(
+                                  //color: Colors.deepOrangeAccent, // Set the background color for the header
+                                  child: ListTile(
+                                    title: const Text(
+                                      'Gear',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                );
+                              },
+                              body: Column(
+                                children: gearList.map((gear) {
+                                  int remainingQuantity = gear.quantity -
+                                      (selectedGearQuantities[gear] ?? 0);
+
+                                  return Container(
+                                    //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(0.0),
+                                      // Rounded corners
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.8),
+                                          spreadRadius: 1,
+                                          blurRadius: 5,
+                                          offset:
+                                              Offset(0, 3), // Shadow position
+                                        ),
+                                      ],
+                                    ),
+                                    child: CheckboxListTile(
+                                      title: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                Flexible(
+                                                  child: Text(
+                                                    gear.name,
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  ' (x$remainingQuantity)  ',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          if (selectedItems.contains(gear))
+                                            if (selectedItems.contains(gear))
+                                              GestureDetector(
+                                                onTap: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return AlertDialog(
+                                                        title: Text(
+                                                            'Select Quantity for ${gear.name}'),
+                                                        content: SizedBox(
+                                                          height: 150,
+                                                          child:
+                                                              CupertinoPicker(
+                                                            scrollController:
+                                                                FixedExtentScrollController(
+                                                              initialItem:
+                                                                  (selectedGearQuantities[
+                                                                              gear] ??
+                                                                          1) -
+                                                                      1,
+                                                            ),
+                                                            itemExtent: 32.0,
+                                                            onSelectedItemChanged:
+                                                                (int value) {
+                                                              dialogSetState(
+                                                                  () {
+                                                                selectedGearQuantities[
+                                                                        gear] =
+                                                                    value + 1;
+                                                              });
+                                                            },
+                                                            children: List<
+                                                                Widget>.generate(
+                                                              gear.quantity,
+                                                              // Use the full quantity for selection
+                                                              (int index) {
+                                                                return Center(
+                                                                  child: Text(
+                                                                      '${index + 1}'),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        actions: [
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              // Finalize the selection
+                                                              dialogSetState(
+                                                                  () {
+                                                                int selectedQuantity =
+                                                                    selectedGearQuantities[
+                                                                            gear] ??
+                                                                        1;
+                                                                remainingQuantity =
+                                                                    gear.quantity -
+                                                                        selectedQuantity;
+                                                              });
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            child: const Text(
+                                                                'Confirm'),
+                                                          ),
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            child: const Text(
+                                                                'Cancel'),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                child: Row(
+                                                  children: [
+                                                    Text(
+                                                      'Qty: ${selectedGearQuantities[gear] ?? 1}',
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 14,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                    const Icon(
+                                                        Icons.arrow_drop_down,
+                                                        color: Colors.black),
+                                                  ],
+                                                ),
+                                              ),
+                                        ],
+                                      ),
+                                      value: selectedItems.contains(gear),
+                                      onChanged: (bool? isChecked) {
+                                        dialogSetState(() {
+                                          if (isChecked == true) {
+                                            selectedItems.add(gear);
+                                            selectedGearQuantities[gear] =
+                                                1; // Default quantity
+                                          } else {
+                                            selectedItems.remove(gear);
+                                            selectedGearQuantities.remove(gear);
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      for (var item in selectedItems) {
+                        if (item is Gear) {
+                          // Respect the selected quantity
+                          int selectedQuantity =
+                              selectedGearQuantities[item] ?? 1;
+
+                          // Create a copy of the gear with the selected quantity
+                          Gear gearWithSelectedQuantity = Gear(
+                            name: item.name,
+                            quantity: selectedQuantity,
+                            weight: item
+                                .weight, // Weight remains the same for each unit
+                          );
+
+                          // Add the gear copy to the load
+                          loads[selectedLoadIndex]
+                              .add(gearWithSelectedQuantity);
+
+                          // Update the remaining quantity in the original gear list
+                          item.quantity -= selectedQuantity;
+
+                          // Remove the gear entirely if no quantity is left
+                          if (item.quantity <= 0) {
+                            gearList.remove(item);
+                          }
+                        } else if (item is CrewMember) {
+                          // Add crew member directly
+                          loads[selectedLoadIndex].add(item);
+                          crewList.remove(item);
+                        }
+                      }
+                    });
+                  },
+                  child: const Text('Add'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   // Function to load the list of Gear and CrewMember items from Hive boxes
   void loadItems() {
     setState(() {
@@ -49,11 +407,16 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
   void _saveTrip() {
     // Update the trip's loads with the current state of loads on the right side
-    widget.trip.loads = loads.asMap().entries.map<Load>((entry) { // Use `asMap` to access index
+    widget.trip.loads = loads.asMap().entries.map<Load>((entry) {
+      // Use `asMap` to access index
       int index = entry.key;
       List<HiveObject> loadItems = entry.value;
 
-      int loadWeight = loadItems.fold(0, (sum, item) => sum + (item is Gear ? item.weight : (item as CrewMember).flightWeight));
+      int loadWeight = loadItems.fold(
+          0,
+          (sum, item) =>
+              sum +
+              (item is Gear ? item.weight : (item as CrewMember).flightWeight));
 
       return Load(
         loadNumber: index + 1,
@@ -69,7 +432,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Trip Saved!',
+        content: Text(
+          'Trip Saved!',
           // Maybe change look
           style: TextStyle(
             color: Colors.black,
@@ -87,15 +451,16 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
   int calculateAvailableWeight(List<HiveObject> loadItems) {
     final totalWeight = loadItems.fold(
         0,
-            (sum, item) =>
-        sum + (item is Gear ? item.weight : (item as CrewMember).flightWeight));
-    return widget.trip.allowable - totalWeight;
+        (sum, item) =>
+            sum +
+            (item is Gear ? item.weight : (item as CrewMember).flightWeight));
+    return totalWeight;
   }
 
 // Function to calculate available seats for a load
   int calculateAvailableSeats(List<HiveObject> loadItems) {
     final totalCrewMembers = loadItems.whereType<CrewMember>().length;
-    return widget.trip.availableSeats - totalCrewMembers;
+    return totalCrewMembers;
   }
 
   @override
@@ -110,12 +475,14 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
             child: ElevatedButton(
               onPressed: _saveTrip,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               ),
               child: const Text(
                 'Save',
@@ -143,268 +510,323 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
               ),
             ),
           ),
-          Row(
-            children: [
-              // Left Side (Draggable Items)
-              Expanded(
-                flex: 1,
-                child: Container(
-                  color: Colors.black.withOpacity(0.6),
-                  child: Scrollbar(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(8.0),
-                      itemCount: gearList.length + crewList.length,
-                      itemBuilder: (context, index) {
-                        final item = index < gearList.length
-                            ? gearList[index]
-                            : crewList[index - gearList.length];
 
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Draggable<HiveObject>(
-                              data: item,
-                              feedback: Material(
-                                color: Colors.transparent,
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  color: Colors.deepOrangeAccent,
-                                  child: Text(
-                                    "${item is Gear ? item.name : (item as CrewMember).name}, ${item is Gear ? item.weight : (item as CrewMember).flightWeight} lbs",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              childWhenDragging: Container(
-                                margin: const EdgeInsets.symmetric(vertical: 4),
-                                padding: const EdgeInsets.all(8),
-                                color: Colors.deepOrangeAccent.withOpacity(0.3),
-                                child: Center(
-                                  child: Text(
-                                    "${item is Gear ? item.name : (item as CrewMember).name}, ${item is Gear ? item.weight : (item as CrewMember).flightWeight} lbs",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              onDragCompleted: () {
-                                setState(() {
-                                  if (item is Gear) {
-                                    gearList.remove(item);
-                                  } else {
-                                    crewList.remove(item);
-                                  }
-                                });
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(vertical: 4),
-                                padding: const EdgeInsets.all(8),
-                                color: Colors.deepOrangeAccent,
-                                child: Center(
-                                  child: Text(
-                                    item is Gear ? item.name : (item as CrewMember).name,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
+          Container(
+            color: Colors.grey.withOpacity(0.1),
+            child: Scrollbar(
+              child: ListView(
+                padding: const EdgeInsets.all(8.0),
+                children: [
+                  ...List.generate(loads.length, (index) {
+                    return Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 5,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Header Section
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.blueGrey[200],
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(10),
                               ),
                             ),
-                            Padding( // Display weight of gear/crewmember under each draggable target.
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Text(
-                                "${item is Gear ? item.weight : (item as CrewMember).flightWeight} lbs",
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
-              // Right Side (Drop Targets)
-              Expanded(
-                flex: 2,
-                child: Container(
-                  color: Colors.grey.withOpacity(0.8),
-                  child: Scrollbar(
-                    child: ListView(
-                      padding: const EdgeInsets.all(8.0),
-                      children: [
-                        ...List.generate(loads.length, (index) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Load ${index + 1}',
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        gearList.addAll(
-                                            loads[index].whereType<Gear>());
-                                        crewList.addAll(
-                                            loads[index].whereType<CrewMember>());
-                                        loads.removeAt(index);
-                                      });
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.red,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 5),
-                                    ),
-                                    child: const Text(
-                                      'Delete Load',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'LOAD #${index + 1}',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4),
-                                child: Text(
-                                  'Available Weight: ${calculateAvailableWeight(loads[index])} lbs',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: calculateAvailableWeight(loads[index]) <
-                                        0
-                                        ? Colors.red
-                                        : Colors.black,
-                                  ),
+                                  ],
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4),
-                                child: Text(
-                                  'Available Seats: ${calculateAvailableSeats(loads[index])}',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: calculateAvailableSeats(loads[index]) <
-                                        0
-                                        ? Colors.red
-                                        : Colors.black,
-                                  ),
-                                ),
-                              ),
-                              DragTarget<HiveObject>(
-                                builder: (context, candidateData, rejectedData) {
-                                  return Container(
-                                    width: double.infinity,
-                                    height: 150 + (loads[index].length * 40),
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 8),
-                                    color: Colors.white.withOpacity(0.2),
-                                    padding: const EdgeInsets.all(8),
-                                    child: Column(
-                                      children: [
-                                        for (var item in loads[index])
+                                Column(
+                                  children: [
+                                    Container(
+                                      height: 30,
+                                      child: Row(
+                                        children: [
                                           Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                "${item is Gear ? item.name : (item as CrewMember).name}, ${item is Gear ? item.weight : (item as CrewMember).flightWeight} lbs",
+                                                '${calculateAvailableWeight(loads[index])}',
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  //fontWeight: FontWeight.bold,
+                                                  color:
+                                                      calculateAvailableWeight(
+                                                                  loads[
+                                                                      index]) >
+                                                              widget.trip
+                                                                  .allowable
+                                                          ? Colors.red
+                                                          : Colors.black,
+                                                ),
+                                              ),
+                                              Text(
+                                                '/${widget.trip.allowable} lbs',
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  //fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const VerticalDivider(
+                                            width: 20,
+                                            // Space between text and divider
+                                            thickness: 1,
+                                            // Thickness of the divider
+                                            color:
+                                                Colors.black, // Divider color
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                '${calculateAvailableSeats(loads[index])}',
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    //fontWeight: FontWeight.bold,
+                                                    color: calculateAvailableSeats(
+                                                                loads[index]) >
+                                                            widget.trip
+                                                                .availableSeats
+                                                        ? Colors.red
+                                                        : Colors.black),
+                                              ),
+                                              Text(
+                                                '/${widget.trip.availableSeats} seats',
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  //fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.red, size: 32),
+                                  onPressed: () {
+                                    setState(() {
+                                      // Iterate through the load being deleted
+                                      for (var item in loads[index]) {
+                                        if (item is Gear) {
+                                          // Find the matching gear in the gearList
+                                          var existingGear =
+                                              gearList.firstWhere(
+                                            (gear) => gear.name == item.name,
+                                            orElse: () => Gear(
+                                                name: item.name,
+                                                quantity: 0,
+                                                weight: item.weight),
+                                          );
+
+                                          // Update the quantity of the gear
+                                          existingGear.quantity +=
+                                              item.quantity;
+
+                                          // If the gear doesn't exist in the gearList, add it
+                                          if (!gearList
+                                              .contains(existingGear)) {
+                                            gearList.add(existingGear);
+                                          }
+                                        } else if (item is CrewMember) {
+                                          // Ensure crew members are added back only once
+                                          if (!crewList.contains(item)) {
+                                            crewList.add(item);
+                                          }
+                                        }
+                                      }
+
+                                      // Remove the load from the list
+                                      loads.removeAt(index);
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Body Section
+
+                          // Body Section with Add Item Button
+                          Padding(
+                            padding: const EdgeInsets.all(0.0),
+                            child: Column(
+                              children: [
+                                for (var item in loads[index])
+                                  Card(
+                                    elevation: 2,
+                                    color: Colors.white,
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 1.0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(0.0),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "${item is Gear ? item.name : (item as CrewMember).name}, "
+                                                "${item is Gear ? item.weight : (item as CrewMember).flightWeight} lbs",
                                                 style: const TextStyle(
-                                                  color: Colors.white,
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                              IconButton(
-                                                icon: const Icon(
-                                                  Icons.delete,
-                                                  color: Colors.red,
-                                                  size: 20,
+                                              Text(
+                                                item is Gear
+                                                    ? 'Quantity: ${item.quantity}'
+                                                    : (item as CrewMember)
+                                                        .getPositionTitle(
+                                                            item.position),
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontStyle: FontStyle.italic,
                                                 ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    loads[index].remove(item);
-                                                    if (item is Gear) {
-                                                      gearList.add(item);
-                                                    } else if (item
-                                                    is CrewMember) {
-                                                      crewList.add(item);
-                                                    }
-                                                  });
-                                                },
                                               ),
                                             ],
                                           ),
-                                      ],
+                                          IconButton(
+                                            icon: const Icon(Icons.delete,
+                                                color: Colors.red),
+                                            onPressed: () {
+                                              setState(() {
+                                                // Ensure the load and item are properly handled
+                                                if (loads[index]
+                                                    .contains(item)) {
+                                                  loads[index].remove(item);
+
+                                                  if (item is Gear) {
+                                                    var existingGear =
+                                                        gearList.firstWhere(
+                                                      (gear) =>
+                                                          gear.name ==
+                                                          item.name,
+                                                      orElse: () => Gear(
+                                                          name: item.name,
+                                                          quantity: 0,
+                                                          weight: item.weight),
+                                                    );
+
+                                                    // Update the quantity or add back to the list
+                                                    existingGear.quantity +=
+                                                        item.quantity;
+                                                    if (!gearList.contains(
+                                                        existingGear)) {
+                                                      gearList
+                                                          .add(existingGear);
+                                                    }
+                                                  } else if (item
+                                                      is CrewMember) {
+                                                    if (!crewList
+                                                        .contains(item)) {
+                                                      crewList.add(item);
+                                                    }
+                                                  }
+                                                }
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  );
-                                },
-                                onWillAccept: (data) => true,
-                                onAccept: (data) {
-                                  setState(() {
-                                    loads[index].add(data);
-                                  });
-                                },
-                              ),
-                            ],
-                          );
-                        }),
-                        Center(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                loads.add([]);
-                              });
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
-                            ),
-                            child: const Text(
-                              'Add Load',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                                  ),
+                                const SizedBox(height: 8),
+                                Center(
+                                  child: GestureDetector(
+                                    onTap: () => _showSelectionDialog(index),
+                                    // Handle the tap
+                                    child: Container(
+                                      width: double.infinity,
+                                      // Make it span the entire width
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 12),
+                                      // Add padding
+                                      color: Colors.transparent,
+                                      // Background color if desired, or leave transparent
+                                      alignment: Alignment.center,
+                                      // Center the text
+                                      child: const Text(
+                                        '+ Add Item',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors
+                                              .black, // Change the text color
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
+                        ],
+                      ),
+                    );
+                  }),
+                  // Add Load Button
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          loads.add([]);
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                      ),
+                      child: const Text(
+                        'Add Load',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ],
       ),
     );
   }
 }
-
-
-
