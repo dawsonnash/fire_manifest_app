@@ -64,6 +64,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
     String customItemName = '';
     int customItemWeight = 0;
+    int customItemQuantity = 1;
 
     // Define focus nodes for each TextField
     final customItemNameFocus = FocusNode();
