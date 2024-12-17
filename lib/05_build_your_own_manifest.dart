@@ -64,7 +64,6 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
     String customItemName = '';
     int customItemWeight = 0;
-    int customItemQuantity = 1;
 
     // Define focus nodes for each TextField
     final customItemNameFocus = FocusNode();
@@ -136,7 +135,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                     ),
                                     child: CheckboxListTile(
                                       title: Text(
-                                        crew.name,
+                                       ' ${crew.name}, ${crew.flightWeight} lbs',
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold),
                                       ),

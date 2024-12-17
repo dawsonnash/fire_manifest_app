@@ -143,6 +143,17 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           ),
         ),
 
+      // Custom Items
+      for (var k = 0; k < load.customItems.length; k++)
+        pw.Positioned(
+          left: 18,
+          top: yOffset + 150 + ((load.loadPersonnel.length + load.loadGear.length + k) * itemSpacing),
+          child: pw.Text(
+            load.customItems[k].name,
+            style: pw.TextStyle(fontSize: 12),
+          ),
+        ),
+
       // CrewMember Weights
       for (var i = 0; i < load.loadPersonnel.length; i++)
         pw.Positioned(
@@ -153,6 +164,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
             style: pw.TextStyle(fontSize: 12),
           ),
         ),
+
       // Gear Weights
       for (var j = 0; j < load.loadGear.length; j++)
         pw.Positioned(
@@ -162,6 +174,17 @@ pw.Widget fillFormFieldsPMS245(Load load) {
             "${load.loadGear[j].totalGearWeight} lbs",
             style: pw.TextStyle(fontSize: 12),
           ),
+
+        ),
+      for (var k = 0; k < load.customItems.length; k++)
+        pw.Positioned(
+          left: 323,
+          top: yOffset + 150 + ((load.loadPersonnel.length + load.loadGear.length + k) * itemSpacing),
+          child: pw.Text(
+            "${load.customItems[k].weight} lbs",
+            style: pw.TextStyle(fontSize: 12),
+          ),
+
         ),
 
       // Total Load Weight
@@ -250,6 +273,17 @@ pw.Widget fillFormFieldsOF252(Load load) {
           ),
         ),
 
+      // Custom Items
+      for (var k = 0; k < load.customItems.length; k++)
+        pw.Positioned(
+          left: xOffset + 32,
+          top: yOffset + 150 + ((load.loadPersonnel.length + load.loadGear.length + k) * itemSpacing),
+          child: pw.Text(
+            load.customItems[k].name,
+            style: pw.TextStyle(fontSize: fontSizeOF252),
+          ),
+        ),
+
       // Gear Quantity
       for (var j = 0; j < load.loadGear.length; j++)
         pw.Positioned(
@@ -278,6 +312,16 @@ pw.Widget fillFormFieldsOF252(Load load) {
           top: yOffset + 150 + ((load.loadPersonnel.length + j) * itemSpacing),
           child: pw.Text(
             "${load.loadGear[j].totalGearWeight} lbs",
+            style: pw.TextStyle(fontSize: fontSizeOF252),
+          ),
+        ),
+
+      for (var k = 0; k < load.customItems.length; k++)
+        pw.Positioned(
+          left: xOffset + 442,
+          top: yOffset + 150 + ((load.loadPersonnel.length + load.loadGear.length + k) * itemSpacing),
+          child: pw.Text(
+            "${load.customItems[k].weight} lbs",
             style: pw.TextStyle(fontSize: fontSizeOF252),
           ),
         ),
