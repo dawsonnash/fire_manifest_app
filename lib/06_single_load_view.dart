@@ -437,10 +437,11 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                 Expanded(
                   child: ListView.builder(
                     itemCount: widget.load.loadPersonnel.length +
-                        widget.load.loadGear.length,
+                        widget.load.loadGear.length +
+                        widget.load.customItems.length,
                     itemBuilder: (context, index) {
-                      // Calculate the boundary between crew members and gear
                       int numCrewMembers = widget.load.loadPersonnel.length;
+                      int numGearItems = widget.load.loadGear.length;
 
                       if (index < numCrewMembers) {
                         // Display a crew member
@@ -454,12 +455,10 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                             child: ListTile(
                               iconColor: Colors.black,
                               title: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         crewmember.name,
@@ -482,7 +481,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                             ),
                           ),
                         );
-                      } else {
+                      } else if (index < numCrewMembers + numGearItems) {
                         // Display a gear item
                         final gearIndex = index - numCrewMembers;
                         final gearItem = widget.load.loadGear[gearIndex];
@@ -495,12 +494,10 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                             child: ListTile(
                               iconColor: Colors.black,
                               title: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
@@ -530,6 +527,50 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                 ],
                               ),
                               leading: Icon(Icons.work_outline_outlined),
+                            ),
+                          ),
+                        );
+                      } else {
+                        // Display a custom item
+                        final customItemIndex = index - numCrewMembers - numGearItems;
+                        final customItem = widget.load.customItems[customItemIndex];
+                        return Card(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(9),
+                            ),
+                            child: ListTile(
+                              iconColor: Colors.black,
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            customItem.name,
+                                            style: const TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+
+                                        ],
+                                      ),
+                                      Text(
+                                        'Weight: ${customItem.weight} lbs',
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              leading: Icon(Icons.inventory_2_outlined),
                             ),
                           ),
                         );

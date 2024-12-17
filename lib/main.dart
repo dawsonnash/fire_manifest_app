@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../Data/gear.dart';
 import '../Data/crewmember.dart';
 import 'Data/crew.dart';
+import 'Data/customItem.dart';
 import 'Data/load.dart';
 import 'Data/trip.dart';
 
@@ -20,6 +21,8 @@ void main() async {
   Hive.registerAdapter(CrewMemberAdapter());
   Hive.registerAdapter(LoadAdapter());
   Hive.registerAdapter(TripAdapter());
+  Hive.registerAdapter(CustomItemAdapter());
+
 
   // Open a Hive boxes to store objects
   await Hive.openBox<Gear>('gearBox');
