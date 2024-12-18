@@ -630,7 +630,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
   int calculateAvailableWeight(List<dynamic> loadItems) {
     final totalWeight = loadItems.fold(0, (sum, item) {
       if (item is Gear) {
-        return sum + item.weight;
+        return sum + (item.weight * item.quantity); // Account for quantity
       } else if (item is CrewMember) {
         return sum + item.flightWeight;
       } else if (item is CustomItem) {
@@ -639,7 +639,6 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         return sum; // Unknown type, ignore it
       }
     });
-
     return totalWeight;
   }
 
