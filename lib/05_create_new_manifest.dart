@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../Data/trip.dart';
 import 'Data/load_calculator.dart';
+import 'main.dart';
 
 class CreateNewManifest extends StatefulWidget {
   const CreateNewManifest({super.key});
@@ -101,6 +102,13 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
       _currentSliderValue = 0;
       allowableController.text = _currentSliderValue.toStringAsFixed(0); // Sync the allowableController with the slider
     });
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => MyHomePage(),
+      ),
+          (Route<dynamic> route) => false, // This clears all the previous routes
+    );
+
 
 
     // // Debug for LogCat

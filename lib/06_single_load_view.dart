@@ -630,7 +630,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                     decoration: BoxDecoration(
                       color: Colors.deepOrangeAccent,
                       border: Border.all(color: Colors.black, width: 2),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.5),

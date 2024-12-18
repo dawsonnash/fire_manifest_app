@@ -10,23 +10,22 @@ import 'Data/trip.dart';
 import 'Data/load.dart';
 import 'Data/customItem.dart';
 
-// Double integers when calculating quantity dont always work out. a 45 lb QB can become 44
-
-class BuildYourOwnManifest extends StatefulWidget {
+class EditTrip extends StatefulWidget {
   final Trip trip;
 
-  const BuildYourOwnManifest({
+  const EditTrip({
     super.key,
     required this.trip,
   });
 
   @override
-  State<BuildYourOwnManifest> createState() => _BuildYourOwnManifestState();
+  State<EditTrip> createState() => _EditTripState();
 }
 
 String itemDisplay(dynamic item) {
   if (item is Gear) {
-    return "${item.name}, ${item.weight} lbs";
+    int totalWeight = item.weight * item.quantity;
+    return "${item.name}, $totalWeight lbs";
   } else if (item is CrewMember) {
     return "${item.name}, ${item.flightWeight} lbs";
   } else if (item is CustomItem) {
@@ -36,7 +35,7 @@ String itemDisplay(dynamic item) {
   }
 }
 
-class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
+class _EditTripState extends State<EditTrip> {
   late final Box<Gear> gearBox;
   late final Box<CrewMember> crewmemberBox;
   late final Box<Trip> tripBox;
@@ -53,7 +52,25 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
     gearBox = Hive.box<Gear>('gearBox');
     crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
     tripBox = Hive.box<Trip>('tripBox');
-    _isExpanded = List.generate(loads.length, (_) => true);
+
+    // Load trip data into UI
+    loads = widget.trip.loads.map((load) {
+      return [
+        ...load.loadPersonnel,
+        ...load.loadGear.map((gear) => Gear(
+          name: gear.name,
+          quantity: gear.quantity,
+          weight: gear.weight,
+          isPersonalTool: gear.isPersonalTool,
+        )),
+        ...load.customItems.map((customItem) => CustomItem(
+          name: customItem.name,
+          weight: customItem.weight,
+        )),
+      ];
+    }).toList();
+
+    _isExpanded = List.generate(loads.length, (_) => false);
     loadItems();
   }
 
@@ -133,7 +150,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                           spreadRadius: 1,
                                           blurRadius: 5,
                                           offset:
-                                              Offset(0, 3), // Shadow position
+                                          Offset(0, 3), // Shadow position
                                         ),
                                       ],
                                     ),
@@ -210,14 +227,14 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                           spreadRadius: 1,
                                           blurRadius: 5,
                                           offset:
-                                              Offset(0, 3), // Shadow position
+                                          Offset(0, 3), // Shadow position
                                         ),
                                       ],
                                     ),
                                     child: CheckboxListTile(
                                       title: Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             child: Row(
@@ -228,10 +245,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                     style: const TextStyle(
                                                       fontSize: 16,
                                                       fontWeight:
-                                                          FontWeight.bold,
+                                                      FontWeight.bold,
                                                     ),
                                                     overflow:
-                                                        TextOverflow.ellipsis,
+                                                    TextOverflow.ellipsis,
                                                   ),
                                                 ),
                                                 Text(
@@ -255,36 +272,36 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                     showDialog(
                                                       context: context,
                                                       builder: (BuildContext
-                                                          context) {
+                                                      context) {
                                                         return AlertDialog(
                                                           title: Text(
                                                               'Select Quantity for ${gear.name}'),
                                                           content: SizedBox(
                                                             height: 150,
                                                             child:
-                                                                CupertinoPicker(
+                                                            CupertinoPicker(
                                                               scrollController:
-                                                                  FixedExtentScrollController(
+                                                              FixedExtentScrollController(
                                                                 initialItem:
-                                                                    (selectedGearQuantities[gear] ??
-                                                                            1) -
-                                                                        1,
+                                                                (selectedGearQuantities[gear] ??
+                                                                    1) -
+                                                                    1,
                                                               ),
                                                               itemExtent: 32.0,
                                                               onSelectedItemChanged:
                                                                   (int value) {
                                                                 dialogSetState(
-                                                                    () {
-                                                                  selectedGearQuantities[
-                                                                          gear] =
-                                                                      value + 1;
-                                                                });
+                                                                        () {
+                                                                      selectedGearQuantities[
+                                                                      gear] =
+                                                                          value + 1;
+                                                                    });
                                                               },
                                                               children: List<
                                                                   Widget>.generate(
                                                                 gear.quantity,
                                                                 // Use the full quantity for selection
-                                                                (int index) {
+                                                                    (int index) {
                                                                   return Center(
                                                                     child: Text(
                                                                         '${index + 1}'),
@@ -298,17 +315,17 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                               onPressed: () {
                                                                 // Finalize the selection
                                                                 dialogSetState(
-                                                                    () {
-                                                                  int selectedQuantity =
-                                                                      selectedGearQuantities[
-                                                                              gear] ??
-                                                                          1;
-                                                                  remainingQuantity =
-                                                                      gear.quantity -
-                                                                          selectedQuantity;
-                                                                });
+                                                                        () {
+                                                                      int selectedQuantity =
+                                                                          selectedGearQuantities[
+                                                                          gear] ??
+                                                                              1;
+                                                                      remainingQuantity =
+                                                                          gear.quantity -
+                                                                              selectedQuantity;
+                                                                    });
                                                                 Navigator.of(
-                                                                        context)
+                                                                    context)
                                                                     .pop();
                                                               },
                                                               child: const Text(
@@ -317,7 +334,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                             TextButton(
                                                               onPressed: () {
                                                                 Navigator.of(
-                                                                        context)
+                                                                    context)
                                                                     .pop();
                                                               },
                                                               child: const Text(
@@ -336,7 +353,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                         'Qty: ${selectedGearQuantities[gear] ?? 1}',
                                                         style: const TextStyle(
                                                           fontWeight:
-                                                              FontWeight.bold,
+                                                          FontWeight.bold,
                                                           fontSize: 14,
                                                           color: Colors.black,
                                                         ),
@@ -356,7 +373,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                           if (isChecked == true) {
                                             selectedItems.add(gear);
                                             selectedGearQuantities[gear] =
-                                                1; // Default quantity
+                                            1; // Default quantity
                                           } else {
                                             selectedItems.remove(gear);
                                             selectedGearQuantities.remove(gear);
@@ -400,7 +417,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       decoration: const InputDecoration(
                                           labelText: 'Item Name'),
                                       textCapitalization:
-                                          TextCapitalization.words,
+                                      TextCapitalization.words,
                                       focusNode: customItemNameFocus,
                                       // Attach focus node
                                       textInputAction: TextInputAction.next,
@@ -483,7 +500,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                           Gear gearWithSelectedQuantity = Gear(
                             name: item.name,
                             quantity: selectedQuantity,
-                            weight: item.weight * selectedQuantity, // Total weight
+                            weight: item.weight,
                             isPersonalTool: item.isPersonalTool,
                           );
 
@@ -506,8 +523,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                           if (item.personalTools != null) {
                             for (var tool in item.personalTools!) {
                               final index = loads[selectedLoadIndex].indexWhere(
-                                (loadItem) =>
-                                    loadItem is Gear &&
+                                    (loadItem) =>
+                                loadItem is Gear &&
                                     loadItem.name == tool.name,
                               );
 
@@ -522,7 +539,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                   Gear(
                                     name: tool.name,
                                     quantity: tool.quantity,
-                                    weight: tool.weight,
+                                    weight: tool.totalGearWeight,
                                     isPersonalTool: tool.isPersonalTool = true,
                                   ),
                                 );
@@ -548,24 +565,25 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
   // Function to load the list of Gear and CrewMember items from Hive boxes
   void loadItems() {
     setState(() {
-      // Create deep copies of the gear and crew member data
-      gearList = gearBox.values.map((gear) {
-        return Gear(
-          name: gear.name,
-          quantity: gear.quantity,
-          weight: gear.weight,
-          isPersonalTool: gear.isPersonalTool,
-        );
-      }).toList();
+      gearList = gearBox.values
+          .where((gear) => !loads.any((load) => load.any((item) => item is Gear && item.name == gear.name)))
+          .map((gear) => Gear(
+        name: gear.name,
+        quantity: gear.quantity,
+        weight: gear.weight,
+        isPersonalTool: gear.isPersonalTool,
+      ))
+          .toList();
 
-      crewList = crewmemberBox.values.map((crew) {
-        return CrewMember(
-          name: crew.name,
-          flightWeight: crew.flightWeight,
-          position: crew.position,
-          personalTools: crew.personalTools,
-        );
-      }).toList();
+      crewList = crewmemberBox.values
+          .where((crew) => !loads.any((load) => load.any((item) => item is CrewMember && item.name == crew.name)))
+          .map((crew) => CrewMember(
+        name: crew.name,
+        flightWeight: crew.flightWeight,
+        position: crew.position,
+        personalTools: crew.personalTools,
+      ))
+          .toList();
     });
   }
 
@@ -576,6 +594,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
   }
 
   void _saveTrip() {
+    // Map loads back to the trip object
     widget.trip.loads = loads.asMap().entries.map<Load>((entry) {
       int index = entry.key;
       List loadItems = entry.value;
@@ -596,19 +615,19 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         weight: loadWeight,
         loadPersonnel: loadItems.whereType<CrewMember>().toList(),
         loadGear: loadItems.whereType<Gear>().toList(),
-        customItems:
-            loadItems.whereType<CustomItem>().toList(), // Save CustomItems
+        customItems: loadItems.whereType<CustomItem>().toList(),
       );
     }).toList();
 
-    // Save the updated trip to Hive
+    // Update trip in Hive
     tripBox.put(widget.trip.tripName, widget.trip);
 
-    // Show success message
+    // Show success message and navigate back
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
-          'Trip Saved!',
+          'Trip Updated!',
+          // Maybe change look
           style: TextStyle(
             color: Colors.black,
             fontSize: 32,
@@ -619,11 +638,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         backgroundColor: Colors.green,
       ),
     );
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => SingleTripView(trip: widget.trip),
-      ),
-    );
+
+    Navigator.of(context).pop();
+    Navigator.of(context).pop();
+
   }
 
   // Function to calculate available weight for a load
@@ -671,13 +689,13 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         actions: [
           Padding(
             padding:
-                const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+            const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
             child: ElevatedButton(
               onPressed: _saveTrip,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               ),
               child: const Text(
                 'Save',
@@ -754,9 +772,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
                                 color: calculateAvailableWeight(loads[index]) >
-                                            widget.trip.allowable ||
-                                        calculateAvailableSeats(loads[index]) >
-                                            widget.trip.availableSeats
+                                    widget.trip.allowable ||
+                                    calculateAvailableSeats(loads[index]) >
+                                        widget.trip.availableSeats
                                     ? Colors.black // Warning color
                                     : Colors.deepOrangeAccent, // Normal color
                                 borderRadius: const BorderRadius.vertical(
@@ -766,21 +784,21 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                               ),
                               child: Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         'LOAD #${index + 1}',
                                         style: TextStyle(
                                           color: calculateAvailableWeight(
-                                                          loads[index]) >
-                                                      widget.trip.allowable ||
-                                                  calculateAvailableSeats(
-                                                          loads[index]) >
-                                                      widget.trip.availableSeats
+                                              loads[index]) >
+                                              widget.trip.allowable ||
+                                              calculateAvailableSeats(
+                                                  loads[index]) >
+                                                  widget.trip.availableSeats
                                               ? Colors.white // Warning color
                                               : Colors.black,
                                           fontSize: 18,
@@ -811,17 +829,17 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                     fontSize: 20,
                                                     fontWeight: FontWeight.bold,
                                                     color: calculateAvailableWeight(
-                                                                    loads[
-                                                                        index]) >
-                                                                widget.trip
-                                                                    .allowable ||
-                                                            calculateAvailableSeats(
-                                                                    loads[
-                                                                        index]) >
-                                                                widget.trip
-                                                                    .availableSeats
+                                                        loads[
+                                                        index]) >
+                                                        widget.trip
+                                                            .allowable ||
+                                                        calculateAvailableSeats(
+                                                            loads[
+                                                            index]) >
+                                                            widget.trip
+                                                                .availableSeats
                                                         ? Colors
-                                                            .white // Warning color
+                                                        .white // Warning color
                                                         : Colors.black,
                                                   ),
                                                 ),
@@ -833,17 +851,17 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                               thickness: 1,
                                               // Thickness of the divider
                                               color: calculateAvailableWeight(
-                                                              loads[index]) >
-                                                          widget
-                                                              .trip.allowable ||
-                                                      calculateAvailableSeats(
-                                                              loads[index]) >
-                                                          widget.trip
-                                                              .availableSeats
+                                                  loads[index]) >
+                                                  widget
+                                                      .trip.allowable ||
+                                                  calculateAvailableSeats(
+                                                      loads[index]) >
+                                                      widget.trip
+                                                          .availableSeats
                                                   ? Colors
-                                                      .white // Warning color
+                                                  .white // Warning color
                                                   : Colors
-                                                      .black, // Divider color
+                                                  .black, // Divider color
                                             ),
                                             Row(
                                               children: [
@@ -853,17 +871,17 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                     fontSize: 20,
                                                     fontWeight: FontWeight.bold,
                                                     color: calculateAvailableWeight(
-                                                                    loads[
-                                                                        index]) >
-                                                                widget.trip
-                                                                    .allowable ||
-                                                            calculateAvailableSeats(
-                                                                    loads[
-                                                                        index]) >
-                                                                widget.trip
-                                                                    .availableSeats
+                                                        loads[
+                                                        index]) >
+                                                        widget.trip
+                                                            .allowable ||
+                                                        calculateAvailableSeats(
+                                                            loads[
+                                                            index]) >
+                                                            widget.trip
+                                                                .availableSeats
                                                         ? Colors
-                                                            .white // Warning color
+                                                        .white // Warning color
                                                         : Colors.black,
                                                   ),
                                                 ),
@@ -873,17 +891,17 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                     fontSize: 20,
                                                     fontWeight: FontWeight.bold,
                                                     color: calculateAvailableWeight(
-                                                                    loads[
-                                                                        index]) >
-                                                                widget.trip
-                                                                    .allowable ||
-                                                            calculateAvailableSeats(
-                                                                    loads[
-                                                                        index]) >
-                                                                widget.trip
-                                                                    .availableSeats
+                                                        loads[
+                                                        index]) >
+                                                        widget.trip
+                                                            .allowable ||
+                                                        calculateAvailableSeats(
+                                                            loads[
+                                                            index]) >
+                                                            widget.trip
+                                                                .availableSeats
                                                         ? Colors
-                                                            .white // Warning color
+                                                        .white // Warning color
                                                         : Colors.black,
                                                   ),
                                                 ),
@@ -898,11 +916,11 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                   IconButton(
                                     icon: Icon(Icons.delete,
                                         color: calculateAvailableWeight(
-                                                        loads[index]) >
-                                                    widget.trip.allowable ||
-                                                calculateAvailableSeats(
-                                                        loads[index]) >
-                                                    widget.trip.availableSeats
+                                            loads[index]) >
+                                            widget.trip.allowable ||
+                                            calculateAvailableSeats(
+                                                loads[index]) >
+                                                widget.trip.availableSeats
                                             ? Colors.white // Warning color
                                             : Colors.black,
                                         size: 32),
@@ -938,7 +956,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                   setState(() {
                                                     // Iterate through all items in the load
                                                     for (var item
-                                                        in loads[index]) {
+                                                    in loads[index]) {
                                                       if (item is CrewMember) {
                                                         // Add crew member back to the crew list
                                                         if (!crewList
@@ -953,11 +971,11 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                         } else {
                                                           // General gear: update or add back to gearList
                                                           final existingGear =
-                                                              gearList
-                                                                  .firstWhere(
-                                                            (gear) =>
-                                                                gear.name ==
-                                                                    item.name &&
+                                                          gearList
+                                                              .firstWhere(
+                                                                (gear) =>
+                                                            gear.name ==
+                                                                item.name &&
                                                                 !gear
                                                                     .isPersonalTool,
                                                             orElse: () => Gear(
@@ -967,7 +985,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                           );
 
                                                           existingGear
-                                                                  .quantity +=
+                                                              .quantity +=
                                                               item.quantity;
 
                                                           // Add to gearList if it's not already present
@@ -1008,13 +1026,13 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         ? Icons.expand_less
                                         : Icons.expand_more,
                                     color:
-                                        calculateAvailableWeight(loads[index]) >
-                                                    widget.trip.allowable ||
-                                                calculateAvailableSeats(
-                                                        loads[index]) >
-                                                    widget.trip.availableSeats
-                                            ? Colors.white // Warning color
-                                            : Colors.black,
+                                    calculateAvailableWeight(loads[index]) >
+                                        widget.trip.allowable ||
+                                        calculateAvailableSeats(
+                                            loads[index]) >
+                                            widget.trip.availableSeats
+                                        ? Colors.white // Warning color
+                                        : Colors.black,
                                   ),
                                 ],
                               ),
@@ -1028,7 +1046,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                               child: Column(
                                 children: [
                                   if (calculateAvailableWeight(loads[index]) >
-                                          widget.trip.allowable)
+                                      widget.trip.allowable)
                                     Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 1.0),
                                       child: Container(
@@ -1053,7 +1071,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       ),
                                     ),
                                   if ( calculateAvailableSeats(loads[index]) >
-                                          widget.trip.availableSeats)
+                                      widget.trip.availableSeats)
                                     Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 1.0), // Adjust padding as needed
                                       child: Container(
@@ -1084,7 +1102,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                           (b is Gear || b is CrewMember)) {
                                         return 1; // CustomItem comes after Gear or CrewMember
                                       } else if ((a is Gear ||
-                                              a is CrewMember) &&
+                                          a is CrewMember) &&
                                           b is CustomItem) {
                                         return -1; // Gear or CrewMember comes before CustomItem
                                       }
@@ -1111,24 +1129,25 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                             loads[index].remove(item);
 
                                             if (item is Gear) {
-                                              var existingGear = gearList.firstWhere(
-                                                    (gear) => gear.name == item.name,
+                                              var existingGear =
+                                              gearList.firstWhere(
+                                                    (gear) =>
+                                                gear.name == item.name,
                                                 orElse: () => Gear(
                                                   name: item.name,
                                                   quantity: 0,
-                                                  weight: item.weight ~/ item.quantity, // Correct per-unit weight
+                                                  weight: item.weight,
                                                 ),
                                               );
 
-                                              // Update quantity and weight in the existing gear
-                                              existingGear.quantity += item.quantity;
-                                              existingGear.weight = (existingGear.quantity * (item.weight / item.quantity)).toInt();
-
-                                              if (!gearList.contains(existingGear)) {
+                                              // Update the quantity or add back to the list
+                                              existingGear.quantity +=
+                                                  item.quantity;
+                                              if (!gearList
+                                                  .contains(existingGear)) {
                                                 gearList.add(existingGear);
                                               }
-                                            }
-                                            else if (item is CrewMember) {
+                                            } else if (item is CrewMember) {
                                               if (!crewList.contains(item)) {
                                                 crewList.add(item);
                                               }
@@ -1140,12 +1159,12 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         elevation: 2,
                                         color: item is CrewMember
                                             ? Colors
-                                                .white // Color for CrewMembers
+                                            .white // Color for CrewMembers
                                             : item is Gear &&
-                                                    item.isPersonalTool == true
-                                                ? Colors.blue[
-                                                    100] // Color for personal tools
-                                                : Colors.orange[100],
+                                            item.isPersonalTool == true
+                                            ? Colors.blue[
+                                        100] // Color for personal tools
+                                            : Colors.orange[100],
                                         // Color for regular Gear
                                         // Different colors for CrewMember and Gear
                                         margin: const EdgeInsets.symmetric(
@@ -1158,31 +1177,31 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                           padding: const EdgeInsets.all(8.0),
                                           child: Row(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                            MainAxisAlignment.spaceBetween,
                                             children: [
                                               Column(
                                                 crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     itemDisplay(item),
                                                     style: const TextStyle(
                                                       fontSize: 16,
                                                       fontWeight:
-                                                          FontWeight.bold,
+                                                      FontWeight.bold,
                                                     ),
                                                   ),
                                                   Text(
                                                     item is Gear
                                                         ? 'Quantity: ${item.quantity}'
                                                         : item is CrewMember
-                                                            ? item.getPositionTitle(
-                                                                item.position)
-                                                            : '',
+                                                        ? item.getPositionTitle(
+                                                        item.position)
+                                                        : '',
                                                     style: const TextStyle(
                                                       fontSize: 14,
                                                       fontStyle:
-                                                          FontStyle.italic,
+                                                      FontStyle.italic,
                                                     ),
                                                   ),
                                                 ],
@@ -1201,9 +1220,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                         var existingGear = gearList.firstWhere(
                                                               (gear) => gear.name == item.name,
                                                           orElse: () => Gear(
-                                                            name: item.name,
-                                                            quantity: 0,
-                                                            weight: item.weight ~/ item.quantity// Correct per-unit weight
+                                                              name: item.name,
+                                                              quantity: 0,
+                                                              weight: item.weight ~/ item.quantity// Correct per-unit weight
                                                           ),
                                                         );
 
@@ -1215,40 +1234,40 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                         }
                                                       }
                                                       else if (item
-                                                          is CrewMember) {
+                                                      is CrewMember) {
                                                         // Handle personal tools
                                                         if (item.personalTools !=
                                                             null) {
                                                           for (var tool in item
                                                               .personalTools!) {
                                                             final toolIndex = loads[
-                                                                    index]
+                                                            index]
                                                                 .indexWhere((loadItem) =>
-                                                                    loadItem
-                                                                        is Gear &&
-                                                                    loadItem.name ==
-                                                                        tool.name);
+                                                            loadItem
+                                                            is Gear &&
+                                                                loadItem.name ==
+                                                                    tool.name);
 
                                                             if (toolIndex !=
                                                                 -1) {
                                                               // Decrement the quantity of the tool
                                                               Gear loadTool =
-                                                                  loads[index][
-                                                                      toolIndex];
+                                                              loads[index][
+                                                              toolIndex];
                                                               loadTool.quantity -=
                                                                   tool.quantity;
                                                               loadTool
                                                                   .weight -= tool
-                                                                      .weight *
+                                                                  .weight *
                                                                   tool.quantity; // Adjust weight
 
                                                               // If the quantity reaches zero, remove the tool
                                                               if (loadTool
-                                                                      .quantity <=
+                                                                  .quantity <=
                                                                   0) {
                                                                 loads[index]
                                                                     .removeAt(
-                                                                        toolIndex);
+                                                                    toolIndex);
                                                               }
                                                             }
                                                           }

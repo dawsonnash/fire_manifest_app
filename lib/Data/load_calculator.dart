@@ -33,7 +33,7 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
   for (var gear in crew.gear) {
     for (int i = 0; i < gear.quantity; i++) {
       // Create copy of gear item for each quantity
-      gearCopy.add(Gear(name: gear.name, weight: gear.weight, quantity: 1));
+      gearCopy.add(Gear(name: gear.name, weight: gear.weight, quantity: 1,  isPersonalTool: gear.isPersonalTool));
     }
   }
   // Initialize all Loads
@@ -197,7 +197,7 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
                     load.weight + gear.weight <= maxLoadWeight) {
                   // Add the gear item to the load
                   load.loadGear.add(
-                      Gear(name: gear.name, weight: gear.weight, quantity: 1));
+                      Gear(name: gear.name, weight: gear.weight, quantity: 1, isPersonalTool: gear.isPersonalTool));
                   load.weight += gear.weight;
                   addedQuantity++;
                   // Remove one instance of the gear from gearCopy
@@ -223,7 +223,7 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
                 if (gearCopy.isNotEmpty &&
                     load.weight + gear.weight <= maxLoadWeight) {
                   load.loadGear.add(
-                      Gear(name: gear.name, weight: gear.weight, quantity: 1));
+                      Gear(name: gear.name, weight: gear.weight, quantity: 1,  isPersonalTool: gear.isPersonalTool));
                   load.weight += gear.weight;
                   addedQuantity++;
                   gearCopy.removeAt(
@@ -257,7 +257,7 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
                     gearCopy.any((item) => item.name == gear.name)) {
                   // Add one item of this specific gear type to the current load
                   load.loadGear.add(
-                      Gear(name: gear.name, weight: gear.weight, quantity: 1));
+                      Gear(name: gear.name, weight: gear.weight, quantity: 1,  isPersonalTool: gear.isPersonalTool));
                   load.weight += gear.weight;
                   addedQuantity++;
 
@@ -331,7 +331,7 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
     for (var gear in load.loadGear) {
       var existingGear = consolidatedGear.firstWhere(
             (item) => item.name == gear.name,
-        orElse: () => Gear(name: gear.name, weight: gear.weight, quantity: 0),
+        orElse: () => Gear(name: gear.name, weight: gear.weight, quantity: 0,   isPersonalTool: gear.isPersonalTool),
       );
 
       if (existingGear.quantity == 0) {
