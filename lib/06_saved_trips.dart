@@ -128,8 +128,8 @@ class _SavedTripsState extends State<SavedTripsView> {
                   ),
                 ),
 
-                // Temporary delete All Button
-                if (savedTrips.savedTrips.isNotEmpty)
+                // Delete All Button
+               // if (savedTrips.savedTrips.isNotEmpty)
                   Padding(
                     padding:
                     const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
