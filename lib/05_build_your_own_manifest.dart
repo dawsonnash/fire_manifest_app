@@ -476,25 +476,32 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                       for (var item in selectedItems) {
                         if (item is Gear) {
                           // Respect the selected quantity
-                          int selectedQuantity =
-                              selectedGearQuantities[item] ?? 1;
+                          int selectedQuantity = selectedGearQuantities[item] ?? 1;
 
-                          // Create a copy of the gear with the selected quantity
-                          Gear gearWithSelectedQuantity = Gear(
-                            name: item.name,
-                            quantity: selectedQuantity,
-                            weight: item.weight * selectedQuantity, // Total weight
-                            isPersonalTool: item.isPersonalTool,
+                          // Check if a gear with the same name already exists in the load
+                          final existingGearIndex = loads[selectedLoadIndex].indexWhere(
+                                (loadItem) => loadItem is Gear && loadItem.name == item.name,
                           );
 
-                          // Add the gear copy to the load
-                          loads[selectedLoadIndex]
-                              .add(gearWithSelectedQuantity);
+                          if (existingGearIndex != -1) {
+                            // If it exists, update its quantity and weight
+                            Gear existingGear = loads[selectedLoadIndex][existingGearIndex] as Gear;
+                            existingGear.quantity += selectedQuantity;
+                            existingGear.weight = existingGear.quantity * item.weight; // Recalculate weight
+                          } else {
+                            // If it doesn't exist, add the new gear item to the load
+                            loads[selectedLoadIndex].add(
+                              Gear(
+                                name: item.name,
+                                quantity: selectedQuantity,
+                                weight: item.weight * selectedQuantity, // Calculate total weight
+                                isPersonalTool: item.isPersonalTool,
+                              ),
+                            );
+                          }
 
-                          // Update the remaining quantity in the original gear list
+                          // Update the remaining quantity in the original inventory
                           item.quantity -= selectedQuantity;
-
-                          // Remove the gear entirely if no quantity is left
                           if (item.quantity <= 0) {
                             gearList.remove(item);
                           }
@@ -505,31 +512,30 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                           // Loop through and add all personal tools
                           if (item.personalTools != null) {
                             for (var tool in item.personalTools!) {
-                              final index = loads[selectedLoadIndex].indexWhere(
-                                (loadItem) =>
-                                    loadItem is Gear &&
-                                    loadItem.name == tool.name,
+                              final existingToolIndex = loads[selectedLoadIndex].indexWhere(
+                                    (loadItem) => loadItem is Gear && loadItem.name == tool.name,
                               );
 
-                              if (index != -1) {
-                                // Update the existing tool's quantity
-                                (loads[selectedLoadIndex][index] as Gear)
-                                    .quantity += tool.quantity;
-                                (loads[selectedLoadIndex][index] as Gear)
-                                    .weight += tool.weight * tool.quantity;
+                              if (existingToolIndex != -1) {
+                                // Update the existing tool's quantity and weight
+                                Gear existingTool = loads[selectedLoadIndex][existingToolIndex] as Gear;
+                                existingTool.quantity += tool.quantity;
+                                existingTool.weight = existingTool.quantity * tool.weight;
                               } else {
+                                // Add the tool as a new gear item
                                 loads[selectedLoadIndex].add(
                                   Gear(
                                     name: tool.name,
                                     quantity: tool.quantity,
-                                    weight: tool.weight,
-                                    isPersonalTool: tool.isPersonalTool = true,
+                                    weight: tool.weight * tool.quantity,
+                                    isPersonalTool: tool.isPersonalTool,
                                   ),
                                 );
                               }
                             }
                           }
 
+                          // Remove crew member from the available list
                           crewList.remove(item);
                         }
                       }
@@ -630,7 +636,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
   int calculateAvailableWeight(List<dynamic> loadItems) {
     final totalWeight = loadItems.fold(0, (sum, item) {
       if (item is Gear) {
-        return sum + (item.weight * item.quantity); // Account for quantity
+        return sum + item.weight; // Use the total weight directly
       } else if (item is CrewMember) {
         return sum + item.flightWeight;
       } else if (item is CustomItem) {
@@ -1105,30 +1111,71 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       ),
                                       onDismissed: (direction) {
                                         setState(() {
-                                          // Ensure the load and item are properly handled
-                                          if (loads[index].contains(item)) {
+                                          if (loads[index]
+                                              .contains(item)) {
                                             loads[index].remove(item);
 
                                             if (item is Gear) {
                                               var existingGear = gearList.firstWhere(
                                                     (gear) => gear.name == item.name,
                                                 orElse: () => Gear(
-                                                  name: item.name,
-                                                  quantity: 0,
-                                                  weight: item.weight ~/ item.quantity, // Correct per-unit weight
+                                                    name: item.name,
+                                                    quantity: 0,
+                                                    weight: item.weight ~/ item.quantity,// Correct per-unit weight
+                                                     isPersonalTool: item.isPersonalTool,
                                                 ),
                                               );
 
-                                              // Update quantity and weight in the existing gear
+                                              // Update the quantity and total weight
                                               existingGear.quantity += item.quantity;
-                                              existingGear.weight = (existingGear.quantity * (item.weight / item.quantity)).toInt();
 
                                               if (!gearList.contains(existingGear)) {
                                                 gearList.add(existingGear);
                                               }
                                             }
-                                            else if (item is CrewMember) {
-                                              if (!crewList.contains(item)) {
+                                            else if (item
+                                            is CrewMember) {
+                                              // Handle personal tools
+                                              if (item.personalTools !=
+                                                  null) {
+                                                for (var tool in item
+                                                    .personalTools!) {
+                                                  final toolIndex = loads[
+                                                  index]
+                                                      .indexWhere((loadItem) =>
+                                                  loadItem
+                                                  is Gear &&
+                                                      loadItem.name ==
+                                                          tool.name);
+
+                                                  if (toolIndex !=
+                                                      -1) {
+                                                    // Decrement the quantity of the tool
+                                                    Gear loadTool =
+                                                    loads[index][
+                                                    toolIndex];
+                                                    loadTool.quantity -=
+                                                        tool.quantity;
+                                                    loadTool
+                                                        .weight -= tool
+                                                        .weight *
+                                                        tool.quantity; // Adjust weight
+
+                                                    // If the quantity reaches zero, remove the tool
+                                                    if (loadTool
+                                                        .quantity <=
+                                                        0) {
+                                                      loads[index]
+                                                          .removeAt(
+                                                          toolIndex);
+                                                    }
+                                                  }
+                                                }
+                                              }
+
+                                              // Add the crew member back to the crew list if necessary
+                                              if (!crewList
+                                                  .contains(item)) {
                                                 crewList.add(item);
                                               }
                                             }
@@ -1202,7 +1249,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                           orElse: () => Gear(
                                                             name: item.name,
                                                             quantity: 0,
-                                                            weight: item.weight ~/ item.quantity// Correct per-unit weight
+                                                            weight: item.weight ~/ item.quantity, // Correct per-unit weight
+                                                            isPersonalTool: item.isPersonalTool,
                                                           ),
                                                         );
 

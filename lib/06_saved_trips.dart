@@ -130,94 +130,94 @@ class _SavedTripsState extends State<SavedTripsView> {
 
                 // Temporary delete All Button
                 if (savedTrips.savedTrips.isNotEmpty)
-                Padding(
-                  padding:
-                      const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      if (savedTrips.savedTrips.isNotEmpty) {
-                        showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text(
-                              'Confirm Deletion',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            content: const Text(
-                              'Are you sure you want to delete all trips?',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(); // Close the dialog without deleting
-                                },
-                                child: const Text(
-                                  'Cancel',
+                  Padding(
+                    padding:
+                    const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (savedTrips.savedTrips.isNotEmpty) {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text(
+                                  'Confirm Deletion',
                                   style: TextStyle(
-                                      color: Colors.grey),
+                                      fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  savedTrips.deleteAllTrips();
-                                  setState(() {
-                                    loadTripList();
-                                  });
-                                  Navigator.of(context)
-                                      .pop(); // Close the dialog after deletion
-                                },
-                                child: const Text(
-                                  'Delete',
-                                  style: TextStyle(
-                                      color: Colors.red),
+                                content: const Text(
+                                  'Are you sure you want to delete all trips?',
+                                  style: TextStyle(fontSize: 16),
                                 ),
-                              ),
-                            ],
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pop(); // Close the dialog without deleting
+                                    },
+                                    child: const Text(
+                                      'Cancel',
+                                      style: TextStyle(
+                                          color: Colors.grey),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      savedTrips.deleteAllTrips();
+                                      setState(() {
+                                        loadTripList();
+                                      });
+                                      Navigator.of(context)
+                                          .pop(); // Close the dialog after deletion
+                                    },
+                                    child: const Text(
+                                      'Delete',
+                                      style: TextStyle(
+                                          color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           );
-                        },
-                      );
-                      }
-                    },
+                        }
+                      },
 
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.deepOrangeAccent,
-                        border: Border.all(color: Colors.black, width: 2),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
-                            spreadRadius: 1,
-                            blurRadius: 8,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      //alignment: Alignment.center,
-                      child: Row(
-                        children: [
-                          Text(
-                            'Delete All Trips',
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.deepOrangeAccent,
+                          border: Border.all(color: Colors.black, width: 2),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.5),
+                              spreadRadius: 1,
+                              blurRadius: 8,
+                              offset: Offset(0, 3),
                             ),
-                          ),
-                          Spacer(),
-                          Icon(Icons.delete, color: Colors.black, size: 32),
-                        ],
+                          ],
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        //alignment: Alignment.center,
+                        child: Row(
+                          children: [
+                            Text(
+                              'Delete All Trips',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Spacer(),
+                            Icon(Icons.delete, color: Colors.black, size: 32),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           ),

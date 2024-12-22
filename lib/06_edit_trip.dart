@@ -648,7 +648,7 @@ class _EditTripState extends State<EditTrip> {
   int calculateAvailableWeight(List<dynamic> loadItems) {
     final totalWeight = loadItems.fold(0, (sum, item) {
       if (item is Gear) {
-        return sum + (item.weight * item.quantity); // Account for quantity
+        return sum + item.weight; // Use the total weight directly
       } else if (item is CrewMember) {
         return sum + item.flightWeight;
       } else if (item is CustomItem) {
@@ -659,6 +659,7 @@ class _EditTripState extends State<EditTrip> {
     });
     return totalWeight;
   }
+
 
 // Function to calculate available seats for a load
   int calculateAvailableSeats(List<dynamic> loadItems) {
@@ -1123,31 +1124,70 @@ class _EditTripState extends State<EditTrip> {
                                       ),
                                       onDismissed: (direction) {
                                         setState(() {
-                                          // Ensure the load and item are properly handled
-                                          if (loads[index].contains(item)) {
+                                          if (loads[index]
+                                              .contains(item)) {
                                             loads[index].remove(item);
 
                                             if (item is Gear) {
-                                              var existingGear =
-                                              gearList.firstWhere(
-                                                    (gear) =>
-                                                gear.name == item.name,
+                                              var existingGear = gearList.firstWhere(
+                                                    (gear) => gear.name == item.name,
                                                 orElse: () => Gear(
-                                                  name: item.name,
-                                                  quantity: 0,
-                                                  weight: item.weight,
+                                                    name: item.name,
+                                                    quantity: 0,
+                                                    weight: item.weight ~/ item.quantity// Correct per-unit weight
                                                 ),
                                               );
 
-                                              // Update the quantity or add back to the list
-                                              existingGear.quantity +=
-                                                  item.quantity;
-                                              if (!gearList
-                                                  .contains(existingGear)) {
+                                              // Update the quantity and total weight
+                                              existingGear.quantity += item.quantity;
+
+                                              if (!gearList.contains(existingGear)) {
                                                 gearList.add(existingGear);
                                               }
-                                            } else if (item is CrewMember) {
-                                              if (!crewList.contains(item)) {
+                                            }
+                                            else if (item
+                                            is CrewMember) {
+                                              // Handle personal tools
+                                              if (item.personalTools !=
+                                                  null) {
+                                                for (var tool in item
+                                                    .personalTools!) {
+                                                  final toolIndex = loads[
+                                                  index]
+                                                      .indexWhere((loadItem) =>
+                                                  loadItem
+                                                  is Gear &&
+                                                      loadItem.name ==
+                                                          tool.name);
+
+                                                  if (toolIndex !=
+                                                      -1) {
+                                                    // Decrement the quantity of the tool
+                                                    Gear loadTool =
+                                                    loads[index][
+                                                    toolIndex];
+                                                    loadTool.quantity -=
+                                                        tool.quantity;
+                                                    loadTool
+                                                        .weight -= tool
+                                                        .weight *
+                                                        tool.quantity; // Adjust weight
+
+                                                    // If the quantity reaches zero, remove the tool
+                                                    if (loadTool
+                                                        .quantity <=
+                                                        0) {
+                                                      loads[index]
+                                                          .removeAt(
+                                                          toolIndex);
+                                                    }
+                                                  }
+                                                }
+                                              }
+
+                                              // Add the crew member back to the crew list if necessary
+                                              if (!crewList
+                                                  .contains(item)) {
                                                 crewList.add(item);
                                               }
                                             }
