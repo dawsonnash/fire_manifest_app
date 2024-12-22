@@ -841,8 +841,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                         }
                                                       } else if (item is Gear) {
                                                         if (item.isPersonalTool) {
-                                                          // Remove personal tools directly from the load, do not add back to gearList
-                                                          continue;
+                                                          gearList.removeWhere((gear) => gear.name == item.name && gear.isPersonalTool);
                                                         } else {
                                                           // General gear: update or add back to gearList
                                                           final existingGear = gearList.firstWhere(
@@ -992,17 +991,37 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                               // Handle personal tools
                                               if (item.personalTools != null) {
                                                 for (var tool in item.personalTools!) {
-                                                  final toolIndex = loads[index].indexWhere((loadItem) => loadItem is Gear && loadItem.name == tool.name);
+                                                  // Check if the tool exists in the gearList first
+                                                  final gearListIndex = gearList.indexWhere(
+                                                        (gear) => gear.name == tool.name,
+                                                  );
 
-                                                  if (toolIndex != -1) {
-                                                    // Decrement the quantity of the tool
-                                                    Gear loadTool = loads[index][toolIndex];
-                                                    loadTool.quantity -= tool.quantity;
-                                                    loadTool.weight -= tool.weight * tool.quantity; // Adjust weight
+                                                  if (gearListIndex != -1) {
+                                                    // Decrement the quantity of the tool in the gearList
+                                                    Gear gearTool = gearList[gearListIndex];
+                                                    gearTool.quantity -= tool.quantity;
+                                                    gearTool.weight -= tool.weight * tool.quantity; // Adjust weight
 
-                                                    // If the quantity reaches zero, remove the tool
-                                                    if (loadTool.quantity <= 0) {
-                                                      loads[index].removeAt(toolIndex);
+                                                    // If the quantity reaches zero, remove the tool from the gearList
+                                                    if (gearTool.quantity <= 0) {
+                                                      gearList.removeAt(gearListIndex);
+                                                    }
+                                                  } else {
+                                                    // Check if the tool exists in the current load
+                                                    final toolIndex = loads[index].indexWhere(
+                                                          (loadItem) => loadItem is Gear && loadItem.name == tool.name,
+                                                    );
+
+                                                    if (toolIndex != -1) {
+                                                      // Decrement the quantity of the tool in the load
+                                                      Gear loadTool = loads[index][toolIndex];
+                                                      loadTool.quantity -= tool.quantity;
+                                                      loadTool.weight -= tool.weight * tool.quantity; // Adjust weight
+
+                                                      // If the quantity reaches zero, remove the tool from the load
+                                                      if (loadTool.quantity <= 0) {
+                                                        loads[index].removeAt(toolIndex);
+                                                      }
                                                     }
                                                   }
                                                 }
@@ -1174,17 +1193,74 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                         // Handle personal tools
                                                         if (item.personalTools != null) {
                                                           for (var tool in item.personalTools!) {
-                                                            final toolIndex = loads[index].indexWhere((loadItem) => loadItem is Gear && loadItem.name == tool.name);
+                                                            // Check if the tool exists in the gearList first
+                                                            final gearListIndex = gearList.indexWhere(
+                                                                  (gear) => gear.name == tool.name,
+                                                            );
 
-                                                            if (toolIndex != -1) {
-                                                              // Decrement the quantity of the tool
-                                                              Gear loadTool = loads[index][toolIndex];
-                                                              loadTool.quantity -= tool.quantity;
-                                                              loadTool.weight -= tool.weight * tool.quantity; // Adjust weight
+                                                            if (gearListIndex != -1) {
+                                                              // Decrement the quantity of the tool in the gearList
+                                                              Gear gearTool = gearList[gearListIndex];
+                                                              gearTool.quantity -= tool.quantity;
+                                                              gearTool.weight -= tool.weight * tool.quantity; // Adjust weight
 
-                                                              // If the quantity reaches zero, remove the tool
-                                                              if (loadTool.quantity <= 0) {
-                                                                loads[index].removeAt(toolIndex);
+                                                              // If the quantity reaches zero, remove the tool from the gearList
+                                                              if (gearTool.quantity <= 0) {
+                                                                gearList.removeAt(gearListIndex);
+                                                              }
+                                                            } else {
+                                                              // Check if the tool exists in the current load
+                                                              final toolIndex = loads[index].indexWhere(
+                                                                    (loadItem) => loadItem is Gear && loadItem.name == tool.name,
+                                                              );
+
+                                                              if (toolIndex != -1) {
+                                                                // Decrement the quantity of the tool in the load
+                                                                Gear loadTool = loads[index][toolIndex];
+                                                                loadTool.quantity -= tool.quantity;
+                                                                loadTool.weight -= tool.weight * tool.quantity; // Adjust weight
+
+                                                                // If the quantity reaches zero, remove the tool from the load
+                                                                if (loadTool.quantity <= 0) {
+                                                                  loads[index].removeAt(toolIndex);
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                        if (item.personalTools != null) {
+                                                          for (var tool in item.personalTools!) {
+                                                            // Check if the tool exists in the gearList first
+                                                            final gearListIndex = gearList.indexWhere(
+                                                                  (gear) => gear.name == tool.name,
+                                                            );
+
+                                                            if (gearListIndex != -1) {
+                                                              // Decrement the quantity of the tool in the gearList
+                                                              Gear gearTool = gearList[gearListIndex];
+                                                              gearTool.quantity -= tool.quantity;
+                                                              gearTool.weight -= tool.weight * tool.quantity; // Adjust weight
+
+                                                              // If the quantity reaches zero, remove the tool from the gearList
+                                                              if (gearTool.quantity <= 0) {
+                                                                gearList.removeAt(gearListIndex);
+                                                              }
+                                                            } else {
+                                                              // Check if the tool exists in the current load
+                                                              final toolIndex = loads[index].indexWhere(
+                                                                    (loadItem) => loadItem is Gear && loadItem.name == tool.name,
+                                                              );
+
+                                                              if (toolIndex != -1) {
+                                                                // Decrement the quantity of the tool in the load
+                                                                Gear loadTool = loads[index][toolIndex];
+                                                                loadTool.quantity -= tool.quantity;
+                                                                loadTool.weight -= tool.weight * tool.quantity; // Adjust weight
+
+                                                                // If the quantity reaches zero, remove the tool from the load
+                                                                if (loadTool.quantity <= 0) {
+                                                                  loads[index].removeAt(toolIndex);
+                                                                }
                                                               }
                                                             }
                                                           }
