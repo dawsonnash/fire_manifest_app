@@ -33,6 +33,9 @@ class _CrewmembersViewState extends State<CrewmembersView> {
 
   @override
   Widget build(BuildContext context) {
+
+    List<CrewMember> sortedCrewMemberList = sortCrewListByPosition(crewmemberList);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -60,9 +63,9 @@ class _CrewmembersViewState extends State<CrewmembersView> {
               children: [
                 Expanded(
                   child: ListView.builder(
-                    itemCount: crewmemberList.length,
+                    itemCount: sortedCrewMemberList.length,
                     itemBuilder: (context, index) {
-                      final crewMember = crewmemberList[index];
+                      final crewMember = sortedCrewMemberList[index];
 
                       // Display crewmember data in a scrollable list
                       return Card(
@@ -77,32 +80,39 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                             title: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${crewMember.name}, ${crewMember.flightWeight} lbs',
-                                      style: const TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          ' ${crewMember.getPositionTitle(crewMember.position)} - ',
-                                          style: const TextStyle(
-                                            fontSize: 14,
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${crewMember.name}, ${crewMember.flightWeight} lbs',
+                                        style: const TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold),
+                                  
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            ' ${crewMember.getPositionTitle(crewMember.position)} - ',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                  
+                                            ),
+                                  
                                           ),
-                                        ),
-                                        Text(
-                                          (crewMember.personalTools ?? []).map((gearItem) => gearItem.name).join(', '),
-                                          style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                          Expanded(
+                                            child: Text(
+                                              (crewMember.personalTools ?? []).map((gearItem) => gearItem.name).join(', '),
+                                              style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 IconButton(
                                     icon: const Icon(Icons.edit,

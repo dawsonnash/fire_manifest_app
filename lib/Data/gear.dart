@@ -34,3 +34,8 @@ class Gear extends HiveObject{
 
   Gear({required this.name, required this.weight, required this.quantity, this.isPersonalTool = false});
 }
+List<Gear> sortGearListAlphabetically(List<Gear> gearList) {
+  gearList.sort((a, b) => a.name.compareTo(b.name));
+  return gearList;
+}
+

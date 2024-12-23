@@ -37,6 +37,9 @@ class _GearViewState extends State<GearView>{
 
   @override
   Widget build(BuildContext context) {
+
+    List<Gear> sortedGearList = sortGearListAlphabetically(gearList);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -65,10 +68,10 @@ class _GearViewState extends State<GearView>{
               children: [
                 Expanded(
                 child: ListView.builder(
-                  itemCount: gearList.length,
+                  itemCount: sortedGearList.length,
                   itemBuilder: (context, index) {
 
-                    final gear = gearList[index];
+                    final gear = sortedGearList[index];
 
                     // Display gear data
                     return Card(
@@ -83,23 +86,27 @@ class _GearViewState extends State<GearView>{
                           title: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    gear.name,
-                                    style: const TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      gear.name,
+                                      style: const TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    '${gear.weight} lbs x ${gear.quantity}',
-                                    style: const TextStyle(
-                                      fontSize:16,
-                                    ),
-                                  )
-                                ],
+                                    Text(
+                                      '${gear.weight} lbs x ${gear.quantity}',
+                                      style: const TextStyle(
+                                        fontSize:16,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    )
+                                  ],
+                                ),
                               ),
                               IconButton(
                                   icon: const Icon(
