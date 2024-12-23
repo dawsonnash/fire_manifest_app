@@ -144,8 +144,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                     ),
                                     child: CheckboxListTile(
                                       title: Text(
-                                        ' ${crew.name}, ${crew.flightWeight} lbs',
+                                        '${crew.name}, ${crew.flightWeight} lbs',
                                         style: const TextStyle(fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.start,
                                       ),
                                       subtitle: Text(
                                         crew.getPositionTitle(crew.position),
@@ -202,7 +203,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                   return Container(
                                     //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: gear.isPersonalTool
+                                          ? Colors.blue[100] // Color for personal tools
+                                          : Colors.orange[100],
                                       borderRadius: BorderRadius.circular(0.0),
                                       // Rounded corners
                                       boxShadow: [
@@ -236,7 +239,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.bold,
-                                                    color: Colors.grey,
+                                                    color: Colors.black,
                                                   ),
                                                 ),
                                               ],
@@ -548,7 +551,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
       int loadWeight = loadItems.fold(0, (sum, item) {
         if (item is Gear) {
-          return sum + (item.weight * item.quantity);
+          return sum + (item.weight);
         } else if (item is CrewMember) {
           return sum + item.flightWeight;
         } else if (item is CustomItem) {

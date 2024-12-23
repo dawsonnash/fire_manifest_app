@@ -135,7 +135,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                     const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
                     child: GestureDetector(
                       onTap: () {
-                        if (savedTrips.savedTrips.isNotEmpty) {
+                        // if (savedTrips.savedTrips.isNotEmpty) {}
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
@@ -180,7 +180,6 @@ class _SavedTripsState extends State<SavedTripsView> {
                               );
                             },
                           );
-                        }
                       },
 
                       child: Container(

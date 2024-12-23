@@ -561,7 +561,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                         ],
                                       ),
                                       Text(
-                                        'Weight: ${gearItem.totalGearWeight} lbs',
+                                        'Weight: ${gearItem.weight} lbs',
                                         style: const TextStyle(
                                           fontSize: 18,
                                         ),

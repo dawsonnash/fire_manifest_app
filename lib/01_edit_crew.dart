@@ -14,7 +14,6 @@ class EditCrew extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -24,7 +23,8 @@ class EditCrew extends StatelessWidget {
     // Button style for all buttons
     final ButtonStyle buttonStyle = ElevatedButton.styleFrom(
       foregroundColor: Colors.black,
-      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold), // temp fix, should make dynamic
+      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      // temp fix, should make dynamic
       backgroundColor: Colors.deepOrangeAccent,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       elevation: 15,
@@ -42,15 +42,20 @@ class EditCrew extends StatelessWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-            'Edit Crew',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-            Text(
-              ' ${crew.totalCrewWeight.toInt().toString()} lbs',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Edit Crew',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Total Crew Weight: ${crew.totalCrewWeight.toInt().toString()} lbs',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ],
             ),
-        ],
+          ],
         ),
       ),
       body: Stack(
@@ -97,7 +102,8 @@ class EditCrew extends StatelessWidget {
                               size: 32,
                             ),
                             //const SizedBox(width: 8),
-                            Flexible( // Allows text to be wrapped
+                            Flexible(
+                              // Allows text to be wrapped
                               child: Text(
                                 'Crew Member',
                                 textAlign: TextAlign.center,
@@ -107,7 +113,6 @@ class EditCrew extends StatelessWidget {
                           ],
                         ),
                       ),
-
                       ElevatedButton(
                         onPressed: () {
                           Navigator.push(
@@ -124,7 +129,8 @@ class EditCrew extends StatelessWidget {
                               size: 32,
                             ),
                             //const SizedBox(width: 8),
-                            Flexible( // Allows text to be wrapped
+                            Flexible(
+                              // Allows text to be wrapped
                               child: Text(
                                 'Crew Members',
                                 textAlign: TextAlign.center,
@@ -134,7 +140,6 @@ class EditCrew extends StatelessWidget {
                           ],
                         ),
                       ),
-
                       ElevatedButton(
                         onPressed: () {
                           Navigator.push(
@@ -152,7 +157,8 @@ class EditCrew extends StatelessWidget {
                               size: 32,
                             ),
                             const SizedBox(width: 8),
-                            Flexible( // Allows text to be wrapped
+                            Flexible(
+                              // Allows text to be wrapped
                               child: Text(
                                 'Gear',
                                 textAlign: TextAlign.center,
@@ -162,7 +168,6 @@ class EditCrew extends StatelessWidget {
                           ],
                         ),
                       ),
-
                       ElevatedButton(
                         onPressed: () {
                           Navigator.push(
@@ -180,7 +185,8 @@ class EditCrew extends StatelessWidget {
                               size: 32,
                             ),
                             const SizedBox(width: 8),
-                            Flexible( // Allows text to be wrapped
+                            Flexible(
+                              // Allows text to be wrapped
                               child: Text(
                                 'Gear',
                                 textAlign: TextAlign.center,
@@ -197,7 +203,7 @@ class EditCrew extends StatelessWidget {
                   width: screenWidth * 0.9, // 90% of screen width
                   height: buttonHeight * 2.2, // This 2.2 was just trialed and errored until it matched the height. Could be a downfall matching multiple device aspect ratios
                   child: Padding(
-                    padding: const EdgeInsets.only(top:16.0, bottom: 16.0),
+                    padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.push(
@@ -216,10 +222,10 @@ class EditCrew extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           const Text(
-                          'Trip Preferences',
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                            'Trip Preferences',
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -227,7 +233,6 @@ class EditCrew extends StatelessWidget {
                 SizedBox(
                   height: screenHeight * 0.05,
                 ),
-
               ],
             ),
           ),
