@@ -550,9 +550,18 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
       int index = entry.key;
       List loadItems = entry.value;
 
+      // Normalize the weights for Gear items
+      // Because i made mistake with gear quantitys/weights. This is a fix before saving trip
+      loadItems.whereType<Gear>().forEach((gear) {
+        if (gear.quantity > 0) {
+          gear.weight = gear.weight ~/ gear.quantity; // Adjust to per-item weight
+        }
+      });
+
+      // Calculate total weight for the load
       int loadWeight = loadItems.fold(0, (sum, item) {
         if (item is Gear) {
-          return sum + (item.weight);
+          return sum + (item.weight * item.quantity); // Use adjusted per-item weight
         } else if (item is CrewMember) {
           return sum + item.flightWeight;
         } else if (item is CustomItem) {
@@ -561,6 +570,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         return sum;
       });
 
+      // Create a new Load object
       return Load(
         loadNumber: index + 1,
         weight: loadWeight,
@@ -588,6 +598,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         backgroundColor: Colors.green,
       ),
     );
+
+    // Navigate to the SingleTripView
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => SingleTripView(trip: widget.trip),

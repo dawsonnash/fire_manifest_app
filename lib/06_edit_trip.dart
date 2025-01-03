@@ -53,6 +53,18 @@ class _EditTripState extends State<EditTrip> {
     loadItems();
   }
 
+  // This is what displays on each load
+  String itemDisplayEditTrip(dynamic item) {
+    if (item is Gear) {
+      return "${item.name}, ${item.totalGearWeight} lbs";
+    } else if (item is CrewMember) {
+      return "${item.name}, ${item.flightWeight} lbs";
+    } else if (item is CustomItem) {
+      return "${item.name}, ${item.weight} lbs";
+    } else {
+      return "Unknown item type";
+    }
+  }
   void _showSelectionDialog(int selectedLoadIndex) async {
     Map<Gear, int> selectedGearQuantities = {};
     List<dynamic> selectedItems = [];
@@ -628,7 +640,7 @@ class _EditTripState extends State<EditTrip> {
   int calculateAvailableWeight(List<dynamic> loadItems) {
     final totalWeight = loadItems.fold(0, (sum, item) {
       if (item is Gear) {
-        return sum + item.weight; // Use the total weight directly
+        return sum + item.totalGearWeight; // Use the total weight directly
       } else if (item is CrewMember) {
         return sum + item.flightWeight;
       } else if (item is CustomItem) {
@@ -1119,7 +1131,7 @@ class _EditTripState extends State<EditTrip> {
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    itemDisplay(item),
+                                                    itemDisplayEditTrip(item),
                                                     style: const TextStyle(
                                                       fontSize: 16,
                                                       fontWeight: FontWeight.bold,
@@ -1353,7 +1365,7 @@ class _EditTripState extends State<EditTrip> {
 
                         // Add load here bruh
                           loads.add([]);
-                          _isExpanded.add(false);
+                          _isExpanded.add(true);
                           print('After adding: loads.length = ${loads.length}, _isExpanded.length = ${_isExpanded.length}');
 
 

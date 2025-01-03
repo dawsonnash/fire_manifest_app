@@ -16,15 +16,18 @@ import 'Data/load.dart';
 Future<Uint8List> generateTripPDF(Trip trip, String manifestForm) async {
   final pdf = pw.Document();
   late String imagePath;
-  late pw.Widget Function(Load load) fillFormFields;
+  late pw.Widget Function(Load load, int pageIndex, int totalPages, List<dynamic> pageItems) fillFormFields;
+  late PdfPageFormat pageFormat;
 
-  // Determine form and form-filling function based on manifestForm
+  // Determine the image path, form-filling logic, and page format based on the manifestForm
   if (manifestForm == 'pms245') {
     imagePath = 'assets/images/crew_manifest_form.png';
-    fillFormFields = fillFormFieldsPMS245;
+    fillFormFields = (load, pageIndex, totalPages, pageItems) => fillFormFieldsPMS245(load);
+    pageFormat = PdfPageFormat.letter;
   } else if (manifestForm == 'of252') {
     imagePath = 'assets/images/helicopter_manifest_form.jpg';
     fillFormFields = fillFormFieldsOF252;
+    pageFormat = PdfPageFormat.a4;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
   }
@@ -33,40 +36,25 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm) async {
   final imageBytes = await rootBundle.load(imagePath);
   final backgroundImage = pw.MemoryImage(imageBytes.buffer.asUint8List());
 
-  // Dynamically add pages based on manifestForm
-  if (manifestForm == 'pms245') {
-    for (var load in trip.loads) {
+  // Iterate through each load in the trip
+  for (var load in trip.loads) {
+    // Combine all items from the load
+    final allItems = [
+      ...load.loadPersonnel,
+      ...load.loadGear,
+      ...load.customItems,
+    ];
+
+    // Paginate items for `of252`, use a single page for `pms245`
+    final paginatedItems = manifestForm == 'of252'
+        ? paginateItems(allItems, maxItemsPerPage)
+        : [allItems];
+
+    // Generate pages based on pagination
+    for (int i = 0; i < paginatedItems.length; i++) {
       pdf.addPage(
         pw.Page(
-          pageFormat: PdfPageFormat.letter,
-          margin: pw.EdgeInsets.all(0),
-          build: (pw.Context context) {
-            return pw.Stack(
-              children: [
-                pw.Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  child: pw.Image(
-                    backgroundImage,
-                    fit: pw.BoxFit
-                        .cover, // Ensures image covers the entire page
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(32),
-                  child: fillFormFields(load), // PMS 245-specific logic
-                ),
-              ],
-            );
-          },
-        ),
-      );
-    }
-  } else if (manifestForm == 'of252') {
-    for (var load in trip.loads) {
-      pdf.addPage(
-        pw.Page(
-          pageFormat: PdfPageFormat.a4,
+          pageFormat: pageFormat, // Use the dynamically set page format
           margin: pw.EdgeInsets.all(0),
           build: (pw.Context context) {
             return pw.Stack(
@@ -80,8 +68,15 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm) async {
                   ),
                 ),
                 pw.Padding(
-                  padding: const pw.EdgeInsets.all(22),
-                  child: fillFormFields(load),
+                  padding: manifestForm == 'pms245'
+                      ? const pw.EdgeInsets.all(32)
+                      : const pw.EdgeInsets.all(22),
+                  child: fillFormFields(
+                    load,
+                    i + 1, // Current page index (1-based)
+                    paginatedItems.length, // Total pages for the current load
+                    paginatedItems[i], // Items for the current page
+                  ),
                 ),
               ],
             );
