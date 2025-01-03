@@ -137,47 +137,88 @@ class _GearViewState extends State<GearView>{
 
                 // Delete All
                 Padding(
-                  padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.deepOrangeAccent,
-                      border: Border.all(color: Colors.black, width: 2),
-                      borderRadius: BorderRadius.circular(4),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          spreadRadius: 1,
-                          blurRadius: 8,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    //alignment: Alignment.center,
-                    child: Row(
-                      children: [
-                        Text(
-                          'Delete all',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Spacer(),
-                        IconButton(
-                            icon: const Icon(
-                                Icons.delete,
-                                color: Colors.black,
-                                size: 32
+                  padding:
+                  const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      // if (savedTrips.savedTrips.isNotEmpty) {}
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text(
+                              'Confirm Deletion',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold),
                             ),
-                            onPressed: (){
-                              crew.deleteAllGear();
-                              setState((){});
-                            }
-                        )
-                      ],
+                            content: const Text(
+                              'Are you sure you want to delete all gear?',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pop(); // Close the dialog without deleting
+                                },
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                      color: Colors.grey),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  crew.deleteAllGear();
+                                  setState(() {
+                                  });
+                                  Navigator.of(context).pop(); // Close the dialog after deletion
+                                  Navigator.of(context).pop(); // Home screen
+                                },
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(
+                                      color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.deepOrangeAccent,
+                        border: Border.all(color: Colors.black, width: 2),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 8,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      //alignment: Alignment.center,
+                      child: Row(
+                        children: [
+                          Text(
+                            'Delete All Gear',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Spacer(),
+                          Icon(Icons.delete, color: Colors.black, size: 32),
+                        ],
+                      ),
                     ),
                   ),
                 ),

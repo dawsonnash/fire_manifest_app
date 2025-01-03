@@ -167,8 +167,8 @@ class _SavedTripsState extends State<SavedTripsView> {
                                       setState(() {
                                         loadTripList();
                                       });
-                                      Navigator.of(context)
-                                          .pop(); // Close the dialog after deletion
+                                      Navigator.of(context).pop(); // Close the dialog after deletion
+                                      Navigator.of(context).pop(); // Home screen
                                     },
                                     child: const Text(
                                       'Delete',

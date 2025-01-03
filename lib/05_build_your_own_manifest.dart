@@ -503,6 +503,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                         }
                       }
                     });
+                    sortLoadItems(loads[selectedLoadIndex]);
                   },
                   child: const Text('Add'),
                 ),
@@ -614,6 +615,27 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
   int calculateAvailableSeats(List<dynamic> loadItems) {
     final totalCrewMembers = loadItems.whereType<CrewMember>().length;
     return totalCrewMembers;
+  }
+
+// Function to sort the load
+  void sortLoadItems(List<dynamic> load) {
+    load.sort((a, b) {
+      // Prioritize CrewMember objects first
+      if (a is CrewMember && b is! CrewMember) return -1;
+      if (b is CrewMember && a is! CrewMember) return 1;
+
+      // Within Gear, prioritize personal tools
+      if (a is Gear && b is Gear) {
+        if (a.isPersonalTool && !b.isPersonalTool) return -1;
+        if (!a.isPersonalTool && b.isPersonalTool) return 1;
+      }
+
+      // Keep CustomItem objects or other cases in relative order
+      if (a is CustomItem && b is! CustomItem) return -1;
+      if (b is CustomItem && a is! CustomItem) return 1;
+
+      return 0; // Maintain relative order for similar types
+    });
   }
 
   @override

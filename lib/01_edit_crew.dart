@@ -85,6 +85,8 @@ class EditCrew extends StatelessWidget {
                     crossAxisCount: 2,
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
+                    shrinkWrap: true, // Makes GridView adapt to its content
+                    physics: NeverScrollableScrollPhysics(), // Disables scrolling
                     children: [
                       ElevatedButton(
                         onPressed: () {

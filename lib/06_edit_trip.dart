@@ -505,9 +505,12 @@ class _EditTripState extends State<EditTrip> {
 
                           // Remove crew member from the available list
                           crewList.remove(item);
+
                         }
+
                       }
                     });
+                    sortLoadItems(loads[selectedLoadIndex]);
                   },
                   child: const Text('Add'),
                 ),
@@ -522,16 +525,33 @@ class _EditTripState extends State<EditTrip> {
   // Function to load the list of Gear and CrewMember items from Hive boxes
   void loadItems() {
     setState(() {
-      gearList = gearBox.values
-          .where((gear) => !loads.any((load) => load.any((item) => item is Gear && item.name == gear.name)))
-          .map((gear) => Gear(
-        name: gear.name,
-        quantity: gear.quantity,
-        weight: gear.weight,
-        isPersonalTool: gear.isPersonalTool,
-      ))
-          .toList();
+      // Map of gear name to remaining quantity
+      Map<String, int> usedGearQuantities = {};
 
+      // Calculate total quantities used in all loads
+      for (var load in loads) {
+        for (var item in load) {
+          if (item is Gear) {
+            usedGearQuantities[item.name] = (usedGearQuantities[item.name] ?? 0) + item.quantity;
+          }
+        }
+      }
+
+      // Calculate remaining quantities for the gear list
+      gearList = gearBox.values.map((gear) {
+        int usedQuantity = usedGearQuantities[gear.name] ?? 0;
+        int remainingQuantity = gear.quantity - usedQuantity;
+
+        // Only include gear with remaining quantities
+        return Gear(
+          name: gear.name,
+          quantity: remainingQuantity > 0 ? remainingQuantity : 0,
+          weight: gear.weight,
+          isPersonalTool: gear.isPersonalTool,
+        );
+      }).where((gear) => gear.quantity > 0).toList();
+
+      // Load crew members
       crewList = crewmemberBox.values
           .where((crew) => !loads.any((load) => load.any((item) => item is CrewMember && item.name == crew.name)))
           .map((crew) => CrewMember(
@@ -621,6 +641,26 @@ class _EditTripState extends State<EditTrip> {
   int calculateAvailableSeats(List<dynamic> loadItems) {
     final totalCrewMembers = loadItems.whereType<CrewMember>().length;
     return totalCrewMembers;
+  }
+
+  void sortLoadItems(List<dynamic> load) {
+    load.sort((a, b) {
+      // Prioritize CrewMember objects first
+      if (a is CrewMember && b is! CrewMember) return -1;
+      if (b is CrewMember && a is! CrewMember) return 1;
+
+      // Within Gear, prioritize personal tools
+      if (a is Gear && b is Gear) {
+        if (a.isPersonalTool && !b.isPersonalTool) return -1;
+        if (!a.isPersonalTool && b.isPersonalTool) return 1;
+      }
+
+      // Keep CustomItem objects or other cases in relative order
+      if (a is CustomItem && b is! CustomItem) return -1;
+      if (b is CustomItem && a is! CustomItem) return 1;
+
+      return 0; // Maintain relative order for similar types
+    });
   }
 
   @override
