@@ -46,22 +46,8 @@ class _EditTripState extends State<EditTrip> {
     tripBox = Hive.box<Trip>('tripBox');
 
 
-    // Load trip data into UI
-    loads = widget.trip.loads.map((load) {
-      return [
-        ...load.loadPersonnel,
-        ...load.loadGear.map((gear) => Gear(
-          name: gear.name,
-          quantity: gear.quantity,
-          weight: gear.weight * gear.quantity,
-          isPersonalTool: gear.isPersonalTool,
-        )),
-        ...load.customItems.map((customItem) => CustomItem(
-          name: customItem.name,
-          weight: customItem.weight,
-        )),
-      ];
-    }).toList();
+    // Convert Load objects to dynamic lists
+    loads = widget.trip.loads.map((load) => loadToDynamicList(load)).toList();
 
     _isExpanded = List.generate(loads.length, (_) => false);
     loadItems();
@@ -564,6 +550,39 @@ class _EditTripState extends State<EditTrip> {
     });
   }
 
+// Convert a Load object to a dynamic list
+  List<dynamic> loadToDynamicList(Load load) {
+    return [
+      ...load.loadPersonnel,
+      ...load.loadGear.map((gear) => Gear(
+        name: gear.name,
+        quantity: gear.quantity,
+        weight: gear.weight,
+        isPersonalTool: gear.isPersonalTool,
+      )),
+      ...load.customItems.map((customItem) => CustomItem(
+        name: customItem.name,
+        weight: customItem.weight,
+      )),
+    ];
+  }
+
+// Convert a dynamic list back to a Load object
+  Load dynamicListToLoad(List<dynamic> dynamicList, int loadNumber) {
+    return Load(
+      loadNumber: loadNumber,
+      weight: dynamicList.fold(0, (sum, item) {
+        if (item is Gear) return sum + item.weight;
+        if (item is CrewMember) return sum + item.flightWeight;
+        if (item is CustomItem) return sum + item.weight;
+        return sum;
+      }),
+      loadPersonnel: dynamicList.whereType<CrewMember>().toList(),
+      loadGear: dynamicList.whereType<Gear>().toList(),
+      customItems: dynamicList.whereType<CustomItem>().toList(),
+    );
+  }
+
 
   @override
   void dispose() {
@@ -574,26 +593,10 @@ class _EditTripState extends State<EditTrip> {
   void _saveTrip() {
     widget.trip.loads = loads.asMap().entries.map<Load>((entry) {
       int index = entry.key;
-      List loadItems = entry.value;
-
-      int loadWeight = loadItems.fold(0, (sum, item) {
-        if (item is Gear) {
-          return sum + (item.weight);
-        } else if (item is CrewMember) {
-          return sum + item.flightWeight;
-        } else if (item is CustomItem) {
-          return sum + item.weight;
-        }
-        return sum;
-      });
-
-      return Load(
-        loadNumber: index + 1,
-        weight: loadWeight,
-        loadPersonnel: loadItems.whereType<CrewMember>().toList(),
-        loadGear: loadItems.whereType<Gear>().toList(),
-        customItems: loadItems.whereType<CustomItem>().toList(), // Save CustomItems
-      );
+      List<dynamic> dynamicList = entry.value;
+      print('Index: $index, DynamicList: $dynamicList');
+      // Convert the dynamic list to a Load object
+      return dynamicListToLoad(dynamicList, index + 1);
     }).toList();
 
     // Save the updated trip to Hive
@@ -1349,6 +1352,8 @@ class _EditTripState extends State<EditTrip> {
                           print('Before adding: loads.length = ${loads.length}, _isExpanded.length = ${_isExpanded.length}');
 
                         // Add load here bruh
+                          loads.add([]);
+                          _isExpanded.add(false);
                           print('After adding: loads.length = ${loads.length}, _isExpanded.length = ${_isExpanded.length}');
 
 
