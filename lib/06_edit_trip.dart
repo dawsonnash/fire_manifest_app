@@ -602,12 +602,18 @@ class _EditTripState extends State<EditTrip> {
   }
 
   void _saveTrip() {
+    // Ensure each load has the correct weight before saving
     widget.trip.loads = loads.asMap().entries.map<Load>((entry) {
       int index = entry.key;
       List<dynamic> dynamicList = entry.value;
-      print('Index: $index, DynamicList: $dynamicList');
-      // Convert the dynamic list to a Load object
-      return dynamicListToLoad(dynamicList, index + 1);
+
+      // Calculate the correct total weight for the load
+      int totalWeight = calculateAvailableWeight(dynamicList);
+
+      // Convert the dynamic list to a Load object and set the weight
+      Load load = dynamicListToLoad(dynamicList, index + 1);
+      load.weight = totalWeight; // Assign the calculated weight
+      return load;
     }).toList();
 
     // Save the updated trip to Hive
@@ -624,13 +630,14 @@ class _EditTripState extends State<EditTrip> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
         backgroundColor: Colors.green,
       ),
     );
+
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => SingleTripView(trip: widget.trip),
+        builder: (context) => SavedTripsView(),
       ),
     );
   }

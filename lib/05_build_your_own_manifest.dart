@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:fire_app/06_saved_trips.dart';
 import 'package:fire_app/06_single_trip_view.dart';
 import 'package:fire_app/Data/crew.dart';
+import 'package:fire_app/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -546,6 +547,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
   }
 
   void _saveTrip() {
+
     widget.trip.loads = loads.asMap().entries.map<Load>((entry) {
       int index = entry.key;
       List loadItems = entry.value;
@@ -602,7 +604,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
     // Navigate to the SingleTripView
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => SingleTripView(trip: widget.trip),
+        builder: (context) => MyHomePage(),
       ),
     );
   }

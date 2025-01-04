@@ -107,7 +107,7 @@ class AddCrewmember extends StatefulWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            duration: Duration(seconds: 2),
+            duration: Duration(seconds: 1),
             backgroundColor: Colors.red,
           ),
         );
@@ -135,7 +135,7 @@ class AddCrewmember extends StatefulWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 1),
           backgroundColor: Colors.green,
         ),
       );

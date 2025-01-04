@@ -109,7 +109,7 @@ class _EditGearState extends State<EditGear>{
               fontWeight: FontWeight.bold,
             ),
           ),
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 1),
           backgroundColor: Colors.red,
         ),
       );
@@ -150,7 +150,7 @@ class _EditGearState extends State<EditGear>{
             fontWeight: FontWeight.bold,
           ),
         ),
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
         backgroundColor: Colors.green,
       ),
     );
