@@ -13,7 +13,7 @@ import '06_edit_trip.dart';
 import 'Data/load.dart';
 
 // Generates PDF
-Future<Uint8List> generateTripPDF(Trip trip, String manifestForm) async {
+Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {
   final pdf = pw.Document();
   late String imagePath;
   late pw.Widget Function(Load load, int pageIndex, int totalPages, List<dynamic> pageItems) fillFormFields;
@@ -26,7 +26,8 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm) async {
     pageFormat = PdfPageFormat.letter;
   } else if (manifestForm == 'of252') {
     imagePath = 'assets/images/helicopter_manifest_form.jpg';
-    fillFormFields = fillFormFieldsOF252;
+    fillFormFields = (load, pageIndex, totalPages, pageItems) =>
+        fillFormFieldsOF252(load, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer);
     pageFormat = PdfPageFormat.a4;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
@@ -91,22 +92,29 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm) async {
 }
 
 // Display preview
-void previewTripPDF(BuildContext context, Trip trip, String manifestForm) async {
+void previewTripPDF(BuildContext context, Trip trip, String manifestForm, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {
   Uint8List pdfBytes;
+  late PdfPageFormat pageFormat;
 
+  // Determine the correct format based on the manifest form
   if (manifestForm == 'pms245') {
-    pdfBytes = await generateTripPDF(trip, 'pms245');
+    pdfBytes = await generateTripPDF(trip, 'pms245', null, null, null, null);
+    pageFormat = PdfPageFormat.letter; // PMS245 requires Letter format
   } else if (manifestForm == 'of252') {
-    pdfBytes = await generateTripPDF(trip, 'of252');
+    pdfBytes = await generateTripPDF(trip, 'of252', helicopterNum, departure,destination, manifestPreparer);
+    pageFormat = PdfPageFormat.a4; // OF252 requires A4 format
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
   }
 
-  // Display the PDF
+  // Display the PDF with the appropriate page format
   await Printing.layoutPdf(
     onLayout: (PdfPageFormat format) async => pdfBytes,
+    usePrinterSettings: false, // Enforce the specified format
+    format: pageFormat,        // Dynamically set the format based on the manifest type
   );
 }
+
 
 class SingleTripView extends StatefulWidget {
 
@@ -195,11 +203,24 @@ class _SingleTripViewState extends State<SingleTripView>{
                             Navigator.of(context).pop();
 
                             if (selectedIndex == 0) {
-                              // Helicopter Manifest
-                              previewTripPDF(context, widget.trip, 'of252');
-                            } else {
+                              // Show additional input dialog for `of252`
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AdditionalInfoDialog(
+                                    onConfirm: (
+                                        String helicopterNum,
+                                        String departure,
+                                        String destination,
+                                        String manifestPreparer) {
+                                      previewTripPDF(context, widget.trip, 'of252', helicopterNum, departure, destination, manifestPreparer);
+                                    },
+                                  );
+                                },
+                              );
+                            }  else {
                               // Fixed-Wing manifest
-                              previewTripPDF(context, widget.trip, 'pms245');
+                              previewTripPDF(context, widget.trip, 'pms245', null, null, null, null);
                             }
                           },
                           child: const Text(
@@ -362,4 +383,133 @@ class _SingleTripViewState extends State<SingleTripView>{
       ),
     );
   }
+}
+class AdditionalInfoDialog extends StatefulWidget {
+  final Function(
+      String helicopterNum,
+      String departure,
+      String destination,
+      String manifestPreparer) onConfirm;
+
+  const AdditionalInfoDialog({required this.onConfirm, super.key});
+
+  @override
+  State<AdditionalInfoDialog> createState() => _AdditionalInfoDialogState();
+}
+
+class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
+  final TextEditingController _helicopterNumController = TextEditingController();
+  final TextEditingController _departureController = TextEditingController();
+  final TextEditingController _destinationController = TextEditingController();
+  final TextEditingController _manifestPreparerController = TextEditingController();
+
+  @override
+  void dispose() {
+    _helicopterNumController.dispose();
+    _departureController.dispose();
+    _destinationController.dispose();
+    _manifestPreparerController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24), // Adjust padding
+      title: const Text(
+        'Additional Information',
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+      ),
+      content: SingleChildScrollView( // Wrap content in a scrollable view
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextField(
+                controller: _helicopterNumController,
+                decoration: const InputDecoration(
+                  labelText: 'Enter helicopter tail #:',
+                ),
+                maxLines: 1, // Single-line input
+                textCapitalization: TextCapitalization.characters, // Automatically capitalize all characters
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(6), // Limit to 25 characters
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextField(
+                controller: _departureController,
+                decoration: const InputDecoration(
+                  labelText: 'Enter departure:',
+                ),
+                maxLines: 1, // Single-line input
+                textCapitalization: TextCapitalization.words, // Capitalize only the first character
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(16), // Limit to 25 characters
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextField(
+                controller: _destinationController,
+                textCapitalization: TextCapitalization.words, // Capitalize only the first character
+                decoration: const InputDecoration(
+                  labelText: 'Enter destination:',
+                ),
+                maxLines: 1, // Single-line input
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(16), // Limit to 25 characters
+                ],
+              ),
+            ),Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextField(
+                controller: _manifestPreparerController,
+                decoration: const InputDecoration(
+                  labelText: 'Enter manifest preparer:',
+                ),
+                maxLines: 1, // Single-line input
+                textCapitalization: TextCapitalization.words, // Capitalize only the first character
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(20), // Limit to 25 characters
+                ],
+              ),
+            ),
+
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            'Cancel',
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            final helicopterNum = _helicopterNumController.text.trim();
+            final departure = _departureController.text.trim();
+            final destination = _destinationController.text.trim();
+            final manifestPreparer = _manifestPreparerController.text.trim();
+            widget.onConfirm(helicopterNum, departure, destination, manifestPreparer); // Pass collected data to the callback
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            'Confirm',
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+      ],
+    );
+  }
+
 }

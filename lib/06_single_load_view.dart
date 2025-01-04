@@ -27,7 +27,7 @@ List<List<dynamic>> paginateItems(List<dynamic> items, int maxItems) {
 }
 
 // Generates PDF
-Future<Uint8List> generatePDF(Load load, String manifestForm) async {
+Future<Uint8List> generatePDF(Load load, String manifestForm, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {
   final pdf = pw.Document();
   late String imagePath;
   late pw.Widget Function(Load load, int pageIndex, int totalPages, List<dynamic> pageItems) fillFormFields;
@@ -40,7 +40,8 @@ Future<Uint8List> generatePDF(Load load, String manifestForm) async {
     pageFormat = PdfPageFormat.letter;
   } else if (manifestForm == 'of252') {
     imagePath = 'assets/images/helicopter_manifest_form.jpg';
-    fillFormFields = fillFormFieldsOF252;
+    fillFormFields = (load, pageIndex, totalPages, pageItems) =>
+        fillFormFieldsOF252(load, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer);
     pageFormat = PdfPageFormat.a4;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
@@ -99,20 +100,26 @@ Future<Uint8List> generatePDF(Load load, String manifestForm) async {
 }
 
 // Display preview
-void previewPDF(BuildContext context, Load load, String manifestForm) async {
+void previewPDF(BuildContext context, Load load, String manifestForm, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {
   Uint8List pdfBytes;
+  late PdfPageFormat pageFormat;
 
+  // Determine the correct format based on the manifest form
   if (manifestForm == 'pms245') {
-    pdfBytes = await generatePDF(load, 'pms245');
+    pdfBytes = await generatePDF(load, 'pms245', null, null, null, null);
+    pageFormat = PdfPageFormat.letter; // PMS245 requires Letter format
   } else if (manifestForm == 'of252') {
-    pdfBytes = await generatePDF(load, 'of252');
+    pdfBytes = await generatePDF(load, 'of252', helicopterNum, departure,destination, manifestPreparer);
+    pageFormat = PdfPageFormat.a4; // OF252 requires A4 format
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
   }
 
-  // Display the PDF
+  // Display the PDF with the appropriate page format
   await Printing.layoutPdf(
     onLayout: (PdfPageFormat format) async => pdfBytes,
+    usePrinterSettings: false, // Enforce the specified format
+    format: pageFormat,        // Dynamically set the format based on the manifest type
   );
 }
 
@@ -244,7 +251,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
   );
 }
 
-pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dynamic> pageItems) {
+pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dynamic> pageItems, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) {
   const double yOffset = 112; // Adjust this value to move everything vertically
   const double xOffset = 6; // Adjust this value to move everything horizontally
   const double itemSpacing = 27.4; // Adjust spacing between items
@@ -252,7 +259,7 @@ pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dyn
 
   DateTime today = DateTime.now();
   String formattedDate = DateFormat('MM/dd/yyyy').format(today);
-
+  String formattedTime = DateFormat('hh:mm a').format(today);
   return pw.Stack(
     children: [
       // Display names and quantities for Crew Members, Gear, and Custom Items
@@ -307,11 +314,21 @@ pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dyn
 
       // Current date
       pw.Positioned(
-        left: xOffset + 452,
-        top: 13,
+        left: xOffset + 459,
+        top: 15,
         child: pw.Text(
           formattedDate,
-          style: pw.TextStyle(fontSize: fontSizeOF252),
+          style: pw.TextStyle(fontSize: 14),
+        ),
+      ),
+
+      // Current time
+      pw.Positioned(
+        left: xOffset + 350,
+        top: 15,
+        child: pw.Text(
+          formattedTime,
+          style: pw.TextStyle(fontSize: 14),
         ),
       ),
 
@@ -325,6 +342,46 @@ pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dyn
             fontSize: 16,
             color: PdfColors.black, // Optional: use a lighter color for page numbers
           ),
+        ),
+      ),
+
+      // Helicopter Tail Number
+      pw.Positioned(
+        left: xOffset + 70,
+        top: 13,
+        child: pw.Text(
+          helicopterNum!,
+          style: pw.TextStyle(fontSize: 16),
+        ),
+      ),
+
+      // Departure
+      pw.Positioned(
+        left: xOffset + 56,
+        top: 55,
+        child: pw.Text(
+          departure!,
+          style: pw.TextStyle(fontSize: 16),
+        ),
+      ),
+
+      // Destintation
+      pw.Positioned(
+        left: xOffset + 336,
+        top: 55,
+        child: pw.Text(
+          destination!,
+          style: pw.TextStyle(fontSize: 16),
+        ),
+      ),
+
+      // Destintation
+      pw.Positioned(
+        left: xOffset + 135,
+        top: yOffset + 656,
+        child: pw.Text(
+          manifestPreparer!,
+          style: pw.TextStyle(fontSize: 16),
         ),
       ),
     ],
@@ -415,11 +472,24 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                             Navigator.of(context).pop();
 
                             if (selectedIndex == 0) {
-                              // Helicopter Manifest
-                              previewPDF(context, widget.load, 'of252');
+                              // Show additional input dialog for `of252`
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AdditionalInfoDialog(
+                                    onConfirm: (
+                                        String helicopterNum,
+                                        String departure,
+                                        String destination,
+                                        String manifestPreparer) {
+                                      previewPDF(context, widget.load, 'of252', helicopterNum, departure, destination, manifestPreparer);
+                                    },
+                                  );
+                                },
+                              );
                             } else {
                               // Fixed-Wing manifest
-                              previewPDF(context, widget.load, 'pms245');
+                              previewPDF(context, widget.load, 'pms245', null, null, null, null);
                             }
                           },
                           child: const Text(
@@ -645,4 +715,133 @@ class _SingleLoadViewState extends State<SingleLoadView> {
       ),
     );
   }
+}
+class AdditionalInfoDialog extends StatefulWidget {
+  final Function(
+      String helicopterNum,
+      String departure,
+      String destination,
+      String manifestPreparer) onConfirm;
+
+  const AdditionalInfoDialog({required this.onConfirm, super.key});
+
+  @override
+  State<AdditionalInfoDialog> createState() => _AdditionalInfoDialogState();
+}
+
+class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
+  final TextEditingController _helicopterNumController = TextEditingController();
+  final TextEditingController _departureController = TextEditingController();
+  final TextEditingController _destinationController = TextEditingController();
+  final TextEditingController _manifestPreparerController = TextEditingController();
+
+  @override
+  void dispose() {
+    _helicopterNumController.dispose();
+    _departureController.dispose();
+    _destinationController.dispose();
+    _manifestPreparerController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24), // Adjust padding
+      title: const Text(
+        'Additional Information',
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+      ),
+      content: SingleChildScrollView( // Wrap content in a scrollable view
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextField(
+                controller: _helicopterNumController,
+                decoration: const InputDecoration(
+                  labelText: 'Enter helicopter tail #:',
+                ),
+                maxLines: 1, // Single-line input
+                textCapitalization: TextCapitalization.characters, // Automatically capitalize all characters
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(6), // Limit to 25 characters
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextField(
+                controller: _departureController,
+                decoration: const InputDecoration(
+                  labelText: 'Enter departure:',
+                ),
+                maxLines: 1, // Single-line input
+                textCapitalization: TextCapitalization.words, // Capitalize only the first character
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(16), // Limit to 25 characters
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextField(
+                controller: _destinationController,
+                textCapitalization: TextCapitalization.words, // Capitalize only the first character
+                decoration: const InputDecoration(
+                  labelText: 'Enter destination:',
+                ),
+                maxLines: 1, // Single-line input
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(16), // Limit to 25 characters
+                ],
+              ),
+            ),Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextField(
+                controller: _manifestPreparerController,
+                decoration: const InputDecoration(
+                  labelText: 'Enter manifest preparer:',
+                ),
+                maxLines: 1, // Single-line input
+                textCapitalization: TextCapitalization.words, // Capitalize only the first character
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(20), // Limit to 25 characters
+                ],
+              ),
+            ),
+
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            'Cancel',
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            final helicopterNum = _helicopterNumController.text.trim();
+            final departure = _departureController.text.trim();
+            final destination = _destinationController.text.trim();
+            final manifestPreparer = _manifestPreparerController.text.trim();
+            widget.onConfirm(helicopterNum, departure, destination, manifestPreparer); // Pass collected data to the callback
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            'Confirm',
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+      ],
+    );
+  }
+
 }
