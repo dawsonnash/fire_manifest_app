@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../Data/gear.dart';
 import '../Data/crewmember.dart';
 import 'Data/crew.dart';
+import 'Data/customItem.dart';
 import 'Data/load.dart';
 import 'Data/trip.dart';
 
@@ -20,6 +21,8 @@ void main() async {
   Hive.registerAdapter(CrewMemberAdapter());
   Hive.registerAdapter(LoadAdapter());
   Hive.registerAdapter(TripAdapter());
+  Hive.registerAdapter(CustomItemAdapter());
+
 
   // Open a Hive boxes to store objects
   await Hive.openBox<Gear>('gearBox');
@@ -54,13 +57,13 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         // for theme based text-> style: Theme.of(context).textTheme.headlineMedium,
       ),
-      home: const MyHomePage(title: 'Fire Manifesting'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -70,8 +73,6 @@ class MyHomePage extends StatefulWidget {
   // case the title) provided by the parent (in this case the App widget) and
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
-
-  final String title;
 
 
 

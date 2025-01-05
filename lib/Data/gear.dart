@@ -11,6 +11,9 @@ class Gear extends HiveObject{
   @HiveField(2)
   int quantity;
 
+  @HiveField(3)
+  bool isPersonalTool;
+
   // bool hazmat;
 
   // Getter function to calculate totalGearWeight: weight * quantity
@@ -25,8 +28,14 @@ class Gear extends HiveObject{
       name: this.name,
       quantity: quantity ?? this.quantity,
       weight: this.weight,
+      isPersonalTool: this.isPersonalTool
     );
   }
 
-  Gear({required this.name, required this.weight, required this.quantity});
+  Gear({required this.name, required this.weight, required this.quantity, this.isPersonalTool = false});
 }
+List<Gear> sortGearListAlphabetically(List<Gear> gearList) {
+  gearList.sort((a, b) => a.name.compareTo(b.name));
+  return gearList;
+}
+

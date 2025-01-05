@@ -9,21 +9,26 @@ import '../Data/trip.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import '06_edit_trip.dart';
 import 'Data/load.dart';
 
 // Generates PDF
-Future<Uint8List> generateTripPDF(Trip trip, String manifestForm) async {
+Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {
   final pdf = pw.Document();
   late String imagePath;
-  late pw.Widget Function(Load load) fillFormFields;
+  late pw.Widget Function(Load load, int pageIndex, int totalPages, List<dynamic> pageItems) fillFormFields;
+  late PdfPageFormat pageFormat;
 
-  // Determine form and form-filling function based on manifestForm
+  // Determine the image path, form-filling logic, and page format based on the manifestForm
   if (manifestForm == 'pms245') {
     imagePath = 'assets/images/crew_manifest_form.png';
-    fillFormFields = fillFormFieldsPMS245;
+    fillFormFields = (load, pageIndex, totalPages, pageItems) => fillFormFieldsPMS245(load);
+    pageFormat = PdfPageFormat.letter;
   } else if (manifestForm == 'of252') {
     imagePath = 'assets/images/helicopter_manifest_form.jpg';
-    fillFormFields = fillFormFieldsOF252;
+    fillFormFields = (load, pageIndex, totalPages, pageItems) =>
+        fillFormFieldsOF252(load, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer);
+    pageFormat = PdfPageFormat.a4;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
   }
@@ -32,40 +37,25 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm) async {
   final imageBytes = await rootBundle.load(imagePath);
   final backgroundImage = pw.MemoryImage(imageBytes.buffer.asUint8List());
 
-  // Dynamically add pages based on manifestForm
-  if (manifestForm == 'pms245') {
-    for (var load in trip.loads) {
+  // Iterate through each load in the trip
+  for (var load in trip.loads) {
+    // Combine all items from the load
+    final allItems = [
+      ...load.loadPersonnel,
+      ...load.loadGear,
+      ...load.customItems,
+    ];
+
+    // Paginate items for `of252`, use a single page for `pms245`
+    final paginatedItems = manifestForm == 'of252'
+        ? paginateItems(allItems, maxItemsPerPage)
+        : [allItems];
+
+    // Generate pages based on pagination
+    for (int i = 0; i < paginatedItems.length; i++) {
       pdf.addPage(
         pw.Page(
-          pageFormat: PdfPageFormat.letter,
-          margin: pw.EdgeInsets.all(0),
-          build: (pw.Context context) {
-            return pw.Stack(
-              children: [
-                pw.Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  child: pw.Image(
-                    backgroundImage,
-                    fit: pw.BoxFit
-                        .cover, // Ensures image covers the entire page
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(32),
-                  child: fillFormFields(load), // PMS 245-specific logic
-                ),
-              ],
-            );
-          },
-        ),
-      );
-    }
-  } else if (manifestForm == 'of252') {
-    for (var load in trip.loads) {
-      pdf.addPage(
-        pw.Page(
-          pageFormat: PdfPageFormat.a4,
+          pageFormat: pageFormat, // Use the dynamically set page format
           margin: pw.EdgeInsets.all(0),
           build: (pw.Context context) {
             return pw.Stack(
@@ -79,8 +69,15 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm) async {
                   ),
                 ),
                 pw.Padding(
-                  padding: const pw.EdgeInsets.all(22),
-                  child: fillFormFields(load),
+                  padding: manifestForm == 'pms245'
+                      ? const pw.EdgeInsets.all(32)
+                      : const pw.EdgeInsets.all(22),
+                  child: fillFormFields(
+                    load,
+                    i + 1, // Current page index (1-based)
+                    paginatedItems.length, // Total pages for the current load
+                    paginatedItems[i], // Items for the current page
+                  ),
                 ),
               ],
             );
@@ -95,22 +92,29 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm) async {
 }
 
 // Display preview
-void previewTripPDF(BuildContext context, Trip trip, String manifestForm) async {
+void previewTripPDF(BuildContext context, Trip trip, String manifestForm, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {
   Uint8List pdfBytes;
+  late PdfPageFormat pageFormat;
 
+  // Determine the correct format based on the manifest form
   if (manifestForm == 'pms245') {
-    pdfBytes = await generateTripPDF(trip, 'pms245');
+    pdfBytes = await generateTripPDF(trip, 'pms245', null, null, null, null);
+    pageFormat = PdfPageFormat.letter; // PMS245 requires Letter format
   } else if (manifestForm == 'of252') {
-    pdfBytes = await generateTripPDF(trip, 'of252');
+    pdfBytes = await generateTripPDF(trip, 'of252', helicopterNum, departure,destination, manifestPreparer);
+    pageFormat = PdfPageFormat.a4; // OF252 requires A4 format
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
   }
 
-  // Display the PDF
+  // Display the PDF with the appropriate page format
   await Printing.layoutPdf(
     onLayout: (PdfPageFormat format) async => pdfBytes,
+    usePrinterSettings: false, // Enforce the specified format
+    format: pageFormat,        // Dynamically set the format based on the manifest type
   );
 }
+
 
 class SingleTripView extends StatefulWidget {
 
@@ -199,11 +203,24 @@ class _SingleTripViewState extends State<SingleTripView>{
                             Navigator.of(context).pop();
 
                             if (selectedIndex == 0) {
-                              // Helicopter Manifest
-                              previewTripPDF(context, widget.trip, 'of252');
-                            } else {
+                              // Show additional input dialog for `of252`
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AdditionalInfoDialog(
+                                    onConfirm: (
+                                        String helicopterNum,
+                                        String departure,
+                                        String destination,
+                                        String manifestPreparer) {
+                                      previewTripPDF(context, widget.trip, 'of252', helicopterNum, departure, destination, manifestPreparer);
+                                    },
+                                  );
+                                },
+                              );
+                            }  else {
                               // Fixed-Wing manifest
-                              previewTripPDF(context, widget.trip, 'pms245');
+                              previewTripPDF(context, widget.trip, 'pms245', null, null, null, null);
                             }
                           },
                           child: const Text(
@@ -235,72 +252,130 @@ class _SingleTripViewState extends State<SingleTripView>{
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListView.builder(
-              //hive: itemCount: tripList.length,
-              itemCount: widget.trip.loads.length,
-              itemBuilder: (context, index) {
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView.builder(
+                    //hive: itemCount: tripList.length,
+                    itemCount: widget.trip.loads.length,
+                    itemBuilder: (context, index) {
 
-                // hive: final trip = tripList[index];
-                final load = widget.trip.loads[index];
+                      // hive: final trip = tripList[index];
+                      final load = widget.trip.loads[index];
 
-                // Display trip data in a scrollable list
-                return Card(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      // Could change color here
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(9),
-                    ),
-                    child: ListTile(
-                      iconColor: Colors.black,
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Load ${load.loadNumber.toString()}',
-                                style: const TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold
-                                ),
-                              ),
-                              Text(
-                                'Weight: ${load.weight} lbs',
-                                style: const TextStyle(
-                                  fontSize:18,
-                                ),
-                              )
-                            ],
+                      // Display trip data in a scrollable list
+                      return Card(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            // Could change color here
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(9),
                           ),
-                          IconButton(
-                              icon: const Icon(
-                                  Icons.arrow_forward_ios,
-                                  //Icons.edit,
-                                  color: Colors.black,
-                                  size: 32
-                              ),
-                              onPressed: (){
-
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SingleLoadView(
-                                      load: load,
+                          child: ListTile(
+                            iconColor: Colors.black,
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Load ${load.loadNumber.toString()}',
+                                      style: const TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold
+                                      ),
                                     ),
-                                  ),
-                                );
-                              }
-                          )
+                                    Text(
+                                      'Weight: ${load.weight} lbs',
+                                      style: const TextStyle(
+                                        fontSize:18,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                IconButton(
+                                    icon: const Icon(
+                                        Icons.arrow_forward_ios,
+                                        //Icons.edit,
+                                        color: Colors.black,
+                                        size: 32
+                                    ),
+                                    onPressed: (){
+
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => SingleLoadView(
+                                            load: load,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                )
+                              ],
+                            ),
+                            leading: Icon(Icons.flight),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                              ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => EditTrip(trip: widget.trip,)),
+                      );
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.deepOrangeAccent,
+                        border: Border.all(color: Colors.black, width: 2),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 8,
+                            offset: Offset(0, 3),
+                          ),
                         ],
                       ),
-                      leading: Icon(Icons.flight),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      //alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Edit',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Icon(
+                                Icons.edit,
+                                color: Colors.black,
+                                size: 32
+                            ),
+
+                        ],
+                      ),
                     ),
                   ),
-                );
-              },
+                ),
+
+              ],
             ),
           ),
 
@@ -308,4 +383,133 @@ class _SingleTripViewState extends State<SingleTripView>{
       ),
     );
   }
+}
+class AdditionalInfoDialog extends StatefulWidget {
+  final Function(
+      String helicopterNum,
+      String departure,
+      String destination,
+      String manifestPreparer) onConfirm;
+
+  const AdditionalInfoDialog({required this.onConfirm, super.key});
+
+  @override
+  State<AdditionalInfoDialog> createState() => _AdditionalInfoDialogState();
+}
+
+class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
+  final TextEditingController _helicopterNumController = TextEditingController();
+  final TextEditingController _departureController = TextEditingController();
+  final TextEditingController _destinationController = TextEditingController();
+  final TextEditingController _manifestPreparerController = TextEditingController();
+
+  @override
+  void dispose() {
+    _helicopterNumController.dispose();
+    _departureController.dispose();
+    _destinationController.dispose();
+    _manifestPreparerController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24), // Adjust padding
+      title: const Text(
+        'Additional Information',
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+      ),
+      content: SingleChildScrollView( // Wrap content in a scrollable view
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextField(
+                controller: _helicopterNumController,
+                decoration: const InputDecoration(
+                  labelText: 'Enter helicopter tail #:',
+                ),
+                maxLines: 1, // Single-line input
+                textCapitalization: TextCapitalization.characters, // Automatically capitalize all characters
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(6), // Limit to 25 characters
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextField(
+                controller: _departureController,
+                decoration: const InputDecoration(
+                  labelText: 'Enter departure:',
+                ),
+                maxLines: 1, // Single-line input
+                textCapitalization: TextCapitalization.words, // Capitalize only the first character
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(16), // Limit to 25 characters
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextField(
+                controller: _destinationController,
+                textCapitalization: TextCapitalization.words, // Capitalize only the first character
+                decoration: const InputDecoration(
+                  labelText: 'Enter destination:',
+                ),
+                maxLines: 1, // Single-line input
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(16), // Limit to 25 characters
+                ],
+              ),
+            ),Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextField(
+                controller: _manifestPreparerController,
+                decoration: const InputDecoration(
+                  labelText: 'Enter manifest preparer:',
+                ),
+                maxLines: 1, // Single-line input
+                textCapitalization: TextCapitalization.words, // Capitalize only the first character
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(20), // Limit to 25 characters
+                ],
+              ),
+            ),
+
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            'Cancel',
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            final helicopterNum = _helicopterNumController.text.trim();
+            final departure = _departureController.text.trim();
+            final destination = _destinationController.text.trim();
+            final manifestPreparer = _manifestPreparerController.text.trim();
+            widget.onConfirm(helicopterNum, departure, destination, manifestPreparer); // Pass collected data to the callback
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            'Confirm',
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+      ],
+    );
+  }
+
 }

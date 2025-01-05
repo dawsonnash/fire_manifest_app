@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../Data/trip.dart';
@@ -139,6 +140,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: TextField(
                           controller: tripNameController,
+                          textCapitalization: TextCapitalization.words,
                           decoration: _inputDecoration(),
                           style: _textStyle(),
                         ),
@@ -149,14 +151,28 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
-                        child: TextField(
+                        child: CupertinoTextField(
                           controller: availableSeatsController,
                           keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.done,
+                          onSubmitted: (value) {
+                            FocusScope.of(context).unfocus();
+                          },
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                          decoration: _inputDecoration(),
-                          style: _textStyle(),
+                          decoration: BoxDecoration(
+                            color: CupertinoColors.white, // Set the background color to white
+                            border: Border.all(color: CupertinoColors.black, width: 2),
+                            borderRadius: BorderRadius.circular(4.0),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
+
                       Padding(
                         padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
                         child: _buildTextInputContainer('Choose Allowable', allowableController),
@@ -217,7 +233,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
 
   InputDecoration _inputDecoration() => InputDecoration(
     filled: true,
-    fillColor: Colors.white.withOpacity(0.9),
+    fillColor: Colors.white,
     enabledBorder: OutlineInputBorder(
       borderSide: const BorderSide(color: Colors.black, width: 2.0),
       borderRadius: BorderRadius.circular(4.0),

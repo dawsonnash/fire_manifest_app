@@ -60,7 +60,7 @@ class AddCrewmember extends StatefulWidget {
 
       if (toolName.isNotEmpty && toolWeight > 0) {
         setState(() {
-          addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1));
+          addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true));
           toolNameController.clear();
           toolWeightController.clear();
           setState(() {});
@@ -107,7 +107,7 @@ class AddCrewmember extends StatefulWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            duration: Duration(seconds: 2),
+            duration: Duration(seconds: 1),
             backgroundColor: Colors.red,
           ),
         );
@@ -135,7 +135,7 @@ class AddCrewmember extends StatefulWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 1),
           backgroundColor: Colors.green,
         ),
       );

@@ -33,6 +33,9 @@ class _CrewmembersViewState extends State<CrewmembersView> {
 
   @override
   Widget build(BuildContext context) {
+
+    List<CrewMember> sortedCrewMemberList = sortCrewListByPosition(crewmemberList);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -60,9 +63,9 @@ class _CrewmembersViewState extends State<CrewmembersView> {
               children: [
                 Expanded(
                   child: ListView.builder(
-                    itemCount: crewmemberList.length,
+                    itemCount: sortedCrewMemberList.length,
                     itemBuilder: (context, index) {
-                      final crewMember = crewmemberList[index];
+                      final crewMember = sortedCrewMemberList[index];
 
                       // Display crewmember data in a scrollable list
                       return Card(
@@ -77,32 +80,39 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                             title: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${crewMember.name}, ${crewMember.flightWeight} lbs',
-                                      style: const TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          ' ${crewMember.getPositionTitle(crewMember.position)} - ',
-                                          style: const TextStyle(
-                                            fontSize: 14,
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${crewMember.name}, ${crewMember.flightWeight} lbs',
+                                        style: const TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold),
+                                  
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            ' ${crewMember.getPositionTitle(crewMember.position)} - ',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                  
+                                            ),
+                                  
                                           ),
-                                        ),
-                                        Text(
-                                          (crewMember.personalTools ?? []).map((gearItem) => gearItem.name).join(', '),
-                                          style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                          Expanded(
+                                            child: Text(
+                                              (crewMember.personalTools ?? []).map((gearItem) => gearItem.name).join(', '),
+                                              style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 IconButton(
                                     icon: const Icon(Icons.edit,
@@ -132,44 +142,87 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                 // Delete all (app testing only)
                 Padding(
                   padding:
-                      const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.deepOrangeAccent,
-                      border: Border.all(color: Colors.black, width: 2),
-                      borderRadius: BorderRadius.circular(4),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          spreadRadius: 1,
-                          blurRadius: 8,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    //alignment: Alignment.center,
-                    child: Row(
-                      children: [
-                        Text(
-                          'Delete all',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                  const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      // if (savedTrips.savedTrips.isNotEmpty) {}
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text(
+                              'Confirm Deletion',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            content: const Text(
+                              'Are you sure you want to delete all crew members?',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pop(); // Close the dialog without deleting
+                                },
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                      color: Colors.grey),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  crew.deleteAllCrewMembers();
+                                  setState(() {
+                                  });
+                                  Navigator.of(context).pop(); // Close the dialog after deletion
+                                  Navigator.of(context).pop(); // Home screen
+                                },
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(
+                                      color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.deepOrangeAccent,
+                        border: Border.all(color: Colors.black, width: 2),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 8,
+                            offset: Offset(0, 3),
                           ),
-                        ),
-                        Spacer(),
-                        IconButton(
-                            icon: const Icon(Icons.delete,
-                                color: Colors.black, size: 32),
-                            onPressed: () {
-                              crew.deleteAllCrewMembers();
-                              setState(() {});
-                            })
-                      ],
+                        ],
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      //alignment: Alignment.center,
+                      child: Row(
+                        children: [
+                          Text(
+                            'Delete All Crew Members',
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Spacer(),
+                          Icon(Icons.delete, color: Colors.black, size: 32),
+                        ],
+                      ),
                     ),
                   ),
                 ),

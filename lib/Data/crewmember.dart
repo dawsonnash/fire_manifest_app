@@ -79,3 +79,18 @@ const Map<int, String> positionMap = {
   25: '6-man',
   26: 'Other',      // User defined
 };
+
+List<CrewMember> sortCrewListByPosition(List<CrewMember> crewList) {
+  // Sort the crewList
+  crewList.sort((a, b) {
+    // Compare positions directly
+    if (a.position != b.position) {
+      return a.position.compareTo(b.position);
+    }
+
+    // If positions are the same, sort alphabetically by name
+    return a.name.compareTo(b.name);
+  });
+
+  return crewList;
+}
