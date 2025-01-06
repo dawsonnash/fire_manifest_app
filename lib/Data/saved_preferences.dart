@@ -1,3 +1,6 @@
+import 'package:fire_app/Data/trip.dart';
+
+import 'crewmember.dart';
 import 'trip_preferences.dart';
 import 'gear_preferences.dart';
 import 'positional_preferences.dart';
@@ -63,19 +66,42 @@ class SavedPreferences {
     tripPreferences = tripPreferenceBox.values.toList(); // Load into memory
   }
 
-  // Debugging: Print all preferences
-  void printPreferences() {
-    for (var trip in tripPreferences) {
-      print('Trip Preference: ${trip.tripPreferenceName}');
+  void printTripPreferencesFromHive() {
+    var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+    var tripPreferenceList = tripPreferenceBox.values.toList();
+
+    for (var trip in tripPreferenceList) {
+      print('Trip Preference Name: ${trip.tripPreferenceName}');
+
+      // Print Positional Preferences
       for (var posPref in trip.positionalPreferences) {
         print('  Positional Preference: Priority ${posPref.priority}');
+        print('    Load Preference: ${loadPreferenceMap[posPref.loadPreference]}');
+        for (var member in posPref.crewMembersDynamic) {
+          if (member is CrewMember) {
+            print('    Individual Crew Member: ${member.name}');
+          } else if (member is List<CrewMember>) {
+            print('    Crew Member List:');
+            for (var crew in member) {
+              print('      - ${crew.name}');
+            }
+          }
+        }
       }
+
+      // Print Gear Preferences
       for (var gearPref in trip.gearPreferences) {
         print('  Gear Preference: Priority ${gearPref.priority}');
+        print('    Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}');
+        for (var gear in gearPref.gear) {
+          print('    Gear Item: ${gear.name} (Quantity: ${gear.quantity}, Weight: ${gear.weight})');
+        }
       }
     }
   }
+
 }
+
 
 // Global instance of SavedPreferences
 final SavedPreferences savedPreferences = SavedPreferences();
@@ -85,3 +111,4 @@ Map<int, String> loadPreferenceMap = {
   1: 'Last',
   2: 'Balanced',
 };
+

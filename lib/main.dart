@@ -36,6 +36,7 @@ void main() async {
   // Open a Hive boxes to store objects
   await Hive.openBox<Gear>('gearBox');
   await Hive.openBox<CrewMember>('crewmemberBox');
+  await Hive.openBox<CrewMemberList>('crewMemberListBox');
   await Hive.openBox<Load>('loadBox');
   await Hive.openBox<Trip>('tripBox');
   await Hive.openBox<TripPreference>('tripPreferenceBox');

@@ -26,6 +26,8 @@ class _TripPreferencesState extends State<TripPreferences>{
     // Open the Hive box and load the list of Gear items
     tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
     loadTripPreferenceList();
+   // savedPreferences.printTripPreferencesFromHive();
+
   }
 
   // Function to load all trip preferences upon screen opening

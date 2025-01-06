@@ -35,6 +35,18 @@ class CrewMember extends HiveObject{
 
   CrewMember({required this.name, required this.flightWeight, required this.position, this.personalTools});
 
+  // To compare CrewMember objects in TripPreferences
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is CrewMember &&
+              runtimeType == other.runtimeType &&
+              name == other.name &&
+              flightWeight == other.flightWeight;
+
+  @override
+  int get hashCode => name.hashCode ^ flightWeight.hashCode;
+
   String getPositionTitle(int positionCode) {
     return positionMap[positionCode] ?? 'Unknown Position';
   }
