@@ -35,10 +35,43 @@ class CrewMember extends HiveObject{
 
   CrewMember({required this.name, required this.flightWeight, required this.position, this.personalTools});
 
+  // To compare CrewMember objects in TripPreferences
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is CrewMember &&
+              runtimeType == other.runtimeType &&
+              name == other.name &&
+              flightWeight == other.flightWeight;
+
+  @override
+  int get hashCode => name.hashCode ^ flightWeight.hashCode;
+
   String getPositionTitle(int positionCode) {
     return positionMap[positionCode] ?? 'Unknown Position';
   }
 
+  // Convert object to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'flightWeight': flightWeight,
+      'position': position,
+      'personalTools': personalTools?.map((tool) => tool.toJson()).toList(),
+    };
+  }
+
+  // Create object from JSON
+  factory CrewMember.fromJson(Map<String, dynamic> json) {
+    return CrewMember(
+      name: json['name'] as String,
+      flightWeight: json['flightWeight'] as int,
+      position: json['position'] as int,
+      personalTools: (json['personalTools'] as List?)
+          ?.map((tool) => Gear.fromJson(tool as Map<String, dynamic>))
+          .toList(),
+    );
+  }
 
 }
 List<Gear> getAllGearItems() {

@@ -1,35 +1,38 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'customItem.dart';
+part of 'gear_preferences.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class CustomItemAdapter extends TypeAdapter<CustomItem> {
+class GearPreferenceAdapter extends TypeAdapter<GearPreference> {
   @override
-  final int typeId = 7;
+  final int typeId = 4;
 
   @override
-  CustomItem read(BinaryReader reader) {
+  GearPreference read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return CustomItem(
-      name: fields[0] as String,
-      weight: fields[1] as int,
+    return GearPreference(
+      priority: fields[0] as int,
+      loadPreference: fields[2] as int,
+      gear: (fields[1] as List).cast<Gear>(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, CustomItem obj) {
+  void write(BinaryWriter writer, GearPreference obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.name)
+      ..write(obj.priority)
       ..writeByte(1)
-      ..write(obj.weight);
+      ..write(obj.gear)
+      ..writeByte(2)
+      ..write(obj.loadPreference);
   }
 
   @override
@@ -38,7 +41,7 @@ class CustomItemAdapter extends TypeAdapter<CustomItem> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CustomItemAdapter &&
+      other is GearPreferenceAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

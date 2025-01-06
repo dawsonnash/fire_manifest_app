@@ -201,16 +201,16 @@ class _SavedTripsState extends State<SavedTripsView> {
                             horizontal: 20, vertical: 10),
                         //alignment: Alignment.center,
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Delete All Trips',
+                              'Delete All Trips ',
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                             ),
-                            Spacer(),
                             Icon(Icons.delete, color: Colors.black, size: 32),
                           ],
                         ),

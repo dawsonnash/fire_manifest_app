@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import '../Data/trip.dart';
 import 'Data/load_calculator.dart';
 import 'main.dart';
+import 'Data/trip_preferences.dart';
 
 class CreateNewManifest extends StatefulWidget {
   const CreateNewManifest({super.key});
@@ -187,7 +188,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                 Container(
                   width: double.infinity,
                   height: double.infinity,
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -204,7 +205,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                             borderRadius: BorderRadius.circular(4),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.5),
+                                color: Colors.black.withValues(alpha: 0.5),
                                 spreadRadius: 1,
                                 blurRadius: 8,
                                 offset: Offset(0, 3),
@@ -234,7 +235,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                               // hintText: 'Enter trip name',
                               // hintStyle: TextStyle(color: Colors.black),
                               filled: true,
-                              fillColor: Colors.white.withOpacity(0.9),
+                              fillColor: Colors.white.withValues(alpha: 0.9),
                               enabledBorder: OutlineInputBorder(
                                 borderSide: const BorderSide(
                                   color: Colors.black,
@@ -271,7 +272,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                             borderRadius: BorderRadius.circular(4),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.5),
+                                color: Colors.black.withValues(alpha: 0.5),
                                 spreadRadius: 1,
                                 blurRadius: 8,
                                 offset: Offset(0, 3),
@@ -298,7 +299,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             borderRadius: BorderRadius.circular(4.0),
                             border: Border.all(color: Colors.black, width: 2.0),
                           ),
@@ -347,7 +348,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                             borderRadius: BorderRadius.circular(4),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.5),
+                                color: Colors.black.withValues(alpha: 0.5),
                                 spreadRadius: 1,
                                 blurRadius: 8,
                                 offset: Offset(0, 3),
@@ -380,7 +381,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                             ],
                             decoration: InputDecoration(
                               filled: true,
-                              fillColor: Colors.white.withOpacity(0.9),
+                              fillColor: Colors.white.withValues(alpha: 0.9),
                               enabledBorder: OutlineInputBorder(
                                 borderSide: const BorderSide(
                                   color: Colors.black,
@@ -419,7 +420,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                             borderRadius: BorderRadius.circular(4),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.5),
+                                color: Colors.black.withValues(alpha: 0.5),
                                 spreadRadius: 1,
                                 blurRadius: 8,
                                 offset: Offset(0, 3),

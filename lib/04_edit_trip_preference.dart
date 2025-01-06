@@ -2,6 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/04_add_load_preference.dart';
+import 'Data/gear_preferences.dart';
+import 'Data/positional_preferences.dart';
+import 'Data/trip_preferences.dart';
 
 import 'Data/crew.dart';
 import 'Data/crewmember.dart';
@@ -54,6 +57,8 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                 setState(() {
                   widget.tripPreference.tripPreferenceName =
                       titleController.text;
+                  widget.tripPreference.save(); // Save changes to Hive
+
                 });
                 Navigator.of(context).pop(); // Dismiss dialog
                 //widget.onUpdate();
@@ -145,7 +150,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                       borderRadius: BorderRadius.circular(4),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withValues(alpha: 0.5),
                           spreadRadius: 1,
                           blurRadius: 8,
                           offset: Offset(0, 3),
@@ -212,6 +217,8 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                   setState(() {
                                     widget.tripPreference.positionalPreferences
                                         .removeAt(index);
+                                    widget.tripPreference.save(); // Save changes to Hive
+
                                   });
                                 },
                               ),
@@ -240,6 +247,8 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                 setState(() {
                                   widget.tripPreference.gearPreferences
                                       .removeAt(gearIndex);
+                                  widget.tripPreference.save(); // Save changes to Hive
+
                                 });
                               },
                             ),
@@ -268,6 +277,8 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                         setState(() {
                           widget.tripPreference.positionalPreferences
                               .add(result);
+                          widget.tripPreference.save(); // Save changes to Hive
+
                         });
                       }
                     },

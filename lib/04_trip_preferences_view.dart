@@ -4,6 +4,8 @@ import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '04_edit_trip_preference.dart';
+import 'Data/trip_preferences.dart';
+import 'package:hive/hive.dart';
 
 
 class TripPreferences extends StatefulWidget {
@@ -16,22 +18,24 @@ class _TripPreferencesState extends State<TripPreferences>{
 
   // late final Box<CrewMember> crewmemberBox;
   List<TripPreference> tripPreferenceList = [];
+  late final Box<TripPreference> tripPreferenceBox;
 
   @override
   void initState() {
     super.initState();
     // Open the Hive box and load the list of Gear items
-    // crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
+    tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
     loadTripPreferenceList();
+   // savedPreferences.printTripPreferencesFromHive();
+
   }
 
   // Function to load all trip preferences upon screen opening
   void loadTripPreferenceList() {
     setState(() {
-      tripPreferenceList = savedPreferences.tripPreferences.toList();
+      tripPreferenceList = tripPreferenceBox.values.toList();
     });
   }
-
   @override
   Widget build(BuildContext context) {
 
@@ -174,7 +178,7 @@ class _TripPreferencesState extends State<TripPreferences>{
                                                 // }
 
                                                 // Remove the crew member
-                                                savedPreferences.deleteTripPreference(tripPreference);
+                                                savedPreferences.removeTripPreference(tripPreference);
 
                                                 // Show deletion pop-up
                                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -182,7 +186,7 @@ class _TripPreferencesState extends State<TripPreferences>{
                                                     content: Text('Trip Preference Deleted!',
                                                       // Maybe change look
                                                       style: const TextStyle(
-                                                        color: Colors.white,
+                                                        color: Colors.black,
                                                         fontSize: 32,
                                                         fontWeight: FontWeight.bold,
                                                       ),

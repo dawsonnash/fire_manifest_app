@@ -5,6 +5,9 @@ import 'package:flutter/services.dart';
 import 'Data/crew.dart';
 import 'Data/gear.dart';
 import 'Data/saved_preferences.dart';
+import 'Data/gear_preferences.dart';
+import 'Data/positional_preferences.dart';
+import 'Data/trip_preferences.dart';
 import 'Data/crewmember.dart';
 import 'package:flutter/material.dart';
 
@@ -42,6 +45,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+
   }
 
   @override
@@ -513,7 +517,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     );
 
     // Add the new preference to the TripPreference object
-    newTripPreference.positionalPreferences.add(newPositionalPreference);
+    savedPreferences.addPositionalPreference(newTripPreference, newPositionalPreference);
 
     // Debugging `crewMembersDynamic`
     // widget.tripPreference.positionalPreferences.forEach((posPref) {
@@ -568,7 +572,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     // }
 
     // Add to TripPreference object
-    newTripPreference.gearPreferences.add(newGearPreference);
+    savedPreferences.addGearPreference(newTripPreference, newGearPreference);
 
     // Trigger the update callback
     widget.onUpdate();
@@ -653,7 +657,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                 child: Container(
                   width: double.infinity,
                   height: double.infinity,
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -670,7 +674,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 16),
                             decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.9),
+                              color: Colors.black.withValues(alpha: 0.9),
                               borderRadius: BorderRadius.circular(12.0),
                               border:
                                   Border.all(color: Colors.white, width: 2.0),
@@ -707,7 +711,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.9),
+                            color: Colors.black.withValues(alpha: 0.9),
                             borderRadius: BorderRadius.circular(12.0),
                             border: Border.all(color: Colors.white, width: 2.0),
                           ),
@@ -813,7 +817,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                 child: Container(
                   width: double.infinity,
                   height: double.infinity,
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -830,7 +834,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 16),
                             decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.9),
+                              color: Colors.black.withValues(alpha: 0.9),
                               borderRadius: BorderRadius.circular(12.0),
                               border:
                                   Border.all(color: Colors.white, width: 2.0),
@@ -861,7 +865,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.9),
+                            color: Colors.black.withValues(alpha: 0.9),
                             borderRadius: BorderRadius.circular(12.0),
                             border: Border.all(color: Colors.white, width: 2.0),
                           ),

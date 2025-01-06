@@ -5,6 +5,8 @@ import 'package:fire_app/04_add_load_preference.dart';
 
 import 'Data/crew.dart';
 import 'Data/crewmember.dart';
+import 'Data/positional_preferences.dart';
+import 'Data/trip_preferences.dart';
 
 class AddTripPreference extends StatefulWidget {
   final VoidCallback onUpdate; // Callback to update previous page
@@ -23,14 +25,14 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
   //List Gear
 
   @override
+  @override
   void initState() {
     super.initState();
-
     // Initialize the TripPreference object with a default name
-    // Should add an option that if they click the back arrow and its still 'Untitled' They will lose all data
     tripPreference = TripPreference(tripPreferenceName: 'Untitled');
-    // Add the new tripPreference to savedPreferences.tripPreferences
-    savedPreferences.tripPreferences.add(tripPreference);
+
+    // Add the new tripPreference to savedPreferences and save it to Hive
+    savedPreferences.addTripPreference(tripPreference);
   }
 
   // Function to edit title
@@ -60,6 +62,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
               onPressed: () {
                 setState(() {
                   tripPreference.tripPreferenceName = titleController.text;
+                  tripPreference.save(); // Save changes to Hive
                 });
                 Navigator.of(context).pop(); // Dismiss dialog
                 //widget.onUpdate();
@@ -146,7 +149,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                       borderRadius: BorderRadius.circular(4),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withValues(alpha: 0.5),
                           spreadRadius: 1,
                           blurRadius: 8,
                           offset: Offset(0, 3),
@@ -231,6 +234,8 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                                 setState(() {
                                   tripPreference.positionalPreferences
                                       .removeAt(index);
+                                  tripPreference.save(); // Save changes to Hive
+
                                 });
                               },
                             ),
@@ -261,6 +266,8 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                               setState(() {
                                 tripPreference.gearPreferences
                                     .removeAt(gearIndex);
+                                tripPreference.save(); // Save changes to Hive
+
                               });
                             },
                           ),

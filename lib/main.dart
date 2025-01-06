@@ -11,6 +11,11 @@ import 'Data/crew.dart';
 import 'Data/customItem.dart';
 import 'Data/load.dart';
 import 'Data/trip.dart';
+import 'Data/trip_preferences.dart';
+import 'Data/positional_preferences.dart';
+import 'Data/gear_preferences.dart';
+import 'Data/saved_preferences.dart';
+import 'Data/crewMemberList.dart';
 
 void main() async {
 
@@ -23,19 +28,26 @@ void main() async {
   // Register the Gear adapters
   Hive.registerAdapter(GearAdapter());
   Hive.registerAdapter(CrewMemberAdapter());
+  Hive.registerAdapter(CrewMemberListAdapter());
   Hive.registerAdapter(LoadAdapter());
   Hive.registerAdapter(TripAdapter());
   Hive.registerAdapter(CustomItemAdapter());
+  Hive.registerAdapter(TripPreferenceAdapter());
+  Hive.registerAdapter(PositionalPreferenceAdapter());
+  Hive.registerAdapter(GearPreferenceAdapter());
 
 
   // Open a Hive boxes to store objects
   await Hive.openBox<Gear>('gearBox');
   await Hive.openBox<CrewMember>('crewmemberBox');
+  await Hive.openBox<CrewMemberList>('crewMemberListBox');
   await Hive.openBox<Load>('loadBox');
   await Hive.openBox<Trip>('tripBox');
+  await Hive.openBox<TripPreference>('tripPreferenceBox');
 
   // Load data from Hive
   crew.loadCrewDataFromHive();
+  savedPreferences.loadPreferencesFromHive();
   // do we need to load trip data as well?how does that work
 
   // Test data for user testing

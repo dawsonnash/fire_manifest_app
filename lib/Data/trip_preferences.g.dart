@@ -1,35 +1,38 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'customItem.dart';
+part of 'trip_preferences.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class CustomItemAdapter extends TypeAdapter<CustomItem> {
+class TripPreferenceAdapter extends TypeAdapter<TripPreference> {
   @override
-  final int typeId = 7;
+  final int typeId = 6;
 
   @override
-  CustomItem read(BinaryReader reader) {
+  TripPreference read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return CustomItem(
-      name: fields[0] as String,
-      weight: fields[1] as int,
-    );
+    return TripPreference(
+      tripPreferenceName: fields[0] as String,
+    )
+      ..positionalPreferences = (fields[1] as List).cast<PositionalPreference>()
+      ..gearPreferences = (fields[2] as List).cast<GearPreference>();
   }
 
   @override
-  void write(BinaryWriter writer, CustomItem obj) {
+  void write(BinaryWriter writer, TripPreference obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.name)
+      ..write(obj.tripPreferenceName)
       ..writeByte(1)
-      ..write(obj.weight);
+      ..write(obj.positionalPreferences)
+      ..writeByte(2)
+      ..write(obj.gearPreferences);
   }
 
   @override
@@ -38,7 +41,7 @@ class CustomItemAdapter extends TypeAdapter<CustomItem> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CustomItemAdapter &&
+      other is TripPreferenceAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

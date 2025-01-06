@@ -1,35 +1,32 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'customItem.dart';
+part of 'crewMemberList.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class CustomItemAdapter extends TypeAdapter<CustomItem> {
+class CrewMemberListAdapter extends TypeAdapter<CrewMemberList> {
   @override
-  final int typeId = 7;
+  final int typeId = 8;
 
   @override
-  CustomItem read(BinaryReader reader) {
+  CrewMemberList read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return CustomItem(
-      name: fields[0] as String,
-      weight: fields[1] as int,
+    return CrewMemberList(
+      crewMembers: (fields[0] as List).cast<CrewMember>(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, CustomItem obj) {
+  void write(BinaryWriter writer, CrewMemberList obj) {
     writer
-      ..writeByte(2)
-      ..writeByte(0)
-      ..write(obj.name)
       ..writeByte(1)
-      ..write(obj.weight);
+      ..writeByte(0)
+      ..write(obj.crewMembers);
   }
 
   @override
@@ -38,7 +35,7 @@ class CustomItemAdapter extends TypeAdapter<CustomItem> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CustomItemAdapter &&
+      other is CrewMemberListAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
