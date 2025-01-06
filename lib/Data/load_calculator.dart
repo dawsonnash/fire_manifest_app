@@ -6,7 +6,7 @@ import 'load.dart';
 import 'crew.dart';
 import 'crewmember.dart';
 import 'gear.dart';
-import 'saved_preferences.dart';
+import 'trip_preferences.dart';
 
 // TripPreference based sorting algorithm
 void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference) {

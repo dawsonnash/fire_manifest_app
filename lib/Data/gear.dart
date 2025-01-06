@@ -33,7 +33,28 @@ class Gear extends HiveObject{
   }
 
   Gear({required this.name, required this.weight, required this.quantity, this.isPersonalTool = false});
+
+  // Convert Gear object to a JSON-like map
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'weight': weight,
+      'quantity': quantity,
+      'isPersonalTool': isPersonalTool,
+    };
+  }
+
+  // Create a Gear object from a JSON-like map
+  factory Gear.fromJson(Map<String, dynamic> json) {
+    return Gear(
+      name: json['name'] as String,
+      weight: json['weight'] as int,
+      quantity: json['quantity'] as int,
+      isPersonalTool: json['isPersonalTool'] as bool,
+    );
+  }
 }
+
 List<Gear> sortGearListAlphabetically(List<Gear> gearList) {
   gearList.sort((a, b) => a.name.compareTo(b.name));
   return gearList;

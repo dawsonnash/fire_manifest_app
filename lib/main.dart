@@ -9,6 +9,11 @@ import 'Data/crew.dart';
 import 'Data/customItem.dart';
 import 'Data/load.dart';
 import 'Data/trip.dart';
+import 'Data/trip_preferences.dart';
+import 'Data/positional_preferences.dart';
+import 'Data/gear_preferences.dart';
+import 'Data/saved_preferences.dart';
+
 
 void main() async {
 
@@ -22,6 +27,9 @@ void main() async {
   Hive.registerAdapter(LoadAdapter());
   Hive.registerAdapter(TripAdapter());
   Hive.registerAdapter(CustomItemAdapter());
+  Hive.registerAdapter(TripPreferenceAdapter());
+  Hive.registerAdapter(PositionalPreferenceAdapter());
+  Hive.registerAdapter(GearPreferenceAdapter());
 
 
   // Open a Hive boxes to store objects
@@ -29,9 +37,11 @@ void main() async {
   await Hive.openBox<CrewMember>('crewmemberBox');
   await Hive.openBox<Load>('loadBox');
   await Hive.openBox<Trip>('tripBox');
+  await Hive.openBox<TripPreference>('tripPreferenceBox');
 
   // Load data from Hive
   crew.loadCrewDataFromHive();
+  savedPreferences.loadPreferencesFromHive();
   // do we need to load trip data as well?how does that work
 
   // Test data for user testing
@@ -149,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Container(
                   width: double.infinity,
                   height: double.infinity,
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   child: Column(
 
                     mainAxisAlignment: MainAxisAlignment.end,

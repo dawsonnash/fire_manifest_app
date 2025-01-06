@@ -4,7 +4,7 @@ import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '04_edit_trip_preference.dart';
-
+import 'Data/trip_preferences.dart';
 
 class TripPreferences extends StatefulWidget {
   const TripPreferences({super.key});
@@ -174,7 +174,7 @@ class _TripPreferencesState extends State<TripPreferences>{
                                                 // }
 
                                                 // Remove the crew member
-                                                savedPreferences.deleteTripPreference(tripPreference);
+                                                savedPreferences.removeTripPreference(tripPreference);
 
                                                 // Show deletion pop-up
                                                 ScaffoldMessenger.of(context).showSnackBar(
