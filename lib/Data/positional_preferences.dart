@@ -15,9 +15,9 @@ class PositionalPreference extends HiveObject
   int loadPreference;										        // First, Last, Balanced => 0, 1, 2
 
   @HiveField(2)
-  List<dynamic> crewMembersDynamic = [];			  // Can hold either individual crew member(s), or entire groups of crew members (like saw teams)
+  List<dynamic> crewMembersDynamic;			  // Can hold either individual crew member(s), or entire groups of crew members (like saw teams)
 
-  PositionalPreference({required this.priority, required this.loadPreference, required this.crewMembersDynamic});
+  PositionalPreference({required this.priority, required this.loadPreference,  this.crewMembersDynamic = const []});
 
 
 }

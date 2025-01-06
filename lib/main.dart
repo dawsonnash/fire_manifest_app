@@ -13,7 +13,7 @@ import 'Data/trip_preferences.dart';
 import 'Data/positional_preferences.dart';
 import 'Data/gear_preferences.dart';
 import 'Data/saved_preferences.dart';
-
+import 'Data/crewMemberList.dart';
 
 void main() async {
 
@@ -24,6 +24,7 @@ void main() async {
   // Register the Gear adapters
   Hive.registerAdapter(GearAdapter());
   Hive.registerAdapter(CrewMemberAdapter());
+  Hive.registerAdapter(CrewMemberListAdapter());
   Hive.registerAdapter(LoadAdapter());
   Hive.registerAdapter(TripAdapter());
   Hive.registerAdapter(CustomItemAdapter());

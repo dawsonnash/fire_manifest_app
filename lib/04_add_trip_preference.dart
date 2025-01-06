@@ -62,6 +62,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
               onPressed: () {
                 setState(() {
                   tripPreference.tripPreferenceName = titleController.text;
+                  tripPreference.save(); // Save changes to Hive
                 });
                 Navigator.of(context).pop(); // Dismiss dialog
                 //widget.onUpdate();
@@ -233,6 +234,8 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                                 setState(() {
                                   tripPreference.positionalPreferences
                                       .removeAt(index);
+                                  tripPreference.save(); // Save changes to Hive
+
                                 });
                               },
                             ),
@@ -263,6 +266,8 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                               setState(() {
                                 tripPreference.gearPreferences
                                     .removeAt(gearIndex);
+                                tripPreference.save(); // Save changes to Hive
+
                               });
                             },
                           ),

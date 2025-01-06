@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
+
 part of 'positional_preferences.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
-
 class PositionalPreferenceAdapter extends TypeAdapter<PositionalPreference> {
   @override
   final int typeId = 5;
@@ -19,28 +19,13 @@ class PositionalPreferenceAdapter extends TypeAdapter<PositionalPreference> {
     // Deserialize the dynamic list
     final rawList = fields[2] as List;
     final crewMembersDynamic = rawList.map((item) {
-      if (item is Map && item['type'] == 'CrewMember') {
-        return CrewMember(
-          name: item['value']['name'],
-          flightWeight: item['value']['flightWeight'],
-          position: item['value']['position'],
-          personalTools: (item['value']['personalTools'] as List?)
-              ?.map((tool) => Gear.fromJson(tool))
-              .toList(),
-        );
-      } else if (item is Map && item['type'] == 'CrewMemberList') {
-        return (item['value'] as List)
-            .map((crewItem) => CrewMember(
-          name: crewItem['name'],
-          flightWeight: crewItem['flightWeight'],
-          position: crewItem['position'],
-          personalTools: (crewItem['personalTools'] as List?)
-              ?.map((tool) => Gear.fromJson(tool))
-              .toList(),
-        ))
-            .toList();
+      if (item is HiveList) {
+        return item.cast<CrewMember>();
+      } else if (item is CrewMember) {
+        return item;
+      } else {
+        return item; // Fallback for other types
       }
-      return item; // Fallback for other unhandled cases
     }).toList();
 
     return PositionalPreference(
@@ -52,6 +37,8 @@ class PositionalPreferenceAdapter extends TypeAdapter<PositionalPreference> {
 
   @override
   void write(BinaryWriter writer, PositionalPreference obj) {
+    final crewMemberBox = Hive.box<CrewMember>('crewmemberBox'); // Get the CrewMember box
+
     writer
       ..writeByte(3)
       ..writeByte(0)
@@ -62,34 +49,17 @@ class PositionalPreferenceAdapter extends TypeAdapter<PositionalPreference> {
 
     // Serialize the dynamic list
     final serializedList = obj.crewMembersDynamic.map((item) {
-      if (item is CrewMember) {
-        return {
-          'type': 'CrewMember',
-          'value': {
-            'name': item.name,
-            'flightWeight': item.flightWeight,
-            'position': item.position,
-            'personalTools': item.personalTools?.map((tool) => tool.toJson()).toList(),
-          },
-        };
-      } else if (item is List<CrewMember>) {
-        return {
-          'type': 'CrewMemberList',
-          'value': item.map((crewItem) {
-            return {
-              'name': crewItem.name,
-              'flightWeight': crewItem.flightWeight,
-              'position': crewItem.position,
-              'personalTools': crewItem.personalTools?.map((tool) => tool.toJson()).toList(),
-            };
-          }).toList(),
-        };
+      if (item is List<CrewMember>) {
+        return HiveList(crewMemberBox, objects: item); // Use the CrewMember box
+      } else if (item is CrewMember) {
+        return item; // Store individual CrewMembers
       }
-      return {'type': 'Other', 'value': item}; // Fallback for other types
+      return item; // Fallback for other types
     }).toList();
 
     writer.write(serializedList);
   }
+
 
   @override
   int get hashCode => typeId.hashCode;

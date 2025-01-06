@@ -17,7 +17,7 @@ class SavedPreferences {
   void removeTripPreference(TripPreference tripPreference) {
     var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
     final keyToRemove = tripPreferenceBox.keys.firstWhere(
-          (key) => tripPreferenceBox.get(key) == tripPreference,
+      (key) => tripPreferenceBox.get(key) == tripPreference,
       orElse: () => null,
     );
     if (keyToRemove != null) {
@@ -34,15 +34,13 @@ class SavedPreferences {
   }
 
   // Add a PositionalPreference to a specific TripPreference
-  void addPositionalPreference(
-      TripPreference tripPreference, PositionalPreference newPreference) {
+  void addPositionalPreference(TripPreference tripPreference, PositionalPreference newPreference) {
     tripPreference.positionalPreferences.add(newPreference); // Update in-memory
     _updateTripPreferenceInHive(tripPreference);
   }
 
   // Add a GearPreference to a specific TripPreference
-  void addGearPreference(
-      TripPreference tripPreference, GearPreference newPreference) {
+  void addGearPreference(TripPreference tripPreference, GearPreference newPreference) {
     tripPreference.gearPreferences.add(newPreference); // Update in-memory
     _updateTripPreferenceInHive(tripPreference);
   }
@@ -51,7 +49,7 @@ class SavedPreferences {
   void _updateTripPreferenceInHive(TripPreference tripPreference) {
     var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
     final keyToUpdate = tripPreferenceBox.keys.firstWhere(
-          (key) => tripPreferenceBox.get(key) == tripPreference,
+      (key) => tripPreferenceBox.get(key) == tripPreference,
       orElse: () => null,
     );
     if (keyToUpdate != null) {
@@ -82,12 +80,8 @@ class SavedPreferences {
 // Global instance of SavedPreferences
 final SavedPreferences savedPreferences = SavedPreferences();
 
-
 Map<int, String> loadPreferenceMap = {
   0: 'First',
   1: 'Last',
   2: 'Balanced',
 };
-
-
-

@@ -516,7 +516,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     );
 
     // Add the new preference to the TripPreference object
-    newTripPreference.positionalPreferences.add(newPositionalPreference);
+    savedPreferences.addPositionalPreference(newTripPreference, newPositionalPreference);
 
     // Debugging `crewMembersDynamic`
     // widget.tripPreference.positionalPreferences.forEach((posPref) {
@@ -571,7 +571,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     // }
 
     // Add to TripPreference object
-    newTripPreference.gearPreferences.add(newGearPreference);
+    savedPreferences.addGearPreference(newTripPreference, newGearPreference);
 
     // Trigger the update callback
     widget.onUpdate();

@@ -57,6 +57,8 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                 setState(() {
                   widget.tripPreference.tripPreferenceName =
                       titleController.text;
+                  widget.tripPreference.save(); // Save changes to Hive
+
                 });
                 Navigator.of(context).pop(); // Dismiss dialog
                 //widget.onUpdate();
@@ -215,6 +217,8 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                   setState(() {
                                     widget.tripPreference.positionalPreferences
                                         .removeAt(index);
+                                    widget.tripPreference.save(); // Save changes to Hive
+
                                   });
                                 },
                               ),
@@ -243,6 +247,8 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                 setState(() {
                                   widget.tripPreference.gearPreferences
                                       .removeAt(gearIndex);
+                                  widget.tripPreference.save(); // Save changes to Hive
+
                                 });
                               },
                             ),
@@ -271,6 +277,8 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                         setState(() {
                           widget.tripPreference.positionalPreferences
                               .add(result);
+                          widget.tripPreference.save(); // Save changes to Hive
+
                         });
                       }
                     },
