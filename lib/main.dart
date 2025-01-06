@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:fire_app/05_manifest.dart';
 import 'package:fire_app/06_saved_trips.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +16,8 @@ void main() async {
 
   // Set up for Hive that needs to run before starting app
   WidgetsFlutterBinding.ensureInitialized();
+  // Disable Impeller
+  PlatformDispatcher.instance.onPlatformConfigurationChanged = null;
   await Hive.initFlutter();
 
   // Register the Gear adapters
@@ -149,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Container(
                   width: double.infinity,
                   height: double.infinity,
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   child: Column(
 
                     mainAxisAlignment: MainAxisAlignment.end,
