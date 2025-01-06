@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:fire_app/05_manifest.dart';
 import 'package:fire_app/06_saved_trips.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,8 @@ void main() async {
 
   // Set up for Hive that needs to run before starting app
   WidgetsFlutterBinding.ensureInitialized();
+  // Disable Impeller
+  PlatformDispatcher.instance.onPlatformConfigurationChanged = null;
   await Hive.initFlutter();
 
   // Register the Gear adapters

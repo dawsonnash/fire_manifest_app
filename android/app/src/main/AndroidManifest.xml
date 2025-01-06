@@ -3,7 +3,6 @@
         android:label="Fire Manifesting"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-        <!-- Add this meta-data tag to disable Impeller -->
         <meta-data
             android:name="io.flutter.embedding.android.EnableImpeller"
             android:value="false" />
