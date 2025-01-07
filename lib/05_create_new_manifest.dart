@@ -81,16 +81,18 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text(
-          'Trip Saved!',
-          // Maybe change look
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
+        content: Center(
+          child: Text(
+            'Trip Saved!',
+            // Maybe change look
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-        duration: Duration(seconds: 1),
+        duration: Duration(seconds: 2),
         backgroundColor: Colors.green,
       ),
     );

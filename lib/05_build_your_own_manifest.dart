@@ -1,7 +1,4 @@
 import 'dart:ui';
-import 'package:fire_app/06_saved_trips.dart';
-import 'package:fire_app/06_single_trip_view.dart';
-import 'package:fire_app/Data/crew.dart';
 import 'package:fire_app/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -588,12 +585,14 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text(
-          'Trip Saved!',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
+        content: Center(
+          child: Text(
+            'Trip Saved!',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         duration: Duration(seconds: 2),

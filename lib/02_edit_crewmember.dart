@@ -110,9 +110,11 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Enter all/correct tool info',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.black),
+          content: Center(
+            child: Text(
+              'Enter all/correct tool info',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.black),
+            ),
           ),
           backgroundColor: Colors.red,
         ),
@@ -177,13 +179,15 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     if (crewMemberNameExists) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Crew member name already used!',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
+          content: Center(
+            child: Text(
+              'Crew member name already used!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           duration: Duration(seconds: 1),
@@ -228,13 +232,15 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text(
-          'Crew Member Updated!',
-          // Maybe change look
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
+        content: Center(
+          child: Text(
+            'Crew Member Updated!',
+            // Maybe change look
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         duration: Duration(seconds: 1),
@@ -593,13 +599,15 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                                 // Show deletion pop-up
                                                 ScaffoldMessenger.of(context).showSnackBar(
                                                   SnackBar(
-                                                    content: Text(
-                                                      '$oldCrewMemberName Deleted!',
-                                                      // Maybe change look
-                                                      style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 32,
-                                                        fontWeight: FontWeight.bold,
+                                                    content: Center(
+                                                      child: Text(
+                                                        '$oldCrewMemberName Deleted!',
+                                                        // Maybe change look
+                                                        style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 32,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
                                                       ),
                                                     ),
                                                     duration: Duration(seconds: 2),

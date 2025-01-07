@@ -142,7 +142,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                 // Delete all (app testing only)
                 Padding(
                   padding:
-                  const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                  const EdgeInsets.only(top: 16.0, bottom: 16.0, left: 16.0, right: 16.0),
                   child: GestureDetector(
                     onTap: () {
                       // if (savedTrips.savedTrips.isNotEmpty) {}

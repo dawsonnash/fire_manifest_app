@@ -106,13 +106,15 @@ class _EditGearState extends State<EditGear>{
     if (gearNameExists) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Gear name already used!',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
+          content: Center(
+            child: Text(
+              'Gear name already used!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           duration: Duration(seconds: 1),
@@ -148,12 +150,14 @@ class _EditGearState extends State<EditGear>{
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text(
-          'Gear Updated!',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
+        content: Center(
+          child: Text(
+            'Gear Updated!',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         duration: Duration(seconds: 1),
@@ -454,12 +458,14 @@ class _EditGearState extends State<EditGear>{
                                                 // Show deletion pop-up
                                                 ScaffoldMessenger.of(context).showSnackBar(
                                                    SnackBar(
-                                                    content: Text('$oldGearName Deleted!',
-                                                      // Maybe change look
-                                                      style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 32,
-                                                        fontWeight: FontWeight.bold,
+                                                    content: Center(
+                                                      child: Text('$oldGearName Deleted!',
+                                                        // Maybe change look
+                                                        style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 32,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
                                                       ),
                                                     ),
                                                     duration: Duration(seconds: 2),

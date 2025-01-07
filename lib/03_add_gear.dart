@@ -68,13 +68,15 @@ class _AddGearState extends State<AddGear>{
     if (gearNameExists) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Gear name already used!',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
+          content: Center(
+            child: Text(
+              'Gear name already used!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           duration: Duration(seconds: 2),
@@ -96,12 +98,14 @@ class _AddGearState extends State<AddGear>{
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Gear Saved!',
-          // Maybe change look
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
+        content: Center(
+          child: Text('Gear Saved!',
+            // Maybe change look
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         duration: Duration(seconds: 2),

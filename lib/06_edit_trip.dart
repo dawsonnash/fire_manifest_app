@@ -1,7 +1,5 @@
 import 'dart:ui';
 import 'package:fire_app/06_saved_trips.dart';
-import 'package:fire_app/06_single_trip_view.dart';
-import 'package:fire_app/Data/crew.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -10,7 +8,6 @@ import 'Data/crewmember.dart';
 import 'Data/trip.dart';
 import 'Data/load.dart';
 import 'Data/customItem.dart';
-import '05_build_your_own_manifest.dart';
 
 // Double integers when calculating quantity dont always work out. a 45 lb QB can become 44
 // Update: Maybe fixed?
@@ -622,12 +619,14 @@ class _EditTripState extends State<EditTrip> {
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text(
-          'Trip Saved!',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
+        content: Center(
+          child: Text(
+            'Trip Saved!',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         duration: Duration(seconds: 1),
@@ -1381,7 +1380,7 @@ class _EditTripState extends State<EditTrip> {
               ),
               Padding(
                 padding:
-                const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                const EdgeInsets.only(top: 16.0, bottom: 16.0, left: 16.0, right: 16.0),
                 child: GestureDetector(
                   onTap: () {
                     // if (savedTrips.savedTrips.isNotEmpty) {}

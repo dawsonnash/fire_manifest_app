@@ -3,6 +3,7 @@ import 'package:fire_app/Data/trip.dart';
 import 'package:fire_app/06_single_trip_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SavedTripsView extends StatefulWidget {
   const SavedTripsView({super.key});
@@ -120,7 +121,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                     })
                               ],
                             ),
-                            leading: Icon(Icons.flight),
+                            leading: Icon(FontAwesomeIcons.helicopter),
                           ),
                         ),
                       );
@@ -132,7 +133,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                // if (savedTrips.savedTrips.isNotEmpty)
                   Padding(
                     padding:
-                    const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                    const EdgeInsets.only(top: 16.0, bottom: 16.0, left: 16.0, right: 16.0),
                     child: GestureDetector(
                       onTap: () {
                         // if (savedTrips.savedTrips.isNotEmpty) {}

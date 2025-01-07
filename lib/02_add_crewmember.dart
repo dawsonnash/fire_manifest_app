@@ -72,8 +72,10 @@ class AddCrewmember extends StatefulWidget {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please enter all tool info',
-             style: TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),),
+            content: Center(
+              child: Text('Please enter all tool info',
+               style: TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),),
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -103,13 +105,15 @@ class AddCrewmember extends StatefulWidget {
       if (crewMemberNameExists) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-              'Crew member name already used!',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+            content: Center(
+              child: Text(
+                'Crew member name already used!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             duration: Duration(seconds: 1),
@@ -132,14 +136,16 @@ class AddCrewmember extends StatefulWidget {
       // Show successful save popup
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Crew Member Saved!',
-              // Maybe change look
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
+          content: Center(
+            child: Text('Crew Member Saved!',
+                // Maybe change look
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
+          ),
           duration: Duration(seconds: 1),
           backgroundColor: Colors.green,
         ),

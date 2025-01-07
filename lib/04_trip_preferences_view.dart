@@ -132,7 +132,7 @@ class _TripPreferencesState extends State<TripPreferences>{
                                 )
                               ],
                             ),
-                            leading: FaIcon(FontAwesomeIcons.helicopter),
+                            leading: FaIcon(FontAwesomeIcons.fire),
                             trailing: IconButton(
                               icon: Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
@@ -183,12 +183,14 @@ class _TripPreferencesState extends State<TripPreferences>{
                                                 // Show deletion pop-up
                                                 ScaffoldMessenger.of(context).showSnackBar(
                                                   SnackBar(
-                                                    content: Text('Trip Preference Deleted!',
-                                                      // Maybe change look
-                                                      style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 32,
-                                                        fontWeight: FontWeight.bold,
+                                                    content: Center(
+                                                      child: Text('Trip Preference Deleted!',
+                                                        // Maybe change look
+                                                        style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 32,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
                                                       ),
                                                     ),
                                                     duration: Duration(seconds: 2),

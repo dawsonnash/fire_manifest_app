@@ -5,7 +5,6 @@ import 'package:fire_app/04_add_load_preference.dart';
 import 'Data/gear_preferences.dart';
 import 'Data/positional_preferences.dart';
 import 'Data/trip_preferences.dart';
-
 import 'Data/crew.dart';
 import 'Data/crewmember.dart';
 
@@ -135,7 +134,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(0.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -186,6 +185,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                             margin: const EdgeInsets.symmetric(
                                 vertical: 8.0, horizontal: 16.0),
                             child: ListTile(
+                              leading: Icon(Icons.person, color: Colors.black),
                               title: Text(
                                 posPref.crewMembersDynamic.map((item) {
                                   if (item is CrewMember) {
@@ -235,6 +235,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                           margin: const EdgeInsets.symmetric(
                               vertical: 8.0, horizontal: 16.0),
                           child: ListTile(
+                            leading: Icon(Icons.work_outline_outlined, color: Colors.black),
                             title: Text(
                               gearPref.gear.map((item) => '${item.name} (x${item.quantity})').join(', '),
                               style: const TextStyle(fontWeight: FontWeight.bold),
