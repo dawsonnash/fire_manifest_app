@@ -64,6 +64,30 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
   void saveTripData() {
     // Take what the trip name contrller has saved
     final String tripName = tripNameController.text;
+
+    // Check if crew member name already exists
+    bool tripNameExists = savedTrips.savedTrips.any((member) => member.tripName == tripName);
+
+    if (tripNameExists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Center(
+            child: Text(
+              'Trip name already used!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          duration: Duration(seconds: 1),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return; // Exit function if the trip name is already used
+    }
     // Convert flight weight text to integer
     final int allowable = int.parse(allowableController.text);
     // Convert available seats text to integer
@@ -103,8 +127,8 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
 
     // Reset the slider value back to 0
     setState(() {
-      _currentSliderValue = 1000;
-      allowableController.text = _currentSliderValue.toStringAsFixed(0); // Sync the allowableController with the slider
+      _sliderValue = 1000;
+      allowableController.text = _sliderValue.toStringAsFixed(0); // Sync the allowableController with the slider
     });
 
     // // Debug for LogCat
@@ -115,19 +139,17 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
     // savedTrips.printTripDetails();
   }
 
-  double _currentSliderValue = 1000;
-
   void _incrementSlider() {
     setState(() {
-      _currentSliderValue = (_currentSliderValue + 5).clamp(1000, 5000); // Prevents from going past boundaries
-      allowableController.text = _currentSliderValue.toStringAsFixed(0);
+      _sliderValue = (_sliderValue + 5).clamp(1000, 5000); // Prevents from going past boundaries
+      allowableController.text = _sliderValue.toStringAsFixed(0);
     });
   }
 
   void _decrementSlider() {
     setState(() {
-      _currentSliderValue = (_currentSliderValue - 5).clamp(1000, 5000);
-      allowableController.text = _currentSliderValue.toStringAsFixed(0);
+      _sliderValue = (_sliderValue - 5).clamp(1000, 5000);
+      allowableController.text = _sliderValue.toStringAsFixed(0);
     });
   }
 

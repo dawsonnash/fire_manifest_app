@@ -195,68 +195,71 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              content: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    ...sawTeamOptions.map((option) {
-                      bool isSelected = selectedCrewMembers.any((item) =>
-                          item is Map && item['name'] == option['name']);
-                      return CheckboxListTile(
-                        title: Text(option['name']),
-                        value: isSelected,
-                        onChanged: (bool? isChecked) {
-                          setState(() {
-                            if (isChecked == true) {
-                              selectedCrewMembers.add(option);
-                              for (var member in option['members']) {
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8, // 80% of the screen width
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      ...sawTeamOptions.map((option) {
+                        bool isSelected = selectedCrewMembers.any((item) =>
+                            item is Map && item['name'] == option['name']);
+                        return CheckboxListTile(
+                          title: Text(option['name']),
+                          value: isSelected,
+                          onChanged: (bool? isChecked) {
+                            setState(() {
+                              if (isChecked == true) {
+                                selectedCrewMembers.add(option);
+                                for (var member in option['members']) {
+                                  selectedCrewMembers.remove(member);
+                                }
+                              } else {
+                                selectedCrewMembers.removeWhere((item) =>
+                                    item is Map &&
+                                    item['name'] == option['name']);
+                              }
+                              updateSelection();
+                            });
+                          },
+                        );
+                      }).toList(),
+                      if (sawTeamOptions.isNotEmpty &&
+                          individualOptions.isNotEmpty)
+                        const Divider(color: Colors.black, thickness: 1),
+                      ...individualOptions.map((option) {
+                        bool isSelected = option['isSelected'] ?? false;
+                        CrewMember member = option['members'].first;
+
+                        return CheckboxListTile(
+                          title: Text(
+                            member.name,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            member.getPositionTitle(member.position),
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                          value: isSelected,
+                          onChanged: (bool? isChecked) {
+                            setState(() {
+                              if (isChecked == true) {
+                                selectedCrewMembers.add(member);
+                              } else {
                                 selectedCrewMembers.remove(member);
                               }
-                            } else {
-                              selectedCrewMembers.removeWhere((item) =>
-                                  item is Map &&
-                                  item['name'] == option['name']);
-                            }
-                            updateSelection();
-                          });
-                        },
-                      );
-                    }).toList(),
-                    if (sawTeamOptions.isNotEmpty &&
-                        individualOptions.isNotEmpty)
-                      const Divider(color: Colors.black, thickness: 1),
-                    ...individualOptions.map((option) {
-                      bool isSelected = option['isSelected'] ?? false;
-                      CrewMember member = option['members'].first;
-
-                      return CheckboxListTile(
-                        title: Text(
-                          member.name,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        subtitle: Text(
-                          member.getPositionTitle(member.position),
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                        value: isSelected,
-                        onChanged: (bool? isChecked) {
-                          setState(() {
-                            if (isChecked == true) {
-                              selectedCrewMembers.add(member);
-                            } else {
-                              selectedCrewMembers.remove(member);
-                            }
-                            updateSelection();
-                          });
-                        },
-                      );
-                    }).toList(),
-                  ],
+                              updateSelection();
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ],
+                  ),
                 ),
               ),
               actions: [
@@ -337,126 +340,129 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                 textAlign: TextAlign.center,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              content: SingleChildScrollView(
-                child: Column(
-                  children: availableGear.map((gear) {
-                    // Calculate the correct remaining quantity for this gear item
-                    int remainingQuantity =
-                        gear.quantity - (totalQuantities[gear.name] ?? 0);
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8, // 80% of the screen width
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: availableGear.map((gear) {
+                      // Calculate the correct remaining quantity for this gear item
+                      int remainingQuantity =
+                          gear.quantity - (totalQuantities[gear.name] ?? 0);
 
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  gear.name,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                  ),
-                                  overflow: TextOverflow
-                                      .ellipsis, // Use ellipsis if text is too long
-                                ),
-                              ),
-                              Text(
-                                ' (x$remainingQuantity)  ',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (tempSelectedGear.contains(gear))
-                          if (remainingQuantity > 1)
-                            GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text(
-                                          'Select Quantity for ${gear.name}'),
-                                      content: Container(
-                                        height: 150,
-                                        child: CupertinoPicker(
-                                          scrollController:
-                                              FixedExtentScrollController(
-                                                  initialItem:
-                                                      (selectedGearQuantities[
-                                                                  gear] ??
-                                                              1) -
-                                                          1),
-                                          itemExtent: 32.0,
-                                          // Height of each item
-                                          onSelectedItemChanged: (int value) {
-                                            setState(() {
-                                              selectedGearQuantities[gear] =
-                                                  value + 1;
-                                            });
-                                          },
-                                          children: List<Widget>.generate(
-                                              remainingQuantity, (int index) {
-                                            return Center(
-                                              child: Text(
-                                                '${index + 1}',
-                                                style: TextStyle(fontSize: 20),
-                                              ),
-                                            );
-                                          }),
-                                        ),
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('Close'),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                              child: Row(
-                                children: [
-                                  Text(
-                                    'Qty: ${selectedGearQuantities[gear] ?? 1}',
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    gear.name,
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: Colors.black,
                                     ),
+                                    overflow: TextOverflow
+                                        .ellipsis, // Use ellipsis if text is too long
                                   ),
-                                  Icon(
-                                    Icons.arrow_drop_down,
-                                    color: Colors.black,
+                                ),
+                                Text(
+                                  ' (x$remainingQuantity)  ',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                        Checkbox(
-                          value: tempSelectedGear.contains(gear),
-                          onChanged: (bool? isChecked) {
-                            setState(() {
-                              if (isChecked == true) {
-                                tempSelectedGear.add(gear);
-                                selectedGearQuantities[gear] = 1;
-                              } else {
-                                tempSelectedGear.remove(gear);
-                                selectedGearQuantities.remove(gear);
-                              }
-                            });
-                          },
-                        ),
-                      ],
-                    );
-                  }).toList(),
+                          ),
+                          if (tempSelectedGear.contains(gear))
+                            if (remainingQuantity > 1)
+                              GestureDetector(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text(
+                                            'Select Quantity for ${gear.name}'),
+                                        content: Container(
+                                          height: 150,
+                                          child: CupertinoPicker(
+                                            scrollController:
+                                                FixedExtentScrollController(
+                                                    initialItem:
+                                                        (selectedGearQuantities[
+                                                                    gear] ??
+                                                                1) -
+                                                            1),
+                                            itemExtent: 32.0,
+                                            // Height of each item
+                                            onSelectedItemChanged: (int value) {
+                                              setState(() {
+                                                selectedGearQuantities[gear] =
+                                                    value + 1;
+                                              });
+                                            },
+                                            children: List<Widget>.generate(
+                                                remainingQuantity, (int index) {
+                                              return Center(
+                                                child: Text(
+                                                  '${index + 1}',
+                                                  style: TextStyle(fontSize: 20),
+                                                ),
+                                              );
+                                            }),
+                                          ),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text('Close'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'Qty: ${selectedGearQuantities[gear] ?? 1}',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.arrow_drop_down,
+                                      color: Colors.black,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          Checkbox(
+                            value: tempSelectedGear.contains(gear),
+                            onChanged: (bool? isChecked) {
+                              setState(() {
+                                if (isChecked == true) {
+                                  tempSelectedGear.add(gear);
+                                  selectedGearQuantities[gear] = 1;
+                                } else {
+                                  tempSelectedGear.remove(gear);
+                                  selectedGearQuantities.remove(gear);
+                                }
+                              });
+                            },
+                          ),
+                        ],
+                      );
+                    }).toList(),
+                  ),
                 ),
               ),
               actions: [
