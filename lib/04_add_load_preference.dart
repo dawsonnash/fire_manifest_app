@@ -69,12 +69,16 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     // Populate saw team options
     for (int i = 1; i <= 6; i++) {
       List<CrewMember> sawTeam = crew.getSawTeam(i);
+
+      // Only add the Saw Team if NONE of its members are in usedCrewMembers or selectedCrewMembers
       if (sawTeam.isNotEmpty &&
-          !sawTeam.every(usedCrewMembers.contains) &&
-          !sawTeam.every((member) => selectedCrewMembers.contains(member))) {
+          sawTeam.every((member) =>
+          !usedCrewMembers.contains(member) &&
+              !selectedCrewMembers.contains(member))) {
         sawTeamOptions.add({'name': 'Saw Team $i', 'members': sawTeam});
       }
     }
+
 
     // Populate individual crew member options, so they remain visible and checked if selected
     for (var member in crew.crewMembers) {
@@ -146,12 +150,13 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
               // Repopulate Saw Team options
               for (int i = 1; i <= 6; i++) {
                 List<CrewMember> sawTeam = crew.getSawTeam(i);
+
+                // Add Saw Team only if all its members are not in usedCrewMembers or selectedCrewMembers
                 if (sawTeam.isNotEmpty &&
-                    !sawTeam.every(usedCrewMembers.contains) &&
-                    !sawTeam.every(
-                        (member) => selectedCrewMembers.contains(member))) {
-                  sawTeamOptions
-                      .add({'name': 'Saw Team $i', 'members': sawTeam});
+                    sawTeam.every((member) =>
+                    !usedCrewMembers.contains(member) &&
+                        !selectedCrewMembers.contains(member))) {
+                  sawTeamOptions.add({'name': 'Saw Team $i', 'members': sawTeam});
                 }
               }
 

@@ -49,7 +49,9 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
   void _checkInput() {
     final isTripNameValid = tripNameController.text.isNotEmpty;
     final isAllowableValid = allowableController.text.isNotEmpty && allowableController.text != '0';
-    final isAvailableSeatsValid = availableSeatsController.text.isNotEmpty && availableSeatsController.text != '0';
+    final isAvailableSeatsValid = availableSeatsController.text.isNotEmpty &&
+        int.tryParse(availableSeatsController.text) != null &&
+        int.parse(availableSeatsController.text) > 0;
 
     setState(() {
       // Need to adjust for position as well
