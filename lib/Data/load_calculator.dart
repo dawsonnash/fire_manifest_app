@@ -137,12 +137,19 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
 
         case 2: // Balanced load preference - places cyclically first through last
           int loadIndex = 0;
+
+          // Calculate the maximum available seats on any load
+          // Edge case for user inputted 1 available seat
+          int maxAvailableSeats = loads
+              .map((load) => availableSeats - load.loadPersonnel.length)
+              .reduce((a, b) => a > b ? a : b);
+
           for (var crewMembersDynamic in posPref.crewMembersDynamic) {
             if (crewMembersDynamic is CrewMember) {
               while (loadIndex < loads.length) {
                 var load = loads[loadIndex];
                 if (load.weight + crewMembersDynamic.totalCrewMemberWeight <=
-                        maxLoadWeight &&
+                    maxLoadWeight &&
                     load.loadPersonnel.length < availableSeats) {
                   load.loadPersonnel.add(crewMembersDynamic);
                   load.loadGear.addAll(
@@ -155,26 +162,46 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
                 loadIndex = (loadIndex + 1) % loads.length;
               }
             } else if (crewMembersDynamic is List<CrewMember>) {
-              int totalGroupWeight = crewMembersDynamic.fold(
-                  0, (sum, member) => sum + member.totalCrewMemberWeight);
-              while (loadIndex < loads.length) {
-                var load = loads[loadIndex];
-                if (load.weight + totalGroupWeight <= maxLoadWeight &&
-                    load.loadPersonnel.length + crewMembersDynamic.length <=
-                        availableSeats) {
-                  load.loadPersonnel.addAll(crewMembersDynamic);
-                  crewMembersDynamic.forEach((member) {
-                    load.loadGear
-                        .addAll(member.personalTools as Iterable<Gear>);
-                  });
-                  load.weight += totalGroupWeight;
-                  crewMembersCopy.removeWhere(
-                      (member) => crewMembersDynamic.contains(member));
-                  loadIndex = (loadIndex + 1) %
-                      loads.length; // Loop through loads cyclically
-                  break;
+              // If the group size exceeds max available seats, treat members individually
+              if (crewMembersDynamic.length > maxAvailableSeats) {
+                for (var member in crewMembersDynamic) {
+                  while (loadIndex < loads.length) {
+                    var load = loads[loadIndex];
+                    if (load.weight + member.totalCrewMemberWeight <= maxLoadWeight &&
+                        load.loadPersonnel.length < availableSeats) {
+                      load.loadPersonnel.add(member);
+                      load.loadGear.addAll(member.personalTools as Iterable<Gear>);
+                      load.weight += member.totalCrewMemberWeight;
+                      crewMembersCopy.remove(member);
+                      loadIndex = (loadIndex + 1) % loads.length;
+                      break;
+                    }
+                    loadIndex = (loadIndex + 1) % loads.length;
+                  }
                 }
-                loadIndex = (loadIndex + 1) % loads.length;
+              } else {
+                // Treat as a group if it fits within the constraints
+                int totalGroupWeight = crewMembersDynamic.fold(
+                    0, (sum, member) => sum + member.totalCrewMemberWeight);
+                while (loadIndex < loads.length) {
+                  var load = loads[loadIndex];
+                  if (load.weight + totalGroupWeight <= maxLoadWeight &&
+                      load.loadPersonnel.length + crewMembersDynamic.length <=
+                          availableSeats) {
+                    load.loadPersonnel.addAll(crewMembersDynamic);
+                    crewMembersDynamic.forEach((member) {
+                      load.loadGear
+                          .addAll(member.personalTools as Iterable<Gear>);
+                    });
+                    load.weight += totalGroupWeight;
+                    crewMembersCopy.removeWhere(
+                            (member) => crewMembersDynamic.contains(member));
+                    loadIndex = (loadIndex + 1) %
+                        loads.length; // Loop through loads cyclically
+                    break;
+                  }
+                  loadIndex = (loadIndex + 1) % loads.length;
+                }
               }
             }
           }
