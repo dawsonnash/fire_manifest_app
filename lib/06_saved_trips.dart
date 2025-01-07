@@ -190,7 +190,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.5),
+                              color: Colors.black.withValues(alpha: 0.5),
                               spreadRadius: 1,
                               blurRadius: 8,
                               offset: Offset(0, 3),

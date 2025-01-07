@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../main.dart';
 import 'trip.dart';
 import 'dart:math';
 import 'load.dart';
@@ -9,7 +10,7 @@ import 'gear.dart';
 import 'trip_preferences.dart';
 
 // TripPreference based sorting algorithm
-void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference) {
+Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference) async {
   int availableSeats = trip.availableSeats;
   int maxLoadWeight = trip.allowable;
 
@@ -309,7 +310,11 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
   // Filling in the remainder of crew members and gear
   int loadIndex = 0; // To track current load index
 
-  while (crewMembersCopy.isNotEmpty || gearCopy.isNotEmpty) {
+  bool noMoreCrewCanBeAdded = false;
+  bool noMoreGearCanBeAdded = false;
+
+  while ((crewMembersCopy.isNotEmpty && !noMoreCrewCanBeAdded) ||
+      (gearCopy.isNotEmpty && !noMoreGearCanBeAdded)) {
     Load currentLoad = loads[loadIndex];
     num currentLoadWeight = currentLoad.weight;
 
@@ -327,6 +332,11 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
           .addAll(firstCrewMember.personalTools as Iterable<Gear>);
       crewMembersCopy.removeAt(0);
       itemAdded = true;
+    } else if (crewMembersCopy.isNotEmpty &&
+        loads.every((load) =>
+        load.weight + crewMembersCopy.first.totalCrewMemberWeight > maxLoadWeight ||
+            load.loadPersonnel.length >= availableSeats)) {
+      noMoreCrewCanBeAdded = true; // No more crew can be added to any load
     }
 
     // Add gear if space allows
@@ -337,6 +347,10 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
       currentLoad.loadGear.add(gearCopy.first);
       gearCopy.removeAt(0);
       itemAdded = true;
+    } else if (gearCopy.isNotEmpty &&
+        loads.every((load) =>
+        load.weight + gearCopy.first.weight > maxLoadWeight)) {
+      noMoreGearCanBeAdded = true; // No more gear can be added to any load
     }
 
     // Update load weight
@@ -344,11 +358,6 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
 
     // Move to the next load in a cyclic manner
     loadIndex = (loadIndex + 1) % loads.length;
-
-    // Break the loop if no items are left to add
-    if (!itemAdded && crewMembersCopy.isEmpty && gearCopy.isEmpty) {
-      break;
-    }
   }
 
   // Ensure all identical gear items are combined within each load, i,e, removes identical items and increases quantity
@@ -370,30 +379,81 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
     load.loadGear = consolidatedGear;
   }
 
+  loads.removeWhere((load) => load.weight == 0); // Remove loads with zero weight
+  // Re-consolidate load numbers
+  for (int i = 0; i < loads.length; i++) {
+    loads[i].loadNumber = i + 1; // Reassign sequential load numbers starting from 1
+  }
+
   // Ensure the trip object reflects the updated loads
   for (var load in loads) {
     trip.addLoad(trip, load);
   }
 
-
+// Error dialogue for user notification
   if (crewMembersCopy.isNotEmpty || gearCopy.isNotEmpty) {
     String errorMessage =
-        "Error: Not all crew members or gear items were allocated to a load.";
-    String remainingCrew = crewMembersCopy.isNotEmpty
-        ? "Remaining crew members: ${crewMembersCopy.map((member) => member.name).join(', ')}"
-        : "";
-    String remainingGear = gearCopy.isNotEmpty
-        ? "Remaining gear items: ${gearCopy.map((item) => item.name).join(', ')}"
-        : "";
+        "Not all crew members or gear items were allocated to a load due to weight constraints. Try again or pick a higher allowable.";
 
     // Show error dialog
-    showDialog(
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title:
-              Text("Algorithm Error: Not all crew members or gear allocated"),
-          content: Text("$errorMessage\n\n$remainingCrew\n$remainingGear"),
+          title: Text(
+            "Load Calculation Error",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("$errorMessage\n"),
+              if (crewMembersCopy.isNotEmpty)
+                RichText(
+                  text: TextSpan(
+                    text: "Remaining crew members:\n",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 16,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: crewMembersCopy
+                            .map((member) => member.name)
+                            .join(', '),
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (gearCopy.isNotEmpty) const SizedBox(height: 8), // Add spacing
+              if (gearCopy.isNotEmpty)
+                RichText(
+                  text: TextSpan(
+                    text: "Remaining gear items:\n",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 16,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: gearCopy.map((item) => item.name).join(', '),
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
           actions: [
             TextButton(
               onPressed: () {
@@ -405,9 +465,14 @@ void loadCalculator(BuildContext context, Trip trip, TripPreference? tripPrefere
         );
       },
     );
-  } else {
-    print("Success! All crew members and gear allocated to loads.");
+
   }
+  Navigator.of(context).pushAndRemoveUntil(
+    MaterialPageRoute(
+      builder: (context) => MyHomePage(),
+    ),
+        (Route<dynamic> route) => false, // This clears all the previous routes
+  );
 }
 
 void shuffleCrewMembers(List<dynamic> crewMembersCopy) {

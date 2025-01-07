@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../Data/trip.dart';
 import 'Data/load_calculator.dart';
-import 'main.dart';
 import 'Data/trip_preferences.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CreateNewManifest extends StatefulWidget {
   const CreateNewManifest({super.key});
@@ -19,12 +19,13 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
   final TextEditingController tripNameController = TextEditingController();
   final TextEditingController allowableController = TextEditingController();
   final TextEditingController availableSeatsController = TextEditingController();
+  final TextEditingController keyboardController = TextEditingController();
+  double _sliderValue = 1000;
 
   // Can be null as a "None" option is available where user doesn't select a Load Preference
   TripPreference? selectedTripPreference;
 
-  bool isCalculateButtonEnabled =
-      false; // Controls whether saving button is showing
+  bool isCalculateButtonEnabled = false; // Controls whether saving button is showing
 
   @override
   void initState() {
@@ -34,34 +35,33 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
     tripNameController.addListener(_checkInput);
     allowableController.addListener(_checkInput);
     availableSeatsController.addListener(_checkInput);
-
   }
+
+  // Track the last input source
+  bool lastInputFromSlider = true;
 
   @override
   void dispose() {
     tripNameController.dispose();
     allowableController.dispose();
     availableSeatsController.dispose();
+    keyboardController.dispose();
     super.dispose();
   }
 
   // Function to check if input is valid and update button state
   void _checkInput() {
     final isTripNameValid = tripNameController.text.isNotEmpty;
-    final isAllowableValid = allowableController.text.isNotEmpty && allowableController.text != '0';
-    final isAvailableSeatsValid = availableSeatsController.text.isNotEmpty &&
-        int.tryParse(availableSeatsController.text) != null &&
-        int.parse(availableSeatsController.text) > 0;
+    final isAvailableSeatsValid = availableSeatsController.text.isNotEmpty && int.tryParse(availableSeatsController.text) != null && int.parse(availableSeatsController.text) > 0;
 
     setState(() {
       // Need to adjust for position as well
-      isCalculateButtonEnabled = isTripNameValid && isAllowableValid && isAvailableSeatsValid;
+      isCalculateButtonEnabled = isTripNameValid && isAvailableSeatsValid;
     });
   }
 
   // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
   void saveTripData() {
-
     // Take what the trip name contrller has saved
     final String tripName = tripNameController.text;
     // Convert flight weight text to integer
@@ -70,8 +70,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
     final int availableSeats = int.parse(availableSeatsController.text);
 
     // Creating a new Trip object
-    Trip newTrip =
-        Trip(tripName: tripName, allowable: allowable, availableSeats: availableSeats);
+    Trip newTrip = Trip(tripName: tripName, allowable: allowable, availableSeats: availableSeats);
 
     // Add the new trip to the global crew object
     savedTrips.addTrip(newTrip);
@@ -102,17 +101,9 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
 
     // Reset the slider value back to 0
     setState(() {
-      _currentSliderValue = 0;
+      _currentSliderValue = 1000;
       allowableController.text = _currentSliderValue.toStringAsFixed(0); // Sync the allowableController with the slider
     });
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => MyHomePage(),
-      ),
-          (Route<dynamic> route) => false, // This clears all the previous routes
-    );
-
-
 
     // // Debug for LogCat
     // print("--------------------------");
@@ -120,23 +111,20 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
     // print("Allowable: $allowable");
     // print("--------------------------");
     // savedTrips.printTripDetails();
-
-
   }
 
-  double _currentSliderValue = 0;
+  double _currentSliderValue = 1000;
 
   void _incrementSlider() {
     setState(() {
-      _currentSliderValue = (_currentSliderValue + 5)
-          .clamp(0, 10000); // Prevents from going past boundaries
+      _currentSliderValue = (_currentSliderValue + 5).clamp(1000, 5000); // Prevents from going past boundaries
       allowableController.text = _currentSliderValue.toStringAsFixed(0);
     });
   }
 
   void _decrementSlider() {
     setState(() {
-      _currentSliderValue = (_currentSliderValue - 5).clamp(0, 10000);
+      _currentSliderValue = (_currentSliderValue - 5).clamp(1000, 5000);
       allowableController.text = _currentSliderValue.toStringAsFixed(0);
     });
   }
@@ -155,12 +143,10 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
         side: const BorderSide(color: Colors.black, width: 2),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         // Maybe change? Dynamic button size based on screen size
-        fixedSize: Size(MediaQuery.of(context).size.width / 2,
-            MediaQuery.of(context).size.height / 10));
+        fixedSize: Size(MediaQuery.of(context).size.width / 2, MediaQuery.of(context).size.height / 10));
 
     return Scaffold(
-      resizeToAvoidBottomInset:
-          false, // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
+      resizeToAvoidBottomInset: false, // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
       appBar: AppBar(
         backgroundColor: Colors.deepOrangeAccent,
         title: const Text(
@@ -244,8 +230,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                   // Border color when the TextField is not focused
                                   width: 2.0, // Border width
                                 ),
-                                borderRadius: BorderRadius.circular(
-                                    4.0), // Rounded corners
+                                borderRadius: BorderRadius.circular(4.0), // Rounded corners
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: const BorderSide(
@@ -306,36 +291,34 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                             border: Border.all(color: Colors.black, width: 2.0),
                           ),
                           child: DropdownButtonHideUnderline(
-                            child: DropdownButton<TripPreference?>(
-                              value: selectedTripPreference,
-                              dropdownColor: Colors.white,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                              child: DropdownButton<TripPreference?>(
+                            value: selectedTripPreference,
+                            dropdownColor: Colors.white,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            iconEnabledColor: Colors.black,
+                            items: [
+                              DropdownMenuItem<TripPreference?>(
+                                value: null, // Represents the "None" option
+                                child: const Text("None"),
                               ),
-                              iconEnabledColor: Colors.black,
-                              items: [
-                                DropdownMenuItem<TripPreference?>(
-                                  value: null, // Represents the "None" option
-                                  child: const Text("None"),
-                                ),
-                                ...savedPreferences.tripPreferences.map((entry) {
-                                  return DropdownMenuItem<TripPreference>(
-                                    value: entry,
-                                    child: Text(entry.tripPreferenceName),
-                                  );
-                                }),
-                              ],
-                              onChanged: (TripPreference? newValue) {
-                                setState(() {
-                                  selectedTripPreference = newValue;
-                                  _checkInput();
-                                });
-                              },
-                            )
-
-                          ),
+                              ...savedPreferences.tripPreferences.map((entry) {
+                                return DropdownMenuItem<TripPreference>(
+                                  value: entry,
+                                  child: Text(entry.tripPreferenceName),
+                                );
+                              }),
+                            ],
+                            onChanged: (TripPreference? newValue) {
+                              setState(() {
+                                selectedTripPreference = newValue;
+                                _checkInput();
+                              });
+                            },
+                          )),
                         ),
                       ),
 
@@ -376,6 +359,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                           child: TextField(
                             controller: availableSeatsController,
                             keyboardType: TextInputType.number,
+                            maxLength: 1,
                             // Only show numeric keyboard
                             inputFormatters: <TextInputFormatter>[
                               FilteringTextInputFormatter.digitsOnly,
@@ -390,8 +374,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                   // Border color when the TextField is not focused
                                   width: 2.0, // Border width
                                 ),
-                                borderRadius: BorderRadius.circular(
-                                    4.0), // Rounded corners
+                                borderRadius: BorderRadius.circular(4.0), // Rounded corners
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: const BorderSide(
@@ -407,9 +390,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
-                          )
-
-                      ),
+                          )),
 
                       // Choose allowable text box
                       Padding(
@@ -429,15 +410,104 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                               ),
                             ],
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                          //alignment: Alignment.center,
-                          child: Text(
-                            'Choose Allowable',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5), // Reduced padding
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  'Choose Allowable',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  // Clear the keyboardController before opening the dialog
+                                  keyboardController.text = '';
+
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      // Save the original value in case of cancel
+                                      String originalValue = allowableController.text;
+
+                                      // Track if the Save button should be enabled
+                                      bool isSaveEnabled = false;
+
+                                      return StatefulBuilder(
+                                        builder: (context, setState) {
+                                          // Function to validate input and enable/disable Save button
+                                          void validateInput(String value) {
+                                            final int? parsedValue = int.tryParse(value);
+                                            setState(() {
+                                              isSaveEnabled = parsedValue != null && parsedValue >= 500 && parsedValue <= 10000;
+                                            });
+                                          }
+
+                                          return AlertDialog(
+                                            title: const Text('Enter Allowable Weight'),
+                                            content: TextField(
+                                              controller: keyboardController,
+                                              keyboardType: TextInputType.number,
+                                              maxLength: 4,
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter.digitsOnly,
+                                              ],
+                                              onChanged: (value) {
+                                                validateInput(value); // Validate the input
+                                                setState(() {
+                                                  lastInputFromSlider = false;
+                                                });
+                                              },
+                                              decoration: const InputDecoration(
+                                                hintText: 'Up to 9,999 lbs',
+                                                counterText: '',
+                                                border: OutlineInputBorder(),
+                                              ),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  // Revert to the original value on cancel
+                                                  keyboardController.text = originalValue;
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: const Text('Cancel'),
+                                              ),
+                                              TextButton(
+                                                onPressed: isSaveEnabled
+                                                    ? () {
+                                                        setState(() {
+                                                          if (keyboardController.text.isNotEmpty) {
+                                                            _sliderValue = double.parse(keyboardController.text).clamp(1000, 5000);
+                                                            allowableController.text = keyboardController.text;
+                                                          }
+                                                        });
+                                                        Navigator.of(context).pop();
+                                                      }
+                                                    : null, // Disable Save if input is invalid
+                                                child: Text(
+                                                  'Save',
+                                                  style: TextStyle(
+                                                    color: isSaveEnabled ? Colors.blue : Colors.grey, // Show enabled/disabled state
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                                icon: const Icon(FontAwesomeIcons.keyboard, size: 32, color: Colors.black),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -478,15 +548,35 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                         ),
                                         child: const Icon(Icons.remove, color: Colors.black, size: 32),
                                       ),
-                                      Spacer(),
-                                      Text(
-                                        '${_currentSliderValue.toStringAsFixed(0)} lbs',
-                                        style: TextStyle(
-                                          fontSize: 32,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                      const Spacer(),
+                                      Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          // Slider value
+                                          Visibility(
+                                            visible: lastInputFromSlider,
+                                            child: Text(
+                                              '${_sliderValue.toStringAsFixed(0)} lbs',
+                                              style: const TextStyle(
+                                                fontSize: 32,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          // Keyboard input value
+                                          Visibility(
+                                            visible: !lastInputFromSlider,
+                                            child: Text(
+                                              '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lbs',
+                                              style: const TextStyle(
+                                                fontSize: 32,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Spacer(),
+                                      const Spacer(),
                                       ElevatedButton(
                                         onPressed: _incrementSlider,
                                         style: ElevatedButton.styleFrom(
@@ -504,18 +594,20 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                   ),
                                 ),
                                 Slider(
-                                  value: _currentSliderValue,
-                                  min: 0,
-                                  max: 10000,
-                                  divisions: 400,
+                                  value: _sliderValue,
+                                  min: 1000,
+                                  max: 5000,
+                                  divisions: 40,
                                   label: null,
                                   onChanged: (double value) {
                                     setState(() {
-                                      _currentSliderValue = value;
-                                      allowableController.text = _currentSliderValue.toStringAsFixed(0);
+                                      _sliderValue = value;
+                                      lastInputFromSlider = true;
+                                      allowableController.text = _sliderValue.toStringAsFixed(0);
                                     });
                                   },
-                                  activeColor: Colors.deepOrange, // Color when the slider is active
+                                  activeColor: Colors.deepOrange,
+                                  // Color when the slider is active
                                   inactiveColor: Colors.grey, // Color for the inactive part
                                 ),
                               ],
@@ -532,9 +624,8 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                         child: ElevatedButton(
                           onPressed: isCalculateButtonEnabled
                               ? () {
-                            saveTripData(); // Call saveTripData first
-
-                          }
+                                  saveTripData(); // Call saveTripData first
+                                }
                               : null, // Button is only enabled if there is input
                           style: style, // Main button theme
                           child: const Text('Calculate'),
