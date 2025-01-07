@@ -82,22 +82,26 @@ class _SavedTripsState extends State<SavedTripsView> {
                             title: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      trip.tripName,
-                                      style: const TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      'Allowable: ${trip.allowable} lbs',
-                                      style: const TextStyle(
-                                        fontSize: 18,
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        trip.tripName,
+                                        style: const TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis, // Add this
+                                        maxLines: 1, // Ensures only one line with ellipsis if the text overflows
                                       ),
-                                    )
-                                  ],
+                                      Text(
+                                        'Allowable: ${trip.allowable} lbs',
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
                                 // Set up to delete right now, not edit. Change later
                                 IconButton(

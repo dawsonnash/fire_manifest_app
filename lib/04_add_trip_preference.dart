@@ -25,7 +25,6 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
   //List Gear
 
   @override
-  @override
   void initState() {
     super.initState();
     // Initialize the TripPreference object with a default name
@@ -47,6 +46,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
           title: const Text("Edit Trip Preference Name"),
           content: TextField(
             controller: titleController,
+            maxLength: 20,
             textCapitalization: TextCapitalization.words,
             decoration:
                 const InputDecoration(labelText: "Trip Preference Name"),

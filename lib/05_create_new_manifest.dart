@@ -242,6 +242,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: TextField(
                             controller: tripNameController,
+                            maxLength: 20,
                             textCapitalization: TextCapitalization.words,
                             decoration: InputDecoration(
                               // hintText: 'Enter trip name',

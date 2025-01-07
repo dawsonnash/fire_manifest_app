@@ -105,11 +105,15 @@ class _TripPreferencesState extends State<TripPreferences>{
                             title: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  tripPreference.tripPreferenceName,
-                                  style: const TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold
+                                Expanded(
+                                  child: Text(
+                                    tripPreference.tripPreferenceName,
+                                    style: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold
+                                    ),
+                                      overflow: TextOverflow.ellipsis, // Add this
+                                      maxLines: 1,
                                   ),
                                 ),
                                 IconButton(

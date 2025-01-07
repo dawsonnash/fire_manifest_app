@@ -71,20 +71,18 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
     });
   }
 
-  // Slider functions
-  double _currentSliderValue = 0;
 
   void _incrementSlider() {
     setState(() {
-      _currentSliderValue = (_currentSliderValue + 5).clamp(0, 10000);
-      allowableController.text = _currentSliderValue.toStringAsFixed(0);
+      _sliderValue = (_sliderValue + 5).clamp(1000, 5000);
+      allowableController.text = _sliderValue.toStringAsFixed(0);
     });
   }
 
   void _decrementSlider() {
     setState(() {
-      _currentSliderValue = (_currentSliderValue - 5).clamp(0, 10000);
-      allowableController.text = _currentSliderValue.toStringAsFixed(0);
+      _sliderValue = (_sliderValue - 5).clamp(1000, 5000);
+      allowableController.text = _sliderValue.toStringAsFixed(0);
     });
   }
 
@@ -150,6 +148,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: TextField(
                           controller: tripNameController,
+                          maxLength: 20,
                           textCapitalization: TextCapitalization.words,
                           decoration: _inputDecoration(),
                           style: _textStyle(),

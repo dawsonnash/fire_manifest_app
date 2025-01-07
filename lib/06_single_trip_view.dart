@@ -150,10 +150,14 @@ class _SingleTripViewState extends State<SingleTripView>{
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-            widget.trip.tripName,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
+            Expanded(
+              child: Text(
+              widget.trip.tripName,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis, // Add this
+                  maxLines: 1, 
+                        ),
+            ),
             IconButton(
               icon: Icon(Icons.ios_share, size: 28,),    // Does this work for android, i dont know
               onPressed: () {
