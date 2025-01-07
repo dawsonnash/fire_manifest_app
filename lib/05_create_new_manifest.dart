@@ -35,6 +35,9 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
     tripNameController.addListener(_checkInput);
     allowableController.addListener(_checkInput);
     availableSeatsController.addListener(_checkInput);
+
+    // Initialize allowableController with the default slider value
+    allowableController.text = _sliderValue.toStringAsFixed(0);
   }
 
   // Track the last input source
@@ -88,7 +91,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
       );
       return; // Exit function if the trip name is already used
     }
-    // Convert flight weight text to integer
+    print('allowableController.text: ${allowableController.text}');    // Convert flight weight text to integer
     final int allowable = int.parse(allowableController.text);
     // Convert available seats text to integer
     final int availableSeats = int.parse(availableSeatsController.text);

@@ -40,12 +40,12 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
   // Initialize all Loads
   List<Load> loads = List.generate(
       numLoads,
-      (index) => Load(
-            loadNumber: index + 1,
-            weight: 0,
-            loadPersonnel: [],
-            loadGear: [],
-          ));
+          (index) => Load(
+        loadNumber: index + 1,
+        weight: 0,
+        loadPersonnel: [],
+        loadGear: [],
+      ));
 
   // TripPreference can be "None", i.e., null
   if (tripPreference != null) {
@@ -60,7 +60,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
               for (var load in loads) {
                 // If the new Crew Member's flight weight is less than the allowable load weight and there are enough seats available
                 if (load.weight + crewMembersDynamic.totalCrewMemberWeight <=
-                        maxLoadWeight &&
+                    maxLoadWeight &&
                     load.loadPersonnel.length < availableSeats) {
                   load.loadPersonnel.add(crewMembersDynamic);
                   load.loadGear.addAll(
@@ -88,7 +88,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                   });
                   load.weight += totalGroupWeight;
                   crewMembersCopy.removeWhere(
-                      (member) => crewMembersDynamic.contains(member));
+                          (member) => crewMembersDynamic.contains(member));
                   break;
                 }
               }
@@ -103,7 +103,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
             if (crewMembersDynamic is CrewMember) {
               for (var load in loads.reversed) {
                 if (load.weight + crewMembersDynamic.totalCrewMemberWeight <=
-                        maxLoadWeight &&
+                    maxLoadWeight &&
                     load.loadPersonnel.length < availableSeats) {
                   load.loadPersonnel.add(crewMembersDynamic);
                   load.loadGear.addAll(
@@ -128,7 +128,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                   });
                   load.weight += totalGroupWeight;
                   crewMembersCopy.removeWhere(
-                      (member) => crewMembersDynamic.contains(member));
+                          (member) => crewMembersDynamic.contains(member));
                   break;
                 }
               }
@@ -163,8 +163,16 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                 loadIndex = (loadIndex + 1) % loads.length;
               }
             } else if (crewMembersDynamic is List<CrewMember>) {
+
+              int totalGroupWeight = crewMembersDynamic.fold(
+                  0, (sum, member) => sum + member.totalCrewMemberWeight);
+
+              // FMximum remaining weight among all loads
+              int maxRemainingWeight = loads.fold(0, (maxWeight, load) =>
+              (maxLoadWeight - load.weight) > maxWeight ? (maxLoadWeight - load.weight) : maxWeight);
+
               // If the group size exceeds max available seats, treat members individually
-              if (crewMembersDynamic.length > maxAvailableSeats) {
+              if ((crewMembersDynamic.length > maxAvailableSeats) || (totalGroupWeight > maxLoadWeight) || (totalGroupWeight > maxRemainingWeight)) {
                 for (var member in crewMembersDynamic) {
                   while (loadIndex < loads.length) {
                     var load = loads[loadIndex];
@@ -291,7 +299,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
 
                   // Remove one instance of this specific gear type from gearCopy
                   int indexToRemove =
-                      gearCopy.indexWhere((item) => item.name == gear.name);
+                  gearCopy.indexWhere((item) => item.name == gear.name);
                   if (indexToRemove != -1) {
                     gearCopy.removeAt(indexToRemove);
                   }
@@ -393,7 +401,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
 // Error dialogue for user notification
   if (crewMembersCopy.isNotEmpty || gearCopy.isNotEmpty) {
     String errorMessage =
-        "Not all crew members or gear items were allocated to a load due to weight constraints. Try again or pick a higher allowable.";
+        "Not all crew members or gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable.";
 
     // Show error dialog
     await showDialog(
