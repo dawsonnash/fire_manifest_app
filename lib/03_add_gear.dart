@@ -42,8 +42,14 @@ class _AddGearState extends State<AddGear>{
   // Function to check if input is valid and update button state
   void _checkInput() {
     final isGearNameValid = gearNameController.text.isNotEmpty;
-    final isGearWeightValid = gearWeightController.text.isNotEmpty;
-    final isGearQuantityValid = int.parse(gearQuantityController.text) >= 1;
+    final isGearWeightValid = gearWeightController.text.isNotEmpty &&
+        int.tryParse(gearWeightController.text) != null &&
+        int.parse(gearWeightController.text) > 0 &&
+        int.parse(gearWeightController.text) <= 500;
+    final isGearQuantityValid = gearQuantityController.text.isNotEmpty &&
+        int.tryParse(gearQuantityController.text) != null &&
+        int.parse(gearQuantityController.text) >= 1 &&
+        int.parse(gearQuantityController.text) < 100;
 
     setState(() {
       // Need to adjust for position as well
@@ -184,6 +190,7 @@ class _AddGearState extends State<AddGear>{
                           padding: const EdgeInsets.all(16.0),
                           child: TextField(
                             controller: gearNameController,
+                            maxLength: 20,
                             textCapitalization: TextCapitalization.words,
                             decoration: InputDecoration(
                               labelText: 'Gear Name',
@@ -194,7 +201,7 @@ class _AddGearState extends State<AddGear>{
                                 //fontWeight: FontWeight.bold,
                               ),
                               filled: true,
-                              fillColor: Colors.black.withOpacity(0.9),
+                              fillColor: Colors.black.withValues(alpha: 0.9),
                               enabledBorder: OutlineInputBorder(
                                 borderSide: const BorderSide(
                                   color: Colors.white,
@@ -228,6 +235,7 @@ class _AddGearState extends State<AddGear>{
                           child: TextField(
                             controller: gearWeightController,
                             keyboardType: TextInputType.number,
+                            maxLength: 3,
                             // Only show numeric keyboard
                             inputFormatters: <TextInputFormatter>[
                               FilteringTextInputFormatter.digitsOnly,
@@ -235,6 +243,11 @@ class _AddGearState extends State<AddGear>{
                             ],
                             decoration: InputDecoration(
                               labelText: 'Weight',
+                              hintText: 'Up to 500 lbs',hintStyle: const TextStyle(
+                              color: Colors.grey, // Optional: Customize the hint text color
+                              fontSize: 20, // Optional: Customize hint text size
+                              fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                            ),
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -276,6 +289,7 @@ class _AddGearState extends State<AddGear>{
                           child: TextField(
                             controller: gearQuantityController,
                             keyboardType: TextInputType.number,
+                            maxLength: 2,
                             // Only show numeric keyboard
                             inputFormatters: <TextInputFormatter>[
                               FilteringTextInputFormatter.digitsOnly,
@@ -283,6 +297,11 @@ class _AddGearState extends State<AddGear>{
                             ],
                             decoration: InputDecoration(
                               labelText: 'Quantity',
+                              hintText: 'Up to 99',hintStyle: const TextStyle(
+                              color: Colors.grey, // Optional: Customize the hint text color
+                              fontSize: 20, // Optional: Customize hint text size
+                              fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                            ),
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,

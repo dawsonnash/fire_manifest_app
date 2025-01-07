@@ -71,16 +71,22 @@ class _EditGearState extends State<EditGear>{
   // Function to check if input is valid and update button state
   void _checkInput() {
     final isNameValid = gearNameController.text.isNotEmpty;
-    final isFlightWeightValid = gearWeightController.text.isNotEmpty;
+    final isGearWeightValid = gearWeightController.text.isNotEmpty &&
+        int.tryParse(gearWeightController.text) != null &&
+        int.parse(gearWeightController.text) > 0 &&
+        int.parse(gearWeightController.text) <= 500;
     final isNameChanged = gearNameController.text != oldGearName;
-    final isFlightWeightChanged = gearWeightController.text != oldGearWeight.toString();
-    final isGearQuantityValid = int.parse(gearQuantityController.text) >= 1;
+    final isGearWeightChanged = gearWeightController.text != oldGearWeight.toString();
+    final isGearQuantityValid = gearQuantityController.text.isNotEmpty &&
+        int.tryParse(gearQuantityController.text) != null &&
+        int.parse(gearQuantityController.text) >= 1 &&
+        int.parse(gearQuantityController.text) < 100;
     final isGearQuantityChanged = gearQuantityController.text != oldGearQuantity.toString();
 
     setState(() {
       // Need to adjust for position as well
       // Only enables saving if name is changed and is not empty
-      isSaveButtonEnabled = (isNameValid && isFlightWeightValid && isGearQuantityValid) && (isNameChanged || isFlightWeightChanged || isGearQuantityChanged);
+      isSaveButtonEnabled = (isNameValid && isGearWeightValid && isGearQuantityValid) && (isNameChanged || isGearWeightChanged || isGearQuantityChanged);
     });
   }
 
@@ -225,6 +231,7 @@ class _EditGearState extends State<EditGear>{
                           child: TextField(
                             controller: gearNameController,
                             textCapitalization: TextCapitalization.words,
+                            maxLength: 20,
                             decoration: InputDecoration(
                               labelText: 'Edit gear name',
                               labelStyle: const TextStyle(
@@ -268,6 +275,7 @@ class _EditGearState extends State<EditGear>{
                           child: TextField(
                             controller: gearWeightController,
                             keyboardType: TextInputType.number,
+                            maxLength: 3,
                             // Only show numeric keyboard
                             inputFormatters: <TextInputFormatter>[
                               FilteringTextInputFormatter.digitsOnly,
@@ -275,6 +283,11 @@ class _EditGearState extends State<EditGear>{
                             ],
                             decoration: InputDecoration(
                               labelText: 'Edit weight',
+                              hintText: 'Up to 500 lbs',hintStyle: const TextStyle(
+                              color: Colors.grey, // Optional: Customize the hint text color
+                              fontSize: 20, // Optional: Customize hint text size
+                              fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                            ),
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -316,6 +329,7 @@ class _EditGearState extends State<EditGear>{
                           child: TextField(
                             controller: gearQuantityController,
                             keyboardType: TextInputType.number,
+                            maxLength: 2,
                             // Only show numeric keyboard
                             inputFormatters: <TextInputFormatter>[
                               FilteringTextInputFormatter.digitsOnly,
@@ -323,6 +337,11 @@ class _EditGearState extends State<EditGear>{
                             ],
                             decoration: InputDecoration(
                               labelText: 'Edit quantity',
+                              hintText: 'Up to 99',hintStyle: const TextStyle(
+                              color: Colors.grey, // Optional: Customize the hint text color
+                              fontSize: 20, // Optional: Customize hint text size
+                              fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                            ),
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -438,7 +457,7 @@ class _EditGearState extends State<EditGear>{
                                                     content: Text('$oldGearName Deleted!',
                                                       // Maybe change look
                                                       style: const TextStyle(
-                                                        color: Colors.white,
+                                                        color: Colors.black,
                                                         fontSize: 32,
                                                         fontWeight: FontWeight.bold,
                                                       ),

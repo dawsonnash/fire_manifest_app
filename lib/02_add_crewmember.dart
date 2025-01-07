@@ -45,7 +45,11 @@ class AddCrewmember extends StatefulWidget {
     // Function to check if input is valid and update button state
     void _checkInput() {
       final isNameValid = nameController.text.isNotEmpty;
-      final isFlightWeightValid = flightWeightController.text.isNotEmpty;
+      final isFlightWeightValid = flightWeightController.text.isNotEmpty &&
+          int.tryParse(flightWeightController.text) != null &&
+          int.parse(flightWeightController.text) > 0 &&
+          int.parse(flightWeightController.text) < 500;
+
       final isPositionSelected = selectedPosition != null;
 
       setState(() {
@@ -68,7 +72,8 @@ class AddCrewmember extends StatefulWidget {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please enter all tool info'),
+            content: Text('Please enter all tool info',
+             style: TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),),
             backgroundColor: Colors.red,
           ),
         );
@@ -223,6 +228,7 @@ class AddCrewmember extends StatefulWidget {
                           child: TextField(
                             controller: nameController,
                             textCapitalization: TextCapitalization.words,
+                            maxLength: 12,
                             decoration: InputDecoration(
                               labelText: 'Last Name',
                               labelStyle: const TextStyle(
@@ -266,6 +272,7 @@ class AddCrewmember extends StatefulWidget {
                           child: TextField(
                             controller: flightWeightController,
                             keyboardType: TextInputType.number,
+                            maxLength: 3,
                             // Only show numeric keyboard
                             inputFormatters: <TextInputFormatter>[
                               FilteringTextInputFormatter.digitsOnly,
@@ -273,6 +280,12 @@ class AddCrewmember extends StatefulWidget {
                             ],
                             decoration: InputDecoration(
                               labelText: 'Flight Weight',
+                              hintText: 'Up to 500 lbs',hintStyle: const TextStyle(
+                              color: Colors.grey, // Optional: Customize the hint text color
+                              fontSize: 20, // Optional: Customize hint text size
+                              fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                            ),
+
                               labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -364,11 +377,12 @@ class AddCrewmember extends StatefulWidget {
                               child: TextField(
                                 controller: toolNameController,
                                 textCapitalization: TextCapitalization.words,
+                                maxLength: 12,
                                 decoration: InputDecoration(
                                   labelText: 'Tool Name',
                                   labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
                                   filled: true,
-                                  fillColor: Colors.black.withOpacity(0.9),
+                                  fillColor: Colors.black.withValues(alpha: 0.9),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: const BorderSide(color: Colors.white, width: 2.0),
                                     borderRadius: BorderRadius.circular(12.0),
@@ -386,9 +400,15 @@ class AddCrewmember extends StatefulWidget {
                               child: TextField(
                                 controller: toolWeightController,
                                 keyboardType: TextInputType.number,
+                                maxLength: 2,
                                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                 decoration: InputDecoration(
                                   labelText: 'Tool Weight',
+                                  hintText: 'Up to 99 lbs',hintStyle: const TextStyle(
+                                  color: Colors.grey, // Optional: Customize the hint text color
+                                  fontSize: 20, // Optional: Customize hint text size
+                                  fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                                ),
                                   labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
                                   filled: true,
                                   fillColor: Colors.black.withOpacity(0.9),
