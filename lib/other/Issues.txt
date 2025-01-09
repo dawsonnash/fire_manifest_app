@@ -1,0 +1,2 @@
+-- How can Trip Preferences be updated for EDITED gear?
+---- Switching saw teams? Differing gear quantities, no fix right now.

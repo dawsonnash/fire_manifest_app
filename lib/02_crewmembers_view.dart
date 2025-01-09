@@ -152,7 +152,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 content: const Text(
-                                  'Are you sure you want to delete all crew members?',
+                                  'Are you sure you want to delete all crew members? Additionally, all Positional Preference data will be erased.',
                                   style: TextStyle(fontSize: 16),
                                 ),
                                 actions: [

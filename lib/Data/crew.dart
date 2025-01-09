@@ -1,3 +1,4 @@
+import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/Data/trip_preferences.dart';
 
 import 'crewmember.dart';
@@ -91,7 +92,7 @@ class Crew {
 
       // If no positional or gear preferences remain, delete the trip preference
       if (tripPreference.positionalPreferences.isEmpty && tripPreference.gearPreferences.isEmpty) {
-        tripPreference.delete();
+        savedPreferences.removeTripPreference(tripPreference);
       } else {
         tripPreference.save(); // Save the updated trip preference
       }
@@ -119,7 +120,7 @@ class Crew {
 
       // If no positional or gear preferences remain, delete the trip preference
       if (tripPreference.positionalPreferences.isEmpty && tripPreference.gearPreferences.isEmpty) {
-        tripPreference.delete();
+        savedPreferences.removeTripPreference(tripPreference);
       } else {
         tripPreference.save(); // Save the updated trip preference
       }
@@ -157,7 +158,7 @@ class Crew {
 
       // Check if the trip preference is empty after removing the gear preferences
       if (tripPreference.positionalPreferences.isEmpty && tripPreference.gearPreferences.isEmpty) {
-        tripPreference.delete();
+        savedPreferences.removeTripPreference(tripPreference);
       } else {
         tripPreference.save(); // Save the updated trip preference
       }
@@ -165,14 +166,6 @@ class Crew {
 
     // Update the total crew weight
     updateTotalCrewWeight();
-  }
-
-  void addGear(Gear gearItem) {
-    var gearBox = Hive.box<Gear>('gearBox');
-    gear.add(gearItem); // added to in-memory as well
-    gearBox.add(gearItem); // save to hive memory
-    updateTotalCrewWeight();
-    print('Updated Total Crew Weight: $totalCrewWeight');
   }
 
   void deleteAllGear() {
@@ -192,7 +185,7 @@ class Crew {
 
       // If no positional or gear preferences remain, delete the trip preference
       if (tripPreference.positionalPreferences.isEmpty && tripPreference.gearPreferences.isEmpty) {
-        tripPreference.delete();
+        savedPreferences.removeTripPreference(tripPreference);
       } else {
         tripPreference.save(); // Save the updated trip preference
       }
@@ -200,6 +193,14 @@ class Crew {
 
     // Update the total crew weight
     updateTotalCrewWeight();
+  }
+
+  void addGear(Gear gearItem) {
+    var gearBox = Hive.box<Gear>('gearBox');
+    gear.add(gearItem); // added to in-memory as well
+    gearBox.add(gearItem); // save to hive memory
+    updateTotalCrewWeight();
+    print('Updated Total Crew Weight: $totalCrewWeight');
   }
 
   // For LogCat testing purposes

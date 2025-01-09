@@ -655,7 +655,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                               fontSize: 22,
                                               fontWeight: FontWeight.bold,
                                             )),
-                                        content: Text('This crew member data ($oldCrewMemberName) will be erased!',
+                                        content: Text('This crew member data ($oldCrewMemberName) and any of their Positional Preference data will be erased!',
                                             style: const TextStyle(
                                               fontSize: 18,
                                             )),
