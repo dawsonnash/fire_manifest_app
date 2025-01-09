@@ -57,177 +57,177 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                   height: double.infinity,
                 )),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
+          Column(
+            children: [
+              Expanded(
+                child: Stack(
+                  children: [
+                    ListView.builder(
                     itemCount: sortedCrewMemberList.length,
                     itemBuilder: (context, index) {
                       final crewMember = sortedCrewMemberList[index];
 
                       // Display crewmember data in a scrollable list
-                      return Card(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            // Could change color here
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(9),
-                          ),
-                          child: ListTile(
-                            iconColor: Colors.black,
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${crewMember.name}, ${crewMember.flightWeight} lbs',
-                                        style: const TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold),
-                                  
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            ' ${crewMember.getPositionTitle(crewMember.position)} - ',
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                  
-                                            ),
-                                  
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white, // Background color
+                          border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
+                        ),
+                        child: ListTile(
+                          iconColor: Colors.black,
+
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${crewMember.name}, ${crewMember.flightWeight} lbs',
+                                      style: const TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold),
+
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          ' ${crewMember.getPositionTitle(crewMember.position)} - ',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+
                                           ),
-                                          Expanded(
-                                            child: Text(
-                                              (crewMember.personalTools ?? []).map((gearItem) => gearItem.name).join(', '),
-                                              style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                IconButton(
-                                    icon: const Icon(Icons.edit,
-                                        color: Colors.black, size: 32),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => EditCrewmember(
-                                            crewMember: crewMember,
-                                            onUpdate:
-                                                loadCrewMemberList, // refresh list on return
+
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            (crewMember.personalTools ?? []).map((gearItem) => gearItem.name).join(', '),
+                                            style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
-                                      );
-                                    })
-                              ],
-                            ),
-                            leading: Icon(Icons.person),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                  icon: const Icon(Icons.edit,
+                                      color: Colors.black, size: 32),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EditCrewmember(
+                                          crewMember: crewMember,
+                                          onUpdate:
+                                              loadCrewMemberList, // refresh list on return
+                                        ),
+                                      ),
+                                    );
+                                  })
+                            ],
                           ),
+                          leading: Icon(Icons.person),
                         ),
                       );
                     },
-                  ),
-                ),
-
-                // Delete all (app testing only)
-                Padding(
-                  padding:
-                  const EdgeInsets.only(top: 16.0, bottom: 16.0, left: 16.0, right: 16.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      // if (savedTrips.savedTrips.isNotEmpty) {}
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text(
-                              'Confirm Deletion',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            content: const Text(
-                              'Are you sure you want to delete all crew members?',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(); // Close the dialog without deleting
-                                },
-                                child: const Text(
-                                  'Cancel',
+                  ),// Delete all
+                    Positioned(
+                      bottom: 10,
+                      left: 16,
+                      right: 16,
+                      child: GestureDetector(
+                        onTap: () {
+                          // if (savedTrips.savedTrips.isNotEmpty) {}
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text(
+                                  'Confirm Deletion',
                                   style: TextStyle(
-                                      color: Colors.grey),
+                                      fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  crew.deleteAllCrewMembers();
-                                  setState(() {
-                                  });
-                                  Navigator.of(context).pop(); // Close the dialog after deletion
-                                  Navigator.of(context).pop(); // Home screen
-                                },
-                                child: const Text(
-                                  'Delete',
-                                  style: TextStyle(
-                                      color: Colors.red),
+                                content: const Text(
+                                  'Are you sure you want to delete all crew members?',
+                                  style: TextStyle(fontSize: 16),
                                 ),
-                              ),
-                            ],
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pop(); // Close the dialog without deleting
+                                    },
+                                    child: const Text(
+                                      'Cancel',
+                                      style: TextStyle(
+                                          color: Colors.grey),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      crew.deleteAllCrewMembers();
+                                      setState(() {
+                                      });
+                                      Navigator.of(context).pop(); // Close the dialog after deletion
+                                      Navigator.of(context).pop(); // Home screen
+                                    },
+                                    child: const Text(
+                                      'Delete',
+                                      style: TextStyle(
+                                          color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           );
                         },
-                      );
-                    },
 
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.deepOrangeAccent,
-                        border: Border.all(color: Colors.black, width: 2),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
-                            spreadRadius: 1,
-                            blurRadius: 8,
-                            offset: Offset(0, 3),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.deepOrangeAccent,
+                            border: Border.all(color: Colors.black, width: 2),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.8),
+                                spreadRadius: 60,
+                                blurRadius: 20,
+                                offset: Offset(0, 50),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      //alignment: Alignment.center,
-                      child: Row(
-                        children: [
-                          Text(
-                            'Delete All Crew Members',
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          //alignment: Alignment.center,
+                          child: Row(
+                            children: [
+                              Text(
+                                'Delete All Crew Members',
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Spacer(),
+                              Icon(Icons.delete, color: Colors.black, size: 32),
+                            ],
                           ),
-                          Spacer(),
-                          Icon(Icons.delete, color: Colors.black, size: 32),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                ),
+
               ],
-            ),
+                ),
+              ),
+
+            ],
           ),
         ],
       ),

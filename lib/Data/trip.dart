@@ -5,7 +5,7 @@ import 'load.dart';
 part 'trip.g.dart';
 
 @HiveType(typeId: 3)
-class Trip extends HiveObject{
+class Trip extends HiveObject {
   @HiveField(0)
   String tripName;
   @HiveField(1)
@@ -15,9 +15,16 @@ class Trip extends HiveObject{
   @HiveField(3)
   List<Load> loads = [];
 
+  @HiveField(4) // Add a new field index
+  DateTime timestamp; // New attribute to store the timestamp
+
   //
 
-  Trip({required this.tripName, required this.allowable, required this.availableSeats});
+  Trip({
+    required this.tripName,
+    required this.allowable,
+    required this.availableSeats,
+    DateTime? timestamp,}) : timestamp = timestamp ?? DateTime.now(); // Default to current time if not provided;
 
   void addLoad(Trip trip, Load newLoad) {
     trip.loads.add(newLoad); //
@@ -25,7 +32,6 @@ class Trip extends HiveObject{
 
   // For LogCat testing purposes
   void printLoadDetails() {
-
     if (loads.isEmpty) {
       print('No loads available for this trip.');
       return;
@@ -43,14 +49,10 @@ class Trip extends HiveObject{
       }
     }
   }
-
-
 }
 
 class SavedTrips {
-
   List<Trip> savedTrips = [];
-
 
   void addTrip(Trip newTrip) {
     var tripBox = Hive.box<Trip>('tripBox');
@@ -58,11 +60,12 @@ class SavedTrips {
     tripBox.add(newTrip); // save to hive memory
   }
 
-  void removeTrip(Trip trip){
+  void removeTrip(Trip trip) {
     var tripBox = Hive.box<Trip>('tripBox');
 
-    final keyToRemove = tripBox.keys.firstWhere( // find which Hive key we want to remove
-          (key) => tripBox.get(key) == trip,
+    final keyToRemove = tripBox.keys.firstWhere(
+      // find which Hive key we want to remove
+      (key) => tripBox.get(key) == trip,
       orElse: () => null,
     );
     if (keyToRemove != null) {
@@ -78,6 +81,7 @@ class SavedTrips {
     // Clear the Hive storage
     tripBox.clear();
   }
+
   // For LogCat testing purposes
   void printTripDetails() {
     // Print out Trip info
@@ -87,7 +91,6 @@ class SavedTrips {
     }
   }
 }
-
 
 // Global object for all saved trips. All created trips will be stored here
 // Until hive implementation

@@ -655,7 +655,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
 
                         // Calculate Button
                         Padding(
-                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 5.0),
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
                           child: ElevatedButton(
                             onPressed: isCalculateButtonEnabled
                                 ? () {

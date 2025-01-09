@@ -86,184 +86,191 @@ class _TripPreferencesState extends State<TripPreferences>{
               children: [
                 Expanded(
                   child:
-                  ListView.builder(
-                    itemCount: tripPreferenceList.length,
-                    itemBuilder: (context, index) {
+                  Stack(
+                    children: [
+                      ListView.builder(
+                      itemCount: tripPreferenceList.length,
+                      itemBuilder: (context, index) {
 
-                      final tripPreference = tripPreferenceList[index];
+                        final tripPreference = tripPreferenceList[index];
 
-                      // Display TripPreference data in a scrollable list
-                      return Card(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            // Could change color here
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(9),
-                          ),
-                          child: ListTile(
-                            iconColor: Colors.black,
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    tripPreference.tripPreferenceName,
-                                    style: const TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold
-                                    ),
-                                      overflow: TextOverflow.ellipsis, // Add this
-                                      maxLines: 1,
-                                  ),
-                                ),
-                                IconButton(
-                                    icon: const Icon(
-                                        Icons.edit,
-                                        color: Colors.black,
-                                        size: 32
-                                    ),
-                                  onPressed: () async {
-                                    // Awaits the result from the next page so it updates in real time
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => EditTripPreference(tripPreference: tripPreference, onUpdate: loadTripPreferenceList),
-                                      ),
-                                    );
-                                    // Calls the update function after returning from AddTripPreference
-                                    loadTripPreferenceList();
-                                  },
-                                )
-                              ],
+                        // Display TripPreference data in a scrollable list
+                        return Card(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              // Could change color here
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(9),
                             ),
-                            leading: FaIcon(FontAwesomeIcons.fire),
-                            trailing: IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text(
-                                          'Delete ${tripPreference.tripPreferenceName}?',
-                                          style: const TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                          )
+                            child: ListTile(
+                              iconColor: Colors.black,
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      tripPreference.tripPreferenceName,
+                                      style: const TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold
                                       ),
-                                      content: Text('This trip preference data (${tripPreference.tripPreferenceName}) will be erased!',
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                          )),
-                                      actions: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();  // Dismiss dialog
-                                              },
-                                              child: const Text('Cancel',
-                                                  style: TextStyle(
-                                                    fontSize: 22,
-                                                  )),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
+                                        overflow: TextOverflow.ellipsis, // Add this
+                                        maxLines: 1,
+                                    ),
+                                  ),
+                                  IconButton(
+                                      icon: const Icon(
+                                          Icons.edit,
+                                          color: Colors.black,
+                                          size: 32
+                                      ),
+                                    onPressed: () async {
+                                      // Awaits the result from the next page so it updates in real time
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => EditTripPreference(tripPreference: tripPreference, onUpdate: loadTripPreferenceList),
+                                        ),
+                                      );
+                                      // Calls the update function after returning from AddTripPreference
+                                      loadTripPreferenceList();
+                                    },
+                                  )
+                                ],
+                              ),
+                              leading: FaIcon(FontAwesomeIcons.fire),
+                              trailing: IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text(
+                                            'Delete ${tripPreference.tripPreferenceName}?',
+                                            style: const TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.bold,
+                                            )
+                                        ),
+                                        content: Text('This trip preference data (${tripPreference.tripPreferenceName}) will be erased!',
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                            )),
+                                        actions: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();  // Dismiss dialog
+                                                },
+                                                child: const Text('Cancel',
+                                                    style: TextStyle(
+                                                      fontSize: 22,
+                                                    )),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
 
-                                                // // Remove item from the Hive box
-                                                // final keyToRemove = crewmemberBox.keys.firstWhere(
-                                                //       (key) => crewmemberBox.get(key) == widget.crewMember,
-                                                //   orElse: () => null,
-                                                // );
-                                                //
-                                                // if (keyToRemove != null) {
-                                                //   crewmemberBox.delete(keyToRemove);
-                                                // }
+                                                  // // Remove item from the Hive box
+                                                  // final keyToRemove = crewmemberBox.keys.firstWhere(
+                                                  //       (key) => crewmemberBox.get(key) == widget.crewMember,
+                                                  //   orElse: () => null,
+                                                  // );
+                                                  //
+                                                  // if (keyToRemove != null) {
+                                                  //   crewmemberBox.delete(keyToRemove);
+                                                  // }
 
-                                                // Remove the crew member
-                                                savedPreferences.removeTripPreference(tripPreference);
+                                                  // Remove the crew member
+                                                  savedPreferences.removeTripPreference(tripPreference);
 
-                                                // Show deletion pop-up
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(
-                                                    content: Center(
-                                                      child: Text('Trip Preference Deleted!',
-                                                        // Maybe change look
-                                                        style: const TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 32,
-                                                          fontWeight: FontWeight.bold,
+                                                  // Show deletion pop-up
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(
+                                                      content: Center(
+                                                        child: Text('Trip Preference Deleted!',
+                                                          // Maybe change look
+                                                          style: const TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 32,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
                                                         ),
                                                       ),
+                                                      duration: Duration(seconds: 2),
+                                                      backgroundColor: Colors.red,
                                                     ),
-                                                    duration: Duration(seconds: 2),
-                                                    backgroundColor: Colors.red,
-                                                  ),
-                                                );
+                                                  );
 
-                                                Navigator.of(context).pop();  // Dismiss the dialog
-                                                loadTripPreferenceList();
-                                              },
-                                              child: const Text('OK',
-                                                  style: TextStyle(
-                                                    fontSize: 22,
-                                                  )),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
+                                                  Navigator.of(context).pop();  // Dismiss the dialog
+                                                  loadTripPreferenceList();
+                                                },
+                                                child: const Text('OK',
+                                                    style: TextStyle(
+                                                      fontSize: 22,
+                                                    )),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
 
+                              ),
                             ),
                           ),
+                        );
+                      },
+                    ),
+                      Positioned(
+                        bottom: 10,
+                        left: 16,
+                        right: 16,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            // Awaits the result from the next page so it updates in real time
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddTripPreference(onUpdate: loadTripPreferenceList),
+                              ),
+                            );
+                            // Calls the update function after returning from AddTripPreference
+                            loadTripPreferenceList();
+                          },
+
+                          style: style,
+                          child: Row(
+                            children: [
+                              const Icon(
+                                  Icons.add,
+                                  color: Colors.black,
+                                  size: 32
+                              ),
+
+                              Flexible( // Allows text to be wrapped
+                                child: Text(
+                                  'Trip Preference',
+                                  textAlign: TextAlign.center,
+                                  softWrap: true,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      );
-                    },
+                      ),
+
+                    ],
                   ),
 
                 ),
 
                 // + Add Load Preference
                 // Make scrollable with the list of loadouts
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      // Awaits the result from the next page so it updates in real time
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddTripPreference(onUpdate: loadTripPreferenceList),
-                        ),
-                      );
-                      // Calls the update function after returning from AddTripPreference
-                      loadTripPreferenceList();
-                    },
-
-                    style: style,
-                      child: Row(
-                        children: [
-                          const Icon(
-                              Icons.add,
-                              color: Colors.black,
-                              size: 32
-                          ),
-
-                          Flexible( // Allows text to be wrapped
-                            child: Text(
-                              'Trip Preference',
-                              textAlign: TextAlign.center,
-                              softWrap: true,
-                            ),
-                          ),
-                      ],
-                      ),
-                  ),
-                ),
 
                 // Delete All Button
                 // Padding(

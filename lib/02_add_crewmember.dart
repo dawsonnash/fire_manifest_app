@@ -245,16 +245,15 @@ class AddCrewmember extends StatefulWidget {
                               decoration: InputDecoration(
                                 labelText: 'Last Name',
                                 labelStyle: const TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 22,
-                                  fontStyle: FontStyle.italic,
                                   //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
-                                fillColor: Colors.black.withOpacity(0.9),
+                                fillColor: Colors.white,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
@@ -263,7 +262,7 @@ class AddCrewmember extends StatefulWidget {
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.black,
+                                    color: Colors.white,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
                                   ),
@@ -272,7 +271,7 @@ class AddCrewmember extends StatefulWidget {
 
                               ),
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 28,
                               ),
                             )
@@ -294,22 +293,20 @@ class AddCrewmember extends StatefulWidget {
                               decoration: InputDecoration(
                                 labelText: 'Flight Weight',
                                 hintText: 'Up to 500 lbs',hintStyle: const TextStyle(
-                                color: Colors.grey, // Optional: Customize the hint text color
-                                fontSize: 20, // Optional: Customize hint text size
-                                fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                                color: Colors.black,
+                                fontSize: 20,
                               ),
 
                                 labelStyle: const TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 22,
-                                  fontStyle: FontStyle.italic,
                                   //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
-                                fillColor: Colors.black.withOpacity(0.9),
+                                fillColor: Colors.white,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
@@ -318,7 +315,7 @@ class AddCrewmember extends StatefulWidget {
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.black,
+                                    color: Colors.white,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
                                   ),
@@ -327,7 +324,7 @@ class AddCrewmember extends StatefulWidget {
 
                               ),
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 28,
                               ),
                             )
@@ -341,9 +338,9 @@ class AddCrewmember extends StatefulWidget {
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.9),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(12.0),
-                              border: Border.all(color: Colors.white, width: 2.0),
+                              border: Border.all(color: Colors.black, width: 2.0),
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<int>(
@@ -351,17 +348,16 @@ class AddCrewmember extends StatefulWidget {
                                 hint: const Text(
                                   'Primary Position',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     fontSize: 22,
-                                    fontStyle: FontStyle.italic,
                                   ),
                                 ),
-                                dropdownColor: Colors.black,
+                                dropdownColor: Colors.white,
                                 style: const TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 22,
                                 ),
-                                iconEnabledColor: Colors.white,
+                                iconEnabledColor: Colors.black,
                                 items: positionMap.entries.map((entry) {
                                   return DropdownMenuItem<int>(
                                     value: entry.key,
@@ -381,101 +377,150 @@ class AddCrewmember extends StatefulWidget {
                           ),
                         ),
 
+                        SizedBox(height: 16),
+
                         // Enter tool(s) & weight
                         Padding(
                           padding: const EdgeInsets.only(top:4.0, bottom: 4.0, left: 16.0, right:16.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  controller: toolNameController,
-                                  textCapitalization: TextCapitalization.words,
-                                  maxLength: 12,
-                                  decoration: InputDecoration(
-                                    labelText: 'Tool Name',
-                                    labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
-                                    filled: true,
-                                    fillColor: Colors.black.withValues(alpha: 0.9),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: const BorderSide(color: Colors.white, width: 2.0),
-                                      borderRadius: BorderRadius.circular(12.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: Colors.white,
+                                    title: const Text(
+                                      'Add Tool',
+                                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                     ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: const BorderSide(color: Colors.black, width: 2.0),
-                                      borderRadius: BorderRadius.circular(12.0),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        TextField(
+                                          controller: toolNameController, // Reuse the existing controller
+                                          textCapitalization: TextCapitalization.words,
+                                          maxLength: 12,
+                                          decoration: InputDecoration(
+                                            labelText: 'Tool Name',
+                                            filled: true,
+                                            fillColor: Colors.grey[200],
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(8),
+                                              borderSide: const BorderSide(color: Colors.grey, width: 2),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        TextField(
+                                          controller: toolWeightController, // Reuse the existing controller
+                                          keyboardType: TextInputType.number,
+                                          maxLength: 2,
+                                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                          decoration: InputDecoration(
+                                            labelText: 'Tool Weight (lbs)',
+                                            filled: true,
+                                            fillColor: Colors.grey[200],
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(8),
+                                              borderSide: const BorderSide(color: Colors.grey, width: 1),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  style: const TextStyle(color: Colors.white, fontSize: 28),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Close the dialog without saving
+                                        },
+                                        child: const Text(
+                                          'Cancel',
+                                          style: TextStyle(color: Colors.grey),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          // Validate input and save values
+                                          if (toolNameController.text.trim().isNotEmpty &&
+                                              toolWeightController.text.trim().isNotEmpty) {
+                                            addTool();
+                                            // Reset controllers
+                                            toolNameController.clear();
+                                            toolWeightController.clear();
+
+                                            Navigator.of(context).pop(); // Close the dialog
+                                          } else {
+                                            // Optionally handle empty fields
+                                          }
+                                        },
+                                        child: const Text(
+                                          'Add',
+                                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.blue[100],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.black, // Black outline color
+                                  width: 2.0,          // Thickness of the outline
                                 ),
                               ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: TextField(
-                                  controller: toolWeightController,
-                                  keyboardType: TextInputType.number,
-                                  maxLength: 2,
-                                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                  decoration: InputDecoration(
-                                    labelText: 'Tool Weight',
-                                    hintText: 'Up to 99 lbs',hintStyle: const TextStyle(
-                                    color: Colors.grey, // Optional: Customize the hint text color
-                                    fontSize: 20, // Optional: Customize hint text size
-                                    fontStyle: FontStyle.italic, // Optional: Italicize the hint
-                                  ),
-                                    labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
-                                    filled: true,
-                                    fillColor: Colors.black.withOpacity(0.9),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: const BorderSide(color: Colors.white, width: 2.0),
-                                      borderRadius: BorderRadius.circular(12.0),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: const BorderSide(color: Colors.black, width: 2.0),
-                                      borderRadius: BorderRadius.circular(12.0),
-                                    ),
-                                  ),
-                                  style: const TextStyle(color: Colors.white, fontSize: 28),
+                              alignment: Alignment.center,
+                              child: const Text(
+                                '+ Add personal tools',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  color: Colors.black,
                                 ),
                               ),
-                              IconButton(
-                                icon: Container(
-                                  padding: const EdgeInsets.all(8.0),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.black),
-                                  ),
-                                  child: const Icon(Icons.add, color: Colors.black, size: 24),
-                                ),
-                                onPressed: addTool,
-                              ),
-                            ],
+                            ),
                           ),
                         ),
+
+                        SizedBox(height: 16),
 
                         // Display added tools
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                            padding: const EdgeInsets.only(left: 12.0, right: 12.0),
                             child: ListView.builder(
                               itemCount: addedTools?.length,
                               itemBuilder: (context, index) {
                                 final tool = addedTools?[index];
                                 return Card(
                                   elevation: 4,
-                                  color: Colors.black,
-                                  child: ListTile(
-                                    title: Text(
-                                      tool!.name,
-                                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                                  color: Colors.white,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white, // Background color (optional)
+                                      border: Border.all(
+                                        color: Colors.black, // Border color
+                                        width: 2.0,          // Border thickness
+                                      ),
+                                      borderRadius: BorderRadius.circular(12), // Rounded corners (optional)
                                     ),
-                                    subtitle: Text(
-                                      '${tool.weight} lbs',
-                                      style: const TextStyle(color: Colors.white, fontSize: 20),
-                                    ),
-                                    trailing: IconButton(
-                                      icon: const Icon(Icons.delete, color: Colors.red, size: 28),
-                                      onPressed: () => removeTool(index),
+                                    child: ListTile(
+                                      title: Text(
+                                        tool!.name,
+                                        style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+                                      ),
+                                      subtitle: Text(
+                                        '${tool.weight} lbs',
+                                        style: const TextStyle(color: Colors.black, fontSize: 20),
+                                      ),
+                                      trailing: IconButton(
+                                        icon: const Icon(Icons.delete, color: Colors.red, size: 28),
+                                        onPressed: () => removeTool(index),
+                                      ),
                                     ),
                                   ),
                                 );

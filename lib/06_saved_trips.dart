@@ -28,7 +28,28 @@ class _SavedTripsState extends State<SavedTripsView> {
   void loadTripList() {
     setState(() {
       tripList = tripBox.values.toList();
+      tripList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
     });
+  }
+  String formatTimestamp(DateTime timestamp) {
+    final now = DateTime.now();
+    final duration = now.difference(timestamp);
+
+    final seconds = duration.inSeconds;
+    final minutes = duration.inMinutes;
+    final hours = duration.inHours;
+    final days = duration.inDays;
+
+    if (seconds < 60) {
+      return '${seconds}s';
+    } else if (minutes < 60) {
+      return '${minutes}m';
+    } else if (hours < 24) {
+      return '${hours}h';
+    } else {
+      return '${days}d ago';
+    }
   }
 
   @override
@@ -61,167 +82,199 @@ class _SavedTripsState extends State<SavedTripsView> {
             child: Column(
               children: [
                 Expanded(
-                  child: ListView.builder(
-                    //hive: itemCount: tripList.length,
-                    itemCount: tripList.length,
-                    // itemCount:savedTrips.savedTrips.length -- in memory
-                    itemBuilder: (context, index) {
-                      final trip = tripList[index];
-                      //final trip = savedTrips.savedTrips[index];
+                  child: Stack(
+                    children: [
+                      ListView.builder(
+                      //hive: itemCount: tripList.length,
+                      itemCount: tripList.length,
+                      // itemCount:savedTrips.savedTrips.length -- in memory
+                      itemBuilder: (context, index) {
+                        final trip = tripList[index];
+                        //final trip = savedTrips.savedTrips[index];
 
-                      // Display trip data in a scrollable list
-                      return Card(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            // Could change color here
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(9),
-                          ),
-                          child: ListTile(
-                            iconColor: Colors.black,
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        trip.tripName,
-                                        style: const TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold),
-                                        overflow: TextOverflow.ellipsis, // Add this
-                                        maxLines: 1, // Ensures only one line with ellipsis if the text overflows
-                                      ),
-                                      Text(
-                                        'Allowable: ${trip.allowable} lbs',
-                                        style: const TextStyle(
-                                          fontSize: 18,
+                        // Display trip data in a scrollable list
+                        return Card(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              // Could change color here
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(9),
+                            ),
+                            child: ListTile(
+                              iconColor: Colors.black,
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Flexible(
+                                              child: Text(
+                                                trip.tripName,
+                                                style: const TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis, // Ensures the name truncates with ellipses
+                                                maxLines: 1, // Restricts to a single line
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8), // Add space between the trip name and the dot
+                                            const Text(
+                                              '•', // Small dot
+                                              style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8), // Add space between the dot and the timestamp
+                                            Text(
+                                              formatTimestamp(trip.timestamp),
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.grey, // Subdued color for the timestamp
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                // Set up to delete right now, not edit. Change later
-                                IconButton(
-                                    icon: const Icon(Icons.arrow_forward_ios,
-                                        //Icons.edit,
-                                        color: Colors.black,
-                                        size: 32),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => SingleTripView(
-                                            trip: trip,
+
+                                        Text(
+                                          'Allowable: ${trip.allowable} lbs',
+                                          style: const TextStyle(
+                                            fontSize: 18,
                                           ),
-                                        ),
-                                      );
-                                      // For deletion
-                                      // savedTrips.removeTrip(trip); -- in memory
-                                      //tripBox.removeTrip(trip);
-                                      //setState(() {});
-                                    })
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  // Set up to delete right now, not edit. Change later
+                                  IconButton(
+                                      icon: const Icon(Icons.arrow_forward_ios,
+                                          //Icons.edit,
+                                          color: Colors.black,
+                                          size: 32),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => SingleTripView(
+                                              trip: trip,
+                                            ),
+                                          ),
+                                        );
+                                        // For deletion
+                                        // savedTrips.removeTrip(trip); -- in memory
+                                        //tripBox.removeTrip(trip);
+                                        //setState(() {});
+                                      })
+                                ],
+                              ),
+                              leading: Icon(FontAwesomeIcons.helicopter),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                      // Delete All Button
+                      // if (savedTrips.savedTrips.isNotEmpty)
+                      Positioned(
+                        bottom: 16,
+                        left: 16,
+                        right: 16,
+                        child: GestureDetector(
+                          onTap: () {
+                            // if (savedTrips.savedTrips.isNotEmpty) {}
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                    'Confirm Deletion',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  content: const Text(
+                                    'Are you sure you want to delete all trips?',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context)
+                                            .pop(); // Close the dialog without deleting
+                                      },
+                                      child: const Text(
+                                        'Cancel',
+                                        style: TextStyle(
+                                            color: Colors.grey),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        savedTrips.deleteAllTrips();
+                                        setState(() {
+                                          loadTripList();
+                                        });
+                                        Navigator.of(context).pop(); // Close the dialog after deletion
+                                        Navigator.of(context).pop(); // Home screen
+                                      },
+                                      child: const Text(
+                                        'Delete',
+                                        style: TextStyle(
+                                            color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.deepOrangeAccent,
+                              border: Border.all(color: Colors.black, width: 2),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.8), // Adjust opacity for fading effect
+                                  spreadRadius: 60, // Increase spread for a wide shadow effect
+                                  blurRadius: 20, // Increase blur for a smooth fade
+                                  offset: Offset(0, 50), // Center the shadow around the container
+                                ),
                               ],
                             ),
-                            leading: Icon(FontAwesomeIcons.helicopter),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            //alignment: Alignment.center,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Delete All Trips ',
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Icon(Icons.delete, color: Colors.black, size: 32),
+                              ],
+                            ),
                           ),
                         ),
-                      );
-                    },
+                      ),
+    ],
                   ),
                 ),
 
-                // Delete All Button
-               // if (savedTrips.savedTrips.isNotEmpty)
-                  Padding(
-                    padding:
-                    const EdgeInsets.only(top: 16.0, bottom: 16.0, left: 16.0, right: 16.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        // if (savedTrips.savedTrips.isNotEmpty) {}
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text(
-                                  'Confirm Deletion',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                content: const Text(
-                                  'Are you sure you want to delete all trips?',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context)
-                                          .pop(); // Close the dialog without deleting
-                                    },
-                                    child: const Text(
-                                      'Cancel',
-                                      style: TextStyle(
-                                          color: Colors.grey),
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      savedTrips.deleteAllTrips();
-                                      setState(() {
-                                        loadTripList();
-                                      });
-                                      Navigator.of(context).pop(); // Close the dialog after deletion
-                                      Navigator.of(context).pop(); // Home screen
-                                    },
-                                    child: const Text(
-                                      'Delete',
-                                      style: TextStyle(
-                                          color: Colors.red),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                      },
 
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.deepOrangeAccent,
-                          border: Border.all(color: Colors.black, width: 2),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.5),
-                              spreadRadius: 1,
-                              blurRadius: 8,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        //alignment: Alignment.center,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Delete All Trips ',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Icon(Icons.delete, color: Colors.black, size: 32),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
               ],
             ),
           ),

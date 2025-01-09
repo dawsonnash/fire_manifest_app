@@ -260,8 +260,6 @@ class _SingleTripViewState extends State<SingleTripView>{
             child: Column(
               children: [
                 Expanded(
-                  child: Padding(
-                  padding: const EdgeInsets.all(8.0),
                   child: ListView.builder(
                     //hive: itemCount: tripList.length,
                     itemCount: widget.trip.loads.length,
@@ -271,64 +269,60 @@ class _SingleTripViewState extends State<SingleTripView>{
                       final load = widget.trip.loads[index];
 
                       // Display trip data in a scrollable list
-                      return Card(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            // Could change color here
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(9),
-                          ),
-                          child: ListTile(
-                            iconColor: Colors.black,
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Load ${load.loadNumber.toString()}',
-                                      style: const TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold
-                                      ),
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white, // Background color
+                          border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
+                        ),
+                        child: ListTile(
+                          iconColor: Colors.black,
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Load ${load.loadNumber.toString()}',
+                                    style: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold
                                     ),
-                                    Text(
-                                      'Weight: ${load.weight} lbs',
-                                      style: const TextStyle(
-                                        fontSize:18,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                IconButton(
-                                    icon: const Icon(
-                                        Icons.arrow_forward_ios,
-                                        //Icons.edit,
-                                        color: Colors.black,
-                                        size: 32
+                                  ),
+                                  Text(
+                                    'Weight: ${load.weight} lbs',
+                                    style: const TextStyle(
+                                      fontSize:18,
                                     ),
-                                    onPressed: (){
+                                  )
+                                ],
+                              ),
+                              IconButton(
+                                  icon: const Icon(
+                                      Icons.arrow_forward_ios,
+                                      //Icons.edit,
+                                      color: Colors.black,
+                                      size: 32
+                                  ),
+                                  onPressed: (){
 
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => SingleLoadView(
-                                            load: load,
-                                          ),
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SingleLoadView(
+                                          load: load,
                                         ),
-                                      );
-                                    }
-                                )
-                              ],
-                            ),
-                            leading: Icon(Icons.flight),
+                                      ),
+                                    );
+                                  }
+                              )
+                            ],
                           ),
+                          leading: Icon(Icons.numbers),
                         ),
                       );
                     },
                   ),
-                              ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),

@@ -420,9 +420,17 @@ class _SingleLoadViewState extends State<SingleLoadView> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Load ${widget.load.loadNumber}',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Text(
+                'Load ${widget.load.loadNumber}',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+                Text(
+                  ' • ${widget.load.weight} lbs',
+                  style: TextStyle(fontSize: 20, color: Colors.black),
+                ),
+        ],
             ),
             IconButton(
               icon: Icon(
@@ -521,195 +529,146 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                   height: double.infinity,
                 )),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: widget.load.loadPersonnel.length + widget.load.loadGear.length + widget.load.customItems.length,
-                    itemBuilder: (context, index) {
-                      int numCrewMembers = widget.load.loadPersonnel.length;
-                      int numGearItems = widget.load.loadGear.length;
+          Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: widget.load.loadPersonnel.length + widget.load.loadGear.length + widget.load.customItems.length,
+                  itemBuilder: (context, index) {
+                    int numCrewMembers = widget.load.loadPersonnel.length;
+                    int numGearItems = widget.load.loadGear.length;
 
-                      if (index < numCrewMembers) {
-                        // Display a crew member
-                        final crewmember = widget.load.loadPersonnel[index];
-                        return Card(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(9),
-                            ),
-                            child: ListTile(
-                              iconColor: Colors.black,
-                              title: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    if (index < numCrewMembers) {
+                      // Display a crew member
+                      final crewmember = widget.load.loadPersonnel[index];
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white, // Background color
+                          border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
+                        ),
+                        child: ListTile(
+                          iconColor: Colors.black,
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                  Text(
+                                    crewmember.name,
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Flight Weight: ${crewmember.flightWeight} lbs',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          leading: Icon(Icons.person),
+                        ),
+                      );
+                    } else if (index < numCrewMembers + numGearItems) {
+                      // Display a gear item
+                      final gearIndex = index - numCrewMembers;
+                      final gearItem = widget.load.loadGear[gearIndex];
+                      return Container(
+                        decoration: BoxDecoration(
+                            color: gearItem.isPersonalTool
+                                ? Colors.blue[100] // Color for personal tools
+                                : Colors.orange[100], // Background color
+                          border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
+                        ),
+                        child: ListTile(
+                          iconColor: Colors.black,
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
                                     children: [
                                       Text(
-                                        crewmember.name,
+                                        gearItem.name,
                                         style: const TextStyle(
                                           fontSize: 22,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                       Text(
-                                        'Flight Weight: ${crewmember.flightWeight} lbs',
+                                        ' (x${gearItem.quantity})',
                                         style: const TextStyle(
                                           fontSize: 18,
                                         ),
                                       ),
                                     ],
                                   ),
+                                  Text(
+                                    'Weight: ${gearItem.totalGearWeight} lbs',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                    ),
+                                  ),
                                 ],
                               ),
-                              leading: Icon(Icons.person),
-                            ),
+                            ],
                           ),
-                        );
-                      } else if (index < numCrewMembers + numGearItems) {
-                        // Display a gear item
-                        final gearIndex = index - numCrewMembers;
-                        final gearItem = widget.load.loadGear[gearIndex];
-                        return Card(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(9),
-                            ),
-                            child: ListTile(
-                              iconColor: Colors.black,
-                              title: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          leading: Icon(Icons.work_outline_outlined),
+                        ),
+                      );
+                    } else {
+                      // Display a custom item
+                      final customItemIndex = index - numCrewMembers - numGearItems;
+                      final customItem = widget.load.customItems[customItemIndex];
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white, // Background color
+                          border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
+                        ),
+                        child: ListTile(
+                          iconColor: Colors.black,
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                  Row(
                                     children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            gearItem.name,
-                                            style: const TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            ' (x${gearItem.quantity})',
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
                                       Text(
-                                        'Weight: ${gearItem.totalGearWeight} lbs',
+                                        customItem.name,
                                         style: const TextStyle(
-                                          fontSize: 18,
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
-                              leading: Icon(Icons.work_outline_outlined),
-                            ),
-                          ),
-                        );
-                      } else {
-                        // Display a custom item
-                        final customItemIndex = index - numCrewMembers - numGearItems;
-                        final customItem = widget.load.customItems[customItemIndex];
-                        return Card(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(9),
-                            ),
-                            child: ListTile(
-                              iconColor: Colors.black,
-                              title: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            customItem.name,
-                                            style: const TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Text(
-                                        'Weight: ${customItem.weight} lbs',
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                        ),
-                                      ),
-                                    ],
+                                  Text(
+                                    'Weight: ${customItem.weight} lbs',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                    ),
                                   ),
                                 ],
                               ),
-                              leading: Icon(Icons.inventory_2_outlined),
-                            ),
+                            ],
                           ),
-                        );
-                      }
-                    },
-                  ),
+                          leading: Icon(Icons.inventory_2_outlined),
+                        ),
+                      );
+                    }
+                  },
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.deepOrangeAccent,
-                      border: Border.all(color: Colors.black, width: 2),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          spreadRadius: 1,
-                          blurRadius: 8,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    //alignment: Alignment.center,
-                    child: Row(
-                      children: [
-                        Text(
-                          'Load Weight:',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Spacer(),
-                        Text(
-                          '${widget.load.weight} lbs',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),

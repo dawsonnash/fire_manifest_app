@@ -34,6 +34,9 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
     tripNameController.addListener(_updateTrip);
     allowableController.addListener(_updateTrip);
     availableSeatsController.addListener(_updateTrip);
+
+    // Initialize allowableController with the default slider value
+    allowableController.text = _sliderValue.toStringAsFixed(0);
   }
   // Track the last input source
   bool lastInputFromSlider = true;
@@ -422,7 +425,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
 
                         // Build Button
                         Padding(
-                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 5.0),
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
                           child: ElevatedButton(
                             onPressed: isCalculateButtonEnabled
                                 ? () {

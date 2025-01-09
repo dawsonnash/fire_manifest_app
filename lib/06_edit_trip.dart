@@ -742,7 +742,6 @@ class _EditTripState extends State<EditTrip> {
             children: [
               Expanded(
                 child: Container(
-                color: Colors.grey.withValues(alpha: 0.1),
                 child: Scrollbar(
                   child: ListView(
                     padding: const EdgeInsets.all(8.0),
@@ -750,7 +749,7 @@ class _EditTripState extends State<EditTrip> {
                       ...List.generate(loads.length, (index) {
                         // Track expanded state for each load
                         bool isExpanded = _isExpanded[index];
-                            
+
                         // Sort the load dynamically by CrewMember first, then Gear
                         loads[index].sort((a, b) {
                           if (a is CrewMember && b is Gear) {
@@ -761,7 +760,7 @@ class _EditTripState extends State<EditTrip> {
                             return 0; // Keep original order if they are the same type
                           }
                         });
-                            
+
                         return Container(
                           margin: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
@@ -786,7 +785,7 @@ class _EditTripState extends State<EditTrip> {
                                   });
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.all(4),
+                                  padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
                                     color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                         ? Colors.black // Warning color
@@ -808,7 +807,7 @@ class _EditTripState extends State<EditTrip> {
                                               color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                                   ? Colors.white // Warning color
                                                   : Colors.black,
-                                              fontSize: 18,
+                                              fontSize: 22,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -878,106 +877,26 @@ class _EditTripState extends State<EditTrip> {
                                           ),
                                         ],
                                       ),
-                                      // Load deletion Icon
-                                      IconButton(
-                                        icon: Icon(Icons.delete,
-                                            color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                ? Colors.white // Warning color
-                                                : Colors.black,
-                                            size: 32),
-                                        onPressed: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                title: const Text(
-                                                  'Confirm Deletion',
-                                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                                ),
-                                                content: const Text(
-                                                  'Are you sure you want to delete this load?',
-                                                  style: TextStyle(fontSize: 16),
-                                                ),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context).pop(); // Close the dialog without deleting
-                                                    },
-                                                    child: const Text(
-                                                      'Cancel',
-                                                      style: TextStyle(color: Colors.grey),
-                                                    ),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      // Execute deletion logic
-                                                      setState(() {
-                                                        // Iterate through all items in the load
-                                                        for (var item in loads[index]) {
-                                                          if (item is CrewMember) {
-                                                            // Add crew member back to the crew list
-                                                            if (!crewList.contains(item)) {
-                                                              crewList.add(item);
-                                                            }
-                                                          } else if (item is Gear) {
-                                                            if (item.isPersonalTool) {
-                                                              gearList.removeWhere((gear) => gear.name == item.name && gear.isPersonalTool);
-                                                            } else {
-                                                              // General gear: update or add back to gearList
-                                                              final existingGear = gearList.firstWhere(
-                                                                    (gear) => gear.name == item.name && !gear.isPersonalTool,
-                                                                orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight ~/ item.quantity),
-                                                              );
-                            
-                                                              existingGear.quantity += item.quantity;
-                            
-                                                              // Add to gearList if it's not already present
-                                                              if (!gearList.contains(existingGear)) {
-                                                                gearList.add(existingGear);
-                                                              }
-                                                            }
-                                                          }
-                                                        }
-                                                        // Remove all personal tools from the gearList
-                                                        gearList.removeWhere((gear) => gear.isPersonalTool);
-                            
-                                                        // Remove the load from the list
-                                                        loads.removeAt(index);
-                                                        _isExpanded.removeAt(index); // Ensure the lists stay in sync
-                                                      });
-                            
-                                                      Navigator.of(context).pop(); // Close the dialog after deletion
-                                                    },
-                                                    child: const Text(
-                                                      'Delete',
-                                                      style: TextStyle(color: Colors.red),
-                                                    ),
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          );
-                                        },
-                                      ),
-                            
                                       // Expansion Icon
                                       Icon(
                                         isExpanded ? Icons.expand_less : Icons.expand_more,
                                         color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                             ? Colors.white // Warning color
                                             : Colors.black,
+                                        size: 36,
                                       ),
                                     ],
                                   ),
                                 ),
                               ),
-                            
+
                               // Body Section with Add Item Button
                               if (isExpanded)
                                 Padding(
                                   padding: const EdgeInsets.all(0.0),
                                   child: Column(
                                     children: [
+                                      // If overweight
                                       if (calculateAvailableWeight(loads[index]) > widget.trip.allowable)
                                         Padding(
                                           padding: const EdgeInsets.symmetric(vertical: 1.0),
@@ -1001,6 +920,7 @@ class _EditTripState extends State<EditTrip> {
                                             ),
                                           ),
                                         ),
+                                      // If over seats
                                       if (calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
                                         Padding(
                                           padding: const EdgeInsets.symmetric(vertical: 1.0), // Adjust padding as needed
@@ -1024,7 +944,7 @@ class _EditTripState extends State<EditTrip> {
                                             ),
                                           ),
                                         ),
-                            
+
                                       for (var item in loads[index]
                                         ..sort((a, b) {
                                           if (a is CustomItem && (b is Gear || b is CrewMember)) {
@@ -1051,7 +971,7 @@ class _EditTripState extends State<EditTrip> {
                                             setState(() {
                                               if (loads[index].contains(item)) {
                                                 loads[index].remove(item);
-                            
+
                                                 if (item is Gear) {
                                                   // No changes needed for Gear removal
                                                   var existingGear = gearList.firstWhere(
@@ -1063,10 +983,10 @@ class _EditTripState extends State<EditTrip> {
                                                       isPersonalTool: item.isPersonalTool,
                                                     ),
                                                   );
-                            
+
                                                   // Update the quantity in the existing inventory
                                                   existingGear.quantity += item.quantity;
-                            
+
                                                   if (!gearList.contains(existingGear)) {
                                                     gearList.add(existingGear);
                                                   }
@@ -1078,11 +998,11 @@ class _EditTripState extends State<EditTrip> {
                                                       final gearListIndex = gearList.indexWhere(
                                                             (gear) => gear.name == tool.name,
                                                       );
-                            
+
                                                       if (gearListIndex != -1) {
                                                         Gear gearTool = gearList[gearListIndex];
                                                         gearTool.quantity -= tool.quantity;
-                            
+
                                                         // If quantity reaches zero, remove the tool from the gearList
                                                         if (gearTool.quantity <= 0) {
                                                           gearList.removeAt(gearListIndex);
@@ -1092,11 +1012,11 @@ class _EditTripState extends State<EditTrip> {
                                                         final toolIndex = loads[index].indexWhere(
                                                               (loadItem) => loadItem is Gear && loadItem.name == tool.name,
                                                         );
-                            
+
                                                         if (toolIndex != -1) {
                                                           Gear loadTool = loads[index][toolIndex];
                                                           loadTool.quantity -= tool.quantity;
-                            
+
                                                           // If quantity reaches zero, remove the tool from the load
                                                           if (loadTool.quantity <= 0) {
                                                             loads[index].removeAt(toolIndex);
@@ -1105,7 +1025,7 @@ class _EditTripState extends State<EditTrip> {
                                                       }
                                                     }
                                                   }
-                            
+
                                                   // Add the CrewMember back to the available list
                                                   if (!crewList.contains(item)) {
                                                     crewList.add(item);
@@ -1155,7 +1075,7 @@ class _EditTripState extends State<EditTrip> {
                                                       ),
                                                     ],
                                                   ),
-                            
+
                                                   // Single Item Deletion
                                                   IconButton(
                                                     icon: const Icon(Icons.delete, color: Colors.red),
@@ -1206,7 +1126,7 @@ class _EditTripState extends State<EditTrip> {
                                                                               setState(() {
                                                                                 // Deduct the selected quantity
                                                                                 item.quantity -= quantityToRemove;
-                            
+
                                                                                 // Handle returning the removed quantity to the inventory
                                                                                 var existingGear = gearList.firstWhere(
                                                                                       (gear) => gear.name == item.name,
@@ -1217,20 +1137,20 @@ class _EditTripState extends State<EditTrip> {
                                                                                     isPersonalTool: item.isPersonalTool,
                                                                                   ),
                                                                                 );
-                            
+
                                                                                 // Update inventory quantity
                                                                                 existingGear.quantity += quantityToRemove;
-                            
+
                                                                                 if (!gearList.contains(existingGear)) {
                                                                                   gearList.add(existingGear);
                                                                                 }
-                            
+
                                                                                 // Remove the item from the load if quantity reaches zero
                                                                                 if (item.quantity <= 0) {
                                                                                   loads[index].remove(item);
                                                                                 }
                                                                               });
-                            
+
                                                                               Navigator.of(context).pop(); // Close the dialog
                                                                             },
                                                                             child: const Text('Remove'),
@@ -1253,10 +1173,10 @@ class _EditTripState extends State<EditTrip> {
                                                                   isPersonalTool: item.isPersonalTool,
                                                                 ),
                                                               );
-                            
+
                                                               // Update inventory quantity
                                                               existingGear.quantity += 1;
-                            
+
                                                               if (!gearList.contains(existingGear)) {
                                                                 gearList.add(existingGear);
                                                               }
@@ -1268,7 +1188,7 @@ class _EditTripState extends State<EditTrip> {
                                                                 final gearListIndex = gearList.indexWhere(
                                                                       (gear) => gear.name == tool.name,
                                                                 );
-                            
+
                                                                 if (gearListIndex != -1) {
                                                                   // Update gear list quantities
                                                                   Gear gearTool = gearList[gearListIndex];
@@ -1281,7 +1201,7 @@ class _EditTripState extends State<EditTrip> {
                                                                   final toolIndex = loads[index].indexWhere(
                                                                         (loadItem) => loadItem is Gear && loadItem.name == tool.name,
                                                                   );
-                            
+
                                                                   if (toolIndex != -1) {
                                                                     Gear loadTool = loads[index][toolIndex];
                                                                     loadTool.quantity -= tool.quantity;
@@ -1309,10 +1229,10 @@ class _EditTripState extends State<EditTrip> {
                                           ),
                                         ),
                                       //const SizedBox(height: 4),
-                            
+
                                       SizedBox(height: 2),
-                                      SizedBox(height: 2),
-                            
+
+                                      // Add Item
                                       GestureDetector(
                                         onTap: () => _showSelectionDialog(index),
                                         child: Container(
@@ -1335,6 +1255,116 @@ class _EditTripState extends State<EditTrip> {
                                           ),
                                         ),
                                       ),
+
+                                      SizedBox(height: 2),
+
+                                      // Delete load
+                                      GestureDetector(
+                                        onTap: ()  {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: const Text(
+                                                  'Confirm Deletion',
+                                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                                ),
+                                                content: const Text(
+                                                  'Are you sure you want to delete this load?',
+                                                  style: TextStyle(fontSize: 16),
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop(); // Close the dialog without deleting
+                                                    },
+                                                    child: const Text(
+                                                      'Cancel',
+                                                      style: TextStyle(color: Colors.grey),
+                                                    ),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      // Execute deletion logic
+                                                      setState(() {
+                                                        // Iterate through all items in the load
+                                                        for (var item in loads[index]) {
+                                                          if (item is CrewMember) {
+                                                            // Add crew member back to the crew list
+                                                            if (!crewList.contains(item)) {
+                                                              crewList.add(item);
+                                                            }
+                                                          } else if (item is Gear) {
+                                                            if (item.isPersonalTool) {
+                                                              gearList.removeWhere((gear) => gear.name == item.name && gear.isPersonalTool);
+                                                            } else {
+                                                              // General gear: update or add back to gearList
+                                                              final existingGear = gearList.firstWhere(
+                                                                    (gear) => gear.name == item.name && !gear.isPersonalTool,
+                                                                orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight ~/ item.quantity),
+                                                              );
+
+                                                              existingGear.quantity += item.quantity;
+
+                                                              // Add to gearList if it's not already present
+                                                              if (!gearList.contains(existingGear)) {
+                                                                gearList.add(existingGear);
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                        // Remove all personal tools from the gearList
+                                                        gearList.removeWhere((gear) => gear.isPersonalTool);
+
+                                                        // Remove the load from the list
+                                                        loads.removeAt(index);
+                                                        _isExpanded.removeAt(index); // Ensure the lists stay in sync
+                                                      });
+
+                                                      Navigator.of(context).pop(); // Close the dialog after deletion
+                                                    },
+                                                    child: const Text(
+                                                      'Delete',
+                                                      style: TextStyle(color: Colors.red),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: Container(
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.symmetric(vertical: 8),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            // Background color
+                                            borderRadius: BorderRadius.circular(8),
+                                            // Rounded corners
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: Row(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.delete,
+                                                color: Colors.black,
+                                                size: 24),
+                                              Text(
+                                                ' Delete Load',
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                        ],
+                                          ),
+                                        ),
+                                      ),
+
+
+
                                     ],
                                   ),
                                 ),
@@ -1342,21 +1372,21 @@ class _EditTripState extends State<EditTrip> {
                           ),
                         );
                       }),
-                            
+
                       // Add Load Button
                       Center(
                         child: ElevatedButton(
                           onPressed: () {
                             setState(() {
                               print('Before adding: loads.length = ${loads.length}, _isExpanded.length = ${_isExpanded.length}');
-                            
+
                             // Add load here bruh
                               loads.add([]);
                               _isExpanded.add(true);
                               print('After adding: loads.length = ${loads.length}, _isExpanded.length = ${_isExpanded.length}');
-                            
-                            
-                            
+
+
+
                             });
                           },
                           style: ElevatedButton.styleFrom(
@@ -1450,15 +1480,15 @@ class _EditTripState extends State<EditTrip> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        Icon(Icons.delete, color: Colors.black, size: 28),
                         Text(
-                          'Delete Trip',
+                          ' Delete Trip',
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
-                        Icon(Icons.delete, color: Colors.black, size: 32),
                       ],
                     ),
                   ),

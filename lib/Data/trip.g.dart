@@ -20,13 +20,14 @@ class TripAdapter extends TypeAdapter<Trip> {
       tripName: fields[0] as String,
       allowable: fields[1] as int,
       availableSeats: fields[2] as int,
+      timestamp: fields[4] as DateTime?,
     )..loads = (fields[3] as List).cast<Load>();
   }
 
   @override
   void write(BinaryWriter writer, Trip obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.tripName)
       ..writeByte(1)
@@ -34,7 +35,9 @@ class TripAdapter extends TypeAdapter<Trip> {
       ..writeByte(2)
       ..write(obj.availableSeats)
       ..writeByte(3)
-      ..write(obj.loads);
+      ..write(obj.loads)
+      ..writeByte(4)
+      ..write(obj.timestamp);
   }
 
   @override

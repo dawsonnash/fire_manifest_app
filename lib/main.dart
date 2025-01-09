@@ -142,13 +142,21 @@ class _MyHomePageState extends State<MyHomePage> {
               // Fitted box automatically scales text based on available space
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: Text(
-                  'Fire Manifesting App',
-                  textAlign: TextAlign.center,
-                  // style: Theme.of(context).textTheme.headlineLarge,
-                  style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
-
-
+                child: Column(
+                  children: [
+                    Text(
+                    'Fire Manifesting',
+                    textAlign: TextAlign.center,
+                    // style: Theme.of(context).textTheme.headlineLarge,
+                    style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                  ),
+                    Text(
+                      'App',
+                      textAlign: TextAlign.center,
+                      // style: Theme.of(context).textTheme.headlineLarge,
+                      style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                    ),
+                ],
                 ),
               ),
             ),
@@ -231,6 +239,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
 
       ),
+
     );
   }
 }

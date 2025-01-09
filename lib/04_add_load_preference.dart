@@ -242,7 +242,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                             member.getPositionTitle(member.position),
                             style: TextStyle(
                               color: Colors.black,
-                              fontStyle: FontStyle.italic,
                             ),
                           ),
                           value: isSelected,
@@ -708,7 +707,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
-                                fontStyle: FontStyle.italic,
                               ),
                             ),
                           ),
@@ -734,7 +732,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 22,
-                                  fontStyle: FontStyle.italic,
                                 ),
                               ),
                               dropdownColor: Colors.black,
@@ -862,7 +859,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
-                                fontStyle: FontStyle.italic,
                               ),
                             ),
                           ),
@@ -888,7 +884,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 22,
-                                  fontStyle: FontStyle.italic,
                                 ),
                               ),
                               dropdownColor: Colors.black,

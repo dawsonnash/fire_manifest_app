@@ -42,18 +42,9 @@ class EditCrew extends StatelessWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Edit Crew',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'Total Crew Weight: ${crew.totalCrewWeight.toInt().toString()} lbs',
-                  style: TextStyle(fontSize: 18),
-                ),
-              ],
+            const Text(
+              'Edit Crew',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ],
         ),
