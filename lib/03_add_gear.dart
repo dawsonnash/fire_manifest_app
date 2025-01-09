@@ -164,6 +164,9 @@ class _AddGearState extends State<AddGear>{
         onTap: () {
           FocusScope.of(context).unfocus(); // Dismiss the keyboard
         },
+        onVerticalDragStart: (_) {
+          FocusScope.of(context).unfocus(); // Dismiss the keyboard on vertical swipe
+        },
         child: Column(
 
           mainAxisAlignment: MainAxisAlignment.start,
