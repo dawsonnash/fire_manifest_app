@@ -161,7 +161,8 @@ class _GearViewState extends State<GearView>{
                                     onPressed: () {
                                       crew.deleteAllGear();
                                       setState(() {});
-                                      Navigator.of(context).pop(); // Close the dialog
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pop(); // Home screen
                                     },
                                     child: const Text(
                                       'Delete',

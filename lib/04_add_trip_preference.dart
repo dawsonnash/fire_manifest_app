@@ -130,142 +130,108 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (tripPreference.positionalPreferences.isEmpty &&
+                  tripPreference.gearPreferences.isEmpty)
 
-                if (tripPreference.positionalPreferences.isEmpty &&
-                    tripPreference.gearPreferences.isEmpty)
-
-                  // Container for if user has no preferences
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.black, width: 2),
-                      borderRadius: BorderRadius.circular(4),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.5),
-                          spreadRadius: 1,
-                          blurRadius: 8,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    child: const Text(
-                      'No preferences added...',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                // Container for if user has no preferences
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.black, width: 2),
+                    borderRadius: BorderRadius.circular(4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        spreadRadius: 1,
+                        blurRadius: 8,
+                        offset: Offset(0, 3),
                       ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
+                  child: const Text(
+                    'No preferences added...',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: tripPreference.positionalPreferences.length +
-                        tripPreference.gearPreferences.length,
-                    itemBuilder: (context, index) {
-                      // If index is within the positionalPreferences range
-                      if (index < tripPreference.positionalPreferences.length) {
-                        final posPref =
-                            tripPreference.positionalPreferences[index];
+                ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: tripPreference.positionalPreferences.length +
+                      tripPreference.gearPreferences.length,
+                  itemBuilder: (context, index) {
+                    // If index is within the positionalPreferences range
+                    if (index < tripPreference.positionalPreferences.length) {
+                      final posPref =
+                          tripPreference.positionalPreferences[index];
 
-                        // Dynacmic title - individual or saw teams
-                        String titleText =
-                            posPref.crewMembersDynamic.map((member) {
-                          if (member is CrewMember) {
-                            return member.name; // Single crew member
-                          } else if (member is List<CrewMember>) {
-                            // Check which saw team this list matches and return the appropriate name
-                            if (member == crew.getSawTeam(1))
-                              return 'Saw Team 1';
-                            if (member == crew.getSawTeam(2))
-                              return 'Saw Team 2';
-                            if (member == crew.getSawTeam(3))
-                              return 'Saw Team 3';
-                            if (member == crew.getSawTeam(4))
-                              return 'Saw Team 4';
-                            if (member == crew.getSawTeam(5))
-                              return 'Saw Team 5';
-                            if (member == crew.getSawTeam(6))
-                              return 'Saw Team 6';
-                          }
-                          return '';
-                        }).join(', ');
+                      // Dynacmic title - individual or saw teams
+                      String titleText =
+                          posPref.crewMembersDynamic.map((member) {
+                        if (member is CrewMember) {
+                          return member.name; // Single crew member
+                        } else if (member is List<CrewMember>) {
+                          // Check which saw team this list matches and return the appropriate name
+                          if (member == crew.getSawTeam(1))
+                            return 'Saw Team 1';
+                          if (member == crew.getSawTeam(2))
+                            return 'Saw Team 2';
+                          if (member == crew.getSawTeam(3))
+                            return 'Saw Team 3';
+                          if (member == crew.getSawTeam(4))
+                            return 'Saw Team 4';
+                          if (member == crew.getSawTeam(5))
+                            return 'Saw Team 5';
+                          if (member == crew.getSawTeam(6))
+                            return 'Saw Team 6';
+                        }
+                        return '';
+                      }).join(', ');
 
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 16.0),
-                          child: ListTile(
-                            title: Text(
-                              posPref.crewMembersDynamic.map((item) {
-                                if (item is CrewMember) {
-                                  return item
-                                      .name; // Display individual crew member name
-                                } else if (item is List<CrewMember>) {
-                                  // Check which Saw Team the list matches and return the appropriate Saw Team name
-                                  for (int i = 1; i <= 6; i++) {
-                                    List<CrewMember> sawTeam =
-                                        crew.getSawTeam(i);
-                                    if (sawTeam.every((member) =>
-                                            item.contains(member)) &&
-                                        item.length == sawTeam.length) {
-                                      return 'Saw Team $i'; // Return Saw Team name
-                                    }
-                                  }
-                                }
-                                return '';
-                              }).join(', '),
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text(
-                                "Load Preference: ${loadPreferenceMap[posPref.loadPreference]}"),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {
-                                setState(() {
-                                  tripPreference.positionalPreferences
-                                      .removeAt(index);
-                                  tripPreference.save(); // Save changes to Hive
-
-                                });
-                              },
-                            ),
-                          ),
-                        );
-                      }
-                      // Handle gear preferences
-                      final gearIndex =
-                          index - tripPreference.positionalPreferences.length;
-                      final gearPref =
-                          tripPreference.gearPreferences[gearIndex];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 8.0, horizontal: 16.0),
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white, // Background color
+                          border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
+                        ),
                         child: ListTile(
                           title: Text(
-                            gearPref.gear
-                                .map((item) =>
-                                    '${item.name} (x${item.quantity})')
-                                .join(', '),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            posPref.crewMembersDynamic.map((item) {
+                              if (item is CrewMember) {
+                                return item
+                                    .name; // Display individual crew member name
+                              } else if (item is List<CrewMember>) {
+                                // Check which Saw Team the list matches and return the appropriate Saw Team name
+                                for (int i = 1; i <= 6; i++) {
+                                  List<CrewMember> sawTeam =
+                                      crew.getSawTeam(i);
+                                  if (sawTeam.every((member) =>
+                                          item.contains(member)) &&
+                                      item.length == sawTeam.length) {
+                                    return 'Saw Team $i'; // Return Saw Team name
+                                  }
+                                }
+                              }
+                              return '';
+                            }).join(', '),
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
                           ),
                           subtitle: Text(
-                              "Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}"),
+                              "Load Preference: ${loadPreferenceMap[posPref.loadPreference]}", style: TextStyle(fontSize: 16)),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () {
                               setState(() {
-                                tripPreference.gearPreferences
-                                    .removeAt(gearIndex);
+                                tripPreference.positionalPreferences
+                                    .removeAt(index);
                                 tripPreference.save(); // Save changes to Hive
 
                               });
@@ -273,48 +239,81 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                           ),
                         ),
                       );
-                    },
-                  ),
-                ),
+                    }
+                    // Handle gear preferences
+                    final gearIndex =
+                        index - tripPreference.positionalPreferences.length;
+                    final gearPref =
+                        tripPreference.gearPreferences[gearIndex];
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white, // Background color
+                        border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
+                      ),
+                      child: ListTile(
+                        title: Text(
+                          gearPref.gear
+                              .map((item) =>
+                                  '${item.name} (x${item.quantity})')
+                              .join(', '),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                        ),
+                        subtitle: Text(
+                            "Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}", style: TextStyle(fontSize: 16),),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () {
+                            setState(() {
+                              tripPreference.gearPreferences
+                                  .removeAt(gearIndex);
+                              tripPreference.save(); // Save changes to Hive
 
-                // Add Load Preference Button
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddLoadPreference(
-                            tripPreference: tripPreference,
-                            onUpdate:
-                                loadPositionalPreferenceList, // refresh list on return
-                          ),
+                            });
+                          },
                         ),
-                      );
-                      if (result != null) {
-                        setState(() {
-                          tripPreference.positionalPreferences.add(result);
-                        });
-                      }
-                    },
-                    style: style,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.add, color: Colors.black, size: 32),
-                        Flexible(
-                          child: Text(
-                            'Load Preference',
-                            textAlign: TextAlign.center,
-                            softWrap: true,
-                          ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // Add Load Preference Button
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddLoadPreference(
+                          tripPreference: tripPreference,
+                          onUpdate:
+                              loadPositionalPreferenceList, // refresh list on return
                         ),
-                      ],
-                    ),
+                      ),
+                    );
+                    if (result != null) {
+                      setState(() {
+                        tripPreference.positionalPreferences.add(result);
+                      });
+                    }
+                  },
+                  style: style,
+                  child: Row(
+                    children: [
+                      const Icon(Icons.add, color: Colors.black, size: 32),
+                      Flexible(
+                        child: Text(
+                          'Load Preference',
+                          textAlign: TextAlign.center,
+                          softWrap: true,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),

@@ -1,3 +1,5 @@
+import 'package:fire_app/Data/trip_preferences.dart';
+
 import 'crewmember.dart';
 import 'gear.dart';
 import 'package:hive/hive.dart';
@@ -54,43 +56,115 @@ class Crew {
     print('Updated Total Crew Weight: $totalCrewWeight');
   }
 
-  void removeCrewMember(CrewMember member){
+  void removeCrewMember(CrewMember member) {
     var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
-    final keyToRemove = crewmemberBox.keys.firstWhere( // find hive key of entry we are removing
+    var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox'); // Assume TripPreference is stored here
+
+    // Remove the crew member from Hive
+    final keyToRemove = crewmemberBox.keys.firstWhere(
           (key) => crewmemberBox.get(key) == member,
       orElse: () => null,
     );
     if (keyToRemove != null) {
       crewmemberBox.delete(keyToRemove);
     }
-    crewMembers.remove(member); // remove in-memory as well
+
+    // Remove the crew member from the in-memory list
+    crewMembers.remove(member);
+
+    // Iterate through all trip preferences to update them
+    for (var tripPreference in tripPreferenceBox.values) {
+      // Remove entire positional preferences if the crew member exists in them
+      tripPreference.positionalPreferences.removeWhere((positionalPreference) {
+        // Check if the crew member exists in the dynamic list (either directly or in nested lists)
+        return positionalPreference.crewMembersDynamic.any((entry) {
+          if (entry is CrewMember) {
+            // Direct match with a CrewMember
+            return entry == member;
+          } else if (entry is List<CrewMember>) {
+            // Check within a nested list
+            return entry.contains(member);
+          }
+          return false;
+        });
+      });
+
+      // If no positional or gear preferences remain, delete the trip preference
+      if (tripPreference.positionalPreferences.isEmpty && tripPreference.gearPreferences.isEmpty) {
+        tripPreference.delete();
+      } else {
+        tripPreference.save(); // Save the updated trip preference
+      }
+    }
+
+    // Update total crew weight
     updateTotalCrewWeight();
     print('Updated Total Crew Weight: $totalCrewWeight');
   }
 
   void deleteAllCrewMembers() {
     var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
-    // Clear the in-memory list
+    var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox'); // Assume TripPreference is stored here
+
+    // Clear the in-memory list of crew members
     crewMembers.clear();
-    // Clear the Hive storage
+
+    // Clear the Hive storage for crew members
     crewmemberBox.clear();
-    // Update the total weight
+
+    // Iterate through all trip preferences to remove positional preferences
+    for (var tripPreference in tripPreferenceBox.values) {
+      // Clear all positional preferences
+      tripPreference.positionalPreferences.clear();
+
+      // If no positional or gear preferences remain, delete the trip preference
+      if (tripPreference.positionalPreferences.isEmpty && tripPreference.gearPreferences.isEmpty) {
+        tripPreference.delete();
+      } else {
+        tripPreference.save(); // Save the updated trip preference
+      }
+    }
+
+    // Update the total crew weight
     updateTotalCrewWeight();
   }
 
-  void removeGear(Gear gearItem){
+  void removeGear(Gear gearItem) {
     var gearBox = Hive.box<Gear>('gearBox');
+    var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox'); // Assume TripPreference is stored here
 
-    final keyToRemove = gearBox.keys.firstWhere( // find hive key of entry we are removing
-          (key) => gearBox.get(key) == gearItem,
+    // Remove the gear item from Hive
+    final keyToRemove = gearBox.keys.firstWhere(
+          (key) => gearBox.get(key)?.name == gearItem.name, // Compare by name
       orElse: () => null,
     );
     if (keyToRemove != null) {
       gearBox.delete(keyToRemove);
     }
-    gear.remove(gearItem); // removed from in-memory as well
+
+    // Remove the gear item from the in-memory list
+    gear.removeWhere((g) => g.name == gearItem.name); // Remove by name
+
+    // Iterate through all trip preferences
+    for (var tripPreference in tripPreferenceBox.values.toList()) {
+
+      // Remove gear preferences containing gear with the same name
+      tripPreference.gearPreferences.removeWhere((gearPreference) {
+
+        // Remove the gearPreference if it contains a gear with the same name
+        return gearPreference.gear.any((g) => g.name == gearItem.name);
+      });
+
+      // Check if the trip preference is empty after removing the gear preferences
+      if (tripPreference.positionalPreferences.isEmpty && tripPreference.gearPreferences.isEmpty) {
+        tripPreference.delete();
+      } else {
+        tripPreference.save(); // Save the updated trip preference
+      }
+    }
+
+    // Update the total crew weight
     updateTotalCrewWeight();
-    print('Updated Total Crew Weight: $totalCrewWeight');
   }
 
   void addGear(Gear gearItem) {
@@ -103,11 +177,28 @@ class Crew {
 
   void deleteAllGear() {
     var gearBox = Hive.box<Gear>('gearBox');
-    // Clear the in-memory list
+    var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox'); // Assume TripPreference is stored here
+
+    // Clear the in-memory list of gear
     gear.clear();
-    // Clear the Hive storage
+
+    // Clear the Hive storage for gear
     gearBox.clear();
-    // Update the total weight
+
+    // Iterate through all trip preferences to remove gear preferences
+    for (var tripPreference in tripPreferenceBox.values) {
+      // Clear all gear preferences
+      tripPreference.gearPreferences.clear();
+
+      // If no positional or gear preferences remain, delete the trip preference
+      if (tripPreference.positionalPreferences.isEmpty && tripPreference.gearPreferences.isEmpty) {
+        tripPreference.delete();
+      } else {
+        tripPreference.save(); // Save the updated trip preference
+      }
+    }
+
+    // Update the total crew weight
     updateTotalCrewWeight();
   }
 
