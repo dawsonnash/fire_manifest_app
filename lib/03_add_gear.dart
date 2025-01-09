@@ -160,207 +160,212 @@ class _AddGearState extends State<AddGear>{
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Column(
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus(); // Dismiss the keyboard
+        },
+        child: Column(
 
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Expanded( // Takes up all available space
-            child: Stack(
-              children: [
-                // Background image
-                Container(
-                  child: ImageFiltered(
-                      imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                      // Blur effect
-                      child: Image.asset('assets/images/logo1.png',
-                        fit: BoxFit.cover, // Cover  entire background
-                        width: double.infinity,
-                        height: double.infinity,
-                      )
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded( // Takes up all available space
+              child: Stack(
+                children: [
+                  // Background image
+                  Container(
+                    child: ImageFiltered(
+                        imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                        // Blur effect
+                        child: Image.asset('assets/images/logo1.png',
+                          fit: BoxFit.cover, // Cover  entire background
+                          width: double.infinity,
+                          height: double.infinity,
+                        )
+                    ),
                   ),
-                ),
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.white.withOpacity(0.1),
-                  child: Column(
+                  Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: Colors.white.withOpacity(0.1),
+                    child: Column(
 
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Spacer(flex: 1),
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Spacer(flex: 1),
 
-                      // Enter Name
-                      Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: TextField(
-                            controller: gearNameController,
-                            maxLength: 20,
-                            textCapitalization: TextCapitalization.words,
-                            decoration: InputDecoration(
-                              labelText: 'Gear Name',
-                              labelStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontStyle: FontStyle.italic,
-                                //fontWeight: FontWeight.bold,
-                              ),
-                              filled: true,
-                              fillColor: Colors.black.withValues(alpha: 0.9),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
+                        // Enter Name
+                        Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: TextField(
+                              controller: gearNameController,
+                              maxLength: 20,
+                              textCapitalization: TextCapitalization.words,
+                              decoration: InputDecoration(
+                                labelText: 'Gear Name',
+                                labelStyle: const TextStyle(
                                   color: Colors.white,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
+                                  fontSize: 22,
+                                  fontStyle: FontStyle.italic,
+                                  //fontWeight: FontWeight.bold,
                                 ),
-                                borderRadius: BorderRadius.circular(
-                                    12.0), // Rounded corners
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
+                                filled: true,
+                                fillColor: Colors.black.withValues(alpha: 0.9),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                      12.0), // Rounded corners
                                 ),
-                                borderRadius: BorderRadius.circular(12.0),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.black,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+
                               ),
-
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                            ),
-                          )
-
-                      ),
-
-                      // Enter Gear Weight
-                      Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: TextField(
-                            controller: gearWeightController,
-                            keyboardType: TextInputType.number,
-                            maxLength: 3,
-                            // Only show numeric keyboard
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly,
-                              // Allow only digits
-                            ],
-                            decoration: InputDecoration(
-                              labelText: 'Weight',
-                              hintText: 'Up to 500 lbs',hintStyle: const TextStyle(
-                              color: Colors.grey, // Optional: Customize the hint text color
-                              fontSize: 20, // Optional: Customize hint text size
-                              fontStyle: FontStyle.italic, // Optional: Italicize the hint
-                            ),
-                              labelStyle: const TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 22,
-                                fontStyle: FontStyle.italic,
-                                //fontWeight: FontWeight.bold,
+                                fontSize: 28,
                               ),
-                              filled: true,
-                              fillColor: Colors.black.withOpacity(0.9),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.white,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                    12.0), // Rounded corners
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                            ),
-                          )
-
-                      ),
-
-                      // Enter quantity
-                      Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: TextField(
-                            controller: gearQuantityController,
-                            keyboardType: TextInputType.number,
-                            maxLength: 2,
-                            // Only show numeric keyboard
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly,
-                              // Allow only digits
-                            ],
-                            decoration: InputDecoration(
-                              labelText: 'Quantity',
-                              hintText: 'Up to 99',hintStyle: const TextStyle(
-                              color: Colors.grey, // Optional: Customize the hint text color
-                              fontSize: 20, // Optional: Customize hint text size
-                              fontStyle: FontStyle.italic, // Optional: Italicize the hint
-                            ),
-                              labelStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontStyle: FontStyle.italic,
-                                //fontWeight: FontWeight.bold,
-                              ),
-                              filled: true,
-                              fillColor: Colors.black.withOpacity(0.9),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.white,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                    12.0), // Rounded corners
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                            ),
-                          )
-
-                      ),
-
-                      const Spacer(flex: 6),
-
-                      // Save Button
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: isSaveButtonEnabled ? () => saveGearData() : null,  // Button is only enabled if there is input
-                            style: style, // Main button theme
-                            child: const Text(
-                                'Save'
                             )
+
                         ),
-                      ),
-                    ],
+
+                        // Enter Gear Weight
+                        Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: TextField(
+                              controller: gearWeightController,
+                              keyboardType: TextInputType.number,
+                              maxLength: 3,
+                              // Only show numeric keyboard
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.digitsOnly,
+                                // Allow only digits
+                              ],
+                              decoration: InputDecoration(
+                                labelText: 'Weight',
+                                hintText: 'Up to 500 lbs',hintStyle: const TextStyle(
+                                color: Colors.grey, // Optional: Customize the hint text color
+                                fontSize: 20, // Optional: Customize hint text size
+                                fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                              ),
+                                labelStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontStyle: FontStyle.italic,
+                                  //fontWeight: FontWeight.bold,
+                                ),
+                                filled: true,
+                                fillColor: Colors.black.withOpacity(0.9),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                      12.0), // Rounded corners
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.black,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+
+                              ),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 28,
+                              ),
+                            )
+
+                        ),
+
+                        // Enter quantity
+                        Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: TextField(
+                              controller: gearQuantityController,
+                              keyboardType: TextInputType.number,
+                              maxLength: 2,
+                              // Only show numeric keyboard
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.digitsOnly,
+                                // Allow only digits
+                              ],
+                              decoration: InputDecoration(
+                                labelText: 'Quantity',
+                                hintText: 'Up to 99',hintStyle: const TextStyle(
+                                color: Colors.grey, // Optional: Customize the hint text color
+                                fontSize: 20, // Optional: Customize hint text size
+                                fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                              ),
+                                labelStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontStyle: FontStyle.italic,
+                                  //fontWeight: FontWeight.bold,
+                                ),
+                                filled: true,
+                                fillColor: Colors.black.withOpacity(0.9),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                      12.0), // Rounded corners
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.black,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+
+                              ),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 28,
+                              ),
+                            )
+
+                        ),
+
+                        const Spacer(flex: 6),
+
+                        // Save Button
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: ElevatedButton(
+                              onPressed: isSaveButtonEnabled ? () => saveGearData() : null,  // Button is only enabled if there is input
+                              style: style, // Main button theme
+                              child: const Text(
+                                  'Save'
+                              )
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

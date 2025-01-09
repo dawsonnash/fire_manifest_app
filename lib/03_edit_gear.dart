@@ -202,304 +202,309 @@ class _EditGearState extends State<EditGear>{
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Column(
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus(); // Dismiss the keyboard
+        },
+        child: Column(
 
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Expanded( // Takes up all available space
-            child: Stack(
-              children: [
-                // Background image
-                ImageFiltered(
-                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                    // Blur effect
-                    child: Image.asset('assets/images/logo1.png',
-                      fit: BoxFit.cover, // Cover  entire background
-                      width: double.infinity,
-                      height: double.infinity,
-                    )
-                ),
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.white.withOpacity(0.1),
-                  child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded( // Takes up all available space
+              child: Stack(
+                children: [
+                  // Background image
+                  ImageFiltered(
+                      imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                      // Blur effect
+                      child: Image.asset('assets/images/logo1.png',
+                        fit: BoxFit.cover, // Cover  entire background
+                        width: double.infinity,
+                        height: double.infinity,
+                      )
+                  ),
+                  Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: Colors.white.withOpacity(0.1),
+                    child: Column(
 
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Spacer(flex: 1),
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Spacer(flex: 1),
 
-                      // Edit Name
-                      Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: TextField(
-                            controller: gearNameController,
-                            textCapitalization: TextCapitalization.words,
-                            maxLength: 20,
-                            decoration: InputDecoration(
-                              labelText: 'Edit gear name',
-                              labelStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontStyle: FontStyle.italic,
-                                //fontWeight: FontWeight.bold,
-                              ),
-                              filled: true,
-                              fillColor: Colors.black.withOpacity(0.9),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
+                        // Edit Name
+                        Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: TextField(
+                              controller: gearNameController,
+                              textCapitalization: TextCapitalization.words,
+                              maxLength: 20,
+                              decoration: InputDecoration(
+                                labelText: 'Edit gear name',
+                                labelStyle: const TextStyle(
                                   color: Colors.white,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
+                                  fontSize: 22,
+                                  fontStyle: FontStyle.italic,
+                                  //fontWeight: FontWeight.bold,
                                 ),
-                                borderRadius: BorderRadius.circular(
-                                    12.0), // Rounded corners
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
+                                filled: true,
+                                fillColor: Colors.black.withOpacity(0.9),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                      12.0), // Rounded corners
                                 ),
-                                borderRadius: BorderRadius.circular(12.0),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.black,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+
                               ),
-
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                            ),
-                          )
-
-                      ),
-
-                      // Edit Weight
-                      Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: TextField(
-                            controller: gearWeightController,
-                            keyboardType: TextInputType.number,
-                            maxLength: 3,
-                            // Only show numeric keyboard
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly,
-                              // Allow only digits
-                            ],
-                            decoration: InputDecoration(
-                              labelText: 'Edit weight',
-                              hintText: 'Up to 500 lbs',hintStyle: const TextStyle(
-                              color: Colors.grey, // Optional: Customize the hint text color
-                              fontSize: 20, // Optional: Customize hint text size
-                              fontStyle: FontStyle.italic, // Optional: Italicize the hint
-                            ),
-                              labelStyle: const TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 22,
-                                fontStyle: FontStyle.italic,
-                                //fontWeight: FontWeight.bold,
+                                fontSize: 28,
                               ),
-                              filled: true,
-                              fillColor: Colors.black.withOpacity(0.9),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.white,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                    12.0), // Rounded corners
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                            ),
-                          )
-
-                      ),
-
-                      // Edit Quantity
-                      Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: TextField(
-                            controller: gearQuantityController,
-                            keyboardType: TextInputType.number,
-                            maxLength: 2,
-                            // Only show numeric keyboard
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly,
-                              // Allow only digits
-                            ],
-                            decoration: InputDecoration(
-                              labelText: 'Edit quantity',
-                              hintText: 'Up to 99',hintStyle: const TextStyle(
-                              color: Colors.grey, // Optional: Customize the hint text color
-                              fontSize: 20, // Optional: Customize hint text size
-                              fontStyle: FontStyle.italic, // Optional: Italicize the hint
-                            ),
-                              labelStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontStyle: FontStyle.italic,
-                                //fontWeight: FontWeight.bold,
-                              ),
-                              filled: true,
-                              fillColor: Colors.black.withOpacity(0.9),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.white,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                    12.0), // Rounded corners
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                            ),
-                          )
-
-                      ),
-
-                      const Spacer(flex: 6),
-
-                      // Save Button
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Spacer(flex:2),
-
-                            ElevatedButton(
-                                onPressed: isSaveButtonEnabled ? () => saveData() : null,  // Button is only enabled if there is input
-                                style: style, // Main button theme
-                                child: const Text(
-                                    'Save'
-                                )
-                            ),
-
-                            const Spacer(flex:1),
-
-                            IconButton(
-                              icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                  size: 32
-                              ),
-
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text(
-                                          'Delete $oldGearName?',
-                                          style: const TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                          )
-                                      ),
-                                      content: Text('This gear data ($oldGearName) will be erased!',
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                          )),
-                                      actions: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();  // Dismiss the dialog
-                                              },
-                                              child: const Text('Cancel',
-                                                  style: TextStyle(
-                                                    fontSize: 22,
-                                                  )),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-
-                                                // Remove item from the Hive box
-                                                final keyToRemove = gearBox.keys.firstWhere(
-                                                      (key) => gearBox.get(key) == widget.gear,
-                                                  orElse: () => null,
-                                                );
-
-                                                if (keyToRemove != null) {
-                                                  gearBox.delete(keyToRemove);
-                                                }
-
-                                                // Remove the crew member from local memory
-                                                crew.removeGear(widget.gear);
-
-                                                widget.onUpdate();            // Callback function to update UI with new data
-
-                                                // Show deletion pop-up
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                   SnackBar(
-                                                    content: Center(
-                                                      child: Text('$oldGearName Deleted!',
-                                                        // Maybe change look
-                                                        style: const TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 32,
-                                                          fontWeight: FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    duration: Duration(seconds: 2),
-                                                    backgroundColor: Colors.red,
-                                                  ),
-                                                );
-
-                                                Navigator.of(context).pop();  // Dismiss the dialog
-                                                Navigator.of(context).pop();  // Return to previous screen
-                                              },
-                                              child: const Text('OK',
-                                                  style: TextStyle(
-                                                    fontSize: 22,
-                                                  )),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
                             )
-                          ],
 
                         ),
-                      ),
-                    ],
+
+                        // Edit Weight
+                        Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: TextField(
+                              controller: gearWeightController,
+                              keyboardType: TextInputType.number,
+                              maxLength: 3,
+                              // Only show numeric keyboard
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.digitsOnly,
+                                // Allow only digits
+                              ],
+                              decoration: InputDecoration(
+                                labelText: 'Edit weight',
+                                hintText: 'Up to 500 lbs',hintStyle: const TextStyle(
+                                color: Colors.grey, // Optional: Customize the hint text color
+                                fontSize: 20, // Optional: Customize hint text size
+                                fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                              ),
+                                labelStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontStyle: FontStyle.italic,
+                                  //fontWeight: FontWeight.bold,
+                                ),
+                                filled: true,
+                                fillColor: Colors.black.withOpacity(0.9),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                      12.0), // Rounded corners
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.black,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+
+                              ),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 28,
+                              ),
+                            )
+
+                        ),
+
+                        // Edit Quantity
+                        Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: TextField(
+                              controller: gearQuantityController,
+                              keyboardType: TextInputType.number,
+                              maxLength: 2,
+                              // Only show numeric keyboard
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.digitsOnly,
+                                // Allow only digits
+                              ],
+                              decoration: InputDecoration(
+                                labelText: 'Edit quantity',
+                                hintText: 'Up to 99',hintStyle: const TextStyle(
+                                color: Colors.grey, // Optional: Customize the hint text color
+                                fontSize: 20, // Optional: Customize hint text size
+                                fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                              ),
+                                labelStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontStyle: FontStyle.italic,
+                                  //fontWeight: FontWeight.bold,
+                                ),
+                                filled: true,
+                                fillColor: Colors.black.withOpacity(0.9),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                      12.0), // Rounded corners
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.black,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+
+                              ),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 28,
+                              ),
+                            )
+
+                        ),
+
+                        const Spacer(flex: 6),
+
+                        // Save Button
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Spacer(flex:2),
+
+                              ElevatedButton(
+                                  onPressed: isSaveButtonEnabled ? () => saveData() : null,  // Button is only enabled if there is input
+                                  style: style, // Main button theme
+                                  child: const Text(
+                                      'Save'
+                                  )
+                              ),
+
+                              const Spacer(flex:1),
+
+                              IconButton(
+                                icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                    size: 32
+                                ),
+
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text(
+                                            'Delete $oldGearName?',
+                                            style: const TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.bold,
+                                            )
+                                        ),
+                                        content: Text('This gear data ($oldGearName) will be erased!',
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                            )),
+                                        actions: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();  // Dismiss the dialog
+                                                },
+                                                child: const Text('Cancel',
+                                                    style: TextStyle(
+                                                      fontSize: 22,
+                                                    )),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+
+                                                  // Remove item from the Hive box
+                                                  final keyToRemove = gearBox.keys.firstWhere(
+                                                        (key) => gearBox.get(key) == widget.gear,
+                                                    orElse: () => null,
+                                                  );
+
+                                                  if (keyToRemove != null) {
+                                                    gearBox.delete(keyToRemove);
+                                                  }
+
+                                                  // Remove the crew member from local memory
+                                                  crew.removeGear(widget.gear);
+
+                                                  widget.onUpdate();            // Callback function to update UI with new data
+
+                                                  // Show deletion pop-up
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                     SnackBar(
+                                                      content: Center(
+                                                        child: Text('$oldGearName Deleted!',
+                                                          // Maybe change look
+                                                          style: const TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 32,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      duration: Duration(seconds: 2),
+                                                      backgroundColor: Colors.red,
+                                                    ),
+                                                  );
+
+                                                  Navigator.of(context).pop();  // Dismiss the dialog
+                                                  Navigator.of(context).pop();  // Return to previous screen
+                                                },
+                                                child: const Text('OK',
+                                                    style: TextStyle(
+                                                      fontSize: 22,
+                                                    )),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              )
+                            ],
+
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

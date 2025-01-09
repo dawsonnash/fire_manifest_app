@@ -110,334 +110,339 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                // Background image
-                Container(
-                  child: ImageFiltered(
-                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                    child: Image.asset(
-                      'assets/images/logo1.png',
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus(); // Dismiss the keyboard
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  // Background image
+                  Container(
+                    child: ImageFiltered(
+                      imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                      child: Image.asset(
+                        'assets/images/logo1.png',
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                      ),
                     ),
                   ),
-                ),
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.white.withValues(alpha: 0.1),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Spacer(flex: 1),
+                  Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: Colors.white.withValues(alpha: 0.1),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Spacer(flex: 1),
 
-                      // Enter Trip Name Text box
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
-                        child: _buildTextInputContainer('Enter Trip Name', tripNameController),
-                      ),
-
-                      // Enter Trip Name Input Field
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                        child: TextField(
-                          controller: tripNameController,
-                          maxLength: 20,
-                          textCapitalization: TextCapitalization.words,
-                          decoration: _inputDecoration(),
-                          style: _textStyle(),
+                        // Enter Trip Name Text box
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
+                          child: _buildTextInputContainer('Enter Trip Name', tripNameController),
                         ),
-                      ),
 
-                      //Enter Available Seats Text Field
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
-                        child: _buildTextInputContainer('Enter # of Available Seats', availableSeatsController),
-                      ),
-
-                      // Enter Available Seats Input Field
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
-                        child: CupertinoTextField(
-                          controller: availableSeatsController,
-                          keyboardType: TextInputType.number,
-                          maxLength: 1,
-                          textInputAction: TextInputAction.done,
-                          onSubmitted: (value) {
-                            FocusScope.of(context).unfocus();
-                          },
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                          decoration: BoxDecoration(
-                            color: CupertinoColors.white, // Set the background color to white
-                            border: Border.all(color: CupertinoColors.black, width: 2),
-                            borderRadius: BorderRadius.circular(4.0),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                        // Enter Trip Name Input Field
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                          child: TextField(
+                            controller: tripNameController,
+                            maxLength: 20,
+                            textCapitalization: TextCapitalization.words,
+                            decoration: _inputDecoration(),
+                            style: _textStyle(),
                           ),
                         ),
-                      ),
 
-                      // Choose Allowable Text Field
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
-                        child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.deepOrangeAccent,
-                            border: Border.all(color: Colors.black, width: 2),
-                            borderRadius: BorderRadius.circular(4),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.5),
-                                spreadRadius: 1,
-                                blurRadius: 8,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5), // Reduced padding
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: Text(
-                                  'Choose Allowable',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  // Clear the keyboardController before opening the dialog
-                                  keyboardController.text = '';
-
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      // Save the original value in case of cancel
-                                      String originalValue = allowableController.text;
-
-                                      // Track if the Save button should be enabled
-                                      bool isSaveEnabled = false;
-
-                                      return StatefulBuilder(
-                                        builder: (context, setState) {
-                                          // Function to validate input and enable/disable Save button
-                                          void validateInput(String value) {
-                                            final int? parsedValue = int.tryParse(value);
-                                            setState(() {
-                                              isSaveEnabled = parsedValue != null && parsedValue >= 500 && parsedValue <= 10000;
-                                            });
-                                          }
-
-                                          return AlertDialog(
-                                            title: const Text('Enter Allowable Weight'),
-                                            content: TextField(
-                                              controller: keyboardController,
-                                              keyboardType: TextInputType.number,
-                                              maxLength: 4,
-                                              inputFormatters: [
-                                                FilteringTextInputFormatter.digitsOnly,
-                                              ],
-                                              onChanged: (value) {
-                                                validateInput(value); // Validate the input
-                                                setState(() {
-                                                  lastInputFromSlider = false;
-                                                });
-                                              },
-                                              decoration: const InputDecoration(
-                                                hintText: 'Up to 9,999 lbs',
-                                                counterText: '',
-                                                border: OutlineInputBorder(),
-                                              ),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  // Revert to the original value on cancel
-                                                  keyboardController.text = originalValue;
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Text('Cancel'),
-                                              ),
-                                              TextButton(
-                                                onPressed: isSaveEnabled
-                                                    ? () {
-                                                  setState(() {
-                                                    if (keyboardController.text.isNotEmpty) {
-                                                      _sliderValue = double.parse(keyboardController.text).clamp(1000, 5000);
-                                                      allowableController.text = keyboardController.text;
-                                                    }
-                                                  });
-                                                  Navigator.of(context).pop();
-                                                }
-                                                    : null, // Disable Save if input is invalid
-                                                child: Text(
-                                                  'Save',
-                                                  style: TextStyle(
-                                                    color: isSaveEnabled ? Colors.blue : Colors.grey, // Show enabled/disabled state
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    },
-                                  );
-                                },
-                                icon: const Icon(FontAwesomeIcons.keyboard, size: 32, color: Colors.black),
-                              ),
-                            ],
-                          ),
+                        //Enter Available Seats Text Field
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
+                          child: _buildTextInputContainer('Enter # of Available Seats', availableSeatsController),
                         ),
-                      ),
 
-                      // Choose Allowable Slider
-                      Padding(
-                        padding: const EdgeInsets.only(top: 0.0, right: 16.0, left: 16.0),
-                        child: Stack(
-                          children: [
-                            // Background container with white background, black outline, and rounded corners
-                            Positioned.fill(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white, // Background color
-                                  border: Border.all(color: Colors.black, width: 2), // Black outline
-                                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                                ),
-                              ),
+                        // Enter Available Seats Input Field
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
+                          child: CupertinoTextField(
+                            controller: availableSeatsController,
+                            keyboardType: TextInputType.number,
+                            maxLength: 1,
+                            textInputAction: TextInputAction.done,
+                            onSubmitted: (value) {
+                              FocusScope.of(context).unfocus();
+                            },
+                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                            decoration: BoxDecoration(
+                              color: CupertinoColors.white, // Set the background color to white
+                              border: Border.all(color: CupertinoColors.black, width: 2),
+                              borderRadius: BorderRadius.circular(4.0),
                             ),
-                            // Column with existing widgets
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton(
-                                        onPressed: _decrementSlider,
-                                        style: ElevatedButton.styleFrom(
-                                          foregroundColor: Colors.black,
-                                          backgroundColor: Colors.deepOrangeAccent,
-                                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                          elevation: 15,
-                                          shadowColor: Colors.black,
-                                          side: const BorderSide(color: Colors.black, width: 2),
-                                          shape: CircleBorder(),
-                                        ),
-                                        child: const Icon(Icons.remove, color: Colors.black, size: 32),
-                                      ),
-                                      const Spacer(),
-                                      Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          // Slider value
-                                          Visibility(
-                                            visible: lastInputFromSlider,
-                                            child: Text(
-                                              '${_sliderValue.toStringAsFixed(0)} lbs',
-                                              style: const TextStyle(
-                                                fontSize: 32,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                          // Keyboard input value
-                                          Visibility(
-                                            visible: !lastInputFromSlider,
-                                            child: Text(
-                                              '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lbs',
-                                              style: const TextStyle(
-                                                fontSize: 32,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const Spacer(),
-                                      ElevatedButton(
-                                        onPressed: _incrementSlider,
-                                        style: ElevatedButton.styleFrom(
-                                          foregroundColor: Colors.black,
-                                          backgroundColor: Colors.deepOrangeAccent,
-                                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                          elevation: 15,
-                                          shadowColor: Colors.black,
-                                          side: const BorderSide(color: Colors.black, width: 2),
-                                          shape: CircleBorder(),
-                                        ),
-                                        child: const Icon(Icons.add, color: Colors.black, size: 32),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Slider(
-                                  value: _sliderValue,
-                                  min: 1000,
-                                  max: 5000,
-                                  divisions: 40,
-                                  label: null,
-                                  onChanged: (double value) {
-                                    setState(() {
-                                      _sliderValue = value;
-                                      lastInputFromSlider = true;
-                                      allowableController.text = _sliderValue.toStringAsFixed(0);
-                                    });
-                                  },
-                                  activeColor: Colors.deepOrange,
-                                  // Color when the slider is active
-                                  inactiveColor: Colors.grey, // Color for the inactive part
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+
+                        // Choose Allowable Text Field
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.deepOrangeAccent,
+                              border: Border.all(color: Colors.black, width: 2),
+                              borderRadius: BorderRadius.circular(4),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.5),
+                                  spreadRadius: 1,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 3),
                                 ),
                               ],
                             ),
-                          ],
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5), // Reduced padding
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    'Choose Allowable',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    // Clear the keyboardController before opening the dialog
+                                    keyboardController.text = '';
+
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        // Save the original value in case of cancel
+                                        String originalValue = allowableController.text;
+
+                                        // Track if the Save button should be enabled
+                                        bool isSaveEnabled = false;
+
+                                        return StatefulBuilder(
+                                          builder: (context, setState) {
+                                            // Function to validate input and enable/disable Save button
+                                            void validateInput(String value) {
+                                              final int? parsedValue = int.tryParse(value);
+                                              setState(() {
+                                                isSaveEnabled = parsedValue != null && parsedValue >= 500 && parsedValue <= 10000;
+                                              });
+                                            }
+
+                                            return AlertDialog(
+                                              title: const Text('Enter Allowable Weight'),
+                                              content: TextField(
+                                                controller: keyboardController,
+                                                keyboardType: TextInputType.number,
+                                                maxLength: 4,
+                                                inputFormatters: [
+                                                  FilteringTextInputFormatter.digitsOnly,
+                                                ],
+                                                onChanged: (value) {
+                                                  validateInput(value); // Validate the input
+                                                  setState(() {
+                                                    lastInputFromSlider = false;
+                                                  });
+                                                },
+                                                decoration: const InputDecoration(
+                                                  hintText: 'Up to 9,999 lbs',
+                                                  counterText: '',
+                                                  border: OutlineInputBorder(),
+                                                ),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    // Revert to the original value on cancel
+                                                    keyboardController.text = originalValue;
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text('Cancel'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: isSaveEnabled
+                                                      ? () {
+                                                    setState(() {
+                                                      if (keyboardController.text.isNotEmpty) {
+                                                        _sliderValue = double.parse(keyboardController.text).clamp(1000, 5000);
+                                                        allowableController.text = keyboardController.text;
+                                                      }
+                                                    });
+                                                    Navigator.of(context).pop();
+                                                  }
+                                                      : null, // Disable Save if input is invalid
+                                                  child: Text(
+                                                    'Save',
+                                                    style: TextStyle(
+                                                      color: isSaveEnabled ? Colors.blue : Colors.grey, // Show enabled/disabled state
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      },
+                                    );
+                                  },
+                                  icon: const Icon(FontAwesomeIcons.keyboard, size: 32, color: Colors.black),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
 
-                      const Spacer(flex: 6),
-
-                      // Build Button
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 5.0),
-                        child: ElevatedButton(
-                          onPressed: isCalculateButtonEnabled
-                              ? () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BuildYourOwnManifest(trip: newTrip),
+                        // Choose Allowable Slider
+                        Padding(
+                          padding: const EdgeInsets.only(top: 0.0, right: 16.0, left: 16.0),
+                          child: Stack(
+                            children: [
+                              // Background container with white background, black outline, and rounded corners
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white, // Background color
+                                    border: Border.all(color: Colors.black, width: 2), // Black outline
+                                    borderRadius: BorderRadius.circular(8), // Rounded corners
+                                  ),
+                                ),
                               ),
-                            );
-                          }
-                              : null,
-                          style: style,
-                          child: const Text('Build'),
+                              // Column with existing widgets
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20.0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: _decrementSlider,
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.black,
+                                            backgroundColor: Colors.deepOrangeAccent,
+                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                            elevation: 15,
+                                            shadowColor: Colors.black,
+                                            side: const BorderSide(color: Colors.black, width: 2),
+                                            shape: CircleBorder(),
+                                          ),
+                                          child: const Icon(Icons.remove, color: Colors.black, size: 32),
+                                        ),
+                                        const Spacer(),
+                                        Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            // Slider value
+                                            Visibility(
+                                              visible: lastInputFromSlider,
+                                              child: Text(
+                                                '${_sliderValue.toStringAsFixed(0)} lbs',
+                                                style: const TextStyle(
+                                                  fontSize: 32,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            // Keyboard input value
+                                            Visibility(
+                                              visible: !lastInputFromSlider,
+                                              child: Text(
+                                                '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lbs',
+                                                style: const TextStyle(
+                                                  fontSize: 32,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Spacer(),
+                                        ElevatedButton(
+                                          onPressed: _incrementSlider,
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.black,
+                                            backgroundColor: Colors.deepOrangeAccent,
+                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                            elevation: 15,
+                                            shadowColor: Colors.black,
+                                            side: const BorderSide(color: Colors.black, width: 2),
+                                            shape: CircleBorder(),
+                                          ),
+                                          child: const Icon(Icons.add, color: Colors.black, size: 32),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Slider(
+                                    value: _sliderValue,
+                                    min: 1000,
+                                    max: 5000,
+                                    divisions: 40,
+                                    label: null,
+                                    onChanged: (double value) {
+                                      setState(() {
+                                        _sliderValue = value;
+                                        lastInputFromSlider = true;
+                                        allowableController.text = _sliderValue.toStringAsFixed(0);
+                                      });
+                                    },
+                                    activeColor: Colors.deepOrange,
+                                    // Color when the slider is active
+                                    inactiveColor: Colors.grey, // Color for the inactive part
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+
+                        const Spacer(flex: 6),
+
+                        // Build Button
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 5.0),
+                          child: ElevatedButton(
+                            onPressed: isCalculateButtonEnabled
+                                ? () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BuildYourOwnManifest(trip: newTrip),
+                                ),
+                              );
+                            }
+                                : null,
+                            style: style,
+                            child: const Text('Build'),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

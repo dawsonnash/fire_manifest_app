@@ -200,305 +200,310 @@ class AddCrewmember extends StatefulWidget {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Column(
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus(); // Dismiss the keyboard
+        },
+        child: Column(
 
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Expanded( // Takes up all available space
-            child: Stack(
-              children: [
-                // Background image
-                Container(
-                  child: ImageFiltered(
-                      imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                      // Blur effect
-                      child: Image.asset('assets/images/logo1.png',
-                        fit: BoxFit.cover, // Cover  entire background
-                        width: double.infinity,
-                        height: double.infinity,
-                      )
-                  ),
-                ),
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.white.withOpacity(0.1),
-                  child: Column(
-
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-
-                      // Enter Name
-                      Padding(
-                          padding: const EdgeInsets.only(top:16.0, bottom: 4.0, left: 16.0, right:16.0),
-                          child: TextField(
-                            controller: nameController,
-                            textCapitalization: TextCapitalization.words,
-                            maxLength: 12,
-                            decoration: InputDecoration(
-                              labelText: 'Last Name',
-                              labelStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontStyle: FontStyle.italic,
-                                //fontWeight: FontWeight.bold,
-                              ),
-                              filled: true,
-                              fillColor: Colors.black.withOpacity(0.9),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.white,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                    12.0), // Rounded corners
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                            ),
-                          )
-
-                      ),
-
-                      // Enter Flight Weight
-                      Padding(
-                          padding: const EdgeInsets.only(top:4.0, bottom: 4.0, left: 16.0, right:16.0),
-                          child: TextField(
-                            controller: flightWeightController,
-                            keyboardType: TextInputType.number,
-                            maxLength: 3,
-                            // Only show numeric keyboard
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly,
-                              // Allow only digits
-                            ],
-                            decoration: InputDecoration(
-                              labelText: 'Flight Weight',
-                              hintText: 'Up to 500 lbs',hintStyle: const TextStyle(
-                              color: Colors.grey, // Optional: Customize the hint text color
-                              fontSize: 20, // Optional: Customize hint text size
-                              fontStyle: FontStyle.italic, // Optional: Italicize the hint
-                            ),
-
-                              labelStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontStyle: FontStyle.italic,
-                                //fontWeight: FontWeight.bold,
-                              ),
-                              filled: true,
-                              fillColor: Colors.black.withOpacity(0.9),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.white,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                    12.0), // Rounded corners
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                            ),
-                          )
-
-                      ),
-
-                      // Enter Position(s)
-                      Padding(
-                        padding: const EdgeInsets.only(top:4.0, bottom: 4.0, left: 16.0, right:16.0),
-                        child: Container(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded( // Takes up all available space
+              child: Stack(
+                children: [
+                  // Background image
+                  Container(
+                    child: ImageFiltered(
+                        imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                        // Blur effect
+                        child: Image.asset('assets/images/logo1.png',
+                          fit: BoxFit.cover, // Cover  entire background
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(12.0),
-                            border: Border.all(color: Colors.white, width: 2.0),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<int>(
-                              value: selectedPosition,
-                              hint: const Text(
-                                'Primary Position',
-                                style: TextStyle(
+                          height: double.infinity,
+                        )
+                    ),
+                  ),
+                  Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: Colors.white.withOpacity(0.1),
+                    child: Column(
+
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+
+                        // Enter Name
+                        Padding(
+                            padding: const EdgeInsets.only(top:16.0, bottom: 4.0, left: 16.0, right:16.0),
+                            child: TextField(
+                              controller: nameController,
+                              textCapitalization: TextCapitalization.words,
+                              maxLength: 12,
+                              decoration: InputDecoration(
+                                labelText: 'Last Name',
+                                labelStyle: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 22,
                                   fontStyle: FontStyle.italic,
+                                  //fontWeight: FontWeight.bold,
                                 ),
+                                filled: true,
+                                fillColor: Colors.black.withOpacity(0.9),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                      12.0), // Rounded corners
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.black,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+
                               ),
-                              dropdownColor: Colors.black,
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 22,
+                                fontSize: 28,
                               ),
-                              iconEnabledColor: Colors.white,
-                              items: positionMap.entries.map((entry) {
-                                return DropdownMenuItem<int>(
-                                  value: entry.key,
-                                  child: Text(entry.value),
+                            )
+
+                        ),
+
+                        // Enter Flight Weight
+                        Padding(
+                            padding: const EdgeInsets.only(top:4.0, bottom: 4.0, left: 16.0, right:16.0),
+                            child: TextField(
+                              controller: flightWeightController,
+                              keyboardType: TextInputType.number,
+                              maxLength: 3,
+                              // Only show numeric keyboard
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.digitsOnly,
+                                // Allow only digits
+                              ],
+                              decoration: InputDecoration(
+                                labelText: 'Flight Weight',
+                                hintText: 'Up to 500 lbs',hintStyle: const TextStyle(
+                                color: Colors.grey, // Optional: Customize the hint text color
+                                fontSize: 20, // Optional: Customize hint text size
+                                fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                              ),
+
+                                labelStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontStyle: FontStyle.italic,
+                                  //fontWeight: FontWeight.bold,
+                                ),
+                                filled: true,
+                                fillColor: Colors.black.withOpacity(0.9),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                      12.0), // Rounded corners
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.black,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+
+                              ),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 28,
+                              ),
+                            )
+
+                        ),
+
+                        // Enter Position(s)
+                        Padding(
+                          padding: const EdgeInsets.only(top:4.0, bottom: 4.0, left: 16.0, right:16.0),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.9),
+                              borderRadius: BorderRadius.circular(12.0),
+                              border: Border.all(color: Colors.white, width: 2.0),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<int>(
+                                value: selectedPosition,
+                                hint: const Text(
+                                  'Primary Position',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                                dropdownColor: Colors.black,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                ),
+                                iconEnabledColor: Colors.white,
+                                items: positionMap.entries.map((entry) {
+                                  return DropdownMenuItem<int>(
+                                    value: entry.key,
+                                    child: Text(entry.value),
+                                  );
+                                }).toList(),
+                                onChanged: (int? newValue) {
+                                  if (newValue != null) {
+                                    setState(() {
+                                      selectedPosition = newValue;
+                                      _checkInput();
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // Enter tool(s) & weight
+                        Padding(
+                          padding: const EdgeInsets.only(top:4.0, bottom: 4.0, left: 16.0, right:16.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: toolNameController,
+                                  textCapitalization: TextCapitalization.words,
+                                  maxLength: 12,
+                                  decoration: InputDecoration(
+                                    labelText: 'Tool Name',
+                                    labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
+                                    filled: true,
+                                    fillColor: Colors.black.withValues(alpha: 0.9),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(color: Colors.white, width: 2.0),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(color: Colors.black, width: 2.0),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                  ),
+                                  style: const TextStyle(color: Colors.white, fontSize: 28),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: TextField(
+                                  controller: toolWeightController,
+                                  keyboardType: TextInputType.number,
+                                  maxLength: 2,
+                                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                  decoration: InputDecoration(
+                                    labelText: 'Tool Weight',
+                                    hintText: 'Up to 99 lbs',hintStyle: const TextStyle(
+                                    color: Colors.grey, // Optional: Customize the hint text color
+                                    fontSize: 20, // Optional: Customize hint text size
+                                    fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                                  ),
+                                    labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
+                                    filled: true,
+                                    fillColor: Colors.black.withOpacity(0.9),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(color: Colors.white, width: 2.0),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(color: Colors.black, width: 2.0),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                  ),
+                                  style: const TextStyle(color: Colors.white, fontSize: 28),
+                                ),
+                              ),
+                              IconButton(
+                                icon: Container(
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.black),
+                                  ),
+                                  child: const Icon(Icons.add, color: Colors.black, size: 24),
+                                ),
+                                onPressed: addTool,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Display added tools
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                            child: ListView.builder(
+                              itemCount: addedTools?.length,
+                              itemBuilder: (context, index) {
+                                final tool = addedTools?[index];
+                                return Card(
+                                  elevation: 4,
+                                  color: Colors.black,
+                                  child: ListTile(
+                                    title: Text(
+                                      tool!.name,
+                                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                                    ),
+                                    subtitle: Text(
+                                      '${tool.weight} lbs',
+                                      style: const TextStyle(color: Colors.white, fontSize: 20),
+                                    ),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.red, size: 28),
+                                      onPressed: () => removeTool(index),
+                                    ),
+                                  ),
                                 );
-                              }).toList(),
-                              onChanged: (int? newValue) {
-                                if (newValue != null) {
-                                  setState(() {
-                                    selectedPosition = newValue;
-                                    _checkInput();
-                                  });
-                                }
                               },
                             ),
                           ),
                         ),
-                      ),
 
-                      // Enter tool(s) & weight
-                      Padding(
-                        padding: const EdgeInsets.only(top:4.0, bottom: 4.0, left: 16.0, right:16.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: toolNameController,
-                                textCapitalization: TextCapitalization.words,
-                                maxLength: 12,
-                                decoration: InputDecoration(
-                                  labelText: 'Tool Name',
-                                  labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
-                                  filled: true,
-                                  fillColor: Colors.black.withValues(alpha: 0.9),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(color: Colors.white, width: 2.0),
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(color: Colors.black, width: 2.0),
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                ),
-                                style: const TextStyle(color: Colors.white, fontSize: 28),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: TextField(
-                                controller: toolWeightController,
-                                keyboardType: TextInputType.number,
-                                maxLength: 2,
-                                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                decoration: InputDecoration(
-                                  labelText: 'Tool Weight',
-                                  hintText: 'Up to 99 lbs',hintStyle: const TextStyle(
-                                  color: Colors.grey, // Optional: Customize the hint text color
-                                  fontSize: 20, // Optional: Customize hint text size
-                                  fontStyle: FontStyle.italic, // Optional: Italicize the hint
-                                ),
-                                  labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
-                                  filled: true,
-                                  fillColor: Colors.black.withOpacity(0.9),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(color: Colors.white, width: 2.0),
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(color: Colors.black, width: 2.0),
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                ),
-                                style: const TextStyle(color: Colors.white, fontSize: 28),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.black),
-                                ),
-                                child: const Icon(Icons.add, color: Colors.black, size: 24),
-                              ),
-                              onPressed: addTool,
-                            ),
-                          ],
-                        ),
-                      ),
 
-                      // Display added tools
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                          child: ListView.builder(
-                            itemCount: addedTools?.length,
-                            itemBuilder: (context, index) {
-                              final tool = addedTools?[index];
-                              return Card(
-                                elevation: 4,
-                                color: Colors.black,
-                                child: ListTile(
-                                  title: Text(
-                                    tool!.name,
-                                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                                  ),
-                                  subtitle: Text(
-                                    '${tool.weight} lbs',
-                                    style: const TextStyle(color: Colors.white, fontSize: 20),
-                                  ),
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.red, size: 28),
-                                    onPressed: () => removeTool(index),
-                                  ),
-                                ),
-                              );
-                            },
+                        // Save Button
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: ElevatedButton(
+                                onPressed: isSaveButtonEnabled ? () => saveCrewMemberData() : null,  // Button is only enabled if there is input
+                                style: style, // Main button theme
+                                child: const Text(
+                                    'Save'
+                                )
+                            ),
                           ),
                         ),
-                      ),
-
-
-                      // Save Button
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: ElevatedButton(
-                              onPressed: isSaveButtonEnabled ? () => saveCrewMemberData() : null,  // Button is only enabled if there is input
-                              style: style, // Main button theme
-                              child: const Text(
-                                  'Save'
-                              )
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

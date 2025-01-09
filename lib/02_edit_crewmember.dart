@@ -276,371 +276,376 @@ class _EditCrewmemberState extends State<EditCrewmember> {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Expanded(
-            // Takes up all available space
-            child: Stack(
-              children: [
-                // Background image
-                ImageFiltered(
-                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                    // Blur effect
-                    child: Image.asset(
-                      'assets/images/logo1.png',
-                      fit: BoxFit.cover, // Cover  entire background
-                      width: double.infinity,
-                      height: double.infinity,
-                    )),
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.white.withOpacity(0.1),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      // Edit Name
-                      Padding(
-                          padding: const EdgeInsets.only(top: 16.0, bottom: 4.0, left: 16.0, right: 16.0),
-                          child: TextField(
-                            controller: nameController,
-                            maxLength: 12,
-                            textCapitalization: TextCapitalization.words,
-                            decoration: InputDecoration(
-                              labelText: 'Edit name',
-                              labelStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontStyle: FontStyle.italic,
-                                //fontWeight: FontWeight.bold,
-                              ),
-                              filled: true,
-                              fillColor: Colors.black.withOpacity(0.9),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus(); // Dismiss the keyboard
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(
+              // Takes up all available space
+              child: Stack(
+                children: [
+                  // Background image
+                  ImageFiltered(
+                      imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                      // Blur effect
+                      child: Image.asset(
+                        'assets/images/logo1.png',
+                        fit: BoxFit.cover, // Cover  entire background
+                        width: double.infinity,
+                        height: double.infinity,
+                      )),
+                  Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: Colors.white.withOpacity(0.1),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        // Edit Name
+                        Padding(
+                            padding: const EdgeInsets.only(top: 16.0, bottom: 4.0, left: 16.0, right: 16.0),
+                            child: TextField(
+                              controller: nameController,
+                              maxLength: 12,
+                              textCapitalization: TextCapitalization.words,
+                              decoration: InputDecoration(
+                                labelText: 'Edit name',
+                                labelStyle: const TextStyle(
                                   color: Colors.white,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
+                                  fontSize: 22,
+                                  fontStyle: FontStyle.italic,
+                                  //fontWeight: FontWeight.bold,
                                 ),
-                                borderRadius: BorderRadius.circular(12.0), // Rounded corners
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
+                                filled: true,
+                                fillColor: Colors.black.withOpacity(0.9),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                            ),
-                          )),
-
-                      // Edit Flight Weight
-                      Padding(
-                          padding: const EdgeInsets.only(top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
-                          child: TextField(
-                            controller: flightWeightController,
-                            maxLength: 3,
-                            keyboardType: TextInputType.number,
-                            // Only show numeric keyboard
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly,
-                              // Allow only digits
-                            ],
-                            decoration: InputDecoration(
-                              labelText: 'Edit flight weight',
-                              labelStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontStyle: FontStyle.italic,
-                                //fontWeight: FontWeight.bold,
-                              ),
-                              hintText: 'Up to 500 lbs',
-                              hintStyle: const TextStyle(
-                                color: Colors.grey, // Optional: Customize the hint text color
-                                fontSize: 20, // Optional: Customize hint text size
-                                fontStyle: FontStyle.italic, // Optional: Italicize the hint
-                              ),
-                              filled: true,
-                              fillColor: Colors.black.withOpacity(0.9),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.white,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.black,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0),
                                 ),
-                                borderRadius: BorderRadius.circular(12.0), // Rounded corners
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                            ),
-                          )),
-
-                      // Enter Position(s)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(12.0),
-                            border: Border.all(color: Colors.white, width: 2.0),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<int>(
-                              value: selectedPosition,
-                              dropdownColor: Colors.black,
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 22,
-                                fontStyle: FontStyle.italic,
+                                fontSize: 28,
                               ),
-                              iconEnabledColor: Colors.white,
-                              items: positionMap.entries.map((entry) {
-                                return DropdownMenuItem<int>(
-                                  value: entry.key,
-                                  child: Text(entry.value),
+                            )),
+
+                        // Edit Flight Weight
+                        Padding(
+                            padding: const EdgeInsets.only(top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
+                            child: TextField(
+                              controller: flightWeightController,
+                              maxLength: 3,
+                              keyboardType: TextInputType.number,
+                              // Only show numeric keyboard
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.digitsOnly,
+                                // Allow only digits
+                              ],
+                              decoration: InputDecoration(
+                                labelText: 'Edit flight weight',
+                                labelStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontStyle: FontStyle.italic,
+                                  //fontWeight: FontWeight.bold,
+                                ),
+                                hintText: 'Up to 500 lbs',
+                                hintStyle: const TextStyle(
+                                  color: Colors.grey, // Optional: Customize the hint text color
+                                  fontSize: 20, // Optional: Customize hint text size
+                                  fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                                ),
+                                filled: true,
+                                fillColor: Colors.black.withOpacity(0.9),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.black,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 28,
+                              ),
+                            )),
+
+                        // Enter Position(s)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.9),
+                              borderRadius: BorderRadius.circular(12.0),
+                              border: Border.all(color: Colors.white, width: 2.0),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<int>(
+                                value: selectedPosition,
+                                dropdownColor: Colors.black,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                                iconEnabledColor: Colors.white,
+                                items: positionMap.entries.map((entry) {
+                                  return DropdownMenuItem<int>(
+                                    value: entry.key,
+                                    child: Text(entry.value),
+                                  );
+                                }).toList(),
+                                onChanged: (int? newValue) {
+                                  if (newValue != null) {
+                                    setState(() {
+                                      selectedPosition = newValue;
+                                      _checkInput();
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // Enter tool(s) & weight
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4.0, bottom: 4.0, left: 16.0, right: 16.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: newToolNameController,
+                                  maxLength: 12,
+                                  textCapitalization: TextCapitalization.words,
+                                  decoration: InputDecoration(
+                                    labelText: 'Tool Name',
+                                    labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
+                                    filled: true,
+                                    fillColor: Colors.black.withOpacity(0.9),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(color: Colors.white, width: 2.0),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(color: Colors.black, width: 2.0),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                  ),
+                                  style: const TextStyle(color: Colors.white, fontSize: 28),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: TextField(
+                                  controller: newToolWeightController,
+                                  maxLength: 2,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                  decoration: InputDecoration(
+                                    labelText: 'Tool Weight',
+                                    labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
+                                    hintText: 'Up to 99 lbs',
+                                    hintStyle: const TextStyle(
+                                      color: Colors.grey, // Optional: Customize the hint text color
+                                      fontSize: 20, // Optional: Customize hint text size
+                                      fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.black.withOpacity(0.9),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(color: Colors.white, width: 2.0),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(color: Colors.black, width: 2.0),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                  ),
+                                  style: const TextStyle(color: Colors.white, fontSize: 28),
+                                ),
+                              ),
+                              IconButton(
+                                icon: Container(
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.black),
+                                  ),
+                                  child: const Icon(Icons.add, color: Colors.black, size: 24),
+                                ),
+                                onPressed: addTool,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Display added tools
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                            child: ListView.builder(
+                              itemCount: addedTools?.length,
+                              itemBuilder: (context, index) {
+                                final tool = addedTools?[index];
+                                return Card(
+                                  elevation: 4,
+                                  color: Colors.black,
+                                  child: ListTile(
+                                    title: Text(
+                                      tool!.name,
+                                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                                    ),
+                                    subtitle: Text(
+                                      '${tool.weight} lbs',
+                                      style: const TextStyle(color: Colors.white, fontSize: 20),
+                                    ),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.red, size: 28),
+                                      onPressed: () {
+                                        removeTool(index);
+                                        _checkInput();
+                                      },
+                                    ),
+                                  ),
                                 );
-                              }).toList(),
-                              onChanged: (int? newValue) {
-                                if (newValue != null) {
-                                  setState(() {
-                                    selectedPosition = newValue;
-                                    _checkInput();
-                                  });
-                                }
                               },
                             ),
                           ),
                         ),
-                      ),
 
-                      // Enter tool(s) & weight
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4.0, bottom: 4.0, left: 16.0, right: 16.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: newToolNameController,
-                                maxLength: 12,
-                                textCapitalization: TextCapitalization.words,
-                                decoration: InputDecoration(
-                                  labelText: 'Tool Name',
-                                  labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
-                                  filled: true,
-                                  fillColor: Colors.black.withOpacity(0.9),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(color: Colors.white, width: 2.0),
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(color: Colors.black, width: 2.0),
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                ),
-                                style: const TextStyle(color: Colors.white, fontSize: 28),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: TextField(
-                                controller: newToolWeightController,
-                                maxLength: 2,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                decoration: InputDecoration(
-                                  labelText: 'Tool Weight',
-                                  labelStyle: const TextStyle(color: Colors.white, fontSize: 22, fontStyle: FontStyle.italic),
-                                  hintText: 'Up to 99 lbs',
-                                  hintStyle: const TextStyle(
-                                    color: Colors.grey, // Optional: Customize the hint text color
-                                    fontSize: 20, // Optional: Customize hint text size
-                                    fontStyle: FontStyle.italic, // Optional: Italicize the hint
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.black.withOpacity(0.9),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(color: Colors.white, width: 2.0),
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(color: Colors.black, width: 2.0),
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                ),
-                                style: const TextStyle(color: Colors.white, fontSize: 28),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.black),
-                                ),
-                                child: const Icon(Icons.add, color: Colors.black, size: 24),
-                              ),
-                              onPressed: addTool,
-                            ),
-                          ],
-                        ),
-                      ),
+                        // Save Button
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Spacer(flex: 2),
+                              ElevatedButton(
+                                  onPressed: isSaveButtonEnabled ? () => saveData() : null, // Button is only enabled if there is input
+                                  style: style, // Main button theme
+                                  child: const Text('Save')),
+                              const Spacer(flex: 1),
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red, size: 32),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Delete $oldCrewMemberName?',
+                                            style: const TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.bold,
+                                            )),
+                                        content: Text('This crew member data ($oldCrewMemberName) will be erased!',
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                            )),
+                                        actions: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop(); // Dismiss the dialog
+                                                },
+                                                child: const Text('Cancel',
+                                                    style: TextStyle(
+                                                      fontSize: 22,
+                                                    )),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  // Remove item from the Hive box
+                                                  final keyToRemove = crewmemberBox.keys.firstWhere(
+                                                    (key) => crewmemberBox.get(key) == widget.crewMember,
+                                                    orElse: () => null,
+                                                  );
 
-                      // Display added tools
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                          child: ListView.builder(
-                            itemCount: addedTools?.length,
-                            itemBuilder: (context, index) {
-                              final tool = addedTools?[index];
-                              return Card(
-                                elevation: 4,
-                                color: Colors.black,
-                                child: ListTile(
-                                  title: Text(
-                                    tool!.name,
-                                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                                  ),
-                                  subtitle: Text(
-                                    '${tool.weight} lbs',
-                                    style: const TextStyle(color: Colors.white, fontSize: 20),
-                                  ),
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.red, size: 28),
-                                    onPressed: () {
-                                      removeTool(index);
-                                      _checkInput();
-                                    },
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
+                                                  if (keyToRemove != null) {
+                                                    crewmemberBox.delete(keyToRemove);
+                                                  }
 
-                      // Save Button
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Spacer(flex: 2),
-                            ElevatedButton(
-                                onPressed: isSaveButtonEnabled ? () => saveData() : null, // Button is only enabled if there is input
-                                style: style, // Main button theme
-                                child: const Text('Save')),
-                            const Spacer(flex: 1),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red, size: 32),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text('Delete $oldCrewMemberName?',
-                                          style: const TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                          )),
-                                      content: Text('This crew member data ($oldCrewMemberName) will be erased!',
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                          )),
-                                      actions: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop(); // Dismiss the dialog
-                                              },
-                                              child: const Text('Cancel',
-                                                  style: TextStyle(
-                                                    fontSize: 22,
-                                                  )),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                // Remove item from the Hive box
-                                                final keyToRemove = crewmemberBox.keys.firstWhere(
-                                                  (key) => crewmemberBox.get(key) == widget.crewMember,
-                                                  orElse: () => null,
-                                                );
+                                                  // Remove the crew member
+                                                  crew.removeCrewMember(widget.crewMember);
 
-                                                if (keyToRemove != null) {
-                                                  crewmemberBox.delete(keyToRemove);
-                                                }
+                                                  widget.onUpdate(); // Callback function to update UI with new data
 
-                                                // Remove the crew member
-                                                crew.removeCrewMember(widget.crewMember);
-
-                                                widget.onUpdate(); // Callback function to update UI with new data
-
-                                                // Show deletion pop-up
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(
-                                                    content: Center(
-                                                      child: Text(
-                                                        '$oldCrewMemberName Deleted!',
-                                                        // Maybe change look
-                                                        style: const TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 32,
-                                                          fontWeight: FontWeight.bold,
+                                                  // Show deletion pop-up
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(
+                                                      content: Center(
+                                                        child: Text(
+                                                          '$oldCrewMemberName Deleted!',
+                                                          // Maybe change look
+                                                          style: const TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 32,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
                                                         ),
                                                       ),
+                                                      duration: Duration(seconds: 2),
+                                                      backgroundColor: Colors.red,
                                                     ),
-                                                    duration: Duration(seconds: 2),
-                                                    backgroundColor: Colors.red,
-                                                  ),
-                                                );
+                                                  );
 
-                                                Navigator.of(context).pop(); // Dismiss the dialog
-                                                Navigator.of(context).pop(); // Return to previous screen
-                                              },
-                                              child: const Text('OK',
-                                                  style: TextStyle(
-                                                    fontSize: 22,
-                                                  )),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                            )
-                          ],
+                                                  Navigator.of(context).pop(); // Dismiss the dialog
+                                                  Navigator.of(context).pop(); // Return to previous screen
+                                                },
+                                                child: const Text('OK',
+                                                    style: TextStyle(
+                                                      fontSize: 22,
+                                                    )),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
