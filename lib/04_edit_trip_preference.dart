@@ -206,7 +206,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                               }).join(', '),
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                              fontSize: 18),
+                              fontSize: 22),
                             ),
                             subtitle: Text(
                                 "Load Preference: ${loadPreferenceMap[posPref.loadPreference]}", style: TextStyle(fontSize: 16)),
@@ -241,7 +241,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                           title: Text(
                             gearPref.gear.map((item) => '${item.name} (x${item.quantity})').join(', '),
                             style: const TextStyle(fontWeight: FontWeight.bold,
-                            fontSize: 18),
+                            fontSize: 22),
                           ),
                           subtitle: Text(
                               "Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}", style: TextStyle(fontSize: 16)),

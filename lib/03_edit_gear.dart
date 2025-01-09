@@ -234,11 +234,10 @@ class _EditGearState extends State<EditGear>{
 
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Spacer(flex: 1),
 
                         // Edit Name
                         Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.only(left: 16.0,right: 16.0, top: 16.0, bottom: 4.0),
                             child: TextField(
                               controller: gearNameController,
                               textCapitalization: TextCapitalization.words,
@@ -246,16 +245,14 @@ class _EditGearState extends State<EditGear>{
                               decoration: InputDecoration(
                                 labelText: 'Edit gear name',
                                 labelStyle: const TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 22,
-                                  fontStyle: FontStyle.italic,
-                                  //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
-                                fillColor: Colors.black.withOpacity(0.9),
+                                fillColor: Colors.white,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
@@ -264,7 +261,7 @@ class _EditGearState extends State<EditGear>{
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.black,
+                                    color: Colors.white,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
                                   ),
@@ -273,7 +270,7 @@ class _EditGearState extends State<EditGear>{
 
                               ),
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 28,
                               ),
                             )
@@ -282,7 +279,7 @@ class _EditGearState extends State<EditGear>{
 
                         // Edit Weight
                         Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.only(left: 16.0,right: 16.0, top: 4.0, bottom: 4.0),
                             child: TextField(
                               controller: gearWeightController,
                               keyboardType: TextInputType.number,
@@ -295,21 +292,18 @@ class _EditGearState extends State<EditGear>{
                               decoration: InputDecoration(
                                 labelText: 'Edit weight',
                                 hintText: 'Up to 500 lbs',hintStyle: const TextStyle(
-                                color: Colors.grey, // Optional: Customize the hint text color
-                                fontSize: 20, // Optional: Customize hint text size
-                                fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                                color: Colors.black,
+                                fontSize: 20,
                               ),
                                 labelStyle: const TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 22,
-                                  fontStyle: FontStyle.italic,
-                                  //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
-                                fillColor: Colors.black.withOpacity(0.9),
+                                fillColor: Colors.white,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
@@ -318,7 +312,7 @@ class _EditGearState extends State<EditGear>{
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.black,
+                                    color: Colors.white,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
                                   ),
@@ -327,7 +321,7 @@ class _EditGearState extends State<EditGear>{
 
                               ),
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 28,
                               ),
                             )
@@ -336,7 +330,7 @@ class _EditGearState extends State<EditGear>{
 
                         // Edit Quantity
                         Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.only(left: 16.0,right: 16.0, top: 4.0, bottom: 4.0),
                             child: TextField(
                               controller: gearQuantityController,
                               keyboardType: TextInputType.number,
@@ -349,21 +343,19 @@ class _EditGearState extends State<EditGear>{
                               decoration: InputDecoration(
                                 labelText: 'Edit quantity',
                                 hintText: 'Up to 99',hintStyle: const TextStyle(
-                                color: Colors.grey, // Optional: Customize the hint text color
-                                fontSize: 20, // Optional: Customize hint text size
-                                fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                                color: Colors.black,
+                                fontSize: 20,
                               ),
                                 labelStyle: const TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 22,
-                                  fontStyle: FontStyle.italic,
                                   //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
-                                fillColor: Colors.black.withOpacity(0.9),
+                                fillColor: Colors.white,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
@@ -372,7 +364,7 @@ class _EditGearState extends State<EditGear>{
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.black,
+                                    color: Colors.white,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
                                   ),
@@ -381,7 +373,7 @@ class _EditGearState extends State<EditGear>{
 
                               ),
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 28,
                               ),
                             )

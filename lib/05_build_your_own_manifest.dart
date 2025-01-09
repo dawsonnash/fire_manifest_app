@@ -82,6 +82,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         return StatefulBuilder(
           builder: (context, dialogSetState) {
             return AlertDialog(
+              backgroundColor: Colors.white,
               title: const Text(
                 'Add Crew Members and Gear',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -381,6 +382,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                     TextField(
                                       decoration: const InputDecoration(labelText: 'Weight (lbs)'),
                                       keyboardType: TextInputType.number,
+                                      maxLength: 3,
                                       focusNode: customItemWeightFocus,
                                       // Attach focus node
                                       textInputAction: TextInputAction.next,

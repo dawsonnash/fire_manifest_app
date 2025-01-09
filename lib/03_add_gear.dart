@@ -194,11 +194,10 @@ class _AddGearState extends State<AddGear>{
 
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Spacer(flex: 1),
 
                         // Enter Name
                         Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.only(left: 16.0,right: 16.0, top: 16.0, bottom: 4.0),
                             child: TextField(
                               controller: gearNameController,
                               maxLength: 20,
@@ -206,16 +205,15 @@ class _AddGearState extends State<AddGear>{
                               decoration: InputDecoration(
                                 labelText: 'Gear Name',
                                 labelStyle: const TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 22,
-                                  fontStyle: FontStyle.italic,
                                   //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
-                                fillColor: Colors.black.withValues(alpha: 0.9),
+                                fillColor: Colors.white,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
@@ -224,7 +222,7 @@ class _AddGearState extends State<AddGear>{
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.black,
+                                    color: Colors.white,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
                                   ),
@@ -233,7 +231,7 @@ class _AddGearState extends State<AddGear>{
 
                               ),
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 28,
                               ),
                             )
@@ -242,7 +240,7 @@ class _AddGearState extends State<AddGear>{
 
                         // Enter Gear Weight
                         Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.only(left: 16.0,right: 16.0, top: 4.0, bottom: 4.0),
                             child: TextField(
                               controller: gearWeightController,
                               keyboardType: TextInputType.number,
@@ -255,21 +253,19 @@ class _AddGearState extends State<AddGear>{
                               decoration: InputDecoration(
                                 labelText: 'Weight',
                                 hintText: 'Up to 500 lbs',hintStyle: const TextStyle(
-                                color: Colors.grey, // Optional: Customize the hint text color
-                                fontSize: 20, // Optional: Customize hint text size
-                                fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                                color: Colors.black,
+                                fontSize: 20,
                               ),
                                 labelStyle: const TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 22,
-                                  fontStyle: FontStyle.italic,
                                   //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
-                                fillColor: Colors.black.withOpacity(0.9),
+                                fillColor: Colors.white,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
@@ -278,7 +274,7 @@ class _AddGearState extends State<AddGear>{
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.black,
+                                    color: Colors.white,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
                                   ),
@@ -287,7 +283,7 @@ class _AddGearState extends State<AddGear>{
 
                               ),
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 28,
                               ),
                             )
@@ -296,7 +292,7 @@ class _AddGearState extends State<AddGear>{
 
                         // Enter quantity
                         Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.only(left: 16.0,right: 16.0, top: 4.0, bottom: 4.0),
                             child: TextField(
                               controller: gearQuantityController,
                               keyboardType: TextInputType.number,
@@ -309,21 +305,19 @@ class _AddGearState extends State<AddGear>{
                               decoration: InputDecoration(
                                 labelText: 'Quantity',
                                 hintText: 'Up to 99',hintStyle: const TextStyle(
-                                color: Colors.grey, // Optional: Customize the hint text color
-                                fontSize: 20, // Optional: Customize hint text size
-                                fontStyle: FontStyle.italic, // Optional: Italicize the hint
+                                color: Colors.white,
+                                fontSize: 20,
                               ),
                                 labelStyle: const TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 22,
-                                  fontStyle: FontStyle.italic,
                                   //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
-                                fillColor: Colors.black.withOpacity(0.9),
+                                fillColor: Colors.white,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
@@ -332,7 +326,7 @@ class _AddGearState extends State<AddGear>{
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                    color: Colors.black,
+                                    color: Colors.white,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
                                   ),
@@ -341,7 +335,7 @@ class _AddGearState extends State<AddGear>{
 
                               ),
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 28,
                               ),
                             )

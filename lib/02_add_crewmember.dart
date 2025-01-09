@@ -381,84 +381,125 @@ class AddCrewmember extends StatefulWidget {
 
                         // Enter tool(s) & weight
                         Padding(
-                          padding: const EdgeInsets.only(top:4.0, bottom: 4.0, left: 16.0, right:16.0),
+                          padding: const EdgeInsets.only(top: 4.0, bottom: 4.0, left: 16.0, right: 16.0),
                           child: GestureDetector(
                             onTap: () {
+                              String? selectedTool = "Custom"; // Default to "Custom"
+                              final List<String> preMadeTools = [
+                                'Custom',
+                                'P-tool',
+                                'Chainsaw',
+                                'Dolmar',
+                              ];
+
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    backgroundColor: Colors.white,
-                                    title: const Text(
-                                      'Add Tool',
-                                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                                    ),
-                                    content: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        TextField(
-                                          controller: toolNameController, // Reuse the existing controller
-                                          textCapitalization: TextCapitalization.words,
-                                          maxLength: 12,
-                                          decoration: InputDecoration(
-                                            labelText: 'Tool Name',
-                                            filled: true,
-                                            fillColor: Colors.grey[200],
-                                            border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(8),
-                                              borderSide: const BorderSide(color: Colors.grey, width: 2),
+                                  return StatefulBuilder(
+                                    builder: (BuildContext context, StateSetter setState) {
+                                      return AlertDialog(
+                                        backgroundColor: Colors.white,
+                                        title: const Text(
+                                          'Add Tool',
+                                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                        ),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            DropdownButtonFormField<String>(
+                                              value: selectedTool,
+                                              decoration: InputDecoration(
+                                                labelText: 'Select a Tool',
+                                                filled: true,
+                                                fillColor: Colors.grey[200],
+                                                border: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  borderSide: const BorderSide(color: Colors.grey, width: 2),
+                                                ),
+                                              ),
+                                              items: preMadeTools.map((tool) {
+                                                return DropdownMenuItem<String>(
+                                                  value: tool,
+                                                  child: Text(tool),
+                                                );
+                                              }).toList(),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  selectedTool = value;
+                                                  if (value != "Custom") {
+                                                    toolNameController.text = value ?? ''; // Pre-fill name
+                                                  } else {
+                                                    toolNameController.clear(); // Clear for custom input
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                            const SizedBox(height: 12),
+                                            if (selectedTool == "Custom")
+                                              TextField(
+                                                controller: toolNameController,
+                                                textCapitalization: TextCapitalization.words,
+                                                maxLength: 12,
+                                                decoration: InputDecoration(
+                                                  labelText: 'Tool Name',
+                                                  filled: true,
+                                                  fillColor: Colors.grey[200],
+                                                  border: OutlineInputBorder(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    borderSide: const BorderSide(color: Colors.grey, width: 2),
+                                                  ),
+                                                ),
+                                              ),
+                                            const SizedBox(height: 12),
+                                            TextField(
+                                              controller: toolWeightController,
+                                              keyboardType: TextInputType.number,
+                                              maxLength: 2,
+                                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                              decoration: InputDecoration(
+                                                labelText: 'Tool Weight (lbs)',
+                                                filled: true,
+                                                fillColor: Colors.grey[200],
+                                                border: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  borderSide: const BorderSide(color: Colors.grey, width: 1),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop(); // Close the dialog without saving
+                                            },
+                                            child: const Text(
+                                              'Cancel',
+                                              style: TextStyle(color: Colors.grey),
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(height: 12),
-                                        TextField(
-                                          controller: toolWeightController, // Reuse the existing controller
-                                          keyboardType: TextInputType.number,
-                                          maxLength: 2,
-                                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                          decoration: InputDecoration(
-                                            labelText: 'Tool Weight (lbs)',
-                                            filled: true,
-                                            fillColor: Colors.grey[200],
-                                            border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(8),
-                                              borderSide: const BorderSide(color: Colors.grey, width: 1),
+                                          TextButton(
+                                            onPressed: () {
+                                              // Validate input and save values
+                                              if (toolNameController.text.trim().isNotEmpty &&
+                                                  toolWeightController.text.trim().isNotEmpty) {
+                                                addTool(); // Save tool logic
+                                                // Reset controllers
+                                                toolNameController.clear();
+                                                toolWeightController.clear();
+                                                Navigator.of(context).pop(); // Close the dialog
+                                              } else {
+                                                // Optionally handle empty fields
+                                              }
+                                            },
+                                            child: const Text(
+                                              'Add',
+                                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(); // Close the dialog without saving
-                                        },
-                                        child: const Text(
-                                          'Cancel',
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          // Validate input and save values
-                                          if (toolNameController.text.trim().isNotEmpty &&
-                                              toolWeightController.text.trim().isNotEmpty) {
-                                            addTool();
-                                            // Reset controllers
-                                            toolNameController.clear();
-                                            toolWeightController.clear();
-
-                                            Navigator.of(context).pop(); // Close the dialog
-                                          } else {
-                                            // Optionally handle empty fields
-                                          }
-                                        },
-                                        child: const Text(
-                                          'Add',
-                                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ],
+                                        ],
+                                      );
+                                    },
                                   );
                                 },
                               );
