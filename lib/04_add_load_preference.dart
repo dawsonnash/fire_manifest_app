@@ -563,16 +563,17 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
   }
 
   void saveGearLoadPreference(TripPreference newTripPreference) {
-    // New list of Gear objects with updated quantities
-    List<Gear> copiedSelectedGear = selectedGear.map((gear) {
-      return gear.copyWith(quantity: selectedGearQuantities[gear] ?? 1);
+    // Use original Gear objects but update their quantities in place
+    List<Gear> referencedSelectedGear = selectedGear.map((gear) {
+      gear.quantity = selectedGearQuantities[gear] ?? 1;
+      return gear; // Use the same reference
     }).toList();
 
     // New GearPreference object with copied Gear objects
     final newGearPreference = GearPreference(
       priority: 1, // To be updated through UI
       loadPreference: selectedGearLoadPreference!,
-      gear: copiedSelectedGear, // Use copied list with updated quantities
+      gear: referencedSelectedGear, // Use copied list with updated quantities
     );
 
     // Print statement to display the gear items and their selected quantities
