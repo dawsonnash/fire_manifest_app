@@ -25,10 +25,10 @@ class Gear extends HiveObject{
   // Function to create a copy of the Gear object with updated attributes - for quantity copies in Gear Preferences
   Gear copyWith({int? quantity}) {
     return Gear(
-      name: this.name,
-      quantity: quantity ?? this.quantity,
-      weight: this.weight,
-      isPersonalTool: this.isPersonalTool
+        name: this.name,
+        quantity: quantity ?? this.quantity,
+        weight: this.weight,
+        isPersonalTool: this.isPersonalTool
     );
   }
 
@@ -59,4 +59,3 @@ List<Gear> sortGearListAlphabetically(List<Gear> gearList) {
   gearList.sort((a, b) => a.name.compareTo(b.name));
   return gearList;
 }
-

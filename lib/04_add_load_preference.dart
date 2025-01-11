@@ -684,10 +684,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 16),
                             decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.9),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(12.0),
                               border:
-                                  Border.all(color: Colors.white, width: 2.0),
+                                  Border.all(color: Colors.black, width: 2.0),
                             ),
                             child: Text(
                               selectedCrewMembers.isEmpty
@@ -705,7 +705,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                       return '';
                                     }).join(', '),
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 22,
                               ),
                             ),
@@ -720,9 +720,9 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.9),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(12.0),
-                            border: Border.all(color: Colors.white, width: 2.0),
+                            border: Border.all(color: Colors.black, width: 2.0),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<int>(
@@ -730,16 +730,16 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                               hint: const Text(
                                 'Choose load preference',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 22,
                                 ),
                               ),
-                              dropdownColor: Colors.black,
+                              dropdownColor: Colors.white,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
                               ),
-                              iconEnabledColor: Colors.white,
+                              iconEnabledColor: Colors.black,
                               items: loadPreferenceMap.entries.map((entry) {
                                 return DropdownMenuItem<int>(
                                   value: entry.key,
@@ -747,12 +747,12 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(entry.value),
+                                      Text(entry.value, style: TextStyle(color: Colors.black),),
                                       IconButton(
                                         icon: const Icon(
                                           Icons.info_outline,
-                                          color: Colors.white,
-                                          size: 20,
+                                          color: Colors.black,
+                                          size: 24,
                                         ),
                                         onPressed: () {
                                           // Info dialog with loadpref explanation
@@ -842,10 +842,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 16),
                             decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.9),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(12.0),
                               border:
-                                  Border.all(color: Colors.white, width: 2.0),
+                                  Border.all(color: Colors.black, width: 2.0),
                             ),
                             child: Text(
                               selectedGear.isEmpty
@@ -857,7 +857,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                       return '${e.name} (x$quantity)';
                                     }).join(', '),
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 22,
                               ),
                             ),
@@ -872,9 +872,9 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.9),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(12.0),
-                            border: Border.all(color: Colors.white, width: 2.0),
+                            border: Border.all(color: Colors.black, width: 2.0),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<int>(
@@ -882,14 +882,14 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                               hint: const Text(
                                 'Choose load preference',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 22,
                                 ),
                               ),
-                              dropdownColor: Colors.black,
+                              dropdownColor: Colors.white,
                               style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
+                                color: Colors.black,
+                                fontSize: 24,
                               ),
                               iconEnabledColor: Colors.white,
                               items: loadPreferenceMap.entries.map((entry) {
@@ -903,8 +903,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                       IconButton(
                                         icon: const Icon(
                                           Icons.info_outline,
-                                          color: Colors.white,
-                                          size: 20,
+                                          color: Colors.black,
+                                          size: 24,
                                         ),
                                         onPressed: () {
                                           // Info dialog with loadpref explanation

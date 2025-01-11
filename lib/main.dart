@@ -109,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final ButtonStyle style =
     ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
-        textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        textStyle: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
         backgroundColor: Colors.deepOrangeAccent,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         //surfaceTintColor: Colors.grey,
@@ -119,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12)),
         // Maybe change? Dynamic button size based on screen size
-        fixedSize: Size(MediaQuery.of(context).size.width / 2, MediaQuery.of(context).size.height / 12)
+        fixedSize: Size(MediaQuery.of(context).size.width / 1.7, MediaQuery.of(context).size.height / 10)
     );
 
     return Scaffold(
@@ -142,21 +142,24 @@ class _MyHomePageState extends State<MyHomePage> {
               // Fitted box automatically scales text based on available space
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: Column(
-                  children: [
-                    Text(
-                    'Fire Manifesting',
-                    textAlign: TextAlign.center,
-                    // style: Theme.of(context).textTheme.headlineLarge,
-                    style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
-                  ),
-                    Text(
-                      'App',
+                child: Padding(
+                  padding:  EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                      'Fire Manifesting',
                       textAlign: TextAlign.center,
                       // style: Theme.of(context).textTheme.headlineLarge,
                       style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
                     ),
-                ],
+                      Text(
+                        'App',
+                        textAlign: TextAlign.center,
+                        // style: Theme.of(context).textTheme.headlineLarge,
+                        style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, ),
+                      ),
+                  ],
+                  ),
                 ),
               ),
             ),
@@ -191,7 +194,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               },
                             style: style,
                             child: const Text(
-                                'Manifest'
+                                'Manifest',
                             )
                         ),
                       ),
@@ -229,6 +232,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             )
                         ),
                       ),
+                      SizedBox(height:10),
 
                     ],
                   ),

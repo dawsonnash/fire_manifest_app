@@ -419,7 +419,7 @@ class _EditGearState extends State<EditGear>{
                                               fontWeight: FontWeight.bold,
                                             )
                                         ),
-                                        content: Text('This gear data ($oldGearName) and any of its Gear Preference data will be erased!',
+                                        content: Text('This gear data ($oldGearName) and any gear preference data containing it will be erased!',
                                             style: const TextStyle(
                                               fontSize: 18,
                                             )),

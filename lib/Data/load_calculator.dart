@@ -25,7 +25,22 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
       : numLoadsBySeat;
 
   // Create copies of crew and gear
-  var crewMembersCopy = List.from(crew.crewMembers);
+  var crewMembersCopy = crew.crewMembers.map((member) {
+    return CrewMember(
+      name: member.name,
+      flightWeight: member.flightWeight,
+      position: member.position,
+      personalTools: member.personalTools?.map((tool) {
+        return Gear(
+          name: tool.name,
+          weight: tool.weight,
+          quantity: tool.quantity,
+          isPersonalTool: tool.isPersonalTool,
+        );
+      }).toList(),
+    );
+  }).toList();
+
   // Shuffle and balance crew members
   shuffleCrewMembers(crewMembersCopy);
 
@@ -62,7 +77,19 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                 if (load.weight + crewMembersDynamic.totalCrewMemberWeight <=
                     maxLoadWeight &&
                     load.loadPersonnel.length < availableSeats) {
-                  load.loadPersonnel.add(crewMembersDynamic);
+                  load.loadPersonnel.add(CrewMember(
+                    name: crewMembersDynamic.name,
+                    flightWeight: crewMembersDynamic.flightWeight,
+                    position: crewMembersDynamic.position,
+                    personalTools: crewMembersDynamic.personalTools?.map((tool) {
+                      return Gear(
+                        name: tool.name,
+                        weight: tool.weight,
+                        quantity: tool.quantity,
+                        isPersonalTool: tool.isPersonalTool,
+                      );
+                    }).toList(),
+                  ));
                   load.loadGear.addAll(
                       crewMembersDynamic.personalTools as Iterable<Gear>);
                   load.weight += crewMembersDynamic.totalCrewMemberWeight;
@@ -80,7 +107,21 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                 if (load.weight + totalGroupWeight <= maxLoadWeight &&
                     load.loadPersonnel.length + crewMembersDynamic.length <=
                         availableSeats) {
-                  load.loadPersonnel.addAll(crewMembersDynamic);
+                  load.loadPersonnel.addAll(crewMembersDynamic.map((member) {
+                    return CrewMember(
+                      name: member.name,
+                      flightWeight: member.flightWeight,
+                      position: member.position,
+                      personalTools: member.personalTools?.map((tool) {
+                        return Gear(
+                          name: tool.name,
+                          weight: tool.weight,
+                          quantity: tool.quantity,
+                          isPersonalTool: tool.isPersonalTool,
+                        );
+                      }).toList(),
+                    );
+                  }));
                   // Add all personal tools
                   crewMembersDynamic.forEach((member) {
                     load.loadGear
@@ -105,7 +146,19 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                 if (load.weight + crewMembersDynamic.totalCrewMemberWeight <=
                     maxLoadWeight &&
                     load.loadPersonnel.length < availableSeats) {
-                  load.loadPersonnel.add(crewMembersDynamic);
+                  load.loadPersonnel.add(CrewMember(
+                    name: crewMembersDynamic.name,
+                    flightWeight: crewMembersDynamic.flightWeight,
+                    position: crewMembersDynamic.position,
+                    personalTools: crewMembersDynamic.personalTools?.map((tool) {
+                      return Gear(
+                        name: tool.name,
+                        weight: tool.weight,
+                        quantity: tool.quantity,
+                        isPersonalTool: tool.isPersonalTool,
+                      );
+                    }).toList(),
+                  ));
                   load.loadGear.addAll(
                       crewMembersDynamic.personalTools as Iterable<Gear>);
                   load.weight += crewMembersDynamic.totalCrewMemberWeight;
@@ -121,7 +174,21 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                 if (load.weight + totalGroupWeight <= maxLoadWeight &&
                     load.loadPersonnel.length + crewMembersDynamic.length <=
                         availableSeats) {
-                  load.loadPersonnel.addAll(crewMembersDynamic);
+                  load.loadPersonnel.addAll(crewMembersDynamic.map((member) {
+                    return CrewMember(
+                      name: member.name,
+                      flightWeight: member.flightWeight,
+                      position: member.position,
+                      personalTools: member.personalTools?.map((tool) {
+                        return Gear(
+                          name: tool.name,
+                          weight: tool.weight,
+                          quantity: tool.quantity,
+                          isPersonalTool: tool.isPersonalTool,
+                        );
+                      }).toList(),
+                    );
+                  }));
                   crewMembersDynamic.forEach((member) {
                     load.loadGear
                         .addAll(member.personalTools as Iterable<Gear>);
@@ -152,7 +219,19 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                 if (load.weight + crewMembersDynamic.totalCrewMemberWeight <=
                     maxLoadWeight &&
                     load.loadPersonnel.length < availableSeats) {
-                  load.loadPersonnel.add(crewMembersDynamic);
+                  load.loadPersonnel.add(CrewMember(
+                    name: crewMembersDynamic.name,
+                    flightWeight: crewMembersDynamic.flightWeight,
+                    position: crewMembersDynamic.position,
+                    personalTools: crewMembersDynamic.personalTools?.map((tool) {
+                      return Gear(
+                        name: tool.name,
+                        weight: tool.weight,
+                        quantity: tool.quantity,
+                        isPersonalTool: tool.isPersonalTool,
+                      );
+                    }).toList(),
+                  ));
                   load.loadGear.addAll(
                       crewMembersDynamic.personalTools as Iterable<Gear>);
                   load.weight += crewMembersDynamic.totalCrewMemberWeight;
@@ -197,7 +276,21 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                   if (load.weight + totalGroupWeight <= maxLoadWeight &&
                       load.loadPersonnel.length + crewMembersDynamic.length <=
                           availableSeats) {
-                    load.loadPersonnel.addAll(crewMembersDynamic);
+                    load.loadPersonnel.addAll(crewMembersDynamic.map((member) {
+                      return CrewMember(
+                        name: member.name,
+                        flightWeight: member.flightWeight,
+                        position: member.position,
+                        personalTools: member.personalTools?.map((tool) {
+                          return Gear(
+                            name: tool.name,
+                            weight: tool.weight,
+                            quantity: tool.quantity,
+                            isPersonalTool: tool.isPersonalTool,
+                          );
+                        }).toList(),
+                      );
+                    }));
                     crewMembersDynamic.forEach((member) {
                       load.loadGear
                           .addAll(member.personalTools as Iterable<Gear>);
@@ -335,7 +428,19 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
         currentLoad.loadPersonnel.length < availableSeats) {
       var firstCrewMember = crewMembersCopy.first;
       currentLoadWeight += firstCrewMember.totalCrewMemberWeight;
-      currentLoad.loadPersonnel.add(firstCrewMember);
+      currentLoad.loadPersonnel.add(CrewMember(
+        name: firstCrewMember.name,
+        flightWeight: firstCrewMember.flightWeight,
+        position: firstCrewMember.position,
+        personalTools: firstCrewMember.personalTools?.map((tool) {
+          return Gear(
+            name: tool.name,
+            weight: tool.weight,
+            quantity: tool.quantity,
+            isPersonalTool: tool.isPersonalTool,
+          );
+        }).toList(),
+      ));
       currentLoad.loadGear
           .addAll(firstCrewMember.personalTools as Iterable<Gear>);
       crewMembersCopy.removeAt(0);
