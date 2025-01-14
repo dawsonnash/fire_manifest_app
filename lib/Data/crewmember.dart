@@ -1,27 +1,30 @@
-
+import 'package:uuid/uuid.dart';
 import 'package:hive/hive.dart';
 
 import 'crew.dart';
 import 'gear.dart';
 part 'crewmember.g.dart';
 
+final uuid = Uuid(); // Instantiate the UUID generator
 
 @HiveType(typeId: 1) // Needs to be a unique ID across app
-class CrewMember extends HiveObject{
-  @HiveField(0)// needs to be unique ID across class
+class CrewMember extends HiveObject {
+  @HiveField(0)
   String name;
-  @HiveField(1)// needs to be unique ID across class
+
+  @HiveField(1)
   int flightWeight;
+
   @HiveField(2)
-  // Had to add a potential null field in crewmember.g, else would not build
-  // position: fields[2] as int? ?? 0,
   int position; // New field to store the position code
 
   @HiveField(3)
   List<Gear>? personalTools;
 
+  @HiveField(4) // Add this field for the UUID
+  final String id;
 
-  // Getter function to calculate totalCrewMemberWeight: flightweight + all personal tools
+  // Getter function to calculate totalCrewMemberWeight: flightWeight + all personal tools
   int get totalCrewMemberWeight {
     int totalWeight = flightWeight;
     if (personalTools != null) {
@@ -32,8 +35,14 @@ class CrewMember extends HiveObject{
     return totalWeight; // Explicitly returning an int
   }
 
-
-  CrewMember({required this.name, required this.flightWeight, required this.position, this.personalTools});
+  // Constructor to generate a UUID automatically
+  CrewMember({
+    required this.name,
+    required this.flightWeight,
+    required this.position,
+    this.personalTools,
+    String? id, // Optional parameter to allow manual ID assignment
+  }) : id = id ?? uuid.v4(); // Generate a new UUID if not provided
 
   // To compare CrewMember objects in TripPreferences
   @override
@@ -41,11 +50,10 @@ class CrewMember extends HiveObject{
       identical(this, other) ||
           other is CrewMember &&
               runtimeType == other.runtimeType &&
-              name == other.name &&
-              flightWeight == other.flightWeight;
+              id == other.id; // Compare by ID for uniqueness
 
   @override
-  int get hashCode => name.hashCode ^ flightWeight.hashCode;
+  int get hashCode => id.hashCode;
 
   String getPositionTitle(int positionCode) {
     return positionMap[positionCode] ?? 'Unknown Position';
@@ -54,6 +62,7 @@ class CrewMember extends HiveObject{
   // Convert object to JSON
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'flightWeight': flightWeight,
       'position': position,
@@ -64,6 +73,7 @@ class CrewMember extends HiveObject{
   // Create object from JSON
   factory CrewMember.fromJson(Map<String, dynamic> json) {
     return CrewMember(
+      id: json['id'] as String,
       name: json['name'] as String,
       flightWeight: json['flightWeight'] as int,
       position: json['position'] as int,
@@ -72,8 +82,8 @@ class CrewMember extends HiveObject{
           .toList(),
     );
   }
-
 }
+
 List<Gear> getAllGearItems() {
   List<Gear> allGear = [];
   for (var crewMember in crew.crewMembers) {
@@ -110,7 +120,7 @@ const Map<int, String> positionMap = {
   23: 'Supply',
   24: 'Tool Manager',
   25: '6-man',
-  26: 'Other',      // User defined
+  26: 'Other', // User defined
 };
 
 List<CrewMember> sortCrewListByPosition(List<CrewMember> crewList) {

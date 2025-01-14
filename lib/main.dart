@@ -55,6 +55,10 @@ void main() async {
     initializeTestData();
   }
 
+
+  // Load all preferences and update them
+  //await updateAllTripPreferencesFromBoxes();
+
   // start app
   runApp(const MyApp());
 }
@@ -247,3 +251,60 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+
+Future<void> updateAllTripPreferencesFromBoxes() async {
+  var crewMemberBox = Hive.box<CrewMember>('crewmemberBox');
+  var gearBox = Hive.box<Gear>('gearBox');
+  var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+
+  // Iterate through all TripPreference objects in the box
+  for (var tripPreference in tripPreferenceBox.values) {
+    // Update PositionalPreferences
+    for (var posPref in tripPreference.positionalPreferences) {
+      for (int i = 0; i < posPref.crewMembersDynamic.length; i++) {
+        var member = posPref.crewMembersDynamic[i];
+
+        if (member is CrewMember) {
+          // Match by name and update attributes
+          var updatedMember = crewMemberBox.values.firstWhere(
+                (cm) => cm.name == member.name,
+            orElse: () => member, // Fallback to the current member if not found
+          );
+
+          posPref.crewMembersDynamic[i] = updatedMember;
+        } else if (member is List<CrewMember>) {
+          // If it's a group (like a Saw Team), update each member
+          for (int j = 0; j < member.length; j++) {
+            var updatedMember = crewMemberBox.values.firstWhere(
+                  (cm) => cm.name == member[j].name,
+              orElse: () => member[j],
+            );
+            member[j] = updatedMember;
+          }
+        }
+      }
+    }
+
+    // Update GearPreferences
+    for (var gearPref in tripPreference.gearPreferences) {
+      for (int i = 0; i < gearPref.gear.length; i++) {
+        var gearItem = gearPref.gear[i];
+
+        // Match by name and update attributes
+        var updatedGear = gearBox.values.firstWhere(
+              (g) => g.name == gearItem.name,
+          orElse: () => gearItem, // Fallback to the current gear if not found
+        );
+
+        gearPref.gear[i] = updatedGear.copyWith(
+          quantity: gearItem.quantity, // Retain the quantity from the preference
+        );
+      }
+    }
+
+    // Save the updated trip preference back to Hive
+    await tripPreference.save();
+  }
+}
+

@@ -39,6 +39,7 @@ dependencies:
   flutter_native_splash: ^2.4.4
   cupertino_icons: ^1.0.6
   path_provider: any
+  uuid: ^4.4.2
 
 dev_dependencies:
   flutter_test:

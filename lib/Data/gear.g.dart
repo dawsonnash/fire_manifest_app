@@ -21,13 +21,14 @@ class GearAdapter extends TypeAdapter<Gear> {
       weight: fields[1] as int,
       quantity: fields[2] as int,
       isPersonalTool: fields[3] as bool,
+      id: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Gear obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class GearAdapter extends TypeAdapter<Gear> {
       ..writeByte(2)
       ..write(obj.quantity)
       ..writeByte(3)
-      ..write(obj.isPersonalTool);
+      ..write(obj.isPersonalTool)
+      ..writeByte(4)
+      ..write(obj.id);
   }
 
   @override

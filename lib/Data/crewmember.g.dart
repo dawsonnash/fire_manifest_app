@@ -21,13 +21,14 @@ class CrewMemberAdapter extends TypeAdapter<CrewMember> {
       flightWeight: fields[1] as int,
       position: fields[2] as int,
       personalTools: (fields[3] as List?)?.cast<Gear>(),
+      id: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, CrewMember obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class CrewMemberAdapter extends TypeAdapter<CrewMember> {
       ..writeByte(2)
       ..write(obj.position)
       ..writeByte(3)
-      ..write(obj.personalTools);
+      ..write(obj.personalTools)
+      ..writeByte(4)
+      ..write(obj.id);
   }
 
   @override

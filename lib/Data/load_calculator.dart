@@ -93,7 +93,8 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                   load.loadGear.addAll(
                       crewMembersDynamic.personalTools as Iterable<Gear>);
                   load.weight += crewMembersDynamic.totalCrewMemberWeight;
-                  crewMembersCopy.remove(crewMembersDynamic);
+                  crewMembersCopy.removeWhere((member) =>
+                  member.name == crewMembersDynamic.name);
                   break;
                 }
               }
@@ -128,8 +129,10 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                         .addAll(member.personalTools as Iterable<Gear>);
                   });
                   load.weight += totalGroupWeight;
-                  crewMembersCopy.removeWhere(
-                          (member) => crewMembersDynamic.contains(member));
+                  // Remove members from crewMembersCopy based on their name
+                  crewMembersDynamic.forEach((dynamicMember) {
+                    crewMembersCopy.removeWhere((member) => member.name == dynamicMember.name);
+                  });
                   break;
                 }
               }
@@ -162,7 +165,8 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                   load.loadGear.addAll(
                       crewMembersDynamic.personalTools as Iterable<Gear>);
                   load.weight += crewMembersDynamic.totalCrewMemberWeight;
-                  crewMembersCopy.remove(crewMembersDynamic);
+                  crewMembersCopy.removeWhere((member) =>
+                  member.name == crewMembersDynamic.name);
                   break;
                 }
               }
@@ -194,8 +198,10 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                         .addAll(member.personalTools as Iterable<Gear>);
                   });
                   load.weight += totalGroupWeight;
-                  crewMembersCopy.removeWhere(
-                          (member) => crewMembersDynamic.contains(member));
+                  // Remove members from crewMembersCopy based on their name
+                  crewMembersDynamic.forEach((dynamicMember) {
+                    crewMembersCopy.removeWhere((member) => member.name == dynamicMember.name);
+                  });
                   break;
                 }
               }
@@ -235,7 +241,8 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                   load.loadGear.addAll(
                       crewMembersDynamic.personalTools as Iterable<Gear>);
                   load.weight += crewMembersDynamic.totalCrewMemberWeight;
-                  crewMembersCopy.remove(crewMembersDynamic);
+                  crewMembersCopy.removeWhere((member) =>
+                  member.name == crewMembersDynamic.name);
                   loadIndex = (loadIndex + 1) % loads.length;
                   break;
                 }
@@ -260,7 +267,9 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                       load.loadPersonnel.add(member);
                       load.loadGear.addAll(member.personalTools as Iterable<Gear>);
                       load.weight += member.totalCrewMemberWeight;
-                      crewMembersCopy.remove(member);
+                      // Remove the member based on matching properties
+                      crewMembersCopy.removeWhere((copyMember) =>
+                      copyMember.name == member.name);
                       loadIndex = (loadIndex + 1) % loads.length;
                       break;
                     }
@@ -296,8 +305,10 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                           .addAll(member.personalTools as Iterable<Gear>);
                     });
                     load.weight += totalGroupWeight;
-                    crewMembersCopy.removeWhere(
-                            (member) => crewMembersDynamic.contains(member));
+                    // Remove members from crewMembersCopy based on their name
+                    crewMembersDynamic.forEach((dynamicMember) {
+                      crewMembersCopy.removeWhere((member) => member.name == dynamicMember.name);
+                    });
                     loadIndex = (loadIndex + 1) %
                         loads.length; // Loop through loads cyclically
                     break;
