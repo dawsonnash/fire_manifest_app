@@ -7,7 +7,8 @@ import 'package:hive/hive.dart';
 
 class Crew {
   List<CrewMember> crewMembers = [];        // Contains all crew members
-  List<Gear> gear = [];
+  List<Gear> gear = [];                     // Contains all gear
+  List<Gear> personalTools = [];            // List of personal tool templates
   double totalCrewWeight = 0.0;
 
   // Helper function to get saw teams
