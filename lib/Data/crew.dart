@@ -58,6 +58,32 @@ class Crew {
     print('Updated Total Crew Weight: $totalCrewWeight');
   }
 
+  void addPersonalTool(Gear tool) {
+    final personalToolsBox = Hive.box<Gear>('personalToolsBox');
+    personalTools.add(tool);
+    personalToolsBox.add(tool);
+  }
+  void removePersonalTool(String toolName) {
+    var personalToolsBox = Hive.box<Gear>('personalToolsBox');
+
+    // Find the tool in Hive based on its name
+    final keyToRemove = personalToolsBox.keys.firstWhere(
+          (key) {
+        final gear = personalToolsBox.get(key);
+        return gear != null && gear.name == toolName;
+      },
+      orElse: () => null, // Return null if no matching tool is found
+    );
+
+    if (keyToRemove != null) {
+      personalToolsBox.delete(keyToRemove); // Remove from Hive
+    }
+
+    // Remove the tool from the in-memory list
+    personalTools.removeWhere((tool) => tool.name == toolName);
+  }
+
+
   void removeCrewMember(CrewMember member) {
     var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
     var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox'); // Assume TripPreference is stored here
@@ -233,6 +259,10 @@ class Crew {
     // Update the total weight after loading the data
     crew.updateTotalCrewWeight();
     //print('Crew data loaded from Hive. Total weight: ${crew.totalCrewWeight}');
+  }
+  void loadPersonalTools() {
+    var personalToolsBox = Hive.box<Gear>('personalTools');
+    personalTools = personalToolsBox.values.toList();
   }
 
 }

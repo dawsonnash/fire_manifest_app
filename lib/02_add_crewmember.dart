@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'Data/crew.dart';
 import 'Data/crewmember.dart';
 import 'Data/gear.dart';
@@ -13,6 +14,9 @@ class AddCrewmember extends StatefulWidget {
 }
 
 class _AddCrewmemberState extends State<AddCrewmember> {
+  late final Box<Gear> personalToolsBox;
+  List<Gear> personalToolsList = [];
+
   // Variables to store user input
   final TextEditingController nameController = TextEditingController();
   final TextEditingController flightWeightController = TextEditingController();
@@ -26,6 +30,10 @@ class _AddCrewmemberState extends State<AddCrewmember> {
   void initState() {
     super.initState();
 
+    // Open the Hive box and load the list of tool items
+    personalToolsBox = Hive.box<Gear>('personalToolsBox');
+    loadPersonalToolsList();
+
     // Listeners to the TextControllers
     nameController.addListener(_checkInput);
     flightWeightController.addListener(_checkInput);
@@ -33,6 +41,12 @@ class _AddCrewmemberState extends State<AddCrewmember> {
     toolWeightController.addListener(_checkInput);
   }
 
+  // Function to load the list of tool items from the Hive box
+  void loadPersonalToolsList() {
+    setState(() {
+      personalToolsList = personalToolsBox.values.toList();
+    });
+  }
   @override
   void dispose() {
     nameController.dispose();
@@ -80,10 +94,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
         ),
       );
     }
-    print('Saved Tools');
-    for (var tools in addedTools!) {
-      print('${tools.name}, ${tools.weight}');
-    }
+
   }
 
   void removeTool(int index) {
@@ -364,9 +375,9 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                           padding: const EdgeInsets.all(16.0),
                           child: GestureDetector(
                             onTap: () {
-                              String? selectedTool = crew.personalTools.isNotEmpty ? crew.personalTools.first.name : null; // Default to first tool
-                              toolWeightController.text = crew.personalTools.isNotEmpty ? crew.personalTools.first.weight.toString() : '';
-                              toolNameController.text = crew.personalTools.isNotEmpty ? crew.personalTools.first.name : '';
+                              String? selectedTool = personalToolsList.isNotEmpty ? personalToolsList.first.name : null; // Default to first tool
+                              toolWeightController.text = personalToolsList.isNotEmpty ? personalToolsList.first.weight.toString() : '';
+                              toolNameController.text = personalToolsList.isNotEmpty ? personalToolsList.first.name : '';
 
                               showDialog(
                                 context: context,
@@ -394,7 +405,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                                 ),
                                               ),
                                               items: [
-                                                ...crew.personalTools.map((tool) {
+                                                ...personalToolsList.map((tool) {
                                                   return DropdownMenuItem<String>(
                                                     value: tool.name,
                                                     child: Text(tool.name),
@@ -410,12 +421,13 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                                   if (value == '+ Add Tool') {
                                                     // Open dialog to add a new tool
                                                     Navigator.of(context).pop(); // Close current dialog
-                                                    _showAddToolDialog(context, setState, toolNameController, toolWeightController, addedTools); // Show Add Tool dialog
+                                                    _showAddToolDialog(context, setState, toolNameController, toolWeightController, personalToolsList, addedTools, personalToolsBox); // Show Add Tool dialog
+
                                                   } else {
                                                     // Select existing tool and update weight
                                                     selectedTool = value;
-                                                    toolWeightController.text = crew.personalTools.firstWhere((tool) => tool.name == value).weight.toString();
-                                                    toolNameController.text = crew.personalTools.firstWhere((tool) => tool.name == value).name;
+                                                    toolWeightController.text = personalToolsList.firstWhere((tool) => tool.name == value).weight.toString();
+                                                    toolNameController.text = personalToolsList.firstWhere((tool) => tool.name == value).name;
                                                   }
                                                 });
                                               },
@@ -555,7 +567,8 @@ class _AddCrewmemberState extends State<AddCrewmember> {
   }
 }
 
-void _showAddToolDialog(BuildContext context, StateSetter parentSetState, TextEditingController toolNameController, TextEditingController toolWeightController, List<Gear>? addedTools) {
+void _showAddToolDialog(BuildContext context, StateSetter parentSetState, TextEditingController toolNameController, TextEditingController toolWeightController, List<Gear> personalToolsList, List<Gear>? addedTools,   Box<Gear> personalToolsBox, // Pass the Hive box
+    ) {
   String? selectedTool = '+ New Tool'; // Default to "+ New Tool"
   String? toolNameErrorMessage;
   String? toolWeightErrorMessage;
@@ -563,7 +576,7 @@ void _showAddToolDialog(BuildContext context, StateSetter parentSetState, TextEd
   // Function to update fields based on selected tool
   void updateFields(String? toolName) {
     if (toolName != null && toolName != '+ New Tool') {
-      final tool = crew.personalTools.firstWhere((tool) => tool.name == toolName);
+      final tool = personalToolsList.firstWhere((tool) => tool.name == toolName);
       toolNameController.text = tool.name;
       toolWeightController.text = tool.weight.toString();
     } else {
@@ -601,7 +614,7 @@ void _showAddToolDialog(BuildContext context, StateSetter parentSetState, TextEd
                     ),
                   ),
                   items: [
-                    ...crew.personalTools.map((tool) {
+                    ...personalToolsList.map((tool) {
                       return DropdownMenuItem<String>(
                         value: tool.name,
                         child: Text(tool.name),
@@ -706,9 +719,10 @@ void _showAddToolDialog(BuildContext context, StateSetter parentSetState, TextEd
                               TextButton(
                                 onPressed: () {
                                   // Proceed with deletion
-                                  crew.personalTools.removeWhere((tool) => tool.name == selectedTool); // Remove from global tools
+                                  // Delete from Hive and temporary page list and from addedTools if it exists
+                                  crew.removePersonalTool(selectedTool!);
+                                  personalToolsList.removeWhere((tool) => tool.name == selectedTool); // Remove from global tools
                                   addedTools?.removeWhere((tool) => tool.name == selectedTool); // Remove from addedTools
-
                                   // Iterate through all crew members and remove the tool from their personalTools list
                                   for (var crewMember in crew.crewMembers) {
                                     crewMember.personalTools?.removeWhere((tool) => tool.name == selectedTool);
@@ -785,7 +799,7 @@ void _showAddToolDialog(BuildContext context, StateSetter parentSetState, TextEd
                     final toolName = toolNameRaw[0].toUpperCase() + toolNameRaw.substring(1).toLowerCase();
 
                     // Check for duplicate tool names (case-insensitive)
-                    final isDuplicate = crew.personalTools.any(
+                    final isDuplicate = personalToolsList.any(
                       (tool) => tool.name.toLowerCase() == toolName.toLowerCase(),
                     );
 
@@ -804,15 +818,12 @@ void _showAddToolDialog(BuildContext context, StateSetter parentSetState, TextEd
 
                     final weight = int.parse(toolWeightText);
 
-                    // Add new tool
-                    crew.personalTools.add(
-                      Gear(
-                        name: toolName,
-                        weight: weight,
-                        quantity: 1,
-                        isPersonalTool: true,
-                      ),
-                    );
+                    // Create new tool
+                    final newTool = Gear(name: toolName, weight: weight, quantity: 1, isPersonalTool: true);
+
+                    // Add to Hive and temporary page list
+                    crew.addPersonalTool(newTool);
+                    personalToolsList.add(newTool);
 
                     Navigator.of(dialogContext).pop(); // Close dialog
                     parentSetState(() {}); // Reflect changes in the parent state
@@ -872,8 +883,30 @@ void _showAddToolDialog(BuildContext context, StateSetter parentSetState, TextEd
 
                                   Navigator.of(confirmationContext).pop(); // Close confirmation dialog
 
-                                  // Update the tool in crew.personalTools
-                                  final tool = crew.personalTools.firstWhere(
+                                  // Update the tool in Hive
+                                  final personalToolsBox = Hive.box<Gear>('personalToolsBox');
+                                  final keyToUpdate = personalToolsBox.keys.firstWhere(
+                                        (key) {
+                                      final storedTool = personalToolsBox.get(key);
+                                      return storedTool != null && storedTool.name.toLowerCase() == selectedTool!.toLowerCase();
+                                    },
+                                    orElse: () => null,
+                                  );
+
+                                  if (keyToUpdate != null) {
+                                    personalToolsBox.put(
+                                      keyToUpdate,
+                                      Gear(
+                                        name: toolNameRaw,
+                                        weight: int.parse(toolWeightText),
+                                        quantity: 1,
+                                        isPersonalTool: true,
+                                      ),
+                                    );
+                                  }
+
+                                  // Update the tool in personalToolsList
+                                  final tool = personalToolsList.firstWhere(
                                         (tool) => tool.name.toLowerCase() == selectedTool!.toLowerCase(),
                                   );
                                   tool.name = toolNameRaw;
@@ -930,4 +963,5 @@ void _showAddToolDialog(BuildContext context, StateSetter parentSetState, TextEd
       );
     },
   );
+
 }
