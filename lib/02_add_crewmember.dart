@@ -47,6 +47,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
       personalToolsList = personalToolsBox.values.toList();
     });
   }
+
   @override
   void dispose() {
     nameController.dispose();
@@ -94,7 +95,6 @@ class _AddCrewmemberState extends State<AddCrewmember> {
         ),
       );
     }
-
   }
 
   void removeTool(int index) {
@@ -412,17 +412,17 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                                   );
                                                 }),
                                                 const DropdownMenuItem<String>(
-                                                  value: '+ Add Tool',
-                                                  child: Text('+ Add Tool'),
+                                                  value: '+ Add/Edit Tool',
+                                                  child: Text('+ Add/Edit Tool'),
                                                 ),
                                               ],
                                               onChanged: (value) {
                                                 setState(() {
-                                                  if (value == '+ Add Tool') {
+                                                  if (value == '+ Add/Edit Tool') {
                                                     // Open dialog to add a new tool
                                                     Navigator.of(context).pop(); // Close current dialog
-                                                    _showAddToolDialog(context, setState, toolNameController, toolWeightController, personalToolsList, addedTools, personalToolsBox); // Show Add Tool dialog
-
+                                                    _showAddToolDialog(
+                                                        context, setState, toolNameController, toolWeightController, personalToolsList, addedTools, personalToolsBox); // Show Add Tool dialog
                                                   } else {
                                                     // Select existing tool and update weight
                                                     selectedTool = value;
@@ -433,7 +433,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                               },
                                             ),
                                             const SizedBox(height: 12),
-                                            if (selectedTool != null && selectedTool != '+ Add Tool')
+                                            if (selectedTool != null && selectedTool != '+ Add/Edit Tool')
                                               TextField(
                                                 controller: toolWeightController,
                                                 enabled: false, // Non-editable field
@@ -459,7 +459,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                               style: TextStyle(color: Colors.grey),
                                             ),
                                           ),
-                                          if (selectedTool != null && selectedTool != '+ Add Tool')
+                                          if (selectedTool != null && selectedTool != '+ Add/Edit Tool')
                                             TextButton(
                                               onPressed: () {
                                                 addTool(); // Save tool logic
@@ -490,7 +490,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                               ),
                               alignment: Alignment.center,
                               child: const Text(
-                                '+ Manage Personal Tools',
+                                '+ Add/Edit Tools',
                                 style: TextStyle(
                                   fontSize: 22,
                                   color: Colors.black,
@@ -567,8 +567,15 @@ class _AddCrewmemberState extends State<AddCrewmember> {
   }
 }
 
-void _showAddToolDialog(BuildContext context, StateSetter parentSetState, TextEditingController toolNameController, TextEditingController toolWeightController, List<Gear> personalToolsList, List<Gear>? addedTools,   Box<Gear> personalToolsBox, // Pass the Hive box
-    ) {
+void _showAddToolDialog(
+  BuildContext context,
+  StateSetter parentSetState,
+  TextEditingController toolNameController,
+  TextEditingController toolWeightController,
+  List<Gear> personalToolsList,
+  List<Gear>? addedTools,
+  Box<Gear> personalToolsBox, // Pass the Hive box
+) {
   String? selectedTool = '+ New Tool'; // Default to "+ New Tool"
   String? toolNameErrorMessage;
   String? toolWeightErrorMessage;
@@ -758,7 +765,7 @@ void _showAddToolDialog(BuildContext context, StateSetter parentSetState, TextEd
 
                   bool hasError = false;
 
-                  // Check if "+ New Tool" is selected
+                  // Adding New Tools Check
                   if (selectedTool == '+ New Tool') {
                     // Validate tool name
                     if (toolNameRaw.isEmpty) {
@@ -827,130 +834,161 @@ void _showAddToolDialog(BuildContext context, StateSetter parentSetState, TextEd
 
                     Navigator.of(dialogContext).pop(); // Close dialog
                     parentSetState(() {}); // Reflect changes in the parent state
-                  }else {
-                    // Handle case where an existing tool is selected
-                    if (selectedTool != null) {
-                      // Show confirmation dialog
-                      showDialog(
-                        context: dialogContext,
-                        builder: (BuildContext confirmationContext) {
-                          return AlertDialog(
-                            title: const Text('Confirm Update'),
-                            content: Text(
-                              'Updating the tool "$selectedTool" will modify this tool for all crew members who have it. Do you want to proceed?',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(confirmationContext).pop(); // Close the confirmation dialog
-                                },
-                                child: const Text(
-                                  'Cancel',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  // Validate weight
-                                  if (toolWeightText.isEmpty || int.tryParse(toolWeightText) == null || int.parse(toolWeightText) <= 0) {
-                                    // Show an error message in the dialog
-                                    showDialog(
-                                      context: confirmationContext,
-                                      builder: (BuildContext errorContext) {
-                                        return AlertDialog(
-                                          title: const Text('Invalid Weight'),
-                                          content: const Text(
-                                            'Please enter a valid weight greater than zero.',
-                                            style: TextStyle(fontSize: 16),
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(errorContext).pop(); // Close the error dialog
-                                              },
-                                              child: const Text(
-                                                'OK',
-                                                style: TextStyle(color: Colors.red),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                    return; // Stop further execution
-                                  }
-
-                                  Navigator.of(confirmationContext).pop(); // Close confirmation dialog
-
-                                  // Update the tool in Hive
-                                  final personalToolsBox = Hive.box<Gear>('personalToolsBox');
-                                  final keyToUpdate = personalToolsBox.keys.firstWhere(
-                                        (key) {
-                                      final storedTool = personalToolsBox.get(key);
-                                      return storedTool != null && storedTool.name.toLowerCase() == selectedTool!.toLowerCase();
-                                    },
-                                    orElse: () => null,
-                                  );
-
-                                  if (keyToUpdate != null) {
-                                    personalToolsBox.put(
-                                      keyToUpdate,
-                                      Gear(
-                                        name: toolNameRaw,
-                                        weight: int.parse(toolWeightText),
-                                        quantity: 1,
-                                        isPersonalTool: true,
-                                      ),
-                                    );
-                                  }
-
-                                  // Update the tool in personalToolsList
-                                  final tool = personalToolsList.firstWhere(
-                                        (tool) => tool.name.toLowerCase() == selectedTool!.toLowerCase(),
-                                  );
-                                  tool.name = toolNameRaw;
-                                  tool.weight = int.parse(toolWeightText);
-
-                                  // Update the tool in all crew members who have it
-                                  for (var crewMember in crew.crewMembers) {
-                                    if (crewMember.personalTools != null) {
-                                      for (var personalTool in crewMember.personalTools!) {
-                                        if (personalTool.name.toLowerCase() == selectedTool!.toLowerCase()) {
-                                          personalTool.name = toolNameRaw;
-                                          personalTool.weight = int.parse(toolWeightText);
-                                        }
-                                      }
-                                    }
-                                  }
-
-                                  // Update the tool in addedTools
-                                  if (addedTools != null) {
-                                    for (var tool in addedTools) {
-                                      if (tool.name.toLowerCase() == selectedTool!.toLowerCase()) {
-                                        tool.name = toolNameRaw;
-                                        tool.weight = int.parse(toolWeightText);
-                                      }
-                                    }
-                                  }
-
-                                  Navigator.of(dialogContext).pop(); // Close the main dialog
-                                  parentSetState(() {}); // Reflect changes in the parent state
-                                  Navigator.of(dialogContext).pop(); // Close the main dialog
-
-                                },
-                                child: const Text(
-                                  'Update',
-                                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    }
                   }
+                  // Updating Tools Check
+                  else {
+                    // Validate tool name
+                    if (toolNameRaw.isEmpty) {
+                      dialogSetState(() {
+                        toolNameErrorMessage = 'Please enter tool name'; // Set error message
+                      });
 
+                      // Clear error after a delay
+                      Future.delayed(const Duration(seconds: 2), () {
+                        dialogSetState(() {
+                          toolNameErrorMessage = null; // Clear error message
+                        });
+                      });
+
+                      hasError = true;
+                    }
+
+                    // Validate tool weight
+                    if (toolWeightText.isEmpty || int.tryParse(toolWeightText) == null || int.parse(toolWeightText) <= 0) {
+                      dialogSetState(() {
+                        toolWeightErrorMessage = 'Please enter tool weight'; // Set error message
+                      });
+
+                      // Clear error after a delay
+                      Future.delayed(const Duration(seconds: 2), () {
+                        dialogSetState(() {
+                          toolWeightErrorMessage = null; // Clear error message
+                        });
+                      });
+
+                      hasError = true;
+                    }
+
+                    // Validate if tool name or weight are unchanged
+                    final existingTool = personalToolsList.firstWhere(
+                      (tool) => tool.name.toLowerCase() == selectedTool?.toLowerCase(),
+                    );
+
+                    if (existingTool != null && toolNameRaw.toLowerCase() == existingTool.name.toLowerCase() && int.parse(toolWeightText) == existingTool.weight) {
+                      dialogSetState(() {
+                        toolNameErrorMessage = 'Tool name is unchanged';
+                        toolWeightErrorMessage = 'Tool weight is unchanged';
+                      });
+
+                      Future.delayed(const Duration(seconds: 2), () {
+                        dialogSetState(() {
+                          toolNameErrorMessage = null;
+                          toolWeightErrorMessage = null;
+                        });
+                      });
+
+                      hasError = true;
+                    }
+
+                    // If there are errors, stop further execution
+                    if (hasError) return;
+
+                    // Show confirmation dialog
+                    showDialog(
+                      context: dialogContext,
+                      builder: (BuildContext confirmationContext) {
+                        return AlertDialog(
+                          title: const Text('Confirm Update'),
+                          content: Text(
+                            'Updating $selectedTool will modify this tool for all crew members who have it, and will update it in your gear inventory if it exists. Do you want to proceed?',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(confirmationContext).pop(); // Close the confirmation dialog
+                              },
+                              child: const Text(
+                                'Cancel',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(confirmationContext).pop(); // Close confirmation dialog
+
+                                // Update the tool in Hive
+                                final personalToolsBox = Hive.box<Gear>('personalToolsBox');
+                                final keyToUpdate = personalToolsBox.keys.firstWhere(
+                                  (key) {
+                                    final storedTool = personalToolsBox.get(key);
+                                    return storedTool != null && storedTool.name.toLowerCase() == selectedTool!.toLowerCase();
+                                  },
+                                  orElse: () => null,
+                                );
+
+                                if (keyToUpdate != null) {
+                                  personalToolsBox.put(
+                                    keyToUpdate,
+                                    Gear(
+                                      name: toolNameRaw,
+                                      weight: int.parse(toolWeightText),
+                                      quantity: 1,
+                                      isPersonalTool: true,
+                                    ),
+                                  );
+                                }
+
+                                // Update the tool in personalToolsList
+                                final tool = personalToolsList.firstWhere(
+                                  (tool) => tool.name.toLowerCase() == selectedTool!.toLowerCase(),
+                                );
+                                tool.name = toolNameRaw;
+                                tool.weight = int.parse(toolWeightText);
+
+                                // Update the tool in all crew members who have it
+                                for (var crewMember in crew.crewMembers) {
+                                  if (crewMember.personalTools != null) {
+                                    for (var personalTool in crewMember.personalTools!) {
+                                      if (personalTool.name.toLowerCase() == selectedTool!.toLowerCase()) {
+                                        personalTool.name = toolNameRaw;
+                                        personalTool.weight = int.parse(toolWeightText);
+                                      }
+                                    }
+                                  }
+                                }
+                                // Update the tool in all gear items
+                                for (var gearItems in crew.gear) {
+                                  if (gearItems.name.toLowerCase() == selectedTool!.toLowerCase()) {
+                                    gearItems.name = toolNameRaw;
+                                    gearItems.weight = int.parse(toolWeightText);
+                                  }
+                                }
+
+                                // Update the tool in addedTools
+                                if (addedTools != null) {
+                                  for (var tool in addedTools) {
+                                    if (tool.name.toLowerCase() == selectedTool!.toLowerCase()) {
+                                      tool.name = toolNameRaw;
+                                      tool.weight = int.parse(toolWeightText);
+                                    }
+                                  }
+                                }
+
+                                Navigator.of(dialogContext).pop(); // Close the main dialog
+                                parentSetState(() {}); // Reflect changes in the parent state
+                                Navigator.of(dialogContext).pop(); // Close the main dialog
+                              },
+                              child: const Text(
+                                'Update',
+                                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
                 },
                 child: const Text(
                   'Save',
@@ -963,5 +1001,4 @@ void _showAddToolDialog(BuildContext context, StateSetter parentSetState, TextEd
       );
     },
   );
-
 }
