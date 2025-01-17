@@ -82,6 +82,16 @@ class CrewMember extends HiveObject {
           .toList(),
     );
   }
+
+  CrewMember copy() {
+    return CrewMember(
+      name: name,
+      flightWeight: flightWeight,
+      position: position,
+      personalTools: personalTools?.map((tool) => tool.copyWith()).toList(),
+      id: id, // Keep the same ID for the copy
+    );
+  }
 }
 
 List<Gear> getAllGearItems() {
@@ -137,3 +147,4 @@ List<CrewMember> sortCrewListByPosition(List<CrewMember> crewList) {
 
   return crewList;
 }
+

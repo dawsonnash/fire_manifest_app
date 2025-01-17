@@ -3,6 +3,7 @@ import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../Data/trip.dart';
+import 'Data/crew.dart';
 import 'Data/load_calculator.dart';
 import 'Data/trip_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -91,13 +92,16 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
       );
       return; // Exit function if the trip name is already used
     }
-    print('allowableController.text: ${allowableController.text}');    // Convert flight weight text to integer
     final int allowable = int.parse(allowableController.text);
     // Convert available seats text to integer
     final int availableSeats = int.parse(availableSeatsController.text);
 
     // Creating a new Trip object
     Trip newTrip = Trip(tripName: tripName, allowable: allowable, availableSeats: availableSeats);
+
+    // Deep copy crewMembers and gear into the new Trip
+    newTrip.crewMembers = crew.crewMembers.map((member) => member.copy()).toList();
+    newTrip.gear = crew.gear.map((item) => item.copyWith()).toList();
 
     // Add the new trip to the global crew object
     savedTrips.addTrip(newTrip);

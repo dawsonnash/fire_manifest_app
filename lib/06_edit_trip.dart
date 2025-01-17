@@ -534,7 +534,7 @@ class _EditTripState extends State<EditTrip> {
       }
 
       // Calculate remaining quantities for the gear list
-      gearList = gearBox.values.map((gear) {
+      gearList = widget.trip.gear.map((gear) {
         int usedQuantity = usedGearQuantities[gear.name] ?? 0;
         int remainingQuantity = gear.quantity - usedQuantity;
 
@@ -548,7 +548,7 @@ class _EditTripState extends State<EditTrip> {
       }).where((gear) => gear.quantity > 0).toList();
 
       // Load crew members
-      crewList = crewmemberBox.values
+      crewList =  widget.trip.crewMembers
           .where((crew) => !loads.any((load) => load.any((item) => item is CrewMember && item.name == crew.name)))
           .map((crew) => CrewMember(
         name: crew.name,

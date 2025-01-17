@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
-
+import 'crewmember.dart';
+import 'gear.dart';
 import 'load.dart';
 
 part 'trip.g.dart';
@@ -14,9 +15,12 @@ class Trip extends HiveObject {
   int availableSeats;
   @HiveField(3)
   List<Load> loads = [];
-
   @HiveField(4) // Add a new field index
   DateTime timestamp; // New attribute to store the timestamp
+  @HiveField(5)
+  List<CrewMember> crewMembers = [];
+  @HiveField(6)
+  List<Gear> gear = [];
 
   //
 
