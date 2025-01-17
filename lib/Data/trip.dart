@@ -21,6 +21,8 @@ class Trip extends HiveObject {
   List<CrewMember> crewMembers = [];
   @HiveField(6)
   List<Gear> gear = [];
+  @HiveField(7)
+  int? totalCrewWeight;
 
   //
 
@@ -52,6 +54,30 @@ class Trip extends HiveObject {
         print('Name: ${gear.name}, Weight: ${gear.weight}');
       }
     }
+  }
+  // Function to calculate total crew weight and update `totalCrewWeight`
+  void calculateTotalCrewWeight() {
+    int totalWeight = 0;
+
+    // Calculate total weight of all crew members and their personal tools
+    for (var crewMember in crewMembers) {
+      totalWeight += crewMember.flightWeight;
+
+      // Add the weight of personal tools, if any
+      if (crewMember.personalTools != null) {
+        for (var tool in crewMember.personalTools!) {
+          totalWeight += tool.totalGearWeight;
+        }
+      }
+    }
+
+    // Calculate total weight of all gear
+    for (var gearItem in gear) {
+      totalWeight += gearItem.totalGearWeight;
+    }
+
+    // Update the `totalCrewWeight` attribute
+    totalCrewWeight = totalWeight;
   }
 }
 

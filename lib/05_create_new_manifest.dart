@@ -1,9 +1,12 @@
 import 'dart:ui';
 import 'package:fire_app/Data/saved_preferences.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import '../Data/trip.dart';
-import 'Data/crew.dart';
+import 'Data/crewmember.dart';
+import 'Data/gear.dart';
 import 'Data/load_calculator.dart';
 import 'Data/trip_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -16,6 +19,20 @@ class CreateNewManifest extends StatefulWidget {
 }
 
 class _CreateNewManifestState extends State<CreateNewManifest> {
+  late final Box<Gear> gearBox;
+  late final Box<CrewMember> crewmemberBox;
+
+  // Lists for Select All/Some dialog
+  List<Gear> gearList = [];
+  List<CrewMember> crewList = [];
+
+  // Lists for actual crew going into trip object
+  List<CrewMember> thisTripCrewMemberList = [];
+  List<Gear> thisTripGearList = [];
+
+  late Map<Gear, int> selectedGearQuantities;
+  late List<dynamic> selectedItems;
+
   // Variables to store user input
   final TextEditingController tripNameController = TextEditingController();
   final TextEditingController allowableController = TextEditingController();
@@ -32,6 +49,9 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
   void initState() {
     super.initState();
 
+    gearBox = Hive.box<Gear>('gearBox');
+    crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
+
     // Listeners to the TextControllers
     tripNameController.addListener(_checkInput);
     allowableController.addListener(_checkInput);
@@ -39,6 +59,404 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
 
     // Initialize allowableController with the default slider value
     allowableController.text = _sliderValue.toStringAsFixed(0);
+
+    // Initialize selectedItems and selectedGearQuantities
+    selectedGearQuantities = {};
+    selectedItems = [];
+
+    loadItems();
+  }
+
+  void _showSelectionDialog() async {
+    // Preselect all crew members and gear by default
+    if (selectedGearQuantities.isEmpty) {
+      selectedGearQuantities = {
+        for (var gear in gearList) gear: gear.quantity, // Default to full quantity
+      };
+    }
+
+    if (selectedItems.isEmpty) {
+      selectedItems = [
+        ...crewList, // Add all crew members
+        ...gearList,
+      ];
+    }
+    List<CrewMember> sortedCrewList = sortCrewListByPosition(crewList);
+    List<Gear> sortedGearList = sortGearListAlphabetically(gearList);
+    bool isCrewExpanded = false;
+    bool isGearExpanded = false;
+
+    // "Select All" starts as true because everything is selected by default
+    bool isSelectAllChecked = selectedItems.length == (crewList.length + gearList.length);
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, dialogSetState) {
+            // Function to update "Select All" checkbox dynamically
+            void updateSelectAllState() {
+              dialogSetState(() {
+                isSelectAllChecked = selectedItems.length == (crewList.length + gearList.length);
+              });
+            }
+
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              title: const Text(
+                'Select Crew Members and Gear',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+              contentPadding: const EdgeInsets.all(16),
+              content: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.7,
+                ),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // Select All Checkbox
+                        CheckboxListTile(
+                          title: const Text(
+                            'Select All',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          value: isSelectAllChecked,
+                          onChanged: (bool? isChecked) {
+                            dialogSetState(() {
+                              isSelectAllChecked = isChecked ?? false;
+
+                              if (isSelectAllChecked) {
+                                selectedItems = [
+                                  ...crewList,
+                                  ...gearList,
+                                ];
+                                selectedGearQuantities = {
+                                  for (var gear in gearList) gear: gear.quantity,
+                                };
+                              } else {
+                                selectedItems.clear();
+                                selectedGearQuantities.clear();
+                              }
+                            });
+                          },
+                        ),
+                        const Divider(),
+
+                        // Crew Member Dropdown
+                        ExpansionPanelList(
+                          elevation: 8,
+                          expandedHeaderPadding: const EdgeInsets.all(0),
+                          expansionCallback: (int index, bool isExpanded) {
+                            dialogSetState(() {
+                              isCrewExpanded = !isCrewExpanded;
+                            });
+                          },
+                          children: [
+                            ExpansionPanel(
+                              isExpanded: isCrewExpanded,
+                              backgroundColor: Colors.deepOrangeAccent,
+                              // Set background color
+                              headerBuilder: (context, isExpanded) {
+                                return Container(
+                                  child: ListTile(
+                                    title: const Text(
+                                      'Crew Members',
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                );
+                              },
+                              body: Column(
+                                children: sortedCrewList.map((crew) {
+                                  return Container(
+                                    //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(0.0),
+                                      // Rounded corners
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.8),
+                                          spreadRadius: 1,
+                                          blurRadius: 5,
+                                          offset: Offset(0, 3), // Shadow position
+                                        ),
+                                      ],
+                                    ),
+                                    child: CheckboxListTile(
+                                      title: Text(
+                                        '${crew.name}, ${crew.flightWeight} lbs',
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      subtitle: Text(
+                                        crew.getPositionTitle(crew.position),
+                                        style: const TextStyle(fontStyle: FontStyle.italic),
+                                      ),
+                                      value: selectedItems.contains(crew),
+                                      onChanged: (bool? isChecked) {
+                                        dialogSetState(() {
+                                          if (isChecked == true) {
+                                            selectedItems.add(crew);
+                                          } else {
+                                            selectedItems.remove(crew);
+                                          }
+                                          updateSelectAllState(); // Dynamically update "Select All" state
+                                        });
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Gear Dropdown
+                        ExpansionPanelList(
+                          elevation: 8,
+                          expandedHeaderPadding: const EdgeInsets.all(0),
+                          expansionCallback: (int index, bool isExpanded) {
+                            dialogSetState(() {
+                              isGearExpanded = !isGearExpanded;
+                            });
+                          },
+                          children: [
+                            ExpansionPanel(
+                              isExpanded: isGearExpanded,
+                              backgroundColor: Colors.deepOrangeAccent,
+                              // Set background color
+                              headerBuilder: (context, isExpanded) {
+                                return Container(
+                                  //color: Colors.deepOrangeAccent, // Set the background color for the header
+                                  child: ListTile(
+                                    title: const Text(
+                                      'Gear',
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                );
+                              },
+                              body: Column(
+                                children: sortedGearList.map((gear) {
+                                  int remainingQuantity = gear.quantity - (selectedGearQuantities[gear] ?? 0);
+
+                                  return Container(
+                                    //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
+                                    decoration: BoxDecoration(
+                                      color: gear.isPersonalTool
+                                          ? Colors.blue[100] // Color for personal tools
+                                          : Colors.orange[100],
+                                      borderRadius: BorderRadius.circular(0.0),
+                                      // Rounded corners
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.8),
+                                          spreadRadius: 1,
+                                          blurRadius: 5,
+                                          offset: Offset(0, 3), // Shadow position
+                                        ),
+                                      ],
+                                    ),
+                                    child: CheckboxListTile(
+                                      title: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                Flexible(
+                                                  child: Text(
+                                                    gear.name,
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  ' (x$remainingQuantity)  ',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          if (selectedItems.contains(gear))
+                                            if (selectedItems.contains(gear))
+                                              GestureDetector(
+                                                onTap: () {
+                                                  final int gearQuantity = gear.quantity;
+                                                  if (gearQuantity > 1) {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return AlertDialog(
+                                                          title: Text('Select Quantity for ${gear.name}'),
+                                                          content: SizedBox(
+                                                            height: 150,
+                                                            child: CupertinoPicker(
+                                                              scrollController: FixedExtentScrollController(
+                                                                initialItem: (selectedGearQuantities[gear] ?? 1) - 1,
+                                                              ),
+                                                              itemExtent: 32.0,
+                                                              onSelectedItemChanged: (int value) {
+                                                                dialogSetState(() {
+                                                                  selectedGearQuantities[gear] = value + 1;
+                                                                });
+                                                              },
+                                                              children: List<Widget>.generate(
+                                                                gear.quantity,
+                                                                // Use the full quantity for selection
+                                                                    (int index) {
+                                                                  return Center(
+                                                                    child: Text('${index + 1}'),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          actions: [
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                // Finalize the selection
+                                                                dialogSetState(() {
+                                                                  int selectedQuantity = selectedGearQuantities[gear] ?? 1;
+                                                                  remainingQuantity = gear.quantity - selectedQuantity;
+                                                                });
+                                                                Navigator.of(context).pop();
+                                                              },
+                                                              child: const Text('Confirm'),
+                                                            ),
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(context).pop();
+                                                              },
+                                                              child: const Text('Cancel'),
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                  }
+                                                },
+                                                child: Row(
+                                                  children: [
+                                                    if (gear.quantity > 1)
+                                                      Text(
+                                                        'Qty: ${selectedGearQuantities[gear] ?? 1}',
+                                                        style: const TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 14,
+                                                          color: Colors.black,
+                                                        ),
+                                                      ),
+                                                    if (gear.quantity > 1) const Icon(Icons.arrow_drop_down, color: Colors.black),
+                                                  ],
+                                                ),
+                                              ),
+                                        ],
+                                      ),
+                                      value: selectedItems.contains(gear),
+                                      onChanged: (bool? isChecked) {
+                                        dialogSetState(() {
+                                          if (isChecked == true) {
+                                            selectedItems.add(gear);
+                                            selectedGearQuantities[gear] = 1; // Default quantity
+                                          } else {
+                                            selectedItems.remove(gear);
+                                            selectedGearQuantities.remove(gear);
+                                          }
+                                        });
+                                        updateSelectAllState(); // Dynamically update "Select All" state
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Update thisTripCrewMemberList with only selected crew members
+                    thisTripCrewMemberList = selectedItems.whereType<CrewMember>().toList();
+
+                    // Update thisTripGearList with only selected gear items and quantities
+                    thisTripGearList = selectedItems
+                        .whereType<Gear>()
+                        .map((gear) {
+                      final selectedQuantity = selectedGearQuantities[gear] ?? 1; // Get selected quantity
+                      return Gear(
+                        name: gear.name,
+                        quantity: selectedQuantity,
+                        weight: gear.weight,
+                        isPersonalTool: gear.isPersonalTool,
+                      );
+                    })
+                        .toList();
+
+                    // Close the dialog
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Select'),
+                ),
+
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void loadItems() {
+    setState(() {
+      // Create deep copies of the gear and crew member data
+      gearList = gearBox.values.map((gear) {
+        return Gear(
+          name: gear.name,
+          quantity: gear.quantity,
+          weight: gear.weight,
+          isPersonalTool: gear.isPersonalTool,
+        );
+      }).toList();
+
+      crewList = crewmemberBox.values.map((crew) {
+        return CrewMember(
+          name: crew.name,
+          flightWeight: crew.flightWeight,
+          position: crew.position,
+          personalTools: crew.personalTools,
+        );
+      }).toList();
+    });
+    // Load CrewMembers from Hive (or another data source)
+    thisTripCrewMemberList.addAll(crewmemberBox.values.toList());
+
+    // Load Gear from Hive (or another data source)
+    thisTripGearList.addAll(gearBox.values.toList());
   }
 
   // Track the last input source
@@ -100,8 +518,10 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
     Trip newTrip = Trip(tripName: tripName, allowable: allowable, availableSeats: availableSeats);
 
     // Deep copy crewMembers and gear into the new Trip
-    newTrip.crewMembers = crew.crewMembers.map((member) => member.copy()).toList();
-    newTrip.gear = crew.gear.map((item) => item.copyWith()).toList();
+    newTrip.crewMembers = thisTripCrewMemberList.map((member) => member.copy()).toList();
+    newTrip.gear =  thisTripGearList.map((item) => item.copyWith()).toList();
+
+    newTrip.calculateTotalCrewWeight();
 
     // Add the new trip to the global crew object
     savedTrips.addTrip(newTrip);
@@ -220,36 +640,6 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                       children: [
                         const Spacer(flex: 1),
 
-                        // Enter Trip Name text box
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0, bottom: 0.0),
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.deepOrangeAccent,
-                              border: Border.all(color: Colors.black, width: 2),
-                              borderRadius: BorderRadius.circular(4),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.5),
-                                  spreadRadius: 1,
-                                  blurRadius: 8,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                            //alignment: Alignment.center,
-                            child: Text(
-                              'Enter Trip Name',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
 
                         // Trip Name input field
                         Padding(
@@ -259,8 +649,12 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                               maxLength: 20,
                               textCapitalization: TextCapitalization.words,
                               decoration: InputDecoration(
-                                // hintText: 'Enter trip name',
-                                // hintStyle: TextStyle(color: Colors.black),
+                                labelText: 'Enter Trip Name',
+                                labelStyle: const TextStyle(
+                                  color: Colors.black, // Label color when not focused
+                                  fontSize: 18, // Label font size
+                                  fontWeight: FontWeight.bold,
+                                ),
                                 filled: true,
                                 fillColor: Colors.white.withValues(alpha: 0.9),
                                 enabledBorder: OutlineInputBorder(
@@ -286,6 +680,90 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                 fontWeight: FontWeight.bold,
                               ),
                             )),
+
+                        // Available Seats input field
+                        Padding(
+                            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
+                            child: TextField(
+                              controller: availableSeatsController,
+                              keyboardType: TextInputType.number,
+                              maxLength: 1,
+                              // Only show numeric keyboard
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.digitsOnly,
+                                // Allow only digits
+                              ],
+                              decoration: InputDecoration(
+                                labelText: 'Enter # of Available Seats',
+                                labelStyle: const TextStyle(
+                                  color: Colors.black, // Label color when not focused
+                                  fontSize: 18, // Label font size
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                filled: true,
+                                fillColor: Colors.white.withValues(alpha: 0.9),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.black,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Colors.black,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.0),
+                                ),
+                              ),
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )),
+
+                        // Select All/Some Crew
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
+                          child: GestureDetector(
+                            onTap: () =>  _showSelectionDialog(),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.9),
+                                borderRadius: BorderRadius.circular(4.0),
+                                border: Border.all(color: Colors.black, width: 2.0),
+                              ),
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 12.0, right: 16.0),
+                                child: Row(
+                                  children: [
+                                    const Text(
+                                    'Select All/Some Crew',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                    const Spacer(), // Pushes the arrow icon to the far right
+                                    Icon(
+                                      Icons.arrow_drop_down, // Dropdown arrow icon
+                                      color: Colors.black,
+                                      size: 24, // Adjust the size as needed
+                                    ),
+                                ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
 
                         // Choose Trip Preference text box
                         Padding(
@@ -361,75 +839,6 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                           ),
                         ),
 
-                        // Enter Available Seats text box
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0, bottom: 0.0),
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.deepOrangeAccent,
-                              border: Border.all(color: Colors.black, width: 2),
-                              borderRadius: BorderRadius.circular(4),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.5),
-                                  spreadRadius: 1,
-                                  blurRadius: 8,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                            //alignment: Alignment.center,
-                            child: Text(
-                              'Enter # of Available Seats',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        // Available Seats input field
-                        Padding(
-                            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
-                            child: TextField(
-                              controller: availableSeatsController,
-                              keyboardType: TextInputType.number,
-                              maxLength: 1,
-                              // Only show numeric keyboard
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.digitsOnly,
-                                // Allow only digits
-                              ],
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: Colors.white.withValues(alpha: 0.9),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.black,
-                                    // Border color when the TextField is not focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(4.0), // Rounded corners
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.black,
-                                    // Border color when the TextField is focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(4.0),
-                                ),
-                              ),
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )),
 
                         // Choose allowable text box
                         Padding(
