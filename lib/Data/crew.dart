@@ -7,7 +7,8 @@ import 'package:hive/hive.dart';
 
 class Crew {
   List<CrewMember> crewMembers = [];        // Contains all crew members
-  List<Gear> gear = [];
+  List<Gear> gear = [];                     // Contains all gear
+  List<Gear> personalTools = [];            // List of personal tool templates
   double totalCrewWeight = 0.0;
 
   // Helper function to get saw teams
@@ -56,6 +57,32 @@ class Crew {
     updateTotalCrewWeight();
     print('Updated Total Crew Weight: $totalCrewWeight');
   }
+
+  void addPersonalTool(Gear tool) {
+    final personalToolsBox = Hive.box<Gear>('personalToolsBox');
+    personalTools.add(tool);
+    personalToolsBox.add(tool);
+  }
+  void removePersonalTool(String toolName) {
+    var personalToolsBox = Hive.box<Gear>('personalToolsBox');
+
+    // Find the tool in Hive based on its name
+    final keyToRemove = personalToolsBox.keys.firstWhere(
+          (key) {
+        final gear = personalToolsBox.get(key);
+        return gear != null && gear.name == toolName;
+      },
+      orElse: () => null, // Return null if no matching tool is found
+    );
+
+    if (keyToRemove != null) {
+      personalToolsBox.delete(keyToRemove); // Remove from Hive
+    }
+
+    // Remove the tool from the in-memory list
+    personalTools.removeWhere((tool) => tool.name == toolName);
+  }
+
 
   void removeCrewMember(CrewMember member) {
     var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
@@ -232,6 +259,10 @@ class Crew {
     // Update the total weight after loading the data
     crew.updateTotalCrewWeight();
     //print('Crew data loaded from Hive. Total weight: ${crew.totalCrewWeight}');
+  }
+  void loadPersonalTools() {
+    var personalToolsBox = Hive.box<Gear>('personalTools');
+    personalTools = personalToolsBox.values.toList();
   }
 
 }

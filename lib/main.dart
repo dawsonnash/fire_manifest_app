@@ -44,10 +44,12 @@ void main() async {
   await Hive.openBox<Load>('loadBox');
   await Hive.openBox<Trip>('tripBox');
   await Hive.openBox<TripPreference>('tripPreferenceBox');
+  await Hive.openBox<Gear>('personalToolsBox');
 
   // Load data from Hive
   crew.loadCrewDataFromHive();
   savedPreferences.loadPreferencesFromHive();
+
   // do we need to load trip data as well?how does that work
 
   // Test data for user testing

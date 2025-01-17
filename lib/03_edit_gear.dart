@@ -4,12 +4,12 @@ import 'package:flutter/services.dart';
 import 'Data/crew.dart';
 import 'Data/gear.dart';
 import 'package:hive/hive.dart';
+import 'Functions/functions.dart';
 
 class EditGear extends StatefulWidget {
-
   // THis page requires a gear item to be passed to it - to edit it
   final Gear gear;
-  final VoidCallback onUpdate;  // Callback for deletion to update previous page
+  final VoidCallback onUpdate; // Callback for deletion to update previous page
 
   const EditGear({
     super.key,
@@ -20,7 +20,10 @@ class EditGear extends StatefulWidget {
   @override
   State<EditGear> createState() => _EditGearState();
 }
-class _EditGearState extends State<EditGear>{
+
+class _EditGearState extends State<EditGear> {
+  late final Box<Gear> personalToolsBox;
+  List<Gear> personalToolsList = [];
 
   // Variables to store user input
   late TextEditingController gearNameController;
@@ -41,8 +44,11 @@ class _EditGearState extends State<EditGear>{
   void initState() {
     super.initState();
 
-    // Initialize the gearBox variable here
+    // Open the Hive box and load the list of tool items
+    personalToolsBox = Hive.box<Gear>('personalToolsBox');
     gearBox = Hive.box<Gear>('gearBox');
+
+    loadPersonalToolsList();
 
     // Initializing the controllers with the current gears data to be edited
     gearNameController = TextEditingController(text: widget.gear.name);
@@ -60,6 +66,13 @@ class _EditGearState extends State<EditGear>{
     gearQuantityController.addListener(_checkInput);
   }
 
+  // Function to load the list of tool items from the Hive box
+  void loadPersonalToolsList() {
+    setState(() {
+      personalToolsList = personalToolsBox.values.toList();
+    });
+  }
+
   @override
   void dispose() {
     gearNameController.dispose();
@@ -71,16 +84,12 @@ class _EditGearState extends State<EditGear>{
   // Function to check if input is valid and update button state
   void _checkInput() {
     final isNameValid = gearNameController.text.isNotEmpty;
-    final isGearWeightValid = gearWeightController.text.isNotEmpty &&
-        int.tryParse(gearWeightController.text) != null &&
-        int.parse(gearWeightController.text) > 0 &&
-        int.parse(gearWeightController.text) <= 500;
+    final isGearWeightValid =
+        gearWeightController.text.isNotEmpty && int.tryParse(gearWeightController.text) != null && int.parse(gearWeightController.text) > 0 && int.parse(gearWeightController.text) <= 500;
     final isNameChanged = gearNameController.text != oldGearName;
     final isGearWeightChanged = gearWeightController.text != oldGearWeight.toString();
-    final isGearQuantityValid = gearQuantityController.text.isNotEmpty &&
-        int.tryParse(gearQuantityController.text) != null &&
-        int.parse(gearQuantityController.text) >= 1 &&
-        int.parse(gearQuantityController.text) < 100;
+    final isGearQuantityValid =
+        gearQuantityController.text.isNotEmpty && int.tryParse(gearQuantityController.text) != null && int.parse(gearQuantityController.text) >= 1 && int.parse(gearQuantityController.text) < 100;
     final isGearQuantityChanged = gearQuantityController.text != oldGearQuantity.toString();
 
     setState(() {
@@ -92,46 +101,86 @@ class _EditGearState extends State<EditGear>{
 
   // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
   void saveData() {
-
     // Get  updated gear name from the TextField
     final String newGearName = gearNameController.text;
     final String originalGearName = widget.gear.name;
+    final String capitalizedGearName = capitalizeEveryWord(newGearName);
 
     // Check if the new gear name already exists in the crew's gear list,
     // but ignore the current gear's original name
     bool gearNameExists = crew.gear.any(
-          (gear) => gear.name == newGearName && gear.name != originalGearName,
+      (gear) => gear.name.toLowerCase() == newGearName.toLowerCase() && gear.name.toLowerCase() != originalGearName.toLowerCase(),
     );
 
-    if (gearNameExists) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Center(
-            child: Text(
-              'Gear name already used!',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+    bool personalToolExists = personalToolsList.any((gear) => gear.name.toLowerCase() == newGearName.toLowerCase());
+
+    if (personalToolExists) {
+      int personalToolWeight = personalToolsList.firstWhere((gear) => gear.name.toLowerCase() == newGearName.toLowerCase()).weight;
+      if (personalToolWeight != (int.parse(gearWeightController.text))) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Gear Conflict'),
+              content: Text(
+                '$capitalizedGearName must be of the weight, ${personalToolsList.firstWhere((gear) => gear.name.toLowerCase() == newGearName.toLowerCase()).weight} lbs. To edit this weight, do so in the "Add Crew Member" page.',
+                style: const TextStyle(fontSize: 16),
               ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+    }
+
+    if (gearNameExists) {
+      String matchingGearName = crew.gear.firstWhere((gear) => gear.name.toLowerCase() == newGearName.toLowerCase()).name;
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Gear Conflict'),
+            content: Text(
+              "$matchingGearName already exists. If you would like to add more, edit the existing item's quantity.",
+              style: const TextStyle(fontSize: 16),
             ),
-          ),
-          duration: Duration(seconds: 1),
-          backgroundColor: Colors.red,
-        ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            ],
+          );
+        },
       );
       return; // Exit function if the gear name is already used
     }
 
     // Update the gear's attributes
-    widget.gear.name = newGearName;
+    widget.gear.name = capitalizedGearName;
     widget.gear.weight = int.parse(gearWeightController.text);
     widget.gear.quantity = int.parse(gearQuantityController.text);
 
     // Find the key for this item, if it's not a new item, update it in Hive
     final key = gearBox.keys.firstWhere(
-          (key) => gearBox.get(key) == widget.gear,
+      (key) => gearBox.get(key) == widget.gear,
       orElse: () => null,
     );
 
@@ -169,7 +218,6 @@ class _EditGearState extends State<EditGear>{
 
   @override
   Widget build(BuildContext context) {
-
     // Main theme button style
     final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
@@ -180,21 +228,13 @@ class _EditGearState extends State<EditGear>{
         elevation: 15,
         shadowColor: Colors.black,
         side: const BorderSide(color: Colors.black, width: 2),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         // Maybe change? Dynamic button size based on screen size
-        fixedSize: Size(MediaQuery
-            .of(context)
-            .size
-            .width / 2, MediaQuery
-            .of(context)
-            .size
-            .height / 10)
-    );
+        fixedSize: Size(MediaQuery.of(context).size.width / 2, MediaQuery.of(context).size.height / 10));
     // Black style input field decoration
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,  // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
+      resizeToAvoidBottomInset: false, // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
       appBar: AppBar(
         backgroundColor: Colors.deepOrangeAccent,
         title: const Text(
@@ -210,34 +250,32 @@ class _EditGearState extends State<EditGear>{
           FocusScope.of(context).unfocus(); // Dismiss the keyboard on vertical swipe
         },
         child: Column(
-
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Expanded( // Takes up all available space
+            Expanded(
+              // Takes up all available space
               child: Stack(
                 children: [
                   // Background image
                   ImageFiltered(
                       imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                       // Blur effect
-                      child: Image.asset('assets/images/logo1.png',
+                      child: Image.asset(
+                        'assets/images/logo1.png',
                         fit: BoxFit.cover, // Cover  entire background
                         width: double.infinity,
                         height: double.infinity,
-                      )
-                  ),
+                      )),
                   Container(
                     width: double.infinity,
                     height: double.infinity,
                     color: Colors.white.withOpacity(0.1),
                     child: Column(
-
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-
                         // Edit Name
                         Padding(
-                            padding: const EdgeInsets.only(left: 16.0,right: 16.0, top: 16.0, bottom: 4.0),
+                            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 4.0),
                             child: TextField(
                               controller: gearNameController,
                               textCapitalization: TextCapitalization.words,
@@ -256,8 +294,7 @@ class _EditGearState extends State<EditGear>{
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
-                                  borderRadius: BorderRadius.circular(
-                                      12.0), // Rounded corners
+                                  borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
@@ -267,19 +304,16 @@ class _EditGearState extends State<EditGear>{
                                   ),
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
-
                               ),
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 28,
                               ),
-                            )
-
-                        ),
+                            )),
 
                         // Edit Weight
                         Padding(
-                            padding: const EdgeInsets.only(left: 16.0,right: 16.0, top: 4.0, bottom: 4.0),
+                            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 4.0, bottom: 4.0),
                             child: TextField(
                               controller: gearWeightController,
                               keyboardType: TextInputType.number,
@@ -291,10 +325,11 @@ class _EditGearState extends State<EditGear>{
                               ],
                               decoration: InputDecoration(
                                 labelText: 'Edit weight',
-                                hintText: 'Up to 500 lbs',hintStyle: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                              ),
+                                hintText: 'Up to 500 lbs',
+                                hintStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                ),
                                 labelStyle: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 22,
@@ -307,8 +342,7 @@ class _EditGearState extends State<EditGear>{
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
-                                  borderRadius: BorderRadius.circular(
-                                      12.0), // Rounded corners
+                                  borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
@@ -318,19 +352,16 @@ class _EditGearState extends State<EditGear>{
                                   ),
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
-
                               ),
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 28,
                               ),
-                            )
-
-                        ),
+                            )),
 
                         // Edit Quantity
                         Padding(
-                            padding: const EdgeInsets.only(left: 16.0,right: 16.0, top: 4.0, bottom: 4.0),
+                            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 4.0, bottom: 4.0),
                             child: TextField(
                               controller: gearQuantityController,
                               keyboardType: TextInputType.number,
@@ -342,10 +373,11 @@ class _EditGearState extends State<EditGear>{
                               ],
                               decoration: InputDecoration(
                                 labelText: 'Edit quantity',
-                                hintText: 'Up to 99',hintStyle: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                              ),
+                                hintText: 'Up to 99',
+                                hintStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                ),
                                 labelStyle: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 22,
@@ -359,8 +391,7 @@ class _EditGearState extends State<EditGear>{
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
-                                  borderRadius: BorderRadius.circular(
-                                      12.0), // Rounded corners
+                                  borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
@@ -370,15 +401,12 @@ class _EditGearState extends State<EditGear>{
                                   ),
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
-
                               ),
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 28,
                               ),
-                            )
-
-                        ),
+                            )),
 
                         const Spacer(flex: 6),
 
@@ -388,37 +416,24 @@ class _EditGearState extends State<EditGear>{
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Spacer(flex:2),
-
+                              const Spacer(flex: 2),
                               ElevatedButton(
-                                  onPressed: isSaveButtonEnabled ? () => saveData() : null,  // Button is only enabled if there is input
+                                  onPressed: isSaveButtonEnabled ? () => saveData() : null, // Button is only enabled if there is input
                                   style: style, // Main button theme
-                                  child: const Text(
-                                      'Save'
-                                  )
-                              ),
-
-                              const Spacer(flex:1),
-
+                                  child: const Text('Save')),
+                              const Spacer(flex: 1),
                               IconButton(
-                                icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                    size: 32
-                                ),
-
+                                icon: const Icon(Icons.delete, color: Colors.red, size: 32),
                                 onPressed: () {
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
                                       return AlertDialog(
-                                        title: Text(
-                                            'Delete $oldGearName?',
+                                        title: Text('Delete $oldGearName?',
                                             style: const TextStyle(
                                               fontSize: 22,
                                               fontWeight: FontWeight.bold,
-                                            )
-                                        ),
+                                            )),
                                         content: Text('This gear data ($oldGearName) and any gear preference data containing it will be erased!',
                                             style: const TextStyle(
                                               fontSize: 18,
@@ -429,7 +444,7 @@ class _EditGearState extends State<EditGear>{
                                             children: [
                                               TextButton(
                                                 onPressed: () {
-                                                  Navigator.of(context).pop();  // Dismiss the dialog
+                                                  Navigator.of(context).pop(); // Dismiss the dialog
                                                 },
                                                 child: const Text('Cancel',
                                                     style: TextStyle(
@@ -438,10 +453,9 @@ class _EditGearState extends State<EditGear>{
                                               ),
                                               TextButton(
                                                 onPressed: () {
-
                                                   // Remove item from the Hive box
                                                   final keyToRemove = gearBox.keys.firstWhere(
-                                                        (key) => gearBox.get(key) == widget.gear,
+                                                    (key) => gearBox.get(key) == widget.gear,
                                                     orElse: () => null,
                                                   );
 
@@ -452,13 +466,14 @@ class _EditGearState extends State<EditGear>{
                                                   // Remove the crew member from local memory
                                                   crew.removeGear(widget.gear);
 
-                                                  widget.onUpdate();            // Callback function to update UI with new data
+                                                  widget.onUpdate(); // Callback function to update UI with new data
 
                                                   // Show deletion pop-up
                                                   ScaffoldMessenger.of(context).showSnackBar(
-                                                     SnackBar(
+                                                    SnackBar(
                                                       content: Center(
-                                                        child: Text('$oldGearName Deleted!',
+                                                        child: Text(
+                                                          '$oldGearName Deleted!',
                                                           // Maybe change look
                                                           style: const TextStyle(
                                                             color: Colors.black,
@@ -472,8 +487,8 @@ class _EditGearState extends State<EditGear>{
                                                     ),
                                                   );
 
-                                                  Navigator.of(context).pop();  // Dismiss the dialog
-                                                  Navigator.of(context).pop();  // Return to previous screen
+                                                  Navigator.of(context).pop(); // Dismiss the dialog
+                                                  Navigator.of(context).pop(); // Return to previous screen
                                                 },
                                                 child: const Text('OK',
                                                     style: TextStyle(
@@ -489,7 +504,6 @@ class _EditGearState extends State<EditGear>{
                                 },
                               )
                             ],
-
                           ),
                         ),
                       ],
