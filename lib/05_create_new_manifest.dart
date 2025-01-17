@@ -60,27 +60,24 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
     // Initialize allowableController with the default slider value
     allowableController.text = _sliderValue.toStringAsFixed(0);
 
-    // Initialize selectedItems and selectedGearQuantities
-    selectedGearQuantities = {};
-    selectedItems = [];
+
 
     loadItems();
+
+    // Initialize selectedItems with all crew and gear items
+    selectedItems = [
+      ...crewList,
+      ...gearList,
+    ];
+
+    // Optionally initialize selectedGearQuantities
+    selectedGearQuantities = {
+      for (var gear in gearList) gear: gear.quantity,
+    };
   }
 
   void _showSelectionDialog() async {
-    // Preselect all crew members and gear by default
-    if (selectedGearQuantities.isEmpty) {
-      selectedGearQuantities = {
-        for (var gear in gearList) gear: gear.quantity, // Default to full quantity
-      };
-    }
 
-    if (selectedItems.isEmpty) {
-      selectedItems = [
-        ...crewList, // Add all crew members
-        ...gearList,
-      ];
-    }
     List<CrewMember> sortedCrewList = sortCrewListByPosition(crewList);
     List<Gear> sortedGearList = sortGearListAlphabetically(gearList);
     bool isCrewExpanded = false;
@@ -118,32 +115,41 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                     child: Column(
                       children: [
                         // Select All Checkbox
-                        CheckboxListTile(
-                          title: const Text(
-                            'Select All',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black, // Outline color
+                              width: 1.0,         // Outline thickness
+                            ),
+                        //    borderRadius: BorderRadius.circular(8.0), // Rounded corners (optional)
                           ),
-                          value: isSelectAllChecked,
-                          onChanged: (bool? isChecked) {
-                            dialogSetState(() {
-                              isSelectAllChecked = isChecked ?? false;
+                          child: CheckboxListTile(
+                            title: const Text(
+                              'Select All',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            value: isSelectAllChecked,
+                            onChanged: (bool? isChecked) {
+                              dialogSetState(() {
+                                isSelectAllChecked = isChecked ?? false;
 
-                              if (isSelectAllChecked) {
-                                selectedItems = [
-                                  ...crewList,
-                                  ...gearList,
-                                ];
-                                selectedGearQuantities = {
-                                  for (var gear in gearList) gear: gear.quantity,
-                                };
-                              } else {
-                                selectedItems.clear();
-                                selectedGearQuantities.clear();
-                              }
-                            });
-                          },
+                                if (isSelectAllChecked) {
+                                  selectedItems = [
+                                    ...crewList,
+                                    ...gearList,
+                                  ];
+                                  selectedGearQuantities = {
+                                    for (var gear in gearList) gear: gear.quantity,
+                                  };
+                                } else {
+                                  selectedItems.clear();
+                                  selectedGearQuantities.clear();
+                                }
+                              });
+                            },
+                          ),
                         ),
-                        const Divider(),
+                        const SizedBox(height: 16),
 
                         // Crew Member Dropdown
                         ExpansionPanelList(
@@ -523,6 +529,33 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
 
     newTrip.calculateTotalCrewWeight();
 
+    if (newTrip.crewMembers.isEmpty){
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+
+              return AlertDialog(
+                title: const Text('No Crew Members Selected'),
+                content: Text('Select at least one crew member and try again.'
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+
+                ],
+              );
+            },
+          );
+        },
+      );
+      return;
+    }
     // Add the new trip to the global crew object
     savedTrips.addTrip(newTrip);
 
@@ -729,38 +762,75 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                         // Select All/Some Crew
                         Padding(
                           padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
-                          child: GestureDetector(
-                            onTap: () =>  _showSelectionDialog(),
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                borderRadius: BorderRadius.circular(4.0),
-                                border: Border.all(color: Colors.black, width: 2.0),
-                              ),
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 12.0, right: 16.0),
-                                child: Row(
-                                  children: [
-                                    const Text(
-                                    'Select All/Some Crew',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              borderRadius: BorderRadius.circular(4.0),
+                              border: Border.all(color: Colors.black, width: 2.0),
+                            ),
+                            alignment: Alignment.centerLeft,
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  icon: Icon(
+                                    selectedItems.length == (crewList.length + gearList.length)
+                                        ? Icons.check_box // Fully selected
+                                        : Icons.check_box_outline_blank, // Partially or none selected
+                                    color: Colors.black,
+                                    size: 24, // Adjust size as needed
                                   ),
-                                    const Spacer(), // Pushes the arrow icon to the far right
-                                    Icon(
-                                      Icons.arrow_drop_down, // Dropdown arrow icon
-                                      color: Colors.black,
-                                      size: 24, // Adjust the size as needed
-                                    ),
-                                ],
+                                  onPressed: () {
+                                    setState(() {
+                                      if (selectedItems.length != (crewList.length + gearList.length)) {
+                                        // Select all items again
+                                        selectedItems = [
+                                          ...crewList,
+                                          ...gearList,
+                                        ];
+                                        selectedGearQuantities = {
+                                          for (var gear in gearList) gear: gear.quantity,
+                                        };
+
+                                        // Update trip lists to reflect the selection
+                                        thisTripCrewMemberList = crewList.map((crew) => crew.copy()).toList();
+                                        thisTripGearList = gearList.map((gear) => gear.copyWith()).toList();
+                                      } else {
+                                        // Clear selections
+                                        thisTripCrewMemberList.clear();
+                                        thisTripGearList.clear();
+                                        selectedItems.clear();
+                                        selectedGearQuantities.clear();
+                                        _showSelectionDialog();
+                                      }
+                                    });
+
+                                  },
+                                ),
+
+                                const Text(
+                                ' Select All Crew',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
                                 ),
                               ),
+                                const Spacer(), // Pushes the arrow icon to the far right
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.list,
+                                    color: Colors.black,
+                                    size: 32,
+                                  ), onPressed: () {
+                                    _showSelectionDialog();
+                                    setState(() {
+
+                                    });
+                                    },
+                                ),
+                            ],
                             ),
                           ),
                         ),
