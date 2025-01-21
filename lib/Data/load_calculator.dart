@@ -1,10 +1,11 @@
+import 'package:fire_app/Data/positional_preferences.dart';
 import 'package:flutter/material.dart';
 
 import '../main.dart';
+import 'gear_preferences.dart';
 import 'trip.dart';
 import 'dart:math';
 import 'load.dart';
-import 'crew.dart';
 import 'crewmember.dart';
 import 'gear.dart';
 import 'trip_preferences.dart';
@@ -15,9 +16,9 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
   int maxLoadWeight = trip.allowable;
 
   // Get  number of loads based on allowable
-  int numLoadsByAllowable = (crew.totalCrewWeight / trip.allowable).ceil();
+  int numLoadsByAllowable = (trip.totalCrewWeight! / trip.allowable).ceil();
   // Get number of loads based on seats available in the helicopter
-  int numLoadsBySeat = (crew.crewMembers.length / trip.availableSeats).ceil();
+  int numLoadsBySeat = (trip.crewMembers.length / trip.availableSeats).ceil();
 
   // Whichever number is greater is the actual number of loads required
   int numLoads = numLoadsByAllowable > numLoadsBySeat
@@ -25,7 +26,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
       : numLoadsBySeat;
 
   // Create copies of crew and gear
-  var crewMembersCopy = crew.crewMembers.map((member) {
+  var crewMembersCopy = trip.crewMembers.map((member) {
     return CrewMember(
       name: member.name,
       flightWeight: member.flightWeight,
@@ -46,7 +47,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
 
   // This treats quantities as individual items
   var gearCopy = <Gear>[];
-  for (var gear in crew.gear) {
+  for (var gear in trip.gear) {
     for (int i = 0; i < gear.quantity; i++) {
       // Create copy of gear item for each quantity
       gearCopy.add(Gear(name: gear.name, weight: gear.weight, quantity: 1,  isPersonalTool: gear.isPersonalTool));
@@ -64,8 +65,11 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
 
   // TripPreference can be "None", i.e., null
   if (tripPreference != null) {
+    // Clean the tripPreference before evaluation
+    var tripPreferenceCopy = cleanTripPreference(tripPreference, trip);
+
     // Loop through all Positional Preferences, not based on Priority yet
-    for (var posPref in tripPreference.positionalPreferences) {
+    for (var posPref in tripPreferenceCopy.positionalPreferences) {
       // Different cases based on Load Preference: First (0), Last (1), Balanced (2)
       switch (posPref.loadPreference) {
         case 0: // First load preference
@@ -323,7 +327,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
     }
 
     // Loop through all Gear Preferences, not based on Priority yet
-    for (var gearPref in tripPreference.gearPreferences) {
+    for (var gearPref in tripPreferenceCopy.gearPreferences) {
       switch (gearPref.loadPreference) {
         case 0: // First load preference
           for (var gear in gearPref.gear) {
@@ -633,4 +637,51 @@ void shuffleCrewMembers(List<dynamic> crewMembersCopy) {
   crewMembersCopy
     ..clear()
     ..addAll(balancedCrewList);
+}
+
+TripPreference cleanTripPreference(TripPreference originalPreference, Trip trip) {
+  // Create a deep copy of the original TripPreference
+  TripPreference tripPreferenceCopy = TripPreference(
+    tripPreferenceName: originalPreference.tripPreferenceName,
+  );
+
+  // Filter and copy positional preferences
+  tripPreferenceCopy.positionalPreferences = originalPreference.positionalPreferences.map((posPref) {
+    // Filter crew members based on trip.crewMembers
+    var validCrewMembersDynamic = posPref.crewMembersDynamic.map((crewDynamic) {
+      if (crewDynamic is CrewMember) {
+        // Check if the crew member exists in the trip
+        return trip.crewMembers.any((member) => member.name == crewDynamic.name) ? crewDynamic : null;
+      } else if (crewDynamic is List<CrewMember>) {
+        // Filter the group to include only members that exist in the trip
+        var validGroup = crewDynamic.where((member) =>
+            trip.crewMembers.any((tripMember) => tripMember.name == member.name)).toList();
+
+        return validGroup.isNotEmpty ? validGroup : null;
+      }
+      return null;
+    }).where((item) => item != null).toList(); // Remove null entries
+
+    return PositionalPreference(
+      priority: posPref.priority,
+      loadPreference: posPref.loadPreference,
+      crewMembersDynamic: validCrewMembersDynamic,
+    );
+  }).toList();
+
+  // Filter and copy gear preferences
+  tripPreferenceCopy.gearPreferences = originalPreference.gearPreferences.map((gearPref) {
+    // Filter gear items based on trip.gear
+    var validGear = gearPref.gear.where((gearItem) {
+      return trip.gear.any((tripGear) => tripGear.name == gearItem.name);
+    }).toList();
+
+    return GearPreference(
+      priority: gearPref.priority,
+      loadPreference: gearPref.loadPreference,
+      gear: validGear,
+    );
+  }).toList();
+
+  return tripPreferenceCopy;
 }
