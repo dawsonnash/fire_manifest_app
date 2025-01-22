@@ -106,13 +106,6 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        backgroundColor: Colors.deepOrangeAccent,
-        title: const Text(
-          'Build Your Own Manifest',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-      ),
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus(); // Dismiss the keyboard
@@ -128,20 +121,21 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                 children: [
                   // Background image
                   Container(
-                    child: ImageFiltered(
-                      imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                      child: Image.asset(
-                        'assets/images/logo1.png',
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                      ),
-                    ),
+                    color: Colors.black,
+                    // child: ImageFiltered(
+                    //   imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                    //   child: Image.asset(
+                    //     'assets/images/logo1.png',
+                    //     fit: BoxFit.cover,
+                    //     width: double.infinity,
+                    //     height: double.infinity,
+                    //   ),
+                    // ),
                   ),
                   Container(
                     width: double.infinity,
                     height: double.infinity,
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: Colors.white.withValues(alpha: 0.05),
                     child: SingleChildScrollView(
 
                       child: Column(
@@ -149,56 +143,91 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                         children: [
 
                           SizedBox(height: 16.0),
-
-                          // Enter Trip Name Text box
-                          Padding(
-                            padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
-                            child: _buildTextInputContainer('Enter Trip Name', tripNameController),
-                          ),
                       
                           // Enter Trip Name Input Field
                           Padding(
-                            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                            child: TextField(
-                              controller: tripNameController,
-                              maxLength: 20,
-                              textCapitalization: TextCapitalization.words,
-                              decoration: _inputDecoration(),
-                              style: _textStyle(),
-                            ),
-                          ),
-                      
-                          //Enter Available Seats Text Field
-                          Padding(
-                            padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
-                            child: _buildTextInputContainer('Enter # of Available Seats', availableSeatsController),
-                          ),
+                              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                              child: TextField(
+                                controller: tripNameController,
+                                maxLength: 20,
+                                textCapitalization: TextCapitalization.words,
+                                decoration: InputDecoration(
+                                  labelText: 'Enter Trip Name',
+                                  labelStyle: const TextStyle(
+                                    color: Colors.black, // Label color when not focused
+                                    fontSize: 18, // Label font size
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white.withValues(alpha: 0.9),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(
+                                      color: Colors.black,
+                                      // Border color when the TextField is not focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(
+                                      color: Colors.black,
+                                      // Border color when the TextField is focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(4.0),
+                                  ),
+                                ),
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )),
                       
                           // Enter Available Seats Input Field
                           Padding(
-                            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
-                            child: CupertinoTextField(
-                              controller: availableSeatsController,
-                              keyboardType: TextInputType.number,
-                              maxLength: 1,
-                              textInputAction: TextInputAction.done,
-                              onSubmitted: (value) {
-                                FocusScope.of(context).unfocus();
-                              },
-                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                              decoration: BoxDecoration(
-                                color: CupertinoColors.white, // Set the background color to white
-                                border: Border.all(color: CupertinoColors.black, width: 2),
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
+                              padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
+                              child: TextField(
+                                controller: availableSeatsController,
+                                keyboardType: TextInputType.number,
+                                maxLength: 1,
+                                // Only show numeric keyboard
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  // Allow only digits
+                                ],
+                                decoration: InputDecoration(
+                                  labelText: 'Enter # of Available Seats',
+                                  labelStyle: const TextStyle(
+                                    color: Colors.black, // Label color when not focused
+                                    fontSize: 18, // Label font size
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white.withValues(alpha: 0.9),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(
+                                      color: Colors.black,
+                                      // Border color when the TextField is not focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(
+                                      color: Colors.black,
+                                      // Border color when the TextField is focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(4.0),
+                                  ),
+                                ),
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )),
                       
                           // Choose Allowable Text Field
                           Padding(

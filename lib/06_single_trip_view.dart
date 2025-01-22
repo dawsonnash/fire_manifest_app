@@ -158,86 +158,173 @@ class _SingleTripViewState extends State<SingleTripView>{
                   maxLines: 1, 
                         ),
             ),
+            Spacer(),
             IconButton(
-              icon: Icon(Icons.ios_share, size: 28,),    // Does this work for android, i dont know
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    int selectedIndex = 0; // Initial selection index
-
-                    return AlertDialog(
-                      title: const Text(
-                        'Select Manifest Type',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      content: SizedBox(
-                        height: MediaQuery.of(context).size.height *
-                            0.15, // Dynamic height
-                        child: CupertinoPicker(
-                          itemExtent: 50, // Height of each item in the picker
-                          onSelectedItemChanged: (int index) {
-                            selectedIndex = index;
-                          },
-                          children: const [
-                            Center(
-                                child: Text('Helicopter Manifest',
-                                    style: TextStyle(fontSize: 18))),
-                            Center(
-                                child: Text('Fixed-Wing Manifest',
-                                    style: TextStyle(fontSize: 18))),
-                          ],
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text(
-                            'Cancel',
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-
-                            if (selectedIndex == 0) {
-                              // Show additional input dialog for `of252`
+                icon: Icon(Icons.more_vert, color: Colors.black,),
+                onPressed: (){
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          // Export
+                          ListTile(
+                            leading: Icon(Icons.ios_share, color: Colors.black),
+                            title: Text('Export', style: TextStyle(color: Colors.black),),
+                            onTap: () {
+                              Navigator.of(context)
+                                  .pop();
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
-                                  return AdditionalInfoDialog(
-                                    onConfirm: (
-                                        String helicopterNum,
-                                        String departure,
-                                        String destination,
-                                        String manifestPreparer) {
-                                      previewTripPDF(context, widget.trip, 'of252', helicopterNum, departure, destination, manifestPreparer);
-                                    },
+                                  int selectedIndex = 0; // Initial selection index
+
+                                  return AlertDialog(
+                                    title: const Text(
+                                      'Select Manifest Type',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    content: SizedBox(
+                                      height: MediaQuery.of(context).size.height *
+                                          0.15, // Dynamic height
+                                      child: CupertinoPicker(
+                                        itemExtent: 50, // Height of each item in the picker
+                                        onSelectedItemChanged: (int index) {
+                                          selectedIndex = index;
+                                        },
+                                        children: const [
+                                          Center(
+                                              child: Text('Helicopter Manifest',
+                                                  style: TextStyle(fontSize: 18))),
+                                          Center(
+                                              child: Text('Fixed-Wing Manifest',
+                                                  style: TextStyle(fontSize: 18))),
+                                        ],
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text(
+                                          'Cancel',
+                                          style: TextStyle(fontSize: 18),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+
+                                          if (selectedIndex == 0) {
+                                            // Show additional input dialog for `of252`
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AdditionalInfoDialog(
+                                                  onConfirm: (
+                                                      String helicopterNum,
+                                                      String departure,
+                                                      String destination,
+                                                      String manifestPreparer) {
+                                                    previewTripPDF(context, widget.trip, 'of252', helicopterNum, departure, destination, manifestPreparer);
+                                                  },
+                                                );
+                                              },
+                                            );
+                                          }  else {
+                                            // Fixed-Wing manifest
+                                            previewTripPDF(context, widget.trip, 'pms245', null, null, null, null);
+                                          }
+                                        },
+                                        child: const Text(
+                                          'Export',
+                                          style: TextStyle(fontSize: 18),
+                                        ),
+                                      ),
+                                    ],
                                   );
                                 },
                               );
-                            }  else {
-                              // Fixed-Wing manifest
-                              previewTripPDF(context, widget.trip, 'pms245', null, null, null, null);
-                            }
-                          },
-                          child: const Text(
-                            'Export',
-                            style: TextStyle(fontSize: 18),
+                            },
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              tooltip: 'Export all loads to a manifest form',
+
+                          // Edit
+                          ListTile(
+                            leading: Icon(Icons.edit, color: Colors.black),
+                            title: Text('Edit Trip', style: TextStyle(color: Colors.black),),
+                            onTap: () {
+                              Navigator.of(context)
+                                  .pop();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => EditTrip(trip: widget.trip,)),
+                              );
+                            },
+                          ),
+
+                          // Delete
+                          ListTile(
+                            leading: Icon(Icons.delete, color: Colors.red),
+                            title: Text('Delete trip', style: TextStyle(color: Colors.black),),
+                            onTap: () {
+                              Navigator.of(context)
+                                  .pop();
+                              // if (savedTrips.savedTrips.isNotEmpty) {}
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text(
+                                      'Confirm Deletion',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    content: const Text(
+                                      'Are you sure you want to delete this trip?',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context)
+                                              .pop(); // Close the dialog without deleting
+                                        },
+                                        child: const Text(
+                                          'Cancel',
+                                          style: TextStyle(
+                                              color: Colors.grey),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            savedTrips.removeTrip(widget.trip);
+                                          });
+                                          Navigator.of(context).pop(); // Close the dialog after deletion
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text(
+                                          'Delete',
+                                          style: TextStyle(
+                                              color: Colors.red),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
             ),
         ],
         ),
@@ -245,135 +332,92 @@ class _SingleTripViewState extends State<SingleTripView>{
       body: Stack(
         children: [
           Container(
-            child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                // Blur effect
-                child: Image.asset('assets/images/logo1.png',
-                  fit: BoxFit.cover, // Cover  entire background
-                  width: double.infinity,
-                  height: double.infinity,
-                )
-            ),
+            color: Colors.black,
+            // child: ImageFiltered(
+            //     imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+            //     // Blur effect
+            //     child: Image.asset('assets/images/logo1.png',
+            //       fit: BoxFit.cover, // Cover  entire background
+            //       width: double.infinity,
+            //       height: double.infinity,
+            //     )
+            // ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    //hive: itemCount: tripList.length,
-                    itemCount: widget.trip.loads.length,
-                    itemBuilder: (context, index) {
+          Container(
+            color: Colors.white.withValues(alpha: 0.05),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      //hive: itemCount: tripList.length,
+                      itemCount: widget.trip.loads.length,
+                      itemBuilder: (context, index) {
 
-                      // hive: final trip = tripList[index];
-                      final load = widget.trip.loads[index];
+                        // hive: final trip = tripList[index];
+                        final load = widget.trip.loads[index];
 
-                      // Display trip data in a scrollable list
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white, // Background color
-                          border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
-                        ),
-                        child: ListTile(
-                          iconColor: Colors.black,
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Load ${load.loadNumber.toString()}',
-                                    style: const TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold
-                                    ),
-                                  ),
-                                  Text(
-                                    'Weight: ${load.weight} lbs',
-                                    style: const TextStyle(
-                                      fontSize:18,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              IconButton(
-                                  icon: const Icon(
-                                      Icons.arrow_forward_ios,
-                                      //Icons.edit,
-                                      color: Colors.black,
-                                      size: 32
-                                  ),
-                                  onPressed: (){
-
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => SingleLoadView(
-                                          load: load,
-                                        ),
+                        // Display trip data in a scrollable list
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[800]?.withValues(alpha: 0.9),
+                            border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
+                          ),
+                          child: ListTile(
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Load ${load.loadNumber.toString()}',
+                                      style: const TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
-                                    );
-                                  }
-                              )
-                            ],
-                          ),
-                          leading: Icon(Icons.numbers),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => EditTrip(trip: widget.trip,)),
-                      );
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.deepOrangeAccent,
-                        border: Border.all(color: Colors.black, width: 2),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
-                            spreadRadius: 1,
-                            blurRadius: 8,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      //alignment: Alignment.center,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Edit',
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Icon(
-                                Icons.edit,
-                                color: Colors.black,
-                                size: 32
-                            ),
+                                    ),
+                                    Text(
+                                      'Weight: ${load.weight} lbs',
+                                      style: const TextStyle(
+                                        fontSize:18,
+                                        color: Colors.white,
 
-                        ],
-                      ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                IconButton(
+                                    icon: const Icon(
+                                        Icons.arrow_forward_ios,
+                                        //Icons.edit,
+                                        color: Colors.deepOrangeAccent,
+                                        size: 32
+                                    ),
+                                    onPressed: (){
+
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => SingleLoadView(
+                                            load: load,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                )
+                              ],
+                            ),
+                            leading: Icon(Icons.numbers,color: Colors.deepOrangeAccent,),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                ),
-
-              ],
+                ],
+              ),
             ),
           ),
 

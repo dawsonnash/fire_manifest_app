@@ -22,6 +22,14 @@ class _SavedTripsState extends State<SavedTripsView> {
     // Open the Hive box and load the list of Gear items
     tripBox = Hive.box<Trip>('tripBox');
     loadTripList();
+
+    // Add listener for changes to the box
+    tripBox.watch().listen((event) {
+      // Reload the list whenever there's a change
+      if (mounted) {
+        loadTripList();
+      }
+    });
   }
 
   // Function to load the list of Gear items from the Hive box
@@ -56,139 +64,26 @@ class _SavedTripsState extends State<SavedTripsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Saved Trips',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.deepOrangeAccent,
-      ),
-      body: Stack(
-        children: [
-          Container(
-            child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                // Blur effect
-                child: Image.asset(
-                  'assets/images/logo1.png',
-                  fit: BoxFit.cover, // Cover  entire background
-                  width: double.infinity,
-                  height: double.infinity,
-                )),
+        title: Row(
+          children: [
+            Text(
+            'Saved Trips',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
           ),
-
-          // Saved Trips list
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      ListView.builder(
-                      //hive: itemCount: tripList.length,
-                      itemCount: tripList.length,
-                      // itemCount:savedTrips.savedTrips.length -- in memory
-                      itemBuilder: (context, index) {
-                        final trip = tripList[index];
-                        //final trip = savedTrips.savedTrips[index];
-
-                        // Display trip data in a scrollable list
-                        return Card(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              // Could change color here
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(9),
-                            ),
-                            child: ListTile(
-                              iconColor: Colors.black,
-                              title: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Flexible(
-                                              child: Text(
-                                                trip.tripName,
-                                                style: const TextStyle(
-                                                  fontSize: 22,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                                overflow: TextOverflow.ellipsis, // Ensures the name truncates with ellipses
-                                                maxLines: 1, // Restricts to a single line
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8), // Add space between the trip name and the dot
-                                            const Text(
-                                              '•', // Small dot
-                                              style: TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8), // Add space between the dot and the timestamp
-                                            Text(
-                                              formatTimestamp(trip.timestamp),
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w400,
-                                                color: Colors.grey, // Subdued color for the timestamp
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-
-                                        Text(
-                                          'Allowable: ${trip.allowable} lbs',
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  // Set up to delete right now, not edit. Change later
-                                  IconButton(
-                                      icon: const Icon(Icons.arrow_forward_ios,
-                                          //Icons.edit,
-                                          color: Colors.black,
-                                          size: 32),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => SingleTripView(
-                                              trip: trip,
-                                            ),
-                                          ),
-                                        );
-                                        // For deletion
-                                        // savedTrips.removeTrip(trip); -- in memory
-                                        //tripBox.removeTrip(trip);
-                                        //setState(() {});
-                                      })
-                                ],
-                              ),
-                              leading: Icon(FontAwesomeIcons.helicopter),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                      // Delete All Button
-                      // if (savedTrips.savedTrips.isNotEmpty)
-                      Positioned(
-                        bottom: 16,
-                        left: 16,
-                        right: 16,
-                        child: GestureDetector(
+            Spacer(),
+            IconButton(
+              icon: Icon(Icons.more_vert, color: Colors.white,),
+              onPressed: (){
+                showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        ListTile(
+                          leading: Icon(Icons.delete, color: Colors.red),
+                          title: Text('Delete All Trips', style: TextStyle(color: Colors.black),),
                           onTap: () {
-                            // if (savedTrips.savedTrips.isNotEmpty) {}
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
@@ -216,66 +111,176 @@ class _SavedTripsState extends State<SavedTripsView> {
                                     ),
                                     TextButton(
                                       onPressed: () {
+                                        // Perform deletion
                                         savedTrips.deleteAllTrips();
+
+                                        // Update the parent widget state
                                         setState(() {
                                           loadTripList();
                                         });
-                                        Navigator.of(context).pop(); // Close the dialog after deletion
-                                        Navigator.of(context).pop(); // Home screen
+
+                                        // Close the dialogs
+                                        Navigator.of(context).pop(); // Close confirmation dialog
+                                        Navigator.of(context).pop(); // Close bottom sheet
                                       },
                                       child: const Text(
                                         'Delete',
-                                        style: TextStyle(
-                                            color: Colors.red),
+                                        style: TextStyle(color: Colors.red),
                                       ),
                                     ),
                                   ],
                                 );
                               },
                             );
-                          },
+                          },                        ),
+                      ],
+                    );
+                  },
+                );
+              }
+            )
+        ],
+        ),
+        backgroundColor: Colors.grey[900],
+      ),
+      body: Stack(
+        children: [
+          Container(
+            color: Colors.black,
+            // child: ImageFiltered(
+            //     imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+            //     // Blur effect
+            //     child: Image.asset(
+            //       'assets/images/logo1.png',
+            //       fit: BoxFit.cover, // Cover  entire background
+            //       width: double.infinity,
+            //       height: double.infinity,
+            //     )),
+          ),
 
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.deepOrangeAccent,
-                              border: Border.all(color: Colors.black, width: 2),
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.8), // Adjust opacity for fading effect
-                                  spreadRadius: 60, // Increase spread for a wide shadow effect
-                                  blurRadius: 20, // Increase blur for a smooth fade
-                                  offset: Offset(0, 50), // Center the shadow around the container
+          // Saved Trips list
+          Container(
+            color: Colors.white.withValues(alpha: 0.05),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        ListView.builder(
+                        //hive: itemCount: tripList.length,
+                        itemCount: tripList.length,
+                        // itemCount:savedTrips.savedTrips.length -- in memory
+                        itemBuilder: (context, index) {
+                          final trip = tripList[index];
+                          //final trip = savedTrips.savedTrips[index];
+
+                          // Display trip data in a scrollable list
+                          return GestureDetector(
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SingleTripView(trip: trip),
                                 ),
-                              ],
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            //alignment: Alignment.center,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Delete All Trips ',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                              );
+                              setState(() {}); // Refresh the list after returning
+                            },
+                            child: Card(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  // Could change color here
+                                  color: Colors.grey[900]?.withValues(alpha: 0.9),
+                                  borderRadius: BorderRadius.circular(9),
+                                ),
+                                child: ListTile(
+                                  iconColor: Colors.black,
+                                  title: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Flexible(
+                                                  child: Text(
+                                                    trip.tripName,
+                                                    style: const TextStyle(
+                                                      fontSize: 22,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis, // Ensures the name truncates with ellipses
+                                                    maxLines: 1, // Restricts to a single line
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8), // Add space between the trip name and the dot
+                                                const Text(
+                                                  '•', // Small dot
+                                                  style: TextStyle(
+                                                    fontSize: 22,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8), // Add space between the dot and the timestamp
+                                                Text(
+                                                  formatTimestamp(trip.timestamp),
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+
+                                            Text(
+                                              'Allowable: ${trip.allowable} lbs',
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.white,
+
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      // Set up to delete right now, not edit. Change later
+                                      IconButton(
+                                          icon: const Icon(Icons.arrow_forward_ios,
+                                              //Icons.edit,
+                                              color: Colors.deepOrangeAccent,
+                                              size: 32),
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => SingleTripView(
+                                                  trip: trip,
+                                                ),
+                                              ),
+                                            );
+                                          })
+                                    ],
                                   ),
+                                  leading: Icon(FontAwesomeIcons.helicopter, color: Colors.deepOrangeAccent,),
                                 ),
-                                Icon(Icons.delete, color: Colors.black, size: 32),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
-    ],
+                ],
+                    ),
                   ),
-                ),
 
 
-              ],
+                ],
+              ),
             ),
           ),
         ],

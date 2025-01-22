@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:fire_app/05_manifest.dart';
+import 'package:fire_app/05_create_new_manifest.dart';
 import 'package:fire_app/06_saved_trips.dart';
 import 'package:fire_app/settings.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +18,8 @@ import 'Data/gear_preferences.dart';
 import 'Data/saved_preferences.dart';
 import 'Data/crewMemberList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 
 void main() async {
   // Set up for Hive that needs to run before starting app
@@ -49,7 +51,7 @@ void main() async {
   // Load data from Hive
   crew.loadCrewDataFromHive();
   savedPreferences.loadPreferencesFromHive();
-  // do we need to load trip data as well?
+  savedTrips.loadTripDataFromHive();  // do we need to load trip data as well?
 
   // Test data for user testing
   if (crew.crewMembers.isEmpty && crew.gear.isEmpty) {
@@ -203,6 +205,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
   }
 }
 
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
@@ -211,173 +214,56 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // Home Page UI
+  int _selectedIndex = 0; // To track the currently selected tab
+
+  // Define the pages for each tab
+  static const List<Widget> _pages = <Widget>[
+    CreateNewManifest(), // Manifest screen
+    SavedTripsView(),    // Trips screen
+    EditCrew(),          // Crew screen
+    SettingsView(),      // Settings screen
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Style for elevated buttons. Should probably figure out a way
-    // to make this universal so we don't have to declare it in every page
-    final ButtonStyle style = ElevatedButton.styleFrom(
-        foregroundColor: Colors.black,
-        textStyle: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-        backgroundColor: Colors.deepOrangeAccent,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        //surfaceTintColor: Colors.grey,
-        elevation: 15,
-        shadowColor: Colors.black,
-        side: const BorderSide(color: Colors.black, width: 2),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        // Maybe change? Dynamic button size based on screen size
-        fixedSize: Size(MediaQuery.of(context).size.width / 1.7, MediaQuery.of(context).size.height / 10));
-
     return Scaffold(
-      // appBar: AppBar(
-      //
-      //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      //
-      //   title: Text(widget.title),
-      // ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            width: double.infinity,
-            height: MediaQuery.of(context).size.height * 0.3, // Scales based on 30% of screen height
-            color: Colors.deepOrangeAccent,
-            child: const Center(
-              // Fitted box automatically scales text based on available space
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Fire Manifesting',
-                        textAlign: TextAlign.center,
-                        // style: Theme.of(context).textTheme.headlineLarge,
-                        style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        'App',
-                        textAlign: TextAlign.center,
-                        // style: Theme.of(context).textTheme.headlineLarge,
-                        style: TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+      body: _pages[_selectedIndex], // Display the selected page
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed, // Ensures all icons are visible
+        selectedItemColor: Colors.deepOrangeAccent,
+        unselectedItemColor: Colors.grey[200],
+        backgroundColor: Colors.grey[900],
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment),
+            label: 'Manifest',
           ),
-          Expanded(
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: Image.asset(
-                    'assets/images/logo1.png',
-                    fit: BoxFit.cover, // Cover  entire background
-                  ),
-                ),
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.white.withValues(alpha: 0.1),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Manifest
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const ManifestHome()),
-                              );
-                            },
-                            style: style,
-                            child: const Text(
-                              'Manifest',
-                            )),
-                      ),
-
-                      // View Trips
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const SavedTripsView()),
-                              );
-                            },
-                            style: style,
-                            child: const Text('View Trips')),
-                      ),
-
-                      // Edit Crew
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const EditCrew()),
-                              );
-                            },
-                            style: style,
-                            child: const Text('Edit Crew')),
-                      ),
-
-                      // ElevatedButton(
-                      //   onPressed: () async {
-                      //     await resetAgreeToTerms();
-                      //   },
-                      //   child: Text('Reset Agree to Terms'),
-                      // ),
-                    ],
-                  ),
-                ),
-
-                // Settings Icon at Bottom Right
-                Positioned(
-                  bottom: 16.0, // Distance from the bottom
-                  right: 16.0, // Distance from the right
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.settings, color: Colors.grey),
-                        iconSize: 40.0, // Size of the icon
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const SettingsView()),
-                          );
-                        },
-                      ),
-                      const Text(
-                        'Settings',
-                        style: TextStyle(
-                          color: Colors.grey, // Matches the icon color
-                          fontSize: 16.0, // Adjust font size as needed
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-              ],
-            ),
+          BottomNavigationBarItem(
+            icon: Icon(FontAwesomeIcons.helicopter),
+            label: 'Trips',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: 'Crew',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
           ),
         ],
       ),
     );
   }
 }
+
 
 Future<void> updateAllTripPreferencesFromBoxes() async {
   var crewMemberBox = Hive.box<CrewMember>('crewmemberBox');

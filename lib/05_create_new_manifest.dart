@@ -1,24 +1,70 @@
 import 'dart:ui';
+import 'package:fire_app/05_build_your_own_manifest.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import '../Data/trip.dart';
+import '05_define_constraints_manifest.dart';
 import 'Data/crewmember.dart';
 import 'Data/gear.dart';
 import 'Data/load_calculator.dart';
 import 'Data/trip_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class CreateNewManifest extends StatefulWidget {
-  const CreateNewManifest({super.key});
+class CreateNewManifest extends StatelessWidget {
+  const CreateNewManifest({Key? key}) : super(key: key);
 
   @override
-  State<CreateNewManifest> createState() => _CreateNewManifestState();
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2, // Number of tabs
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.grey[900],
+          elevation: 0,
+          toolbarHeight: 0,
+          bottom: TabBar(
+            labelColor: Colors.deepOrangeAccent, // Selected text and icon color
+            unselectedLabelColor: Colors.grey[300],   // Unselected text and icon color
+            indicatorColor: Colors.deepOrangeAccent, // Tab indicator color
+            tabs: [
+              Tab(text: 'Quick Manifest',
+                  icon: Icon(Icons.bolt),
+              ),
+              Tab(text: 'Build Your Own', icon: Icon(Icons.build)),
+            ],
+          ),
+        ),
+        body: GestureDetector(
+          onTap: () {
+          FocusScope.of(context).unfocus(); // Dismiss the keyboard
+        },
+          onVerticalDragStart: (_) {
+            FocusScope.of(context).unfocus(); // Dismiss the keyboard on vertical swipe
+          },
+
+          child: const TabBarView(
+            children: [
+              QuickManifest(), // Your first screen
+              DesignNewManifest(),      // Replace with your second screen widget
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _CreateNewManifestState extends State<CreateNewManifest> {
+class QuickManifest extends StatefulWidget {
+  const QuickManifest({super.key});
+
+  @override
+  State<QuickManifest> createState() => _QuickManifestState();
+}
+
+class _QuickManifestState extends State<QuickManifest> {
   late final Box<Gear> gearBox;
   late final Box<CrewMember> crewmemberBox;
 
@@ -651,13 +697,6 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false, // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
-      appBar: AppBar(
-        backgroundColor: Colors.deepOrangeAccent,
-        title: const Text(
-          'Create New Manifest',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-      ),
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus(); // Dismiss the keyboard
@@ -674,20 +713,21 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                 children: [
                   // Background image
                   Container(
-                    child: ImageFiltered(
-                        imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                        // Blur effect
-                        child: Image.asset(
-                          'assets/images/logo1.png',
-                          fit: BoxFit.cover, // Cover  entire background
-                          width: double.infinity,
-                          height: double.infinity,
-                        )),
+                    color: Colors.black,
+                    // child: ImageFiltered(
+                    //     imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                    //     // Blur effect
+                    //     child: Image.asset(
+                    //       'assets/images/logo1.png',
+                    //       fit: BoxFit.cover, // Cover  entire background
+                    //       width: double.infinity,
+                    //       height: double.infinity,
+                    //     )),
                   ),
                   Container(
                     width: double.infinity,
                     height: double.infinity,
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: Colors.white.withValues(alpha: 0.05),
                     child: SingleChildScrollView(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -794,11 +834,12 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                 children: [
                                   // Checkbox
                                   IconButton(
+                                    padding: EdgeInsets.zero,
                                     icon: Icon(
                                       selectedItems.length == (crewList.length + gearList.length)
                                           ? Icons.check_box // Fully selected
                                           : Icons.check_box_outline_blank, // Partially or none selected
-                                      color: Colors.black,
+                                      color: Colors.black.withValues(alpha: 0.9), // Sets the checkmark color to black
                                       size: 28, // Adjust size as needed
                                     ),
                                     onPressed: () {
