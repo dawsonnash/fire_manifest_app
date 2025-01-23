@@ -65,14 +65,14 @@ class _SavedTripsState extends State<SavedTripsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
+        centerTitle: true, // Centers the title
+
+        title:
             Text(
               'Saved Trips',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
-            Spacer(),
-            IconButton(
+            actions: [IconButton(
                 icon: Icon(
                   Icons.more_vert,
                   color: AppColors.textColorPrimary,
@@ -148,9 +148,8 @@ class _SavedTripsState extends State<SavedTripsView> {
                       );
                     },
                   );
-                })
-          ],
-        ),
+                })],
+
         backgroundColor: AppColors.appBarColor,
       ),
       body: Stack(

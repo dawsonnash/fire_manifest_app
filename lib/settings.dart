@@ -108,9 +108,11 @@ class _SettingsState extends State<SettingsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:  Text(
-          'Settings',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+        title:  Center(
+          child: Text(
+            'Settings',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          ),
         ),
         backgroundColor: AppColors.appBarColor,
       ),

@@ -416,6 +416,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
       resizeToAvoidBottomInset: false,
       // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
       appBar: AppBar(
+        centerTitle: true,
         backgroundColor: AppColors.appBarColor,
         leading: IconButton(
           icon: Icon(
@@ -427,98 +428,97 @@ class _SingleLoadViewState extends State<SingleLoadView> {
           },
         ),
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              children: [
-                Text(
-                  'Load ${widget.load.loadNumber}',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                ),
-                Text(
-                  ' • ${widget.load.weight} lbs',
-                  style: TextStyle(fontSize: 20, color: AppColors.textColorPrimary),
-                ),
-              ],
+
+            Text(
+              'Load ${widget.load.loadNumber}',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
-            IconButton(
-              icon: Icon(Icons.ios_share, size: 28, color: AppColors.textColorPrimary),
-              // Does this work for android, i dont know
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    int selectedIndex = 0; // Initial selection index
-
-                    return AlertDialog(
-                      backgroundColor: AppColors.textFieldColor,
-                      title: Text(
-                        'Select Manifest Type',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textColorPrimary,
-                        ),
-                      ),
-                      content: SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.15, // Dynamic height
-                        child: CupertinoPicker(
-                          itemExtent: 50, // Height of each item in the picker
-                          onSelectedItemChanged: (int index) {
-                            selectedIndex = index;
-                          },
-                          children: [
-                            Center(child: Text('Helicopter Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
-                            Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
-                          ],
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(fontSize: 16, color: AppColors.cancelButton),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-
-                            if (selectedIndex == 0) {
-                              // Show additional input dialog for `of252`
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AdditionalInfoDialog(
-                                    onConfirm: (String helicopterNum, String departure, String destination, String manifestPreparer) {
-                                      previewPDF(context, widget.load, 'of252', helicopterNum, departure, destination, manifestPreparer);
-                                    },
-                                  );
-                                },
-                              );
-                            } else {
-                              // Fixed-Wing manifest
-                              previewPDF(context, widget.load, 'pms245', null, null, null, null);
-                            }
-                          },
-                          child: Text(
-                            'Export',
-                            style: TextStyle(fontSize: 16, color: AppColors.saveButtonAllowableWeight),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-
-              tooltip: 'Export all loads to a manifest form',
+            Text(
+              ' • ${widget.load.weight} lbs',
+              style: TextStyle(fontSize: 20, color: AppColors.textColorPrimary),
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.ios_share, size: 28, color: AppColors.textColorPrimary),
+            // Does this work for android, i dont know
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  int selectedIndex = 0; // Initial selection index
+
+                  return AlertDialog(
+                    backgroundColor: AppColors.textFieldColor2,
+                    title: Text(
+                      'Select Manifest Type',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textColorPrimary,
+                      ),
+                    ),
+                    content: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.15, // Dynamic height
+                      child: CupertinoPicker(
+                        itemExtent: 50, // Height of each item in the picker
+                        onSelectedItemChanged: (int index) {
+                          selectedIndex = index;
+                        },
+                        children: [
+                          Center(child: Text('Helicopter Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                          Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                        ],
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(fontSize: 16, color: AppColors.cancelButton),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+
+                          if (selectedIndex == 0) {
+                            // Show additional input dialog for `of252`
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AdditionalInfoDialog(
+                                  onConfirm: (String helicopterNum, String departure, String destination, String manifestPreparer) {
+                                    previewPDF(context, widget.load, 'of252', helicopterNum, departure, destination, manifestPreparer);
+                                  },
+                                );
+                              },
+                            );
+                          } else {
+                            // Fixed-Wing manifest
+                            previewPDF(context, widget.load, 'pms245', null, null, null, null);
+                          }
+                        },
+                        child: Text(
+                          'Export',
+                          style: TextStyle(fontSize: 16, color: AppColors.saveButtonAllowableWeight),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+
+            tooltip: 'Export all loads to a manifest form',
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -526,36 +526,35 @@ class _SingleLoadViewState extends State<SingleLoadView> {
             color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
             child: AppColors.isDarkMode
                 ? (AppColors.enableBackgroundImage
-                ? Stack(
-              children: [
-                ImageFiltered(
-                  imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                  child: Image.asset(
-                    'assets/images/logo1.png',
-                    fit: BoxFit.cover, // Cover the entire background
-                    width: double.infinity,
-                    height: double.infinity,
-                  ),
-                ),
-                Container(
-                  color: AppColors.logoImageOverlay, // Semi-transparent overlay
-                  width: double.infinity,
-                  height: double.infinity,
-                ),
-              ],
-            )
-                : null) // No image if background is disabled
+                    ? Stack(
+                        children: [
+                          ImageFiltered(
+                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                            child: Image.asset(
+                              'assets/images/logo1.png',
+                              fit: BoxFit.cover, // Cover the entire background
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                          Container(
+                            color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ],
+                      )
+                    : null) // No image if background is disabled
                 : ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
-              child: Image.asset(
-                'assets/images/logo1.png',
-                fit: BoxFit.cover, // Cover the entire background
-                width: double.infinity,
-                height: double.infinity,
-              ),
-            ),
+                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+                    child: Image.asset(
+                      'assets/images/logo1.png',
+                      fit: BoxFit.cover, // Cover the entire background
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
           ),
-
           Container(
             color: Colors.white.withValues(alpha: 0.05),
             child: Column(
@@ -628,23 +627,17 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                       children: [
                                         Text(
                                           gearItem.name,
-                                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,                                         color: Colors.black
-                                          ),
+                                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
                                         ),
                                         Text(
                                           ' (x${gearItem.quantity})',
-                                          style: TextStyle(fontSize: 18,                                         color: Colors.black
-                                          ),
+                                          style: TextStyle(fontSize: 18, color: Colors.black),
                                         ),
                                       ],
                                     ),
                                     Text(
                                       'Weight: ${gearItem.totalGearWeight} lbs',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                          color: Colors.black
-
-                                      ),
+                                      style: TextStyle(fontSize: 18, color: Colors.black),
                                     ),
                                   ],
                                 ),
