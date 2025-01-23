@@ -696,7 +696,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
             child: ElevatedButton(
               onPressed: _saveTrip,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.buttonStyle1,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               ),
               child: Text(
@@ -715,11 +715,30 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         children: [
           // Background Image
           Container(
-            color: AppColors.isDarkMode ? Colors.black.withValues(alpha: 0.9) : Colors.transparent, // Black background in dark mode
+            color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
             child: AppColors.isDarkMode
-                ? null // No child if dark mode is enabled
+                ? (AppColors.enableBackgroundImage
+                ? Stack(
+              children: [
+                ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                  child: Image.asset(
+                    'assets/images/logo1.png',
+                    fit: BoxFit.cover, // Cover the entire background
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                ),
+                Container(
+                  color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              ],
+            )
+                : null) // No image if background is disabled
                 : ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
               child: Image.asset(
                 'assets/images/logo1.png',
                 fit: BoxFit.cover, // Cover the entire background
@@ -728,6 +747,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
               ),
             ),
           ),
+
 
 
           Container(

@@ -338,11 +338,30 @@ class _SingleTripViewState extends State<SingleTripView> {
       body: Stack(
         children: [
           Container(
-            color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Black background in dark mode
+            color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
             child: AppColors.isDarkMode
-                ? null // No child if dark mode is enabled
+                ? (AppColors.enableBackgroundImage
+                ? Stack(
+              children: [
+                ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                  child: Image.asset(
+                    'assets/images/logo1.png',
+                    fit: BoxFit.cover, // Cover the entire background
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                ),
+                Container(
+                  color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              ],
+            )
+                : null) // No image if background is disabled
                 : ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
               child: Image.asset(
                 'assets/images/logo1.png',
                 fit: BoxFit.cover, // Cover the entire background
@@ -351,6 +370,7 @@ class _SingleTripViewState extends State<SingleTripView> {
               ),
             ),
           ),
+
           Container(
             color: Colors.white.withValues(alpha: 0.05),
             child: Padding(
@@ -368,8 +388,8 @@ class _SingleTripViewState extends State<SingleTripView> {
                         // Display trip data in a scrollable list
                         return Container(
                           decoration: BoxDecoration(
-                            color: AppColors.textFieldColor2,
-                            border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
+                            color: AppColors.textFieldColor,
+                            border: Border(top: BorderSide(color: Colors.black, width: 1)), // Add a border
                           ),
                           child: GestureDetector(
                             onTap: () {
@@ -412,7 +432,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                   ),
                                    Icon(Icons.arrow_forward_ios,
                                       //Icons.edit,
-                                      color: AppColors.primaryColor,
+                                      color: AppColors.textColorPrimary,
                                       size: 32),
                                 ],
                               ),

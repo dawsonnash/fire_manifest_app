@@ -6,8 +6,9 @@ class AppColors {
   static Color get fireColor => Colors.deepOrangeAccent;
   static Color get primaryColor => isDarkMode ? Colors.deepOrangeAccent : Colors.black;
   static Color get appBarColor => isDarkMode ? Colors.grey[900]! : Colors.deepOrangeAccent;
-  static Color get textFieldColor => isDarkMode ? Colors.grey[900]! : Colors.white;
-  static Color get textFieldColor2 => isDarkMode ? Colors.grey[800]! : Colors.white;
+  static Color get panelColor => isDarkMode ? Colors.grey[900]!.withValues(alpha: 0.9) : Colors.deepOrangeAccent;
+  static Color get textFieldColor => isDarkMode ? Colors.grey[900]!.withValues(alpha: 0.9) : Colors.white;
+  static Color get textFieldColor2 => isDarkMode ? Colors.grey[900]! : Colors.white;
   static Color get textColorPrimary => isDarkMode ? Colors.white : Colors.black;
   static Color get textColorSecondary => isDarkMode ? Colors.black : Colors.white;
   static Color get tabIconColor => isDarkMode ? Colors.grey[300]! :  Colors.grey[800]!;
@@ -17,12 +18,15 @@ class AppColors {
   static Color get gearYellow => isDarkMode ? Colors.orange[200]! : Colors.orange[100]!;
   static Color get buttonStyle1 => Colors.green;
   static Color get cancelButton => isDarkMode ? Colors.white : Colors.grey;
+  static Color get logoImageOverlay => Colors.black.withValues(alpha: 0.6);
 
   static bool isDarkMode = true; // This will be toggled based on SharedPreferences
+  static bool enableBackgroundImage = false; // Default to background image disabled
 }
 
 class ThemePreferences {
   static const _key = 'isDarkMode';
+  static const _backgroundImageKey = 'enableBackgroundImage';
 
   static Future<bool> getTheme() async {
     final prefs = await SharedPreferences.getInstance();
@@ -32,5 +36,15 @@ class ThemePreferences {
   static Future<void> setTheme(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_key, value);
+  }
+
+  static Future<bool> getBackgroundImagePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_backgroundImageKey) ?? false; // Default to disabled
+  }
+
+  static Future<void> setBackgroundImagePreference(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_backgroundImageKey, value);
   }
 }

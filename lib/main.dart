@@ -63,8 +63,9 @@ void main() async {
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool agreedToTerms = prefs.getBool('agreedToTerms') ?? false;
-  // Initialize the dark mode setting
+  // Initialize the dark mode and background image setting
   AppColors.isDarkMode = await ThemePreferences.getTheme();
+  AppColors.enableBackgroundImage = await ThemePreferences.getBackgroundImagePreference();
 
   // start app
   runApp(MyApp(showDisclaimer: !agreedToTerms));
@@ -106,7 +107,9 @@ class _MyHomePageState extends State<MyHomePage> {
         EditCrew(),
         SettingsView(
           isDarkMode: AppColors.isDarkMode,
+          enableBackgroundImage: AppColors.enableBackgroundImage,
           onThemeChanged: _toggleTheme,
+          onBackgroundImageChange: _toggleBackgroundImage,
         ),
       ];
 
@@ -115,6 +118,12 @@ class _MyHomePageState extends State<MyHomePage> {
       AppColors.isDarkMode = isDarkMode;
     });
     await ThemePreferences.setTheme(isDarkMode);
+  }
+  void _toggleBackgroundImage(bool enableBackgroundImage) async {
+    setState(() {
+      AppColors.enableBackgroundImage = enableBackgroundImage;
+    });
+    await ThemePreferences.setBackgroundImagePreference(enableBackgroundImage);
   }
 
   void _onItemTapped(int index) {

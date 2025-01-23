@@ -523,160 +523,183 @@ class _SingleLoadViewState extends State<SingleLoadView> {
       body: Stack(
         children: [
           Container(
-            color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Black background in dark mode
+            color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
             child: AppColors.isDarkMode
-                ? null // No child if dark mode is enabled
-                : ImageFiltered(
-                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                    child: Image.asset(
-                      'assets/images/logo1.png',
-                      fit: BoxFit.cover, // Cover the entire background
-                      width: double.infinity,
-                      height: double.infinity,
-                    ),
+                ? (AppColors.enableBackgroundImage
+                ? Stack(
+              children: [
+                ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                  child: Image.asset(
+                    'assets/images/logo1.png',
+                    fit: BoxFit.cover, // Cover the entire background
+                    width: double.infinity,
+                    height: double.infinity,
                   ),
-          ),
-          Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: widget.load.loadPersonnel.length + widget.load.loadGear.length + widget.load.customItems.length,
-                  itemBuilder: (context, index) {
-                    int numCrewMembers = widget.load.loadPersonnel.length;
-                    int numGearItems = widget.load.loadGear.length;
-
-                    if (index < numCrewMembers) {
-                      // Display a crew member
-                      final crewmember = widget.load.loadPersonnel[index];
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.textFieldColor2, // Background color
-                          border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
-                        ),
-                        child: ListTile(
-                          iconColor: AppColors.primaryColor,
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    crewmember.name,
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.textColorPrimary,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Flight Weight: ${crewmember.flightWeight} lbs',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: AppColors.textColorPrimary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          leading: Icon(Icons.person),
-                        ),
-                      );
-                    } else if (index < numCrewMembers + numGearItems) {
-                      // Display a gear item
-                      final gearIndex = index - numCrewMembers;
-                      final gearItem = widget.load.loadGear[gearIndex];
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: gearItem.isPersonalTool
-                              ? AppColors.toolBlue // Color for personal tools
-                              : AppColors.gearYellow, // Background color
-                          border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
-                        ),
-                        child: ListTile(
-                          iconColor: Colors.black,
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        gearItem.name,
-                                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,                                         color: Colors.black
-                                        ),
-                                      ),
-                                      Text(
-                                        ' (x${gearItem.quantity})',
-                                        style: TextStyle(fontSize: 18,                                         color: Colors.black
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    'Weight: ${gearItem.totalGearWeight} lbs',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                        color: Colors.black
-
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          leading: Icon(Icons.work_outline_outlined),
-                        ),
-                      );
-                    } else {
-                      // Display a custom item
-                      final customItemIndex = index - numCrewMembers - numGearItems;
-                      final customItem = widget.load.customItems[customItemIndex];
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white, // Background color
-                          border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
-                        ),
-                        child: ListTile(
-                          iconColor: Colors.black,
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        customItem.name,
-                                        style: const TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    'Weight: ${customItem.weight} lbs',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          leading: Icon(Icons.inventory_2_outlined),
-                        ),
-                      );
-                    }
-                  },
                 ),
+                Container(
+                  color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              ],
+            )
+                : null) // No image if background is disabled
+                : ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+              child: Image.asset(
+                'assets/images/logo1.png',
+                fit: BoxFit.cover, // Cover the entire background
+                width: double.infinity,
+                height: double.infinity,
               ),
-            ],
+            ),
+          ),
+
+          Container(
+            color: Colors.white.withValues(alpha: 0.05),
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: widget.load.loadPersonnel.length + widget.load.loadGear.length + widget.load.customItems.length,
+                    itemBuilder: (context, index) {
+                      int numCrewMembers = widget.load.loadPersonnel.length;
+                      int numGearItems = widget.load.loadGear.length;
+
+                      if (index < numCrewMembers) {
+                        // Display a crew member
+                        final crewmember = widget.load.loadPersonnel[index];
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.textFieldColor, // Background color
+                            border: Border(top: BorderSide(color: Colors.black, width: 1)), // Add a border
+                          ),
+                          child: ListTile(
+                            iconColor: AppColors.primaryColor,
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      crewmember.name,
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textColorPrimary,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Flight Weight: ${crewmember.flightWeight} lbs',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: AppColors.textColorPrimary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            leading: Icon(Icons.person),
+                          ),
+                        );
+                      } else if (index < numCrewMembers + numGearItems) {
+                        // Display a gear item
+                        final gearIndex = index - numCrewMembers;
+                        final gearItem = widget.load.loadGear[gearIndex];
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: gearItem.isPersonalTool
+                                ? AppColors.toolBlue.withValues(alpha: 0.9) // Color for personal tools
+                                : AppColors.gearYellow.withValues(alpha: 0.9), // Background color
+                            border: Border(bottom: BorderSide(color: Colors.black, width: 1)), // Add a border
+                          ),
+                          child: ListTile(
+                            iconColor: Colors.black,
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          gearItem.name,
+                                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,                                         color: Colors.black
+                                          ),
+                                        ),
+                                        Text(
+                                          ' (x${gearItem.quantity})',
+                                          style: TextStyle(fontSize: 18,                                         color: Colors.black
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      'Weight: ${gearItem.totalGearWeight} lbs',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                          color: Colors.black
+
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            leading: Icon(Icons.work_outline_outlined),
+                          ),
+                        );
+                      } else {
+                        // Display a custom item
+                        final customItemIndex = index - numCrewMembers - numGearItems;
+                        final customItem = widget.load.customItems[customItemIndex];
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white, // Background color
+                            border: Border(bottom: BorderSide(color: Colors.black, width: 1)), // Add a border
+                          ),
+                          child: ListTile(
+                            iconColor: Colors.black,
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          customItem.name,
+                                          style: const TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      'Weight: ${customItem.weight} lbs',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            leading: Icon(Icons.inventory_2_outlined),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

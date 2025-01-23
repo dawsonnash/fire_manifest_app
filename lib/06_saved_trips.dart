@@ -79,7 +79,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                 ),
                 onPressed: () {
                   showModalBottomSheet(
-                    backgroundColor: AppColors.textFieldColor,
+                    backgroundColor: AppColors.textFieldColor2,
                     context: context,
                     builder: (BuildContext context) {
                       return Column(
@@ -100,7 +100,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    backgroundColor: AppColors.textFieldColor,
+                                    backgroundColor: AppColors.textFieldColor2,
                                     title: Text(
                                       'Confirm Deletion',
                                       style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
@@ -156,18 +156,37 @@ class _SavedTripsState extends State<SavedTripsView> {
       body: Stack(
         children: [
           Container(
-            color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Black background in dark mode
+            color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
             child: AppColors.isDarkMode
-                ? null // No child if dark mode is enabled
-                : ImageFiltered(
-                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                    child: Image.asset(
-                      'assets/images/logo1.png',
-                      fit: BoxFit.cover, // Cover the entire background
-                      width: double.infinity,
-                      height: double.infinity,
-                    ),
+                ? (AppColors.enableBackgroundImage
+                ? Stack(
+              children: [
+                ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                  child: Image.asset(
+                    'assets/images/logo1.png',
+                    fit: BoxFit.cover, // Cover the entire background
+                    width: double.infinity,
+                    height: double.infinity,
                   ),
+                ),
+                Container(
+                  color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              ],
+            )
+                : null) // No image if background is disabled
+                : ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+              child: Image.asset(
+                'assets/images/logo1.png',
+                fit: BoxFit.cover, // Cover the entire background
+                width: double.infinity,
+                height: double.infinity,
+              ),
+            ),
           ),
           // Saved Trips list
           if (savedTrips.savedTrips.isEmpty)
@@ -181,12 +200,12 @@ class _SavedTripsState extends State<SavedTripsView> {
                     shadows: AppColors.isDarkMode
                         ? null // No shadow in dark mode
                         : [
-                      Shadow(
-                        offset: Offset(0, 0),
-                        blurRadius: 60.0,
-                        color: Colors.white,
-                      ),
-                    ],
+                            Shadow(
+                              offset: Offset(0, 0),
+                              blurRadius: 60.0,
+                              color: Colors.white,
+                            ),
+                          ],
                   ),
                 ),
               ),
@@ -231,7 +250,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
-                                      backgroundColor: AppColors.textFieldColor,
+                                      backgroundColor: AppColors.textFieldColor2,
                                       title: Text(
                                         'Confirm Deletion',
                                         style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
@@ -290,13 +309,13 @@ class _SavedTripsState extends State<SavedTripsView> {
                                   setState(() {}); // Refresh the list after returning
                                 },
                                 child: Card(
+                                  color: Colors.transparent,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: AppColors.textFieldColor.withValues(alpha: 0.9),
+                                      color: AppColors.textFieldColor,
                                       borderRadius: BorderRadius.circular(9),
                                     ),
                                     child: ListTile(
-                                      iconColor: Colors.black,
                                       title: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
@@ -351,7 +370,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                           IconButton(
                                             icon: Icon(
                                               Icons.arrow_forward_ios,
-                                              color: AppColors.primaryColor,
+                                              color: AppColors.textColorPrimary,
                                               size: 32,
                                             ),
                                             onPressed: () {

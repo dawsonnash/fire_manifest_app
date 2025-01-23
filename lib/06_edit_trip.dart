@@ -707,17 +707,26 @@ class _EditTripState extends State<EditTrip> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: AppColors.fireColor,
+        backgroundColor: AppColors.appBarColor,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back, // The back arrow icon
+            color: AppColors.textColorPrimary, // Set the desired color
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(); // Navigate back when pressed
+          },
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               widget.trip.tripName,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lbs',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
           ],
         ),
@@ -727,7 +736,7 @@ class _EditTripState extends State<EditTrip> {
             child: ElevatedButton(
               onPressed: _saveTrip,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.buttonStyle1,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               ),
               child:  Text(
@@ -746,18 +755,37 @@ class _EditTripState extends State<EditTrip> {
         children: [
           // Background Image
           Container(
-            color: AppColors.isDarkMode ? Colors.black.withValues(alpha: 0.9) : Colors.transparent, // Black background in dark mode
+            color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
             child: AppColors.isDarkMode
-                ? null // No child if dark mode is enabled
-                : ImageFiltered(
-                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                    child: Image.asset(
-                      'assets/images/logo1.png',
-                      fit: BoxFit.cover, // Cover the entire background
-                      width: double.infinity,
-                      height: double.infinity,
-                    ),
+                ? (AppColors.enableBackgroundImage
+                ? Stack(
+              children: [
+                ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                  child: Image.asset(
+                    'assets/images/logo1.png',
+                    fit: BoxFit.cover, // Cover the entire background
+                    width: double.infinity,
+                    height: double.infinity,
                   ),
+                ),
+                Container(
+                  color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              ],
+            )
+                : null) // No image if background is disabled
+                : ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+              child: Image.asset(
+                'assets/images/logo1.png',
+                fit: BoxFit.cover, // Cover the entire background
+                width: double.infinity,
+                height: double.infinity,
+              ),
+            ),
           ),
 
           Column(
