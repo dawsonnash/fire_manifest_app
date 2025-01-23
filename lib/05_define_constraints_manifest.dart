@@ -6,6 +6,8 @@ import '../Data/trip.dart';
 import 'package:fire_app/05_build_your_own_manifest.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'CodeShare/colors.dart';
+
 class DesignNewManifest extends StatefulWidget {
   const DesignNewManifest({super.key});
 
@@ -38,6 +40,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
     // Initialize allowableController with the default slider value
     allowableController.text = _sliderValue.toStringAsFixed(0);
   }
+
   // Track the last input source
   bool lastInputFromSlider = true;
 
@@ -101,7 +104,13 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
       shadowColor: Colors.black,
       side: const BorderSide(color: Colors.black, width: 2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      fixedSize: Size(MediaQuery.of(context).size.width / 2, MediaQuery.of(context).size.height / 10),
+      fixedSize: Size(MediaQuery
+          .of(context)
+          .size
+          .width / 2, MediaQuery
+          .of(context)
+          .size
+          .height / 10),
     );
 
     return Scaffold(
@@ -121,16 +130,18 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                 children: [
                   // Background image
                   Container(
-                    color: Colors.black,
-                    // child: ImageFiltered(
-                    //   imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                    //   child: Image.asset(
-                    //     'assets/images/logo1.png',
-                    //     fit: BoxFit.cover,
-                    //     width: double.infinity,
-                    //     height: double.infinity,
-                    //   ),
-                    // ),
+                    color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Black background in dark mode
+                    child: AppColors.isDarkMode
+                        ? null // No child if dark mode is enabled
+                        : ImageFiltered(
+                      imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                      child: Image.asset(
+                        'assets/images/logo1.png',
+                        fit: BoxFit.cover, // Cover the entire background
+                        width: double.infinity,
+                        height: double.infinity,
+                      ),
+                    ),
                   ),
                   Container(
                     width: double.infinity,
@@ -143,7 +154,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                         children: [
 
                           SizedBox(height: 16.0),
-                      
+
                           // Enter Trip Name Input Field
                           Padding(
                               padding: const EdgeInsets.only(left: 16.0, right: 16.0),
@@ -153,37 +164,36 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                 textCapitalization: TextCapitalization.words,
                                 decoration: InputDecoration(
                                   labelText: 'Enter Trip Name',
-                                  labelStyle: const TextStyle(
-                                    color: Colors.black, // Label color when not focused
+                                  labelStyle: TextStyle(
+                                    color: AppColors.textColorPrimary, // Label color when not focused
                                     fontSize: 18, // Label font size
-                                    fontWeight: FontWeight.bold,
                                   ),
                                   filled: true,
-                                  fillColor: Colors.white.withValues(alpha: 0.9),
+                                  fillColor: AppColors.textFieldColor,
                                   enabledBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Colors.black,
+                                    borderSide: BorderSide(
+                                      color: AppColors.borderPrimary,
                                       // Border color when the TextField is not focused
                                       width: 2.0, // Border width
                                     ),
                                     borderRadius: BorderRadius.circular(4.0), // Rounded corners
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Colors.black,
+                                    borderSide: BorderSide(
+                                      color: AppColors.primaryColor,
                                       // Border color when the TextField is focused
                                       width: 2.0, // Border width
                                     ),
                                     borderRadius: BorderRadius.circular(4.0),
                                   ),
                                 ),
-                                style: const TextStyle(
-                                  color: Colors.black,
+                                style: TextStyle(
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                 ),
                               )),
-                      
+
                           // Enter Available Seats Input Field
                           Padding(
                               padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
@@ -198,44 +208,43 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                 ],
                                 decoration: InputDecoration(
                                   labelText: 'Enter # of Available Seats',
-                                  labelStyle: const TextStyle(
-                                    color: Colors.black, // Label color when not focused
+                                  labelStyle: TextStyle(
+                                    color: AppColors.textColorPrimary, // Label color when not focused
                                     fontSize: 18, // Label font size
-                                    fontWeight: FontWeight.bold,
                                   ),
                                   filled: true,
-                                  fillColor: Colors.white.withValues(alpha: 0.9),
+                                  fillColor: AppColors.textFieldColor,
                                   enabledBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Colors.black,
+                                    borderSide: BorderSide(
+                                      color: AppColors.borderPrimary,
                                       // Border color when the TextField is not focused
                                       width: 2.0, // Border width
                                     ),
                                     borderRadius: BorderRadius.circular(4.0), // Rounded corners
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Colors.black,
+                                    borderSide: BorderSide(
+                                      color: AppColors.primaryColor,
                                       // Border color when the TextField is focused
                                       width: 2.0, // Border width
                                     ),
                                     borderRadius: BorderRadius.circular(4.0),
                                   ),
                                 ),
-                                style: const TextStyle(
-                                  color: Colors.black,
+                                style: TextStyle(
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                 ),
                               )),
-                      
+
                           // Choose Allowable Text Field
                           Padding(
                             padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
                             child: Container(
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                color: Colors.deepOrangeAccent,
+                                color: AppColors.fireColor,
                                 border: Border.all(color: Colors.black, width: 2),
                                 borderRadius: BorderRadius.circular(4),
                                 boxShadow: [
@@ -255,7 +264,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                     padding: const EdgeInsets.only(left: 8.0),
                                     child: Text(
                                       'Choose Allowable',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black,
@@ -266,16 +275,16 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                     onPressed: () {
                                       // Clear the keyboardController before opening the dialog
                                       keyboardController.text = '';
-                      
+
                                       showDialog(
                                         context: context,
                                         builder: (BuildContext context) {
                                           // Save the original value in case of cancel
                                           String originalValue = allowableController.text;
-                      
+
                                           // Track if the Save button should be enabled
                                           bool isSaveEnabled = false;
-                      
+
                                           return StatefulBuilder(
                                             builder: (context, setState) {
                                               // Function to validate input and enable/disable Save button
@@ -285,9 +294,10 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                   isSaveEnabled = parsedValue != null && parsedValue >= 500 && parsedValue <= 10000;
                                                 });
                                               }
-                      
+
                                               return AlertDialog(
-                                                title: const Text('Enter Allowable Weight'),
+                                                backgroundColor: AppColors.textFieldColor,
+                                                title: Text('Enter Allowable Weight', style: TextStyle(color: AppColors.textColorPrimary)),
                                                 content: TextField(
                                                   controller: keyboardController,
                                                   keyboardType: TextInputType.number,
@@ -301,10 +311,20 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                       lastInputFromSlider = false;
                                                     });
                                                   },
-                                                  decoration: const InputDecoration(
+                                                  decoration: InputDecoration(
                                                     hintText: 'Up to 9,999 lbs',
+                                                    hintStyle: TextStyle(color: AppColors.textColorPrimary),
+                                                    filled: true,
+                                                    fillColor: AppColors.textFieldColor,
+                                                    // Background color of the text field
                                                     counterText: '',
-                                                    border: OutlineInputBorder(),
+                                                    border: const OutlineInputBorder(
+
+                                                    ),
+                                                  ),
+                                                  style: TextStyle(
+                                                    color: AppColors.textColorPrimary, // Color of the typed text
+                                                    fontSize: 18, // Font size for the typed text
                                                   ),
                                                 ),
                                                 actions: [
@@ -314,7 +334,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                       keyboardController.text = originalValue;
                                                       Navigator.of(context).pop();
                                                     },
-                                                    child: const Text('Cancel'),
+                                                    child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
                                                   ),
                                                   TextButton(
                                                     onPressed: isSaveEnabled
@@ -331,7 +351,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                     child: Text(
                                                       'Save',
                                                       style: TextStyle(
-                                                        color: isSaveEnabled ? Colors.blue : Colors.grey, // Show enabled/disabled state
+                                                        color: isSaveEnabled ? AppColors.saveButtonAllowableWeight : Colors.grey, // Show enabled/disabled state
                                                       ),
                                                     ),
                                                   ),
@@ -342,13 +362,13 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                         },
                                       );
                                     },
-                                    icon: const Icon(FontAwesomeIcons.keyboard, size: 32, color: Colors.black),
+                                    icon: Icon(FontAwesomeIcons.keyboard, size: 32, color: Colors.black),
                                   ),
                                 ],
                               ),
                             ),
                           ),
-                      
+
                           // Choose Allowable Slider
                           Padding(
                             padding: const EdgeInsets.only(top: 0.0, right: 16.0, left: 16.0),
@@ -358,7 +378,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.white, // Background color
+                                      color: AppColors.textFieldColor, // Background color
                                       border: Border.all(color: Colors.black, width: 2), // Black outline
                                       borderRadius: BorderRadius.circular(8), // Rounded corners
                                     ),
@@ -376,7 +396,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                             onPressed: _decrementSlider,
                                             style: ElevatedButton.styleFrom(
                                               foregroundColor: Colors.black,
-                                              backgroundColor: Colors.deepOrangeAccent,
+                                              backgroundColor: AppColors.fireColor,
                                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                               elevation: 15,
                                               shadowColor: Colors.black,
@@ -394,9 +414,10 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                 visible: lastInputFromSlider,
                                                 child: Text(
                                                   '${_sliderValue.toStringAsFixed(0)} lbs',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 32,
                                                     fontWeight: FontWeight.bold,
+                                                    color: AppColors.textColorPrimary,
                                                   ),
                                                 ),
                                               ),
@@ -405,9 +426,10 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                 visible: !lastInputFromSlider,
                                                 child: Text(
                                                   '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lbs',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 32,
                                                     fontWeight: FontWeight.bold,
+                                                    color: AppColors.textColorPrimary,
                                                   ),
                                                 ),
                                               ),
@@ -418,7 +440,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                             onPressed: _incrementSlider,
                                             style: ElevatedButton.styleFrom(
                                               foregroundColor: Colors.black,
-                                              backgroundColor: Colors.deepOrangeAccent,
+                                              backgroundColor: AppColors.fireColor,
                                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                               elevation: 15,
                                               shadowColor: Colors.black,
@@ -443,7 +465,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                           allowableController.text = _sliderValue.toStringAsFixed(0);
                                         });
                                       },
-                                      activeColor: Colors.deepOrange,
+                                      activeColor: AppColors.fireColor,
                                       // Color when the slider is active
                                       inactiveColor: Colors.grey, // Color for the inactive part
                                     ),
@@ -486,41 +508,5 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
     );
   }
 
-  Widget _buildTextInputContainer(String title, TextEditingController controller) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.deepOrangeAccent,
-        border: Border.all(color: Colors.black, width: 2),
-        borderRadius: BorderRadius.circular(4),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.5), spreadRadius: 1, blurRadius: 8, offset: Offset(0, 3))],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
-      ),
-    );
-  }
-
-  InputDecoration _inputDecoration() => InputDecoration(
-    filled: true,
-    fillColor: Colors.white,
-    enabledBorder: OutlineInputBorder(
-      borderSide: const BorderSide(color: Colors.black, width: 2.0),
-      borderRadius: BorderRadius.circular(4.0),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderSide: const BorderSide(color: Colors.black, width: 2.0),
-      borderRadius: BorderRadius.circular(4.0),
-    ),
-  );
-
-  TextStyle _textStyle() => const TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold);
 
 }
-

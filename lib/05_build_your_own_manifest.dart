@@ -3,6 +3,7 @@ import 'package:fire_app/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'CodeShare/colors.dart';
 import 'Data/gear.dart';
 import 'Data/crewmember.dart';
 import 'Data/trip.dart';
@@ -82,10 +83,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         return StatefulBuilder(
           builder: (context, dialogSetState) {
             return AlertDialog(
-              backgroundColor: Colors.white,
-              title: const Text(
+              backgroundColor: AppColors.textFieldColor,
+              title:  Text(
                 'Add Crew Members and Gear',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textColorPrimary),
               ),
               contentPadding: const EdgeInsets.all(16),
               content: ConstrainedBox(
@@ -109,7 +110,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                           children: [
                             ExpansionPanel(
                               isExpanded: isCrewExpanded,
-                              backgroundColor: Colors.deepOrangeAccent,
+                              backgroundColor: AppColors.fireColor,
                               // Set background color
                               headerBuilder: (context, isExpanded) {
                                 return Container(
@@ -126,7 +127,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                   return Container(
                                     //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: AppColors.textFieldColor,
                                       borderRadius: BorderRadius.circular(0.0),
                                       // Rounded corners
                                       boxShadow: [
@@ -139,14 +140,20 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       ],
                                     ),
                                     child: CheckboxListTile(
+                                      activeColor: AppColors.textColorPrimary, // Checkbox outline color when active
+                                      checkColor: AppColors.textColorSecondary,
+                                      side: BorderSide(
+                                        color: AppColors.textColorPrimary, // Outline color
+                                        width: 2.0, // Outline width
+                                      ),//
                                       title: Text(
                                         '${crew.name}, ${crew.flightWeight} lbs',
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                         textAlign: TextAlign.start,
                                       ),
                                       subtitle: Text(
                                         crew.getPositionTitle(crew.position),
-                                        style: const TextStyle(fontStyle: FontStyle.italic),
+                                        style: TextStyle(color: AppColors.textColorPrimary),
                                       ),
                                       value: selectedItems.contains(crew),
                                       onChanged: (bool? isChecked) {
@@ -179,7 +186,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                           children: [
                             ExpansionPanel(
                               isExpanded: isGearExpanded,
-                              backgroundColor: Colors.deepOrangeAccent,
+                              backgroundColor: AppColors.fireColor,
                               // Set background color
                               headerBuilder: (context, isExpanded) {
                                 return Container(
@@ -200,8 +207,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                     //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
                                     decoration: BoxDecoration(
                                       color: gear.isPersonalTool
-                                          ? Colors.blue[100] // Color for personal tools
-                                          : Colors.orange[100],
+                                          ? AppColors.toolBlue // Color for personal tools
+                                          : AppColors.gearYellow,
                                       borderRadius: BorderRadius.circular(0.0),
                                       // Rounded corners
                                       boxShadow: [
@@ -251,7 +258,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                       context: context,
                                                       builder: (BuildContext context) {
                                                         return AlertDialog(
-                                                          title: Text('Select Quantity for ${gear.name}'),
+                                                          backgroundColor: AppColors.textFieldColor,
+                                                          title: Text('Select Quantity for ${gear.name}', style: TextStyle(color: AppColors.textColorPrimary),),
                                                           content: SizedBox(
                                                             height: 150,
                                                             child: CupertinoPicker(
@@ -269,13 +277,19 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                 // Use the full quantity for selection
                                                                 (int index) {
                                                                   return Center(
-                                                                    child: Text('${index + 1}'),
+                                                                    child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                   );
                                                                 },
                                                               ),
                                                             ),
                                                           ),
                                                           actions: [
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(context).pop();
+                                                              },
+                                                              child:  Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                                            ),
                                                             TextButton(
                                                               onPressed: () {
                                                                 // Finalize the selection
@@ -285,14 +299,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                 });
                                                                 Navigator.of(context).pop();
                                                               },
-                                                              child: const Text('Confirm'),
+                                                              child: Text('Confirm', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
                                                             ),
-                                                            TextButton(
-                                                              onPressed: () {
-                                                                Navigator.of(context).pop();
-                                                              },
-                                                              child: const Text('Cancel'),
-                                                            ),
+
                                                           ],
                                                         );
                                                       },
@@ -304,13 +313,13 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                     if (gear.quantity > 1)
                                                       Text(
                                                         'Qty: ${selectedGearQuantities[gear] ?? 1}',
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
                                                           fontWeight: FontWeight.bold,
                                                           fontSize: 14,
-                                                          color: Colors.black,
+                                                          color: AppColors.textColorSecondary,
                                                         ),
                                                       ),
-                                                    if (gear.quantity > 1) const Icon(Icons.arrow_drop_down, color: Colors.black),
+                                                    if (gear.quantity > 1)  Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
                                                   ],
                                                 ),
                                               ),
@@ -347,9 +356,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                           children: [
                             ExpansionPanel(
                               isExpanded: isCustomItemExpanded,
-                              backgroundColor: Colors.deepOrangeAccent,
+                              backgroundColor: AppColors.fireColor,
                               headerBuilder: (context, isExpanded) => ListTile(
-                                title: const Text(
+                                title: Text(
                                   'Add Custom Item',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
@@ -357,12 +366,14 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                 ),
                               ),
                               body: Container(
-                                color: Colors.white,
+                                color: AppColors.textFieldColor,
                                 child: Column(
                                   children: [
                                     // Custom Item Name Field
                                     TextField(
-                                      decoration: const InputDecoration(labelText: 'Item Name'),
+                                      decoration: InputDecoration(labelText: 'Item Name',
+                                        labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
+                                      ),
                                       textCapitalization: TextCapitalization.words,
                                       focusNode: customItemNameFocus,
                                       // Attach focus node
@@ -380,7 +391,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
                                     // Custom Item Weight Field
                                     TextField(
-                                      decoration: const InputDecoration(labelText: 'Weight (lbs)'),
+                                      decoration: InputDecoration(labelText: 'Weight (lbs)',
+                                        labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
+                                      ),
                                       keyboardType: TextInputType.number,
                                       maxLength: 3,
                                       focusNode: customItemWeightFocus,
@@ -411,7 +424,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Cancel'),
+                  child:  Text('Cancel', style: TextStyle(color: AppColors.cancelButton),),
                 ),
                 TextButton(
                   onPressed: () {
@@ -502,7 +515,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                     });
                     sortLoadItems(loads[selectedLoadIndex]);
                   },
-                  child: const Text('Add'),
+                  child:  Text('Add', style: TextStyle(color: AppColors.saveButtonAllowableWeight),),
                 ),
               ],
             );
@@ -654,17 +667,26 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: Colors.deepOrangeAccent,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back, // The back arrow icon
+            color: AppColors.textColorPrimary, // Set the desired color
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(); // Navigate back when pressed
+          },
+        ),
+        backgroundColor: AppColors.appBarColor,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               widget.trip.tripName,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lbs',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
           ],
         ),
@@ -677,10 +699,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                 backgroundColor: Colors.green,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               ),
-              child: const Text(
+              child: Text(
                 'Save',
                 style: TextStyle(
-                  color: Colors.white,
+                  color:  AppColors.textColorSecondary,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -693,19 +715,22 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         children: [
           // Background Image
           Container(
-            child: ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+            color: AppColors.isDarkMode ? Colors.black.withValues(alpha: 0.9) : Colors.transparent, // Black background in dark mode
+            child: AppColors.isDarkMode
+                ? null // No child if dark mode is enabled
+                : ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
               child: Image.asset(
                 'assets/images/logo1.png',
-                fit: BoxFit.cover,
+                fit: BoxFit.cover, // Cover the entire background
                 width: double.infinity,
                 height: double.infinity,
               ),
             ),
           ),
 
+
           Container(
-            color: Colors.grey.withValues(alpha: 0.1),
             child: Scrollbar(
               child: ListView(
                 padding: const EdgeInsets.all(8.0),
@@ -753,7 +778,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                               decoration: BoxDecoration(
                                 color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                     ? Colors.black // Warning color
-                                    : Colors.deepOrangeAccent, // Normal color
+                                    : AppColors.fireColor, // Normal color
                                 borderRadius: const BorderRadius.vertical(
                                   top: Radius.circular(10),
                                   bottom: Radius.circular(10),
@@ -930,7 +955,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         // Red background for delete action
                                         alignment: Alignment.centerRight,
                                         padding: const EdgeInsets.symmetric(horizontal: 20),
-                                        child: const Icon(Icons.delete, color: Colors.white), // Trash icon
+                                        child: Icon(Icons.delete, color: AppColors.textColorSecondary), // Trash icon
                                       ),
                                       onDismissed: (direction) {
                                         setState(() {
@@ -1005,10 +1030,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       child: Card(
                                         elevation: 2,
                                         color: item is CrewMember
-                                            ? Colors.white // Color for CrewMembers
+                                            ? AppColors.textFieldColor2 // Color for CrewMembers
                                             : item is Gear && item.isPersonalTool == true
-                                                ? Colors.blue[100] // Color for personal tools
-                                                : Colors.orange[100],
+                                            ? AppColors.toolBlue // Color for personal tools
+                                            : AppColors.gearYellow,
                                         // Color for regular Gear
                                         // Different colors for CrewMember and Gear
                                         margin: const EdgeInsets.symmetric(vertical: 1.0),
@@ -1025,9 +1050,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                 children: [
                                                   Text(
                                                     itemDisplay(item),
-                                                    style: const TextStyle(
+                                                    style: TextStyle(
                                                       fontSize: 16,
                                                       fontWeight: FontWeight.bold,
+                                                      color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
                                                     ),
                                                   ),
                                                   Text(
@@ -1036,9 +1062,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                         : item is CrewMember
                                                             ? item.getPositionTitle(item.position)
                                                             : '',
-                                                    style: const TextStyle(
+                                                    style: TextStyle(
                                                       fontSize: 14,
-                                                      fontStyle: FontStyle.italic,
+                                                      color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
+
                                                     ),
                                                   ),
                                                 ],
@@ -1058,19 +1085,21 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                               int quantityToRemove = 1; // Default to 1 for selection
                                                               return StatefulBuilder(builder: (BuildContext context, StateSetter setDialogState) {
                                                                 return AlertDialog(
-                                                                  title: Text('Remove ${item.name}'),
+                                                                  backgroundColor: AppColors.textFieldColor,
+                                                                  title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                   content: Column(
                                                                     mainAxisSize: MainAxisSize.min,
                                                                     children: [
-                                                                      Text('Select the quantity to remove:'),
+                                                                      Text('Select the quantity to remove:', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                       SizedBox(height: 8),
                                                                       DropdownButton<int>(
+                                                                        dropdownColor: AppColors.textFieldColor,
                                                                         value: quantityToRemove,
                                                                         items: List.generate(
                                                                           item.quantity,
                                                                           (index) => DropdownMenuItem(
                                                                             value: index + 1,
-                                                                            child: Text('${index + 1}'),
+                                                                            child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                           ),
                                                                         ),
                                                                         onChanged: (value) {
@@ -1086,7 +1115,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                       onPressed: () {
                                                                         Navigator.of(context).pop(); // Cancel action
                                                                       },
-                                                                      child: const Text('Cancel'),
+                                                                      child:  Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
                                                                     ),
                                                                     TextButton(
                                                                       onPressed: () {
@@ -1124,7 +1153,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
                                                                         Navigator.of(context).pop(); // Close the dialog
                                                                       },
-                                                                      child: const Text('Remove'),
+                                                                      child: const Text('Remove', style: TextStyle(color: Colors.red)),
                                                                     ),
                                                                   ],
                                                                 );
@@ -1218,18 +1247,18 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       width: double.infinity,
                                       padding: const EdgeInsets.symmetric(vertical: 8),
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
+                                        color: AppColors.textFieldColor2,
                                         // Background color
                                         borderRadius: BorderRadius.circular(8),
                                         // Rounded corners
                                       ),
                                       alignment: Alignment.center,
-                                      child: const Text(
+                                      child: Text(
                                         '+ Add Item',
                                         style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.black,
+                                          color: AppColors.textColorPrimary,
                                         ),
                                       ),
                                     ),
@@ -1244,22 +1273,23 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         context: context,
                                         builder: (BuildContext context) {
                                           return AlertDialog(
-                                            title: const Text(
+                                            backgroundColor: AppColors.textFieldColor,
+                                            title:  Text(
                                               'Confirm Deletion',
-                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                              style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                             ),
-                                            content: const Text(
+                                            content: Text(
                                               'Are you sure you want to delete this load?',
-                                              style: TextStyle(fontSize: 16),
+                                              style: TextStyle(fontSize: 16,color: AppColors.textColorPrimary),
                                             ),
                                             actions: [
                                               TextButton(
                                                 onPressed: () {
                                                   Navigator.of(context).pop(); // Close the dialog without deleting
                                                 },
-                                                child: const Text(
+                                                child:  Text(
                                                   'Cancel',
-                                                  style: TextStyle(color: Colors.grey),
+                                                  style: TextStyle(color: AppColors.cancelButton),
                                                 ),
                                               ),
                                               TextButton(
@@ -1360,14 +1390,14 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                         });
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: AppColors.buttonStyle1,
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       ),
-                      child: const Text(
-                        'Add Load',
+                      child:  Text(
+                        '+ Add Load',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white,
+                          color: AppColors.textColorSecondary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

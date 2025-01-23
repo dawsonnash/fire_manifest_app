@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'Data/crew.dart';
 import 'Data/gear.dart';
-import 'Functions/functions.dart';
+import 'CodeShare/functions.dart';
 
 // Tester data
 class AddGear extends StatefulWidget {

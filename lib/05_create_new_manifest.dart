@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:fire_app/05_build_your_own_manifest.dart';
+import 'package:fire_app/CodeShare/colors.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +14,8 @@ import 'Data/trip_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CreateNewManifest extends StatelessWidget {
-  const CreateNewManifest({Key? key}) : super(key: key);
+  final void Function(int) onSwitchTab; // Callback to switch tabs
+  const CreateNewManifest({super.key, required this.onSwitchTab});
 
   @override
   Widget build(BuildContext context) {
@@ -22,16 +23,17 @@ class CreateNewManifest extends StatelessWidget {
       length: 2, // Number of tabs
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.grey[900],
+          backgroundColor: AppColors.appBarColor,
           elevation: 0,
           toolbarHeight: 0,
           bottom: TabBar(
-            labelColor: Colors.deepOrangeAccent, // Selected text and icon color
-            unselectedLabelColor: Colors.grey[300],   // Unselected text and icon color
-            indicatorColor: Colors.deepOrangeAccent, // Tab indicator color
+            labelColor: AppColors.primaryColor, // Selected text and icon color
+            unselectedLabelColor: AppColors.tabIconColor, // Unselected text and icon color
+            indicatorColor: AppColors.primaryColor, // Tab indicator color
             tabs: [
-              Tab(text: 'Quick Manifest',
-                  icon: Icon(Icons.bolt),
+              Tab(
+                text: 'Quick Manifest',
+                icon: Icon(Icons.bolt),
               ),
               Tab(text: 'Build Your Own', icon: Icon(Icons.build)),
             ],
@@ -39,16 +41,15 @@ class CreateNewManifest extends StatelessWidget {
         ),
         body: GestureDetector(
           onTap: () {
-          FocusScope.of(context).unfocus(); // Dismiss the keyboard
-        },
+            FocusScope.of(context).unfocus(); // Dismiss the keyboard
+          },
           onVerticalDragStart: (_) {
             FocusScope.of(context).unfocus(); // Dismiss the keyboard on vertical swipe
           },
-
-          child: const TabBarView(
+          child: TabBarView(
             children: [
-              QuickManifest(), // Your first screen
-              DesignNewManifest(),      // Replace with your second screen widget
+              QuickManifest(onSwitchTab: onSwitchTab), // Your first screen
+              const DesignNewManifest(), // Replace with your second screen widget
             ],
           ),
         ),
@@ -58,7 +59,9 @@ class CreateNewManifest extends StatelessWidget {
 }
 
 class QuickManifest extends StatefulWidget {
-  const QuickManifest({super.key});
+  final void Function(int) onSwitchTab;
+
+  const QuickManifest({super.key, required this.onSwitchTab});
 
   @override
   State<QuickManifest> createState() => _QuickManifestState();
@@ -106,8 +109,6 @@ class _QuickManifestState extends State<QuickManifest> {
     // Initialize allowableController with the default slider value
     allowableController.text = _sliderValue.toStringAsFixed(0);
 
-
-
     loadItems();
 
     // Initialize selectedItems with all crew and gear items
@@ -123,7 +124,6 @@ class _QuickManifestState extends State<QuickManifest> {
   }
 
   void _showSelectionDialog() async {
-
     List<CrewMember> sortedCrewList = sortCrewListByPosition(crewList);
     List<Gear> sortedGearList = sortGearListAlphabetically(gearList);
     bool isCrewExpanded = false;
@@ -145,10 +145,10 @@ class _QuickManifestState extends State<QuickManifest> {
             }
 
             return AlertDialog(
-              backgroundColor: Colors.white,
-              title: const Text(
+              backgroundColor: AppColors.textFieldColor,
+              title: Text(
                 'Select Crew Members and Gear',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textColorPrimary),
               ),
               contentPadding: const EdgeInsets.all(16),
               content: ConstrainedBox(
@@ -164,17 +164,23 @@ class _QuickManifestState extends State<QuickManifest> {
                         Container(
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: Colors.black, // Outline color
-                              width: 1.0,         // Outline thickness
+                              color: AppColors.primaryColor, // Outline color
+                              width: 1.0, // Outline thickness
                             ),
-                        //    borderRadius: BorderRadius.circular(8.0), // Rounded corners (optional)
+                            //    borderRadius: BorderRadius.circular(8.0), // Rounded corners (optional)
                           ),
                           child: CheckboxListTile(
-                            //  activeColor: Colors.black, // Checkbox outline color when active
-                           // checkColor: Colors.white,  // Checkmark color
-                            title: const Text(
+                            activeColor: AppColors.textColorPrimary,
+                            // Checkbox outline color when active
+                            checkColor: AppColors.textColorSecondary,
+                            side: BorderSide(
+                              color: AppColors.textColorPrimary, // Outline color
+                              width: 2.0, // Outline width
+                            ),
+                            // Checkmark color
+                            title: Text(
                               'Select All',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textColorPrimary),
                             ),
                             value: isSelectAllChecked,
                             onChanged: (bool? isChecked) {
@@ -211,14 +217,14 @@ class _QuickManifestState extends State<QuickManifest> {
                           children: [
                             ExpansionPanel(
                               isExpanded: isCrewExpanded,
-                              backgroundColor: Colors.deepOrangeAccent,
+                              backgroundColor: AppColors.fireColor,
                               // Set background color
                               headerBuilder: (context, isExpanded) {
                                 return Container(
                                   child: ListTile(
-                                    title: const Text(
+                                    title: Text(
                                       'Crew Members',
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                     ),
                                   ),
                                 );
@@ -228,7 +234,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                   return Container(
                                     //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: AppColors.textFieldColor,
                                       borderRadius: BorderRadius.circular(0.0),
                                       // Rounded corners
                                       boxShadow: [
@@ -241,14 +247,22 @@ class _QuickManifestState extends State<QuickManifest> {
                                       ],
                                     ),
                                     child: CheckboxListTile(
+                                      activeColor: AppColors.textColorPrimary,
+                                      // Checkbox outline color when active
+                                      checkColor: AppColors.textColorSecondary,
+                                      // Checkmark color
+                                      side: BorderSide(
+                                        color: AppColors.textColorPrimary, // Outline color
+                                        width: 2.0, // Outline width
+                                      ),
                                       title: Text(
                                         '${crew.name}, ${crew.flightWeight} lbs',
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                         textAlign: TextAlign.start,
                                       ),
                                       subtitle: Text(
                                         crew.getPositionTitle(crew.position),
-                                        style: const TextStyle(fontStyle: FontStyle.italic),
+                                        style: TextStyle(fontStyle: FontStyle.italic, color: AppColors.textColorPrimary),
                                       ),
                                       value: selectedItems.contains(crew),
                                       onChanged: (bool? isChecked) {
@@ -282,7 +296,7 @@ class _QuickManifestState extends State<QuickManifest> {
                           children: [
                             ExpansionPanel(
                               isExpanded: isGearExpanded,
-                              backgroundColor: Colors.deepOrangeAccent,
+                              backgroundColor: AppColors.fireColor,
                               // Set background color
                               headerBuilder: (context, isExpanded) {
                                 return Container(
@@ -302,9 +316,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                   return Container(
                                     //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
                                     decoration: BoxDecoration(
-                                      color: gear.isPersonalTool
-                                          ? Colors.blue[100] // Color for personal tools
-                                          : Colors.orange[100],
+                                      color: AppColors.textFieldColor,
                                       borderRadius: BorderRadius.circular(0.0),
                                       // Rounded corners
                                       boxShadow: [
@@ -317,6 +329,13 @@ class _QuickManifestState extends State<QuickManifest> {
                                       ],
                                     ),
                                     child: CheckboxListTile(
+                                      activeColor: AppColors.textColorPrimary,
+                                      // Checkbox outline color when active
+                                      checkColor: AppColors.textColorSecondary,
+                                      side: BorderSide(
+                                        color: AppColors.textColorPrimary, // Outline color
+                                        width: 2.0, // Outline width
+                                      ),
                                       title: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
@@ -326,9 +345,10 @@ class _QuickManifestState extends State<QuickManifest> {
                                                 Flexible(
                                                   child: Text(
                                                     gear.name,
-                                                    style: const TextStyle(
+                                                    style: TextStyle(
                                                       fontSize: 16,
                                                       fontWeight: FontWeight.bold,
+                                                      color: AppColors.textColorPrimary,
                                                     ),
                                                     overflow: TextOverflow.ellipsis,
                                                   ),
@@ -338,7 +358,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.bold,
-                                                    color: Colors.black,
+                                                    color: AppColors.textColorPrimary,
                                                   ),
                                                 ),
                                               ],
@@ -354,7 +374,11 @@ class _QuickManifestState extends State<QuickManifest> {
                                                       context: context,
                                                       builder: (BuildContext context) {
                                                         return AlertDialog(
-                                                          title: Text('Select Quantity for ${gear.name}'),
+                                                          backgroundColor: AppColors.textFieldColor,
+                                                          title: Text(
+                                                            'Select Quantity for ${gear.name}',
+                                                            style: TextStyle(color: AppColors.textColorPrimary),
+                                                          ),
                                                           content: SizedBox(
                                                             height: 150,
                                                             child: CupertinoPicker(
@@ -370,15 +394,23 @@ class _QuickManifestState extends State<QuickManifest> {
                                                               children: List<Widget>.generate(
                                                                 gear.quantity,
                                                                 // Use the full quantity for selection
-                                                                    (int index) {
+                                                                (int index) {
                                                                   return Center(
-                                                                    child: Text('${index + 1}'),
+                                                                    child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                   );
                                                                 },
                                                               ),
                                                             ),
                                                           ),
                                                           actions: [
+
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(context).pop();
+                                                              },
+                                                              child:  Text('Cancel',style: TextStyle(color: AppColors.cancelButton) ),
+                                                            ),
+
                                                             TextButton(
                                                               onPressed: () {
                                                                 // Finalize the selection
@@ -388,13 +420,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                                 });
                                                                 Navigator.of(context).pop();
                                                               },
-                                                              child: const Text('Confirm'),
-                                                            ),
-                                                            TextButton(
-                                                              onPressed: () {
-                                                                Navigator.of(context).pop();
-                                                              },
-                                                              child: const Text('Cancel'),
+                                                              child:  Text('Confirm', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
                                                             ),
                                                           ],
                                                         );
@@ -407,13 +433,13 @@ class _QuickManifestState extends State<QuickManifest> {
                                                     if (gear.quantity > 1)
                                                       Text(
                                                         'Qty: ${selectedGearQuantities[gear] ?? 1}',
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
                                                           fontWeight: FontWeight.bold,
                                                           fontSize: 14,
-                                                          color: Colors.black,
+                                                          color: AppColors.textColorPrimary,
                                                         ),
                                                       ),
-                                                    if (gear.quantity > 1) const Icon(Icons.arrow_drop_down, color: Colors.black),
+                                                    if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorPrimary),
                                                   ],
                                                 ),
                                               ),
@@ -439,7 +465,6 @@ class _QuickManifestState extends State<QuickManifest> {
                             ),
                           ],
                         ),
-
                       ],
                     ),
                   ),
@@ -449,8 +474,7 @@ class _QuickManifestState extends State<QuickManifest> {
                 TextButton(
                   onPressed: () {
                     setState(() {
-                      if (selectedItems.isEmpty){
-
+                      if (selectedItems.isEmpty) {
                         // Select all items again
                         selectedItems = [
                           ...crewList,
@@ -463,12 +487,14 @@ class _QuickManifestState extends State<QuickManifest> {
                         // Update trip lists to reflect the selection
                         thisTripCrewMemberList = crewList.map((crew) => crew.copy()).toList();
                         thisTripGearList = gearList.map((gear) => gear.copyWith()).toList();
-
                       }
                     });
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Cancel'),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: AppColors.cancelButton),
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
@@ -476,9 +502,7 @@ class _QuickManifestState extends State<QuickManifest> {
                     thisTripCrewMemberList = selectedItems.whereType<CrewMember>().toList();
 
                     // Update thisTripGearList with only selected gear items and quantities
-                    thisTripGearList = selectedItems
-                        .whereType<Gear>()
-                        .map((gear) {
+                    thisTripGearList = selectedItems.whereType<Gear>().map((gear) {
                       final selectedQuantity = selectedGearQuantities[gear] ?? 1; // Get selected quantity
                       return Gear(
                         name: gear.name,
@@ -486,15 +510,13 @@ class _QuickManifestState extends State<QuickManifest> {
                         weight: gear.weight,
                         isPersonalTool: gear.isPersonalTool,
                       );
-                    })
-                        .toList();
+                    }).toList();
 
                     // Close the dialog
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Select'),
+                  child: Text('Select', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
                 ),
-
               ],
             );
           },
@@ -555,7 +577,7 @@ class _QuickManifestState extends State<QuickManifest> {
   }
 
   // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
-  void saveTripData() {
+  void saveTripData(VoidCallback onSuccess) {
     // Take what the trip name contrller has saved
     final String tripName = tripNameController.text;
 
@@ -591,29 +613,30 @@ class _QuickManifestState extends State<QuickManifest> {
 
     // Deep copy crewMembers and gear into the new Trip
     newTrip.crewMembers = thisTripCrewMemberList.map((member) => member.copy()).toList();
-    newTrip.gear =  thisTripGearList.map((item) => item.copyWith()).toList();
+    newTrip.gear = thisTripGearList.map((item) => item.copyWith()).toList();
 
     newTrip.calculateTotalCrewWeight();
 
-    if (newTrip.crewMembers.isEmpty){
+    if (newTrip.crewMembers.isEmpty) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return StatefulBuilder(
             builder: (context, setState) {
-
               return AlertDialog(
-                title: const Text('No Crew Members Selected'),
-                content: Text('Select at least one crew member and try again.'
+                backgroundColor: AppColors.textFieldColor,
+                title: Text(
+                  'No Crew Members Selected',
+                  style: TextStyle(color: AppColors.textColorPrimary),
                 ),
+                content: Text('Select at least one crew member and try again.', style: TextStyle(color: AppColors.textColorPrimary)),
                 actions: [
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: const Text('OK'),
+                    child: Text('OK', style: TextStyle(color: AppColors.textColorPrimary)),
                   ),
-
                 ],
               );
             },
@@ -657,12 +680,8 @@ class _QuickManifestState extends State<QuickManifest> {
       allowableController.text = _sliderValue.toStringAsFixed(0); // Sync the allowableController with the slider
     });
 
-    // // Debug for LogCat
-    // print("--------------------------");
-    // print("Trip Name: $tripName");
-    // print("Allowable: $allowable");
-    // print("--------------------------");
-    // savedTrips.printTripDetails();
+    // Notify parent widget
+    // onSuccess();
   }
 
   void _incrementSlider() {
@@ -685,7 +704,7 @@ class _QuickManifestState extends State<QuickManifest> {
     final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
         textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        backgroundColor: Colors.deepOrangeAccent,
+        backgroundColor: AppColors.fireColor,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         //surfaceTintColor: Colors.grey,
         elevation: 15,
@@ -713,17 +732,20 @@ class _QuickManifestState extends State<QuickManifest> {
                 children: [
                   // Background image
                   Container(
-                    color: Colors.black,
-                    // child: ImageFiltered(
-                    //     imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                    //     // Blur effect
-                    //     child: Image.asset(
-                    //       'assets/images/logo1.png',
-                    //       fit: BoxFit.cover, // Cover  entire background
-                    //       width: double.infinity,
-                    //       height: double.infinity,
-                    //     )),
+                    color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Black background in dark mode
+                    child: AppColors.isDarkMode
+                        ? null // No child if dark mode is enabled
+                        : ImageFiltered(
+                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                            child: Image.asset(
+                              'assets/images/logo1.png',
+                              fit: BoxFit.cover, // Cover the entire background
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
                   ),
+
                   Container(
                     width: double.infinity,
                     height: double.infinity,
@@ -732,7 +754,7 @@ class _QuickManifestState extends State<QuickManifest> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                        SizedBox(height: 16),
+                          SizedBox(height: 16),
                           // Trip Name input field
                           Padding(
                               padding: const EdgeInsets.only(left: 16.0, right: 16.0),
@@ -742,37 +764,36 @@ class _QuickManifestState extends State<QuickManifest> {
                                 textCapitalization: TextCapitalization.words,
                                 decoration: InputDecoration(
                                   labelText: 'Enter Trip Name',
-                                  labelStyle: const TextStyle(
-                                    color: Colors.black, // Label color when not focused
+                                  labelStyle: TextStyle(
+                                    color: AppColors.textColorPrimary, // Label color when not focused
                                     fontSize: 18, // Label font size
-                                    fontWeight: FontWeight.bold,
                                   ),
                                   filled: true,
-                                  fillColor: Colors.white.withValues(alpha: 0.9),
+                                  fillColor: AppColors.textFieldColor,
                                   enabledBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Colors.black,
+                                    borderSide: BorderSide(
+                                      color: AppColors.borderPrimary,
                                       // Border color when the TextField is not focused
                                       width: 2.0, // Border width
                                     ),
                                     borderRadius: BorderRadius.circular(4.0), // Rounded corners
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Colors.black,
+                                    borderSide: BorderSide(
+                                      color: AppColors.primaryColor,
                                       // Border color when the TextField is focused
                                       width: 2.0, // Border width
                                     ),
                                     borderRadius: BorderRadius.circular(4.0),
                                   ),
                                 ),
-                                style: const TextStyle(
-                                  color: Colors.black,
+                                style: TextStyle(
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                 ),
                               )),
-                      
+
                           // Available Seats input field
                           Padding(
                               padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
@@ -787,37 +808,36 @@ class _QuickManifestState extends State<QuickManifest> {
                                 ],
                                 decoration: InputDecoration(
                                   labelText: 'Enter # of Available Seats',
-                                  labelStyle: const TextStyle(
-                                    color: Colors.black, // Label color when not focused
+                                  labelStyle: TextStyle(
+                                    color: AppColors.textColorPrimary, // Label color when not focused
                                     fontSize: 18, // Label font size
-                                    fontWeight: FontWeight.bold,
                                   ),
                                   filled: true,
-                                  fillColor: Colors.white.withValues(alpha: 0.9),
+                                  fillColor: AppColors.textFieldColor,
                                   enabledBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Colors.black,
+                                    borderSide: BorderSide(
+                                      color: AppColors.borderPrimary,
                                       // Border color when the TextField is not focused
                                       width: 2.0, // Border width
                                     ),
                                     borderRadius: BorderRadius.circular(4.0), // Rounded corners
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Colors.black,
+                                    borderSide: BorderSide(
+                                      color: AppColors.primaryColor,
                                       // Border color when the TextField is focused
                                       width: 2.0, // Border width
                                     ),
                                     borderRadius: BorderRadius.circular(4.0),
                                   ),
                                 ),
-                                style: const TextStyle(
-                                  color: Colors.black,
+                                style: TextStyle(
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                 ),
                               )),
-                      
+
                           // Select All/Some Crew
                           Padding(
                             padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
@@ -825,9 +845,9 @@ class _QuickManifestState extends State<QuickManifest> {
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.9),
+                                color: AppColors.textFieldColor,
                                 borderRadius: BorderRadius.circular(4.0),
-                                border: Border.all(color: Colors.black, width: 2.0),
+                                border: Border.all(color: AppColors.borderPrimary, width: 2.0),
                               ),
                               alignment: Alignment.centerLeft,
                               child: Row(
@@ -839,7 +859,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                       selectedItems.length == (crewList.length + gearList.length)
                                           ? Icons.check_box // Fully selected
                                           : Icons.check_box_outline_blank, // Partially or none selected
-                                      color: Colors.black.withValues(alpha: 0.9), // Sets the checkmark color to black
+                                      color: AppColors.textColorPrimary,
                                       size: 28, // Adjust size as needed
                                     ),
                                     onPressed: () {
@@ -853,7 +873,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                           selectedGearQuantities = {
                                             for (var gear in gearList) gear: gear.quantity,
                                           };
-                      
+
                                           // Update trip lists to reflect the selection
                                           thisTripCrewMemberList = crewList.map((crew) => crew.copy()).toList();
                                           thisTripGearList = gearList.map((gear) => gear.copyWith()).toList();
@@ -866,46 +886,43 @@ class _QuickManifestState extends State<QuickManifest> {
                                           _showSelectionDialog();
                                         }
                                       });
-                      
                                     },
                                   ),
-                      
-                                  const Text(
-                                  'Select All Crew',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+
+                                  Text(
+                                    'Select All Crew',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: AppColors.textColorPrimary,
+                                    ),
                                   ),
-                                ),
-                      
+
                                   const Spacer(),
-                      
+
                                   // List icon
                                   IconButton(
                                     icon: Icon(
                                       Icons.list,
-                                      color: Colors.black,
+                                      color: AppColors.textColorPrimary,
                                       size: 32,
-                                    ), onPressed: () {
+                                    ),
+                                    onPressed: () {
                                       _showSelectionDialog();
-                                      setState(() {
-                      
-                                      });
-                                      },
+                                      setState(() {});
+                                    },
                                   ),
-                              ],
+                                ],
                               ),
                             ),
                           ),
-                      
+
                           // Choose Trip Preference text box
                           Padding(
                             padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0, bottom: 0.0),
                             child: Container(
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                color: Colors.deepOrangeAccent,
+                                color: AppColors.fireColor,
                                 border: Border.all(color: Colors.black, width: 2),
                                 borderRadius: BorderRadius.circular(4),
                                 boxShadow: [
@@ -921,7 +938,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               //alignment: Alignment.center,
                               child: Text(
                                 'Choose Trip Preference',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
@@ -929,7 +946,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               ),
                             ),
                           ),
-                      
+
                           // Choose Trip Preference
                           Padding(
                             padding: const EdgeInsets.only(top: 0.0, left: 16.0, right: 16.0, bottom: 5.0),
@@ -937,20 +954,20 @@ class _QuickManifestState extends State<QuickManifest> {
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.9),
+                                color: AppColors.textFieldColor,
                                 borderRadius: BorderRadius.circular(4.0),
-                                border: Border.all(color: Colors.black, width: 2.0),
+                                border: Border.all(color: AppColors.borderPrimary, width: 2.0),
                               ),
                               child: DropdownButtonHideUnderline(
                                   child: DropdownButton<TripPreference?>(
                                 value: selectedTripPreference,
-                                dropdownColor: Colors.white,
-                                style: const TextStyle(
-                                  color: Colors.black,
+                                dropdownColor: AppColors.textFieldColor,
+                                style: TextStyle(
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                 ),
-                                iconEnabledColor: Colors.black,
+                                iconEnabledColor: AppColors.textColorPrimary,
                                 items: [
                                   DropdownMenuItem<TripPreference?>(
                                     value: null, // Represents the "None" option
@@ -972,15 +989,14 @@ class _QuickManifestState extends State<QuickManifest> {
                               )),
                             ),
                           ),
-                      
-                      
+
                           // Choose allowable text box
                           Padding(
                             padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
                             child: Container(
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                color: Colors.deepOrangeAccent,
+                                color: AppColors.fireColor,
                                 border: Border.all(color: Colors.black, width: 2),
                                 borderRadius: BorderRadius.circular(4),
                                 boxShadow: [
@@ -1000,7 +1016,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                     padding: const EdgeInsets.only(left: 8.0),
                                     child: Text(
                                       'Choose Allowable',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black,
@@ -1011,16 +1027,16 @@ class _QuickManifestState extends State<QuickManifest> {
                                     onPressed: () {
                                       // Clear the keyboardController before opening the dialog
                                       keyboardController.text = '';
-                      
+
                                       showDialog(
                                         context: context,
                                         builder: (BuildContext context) {
                                           // Save the original value in case of cancel
                                           String originalValue = allowableController.text;
-                      
+
                                           // Track if the Save button should be enabled
                                           bool isSaveEnabled = false;
-                      
+
                                           return StatefulBuilder(
                                             builder: (context, setState) {
                                               // Function to validate input and enable/disable Save button
@@ -1030,9 +1046,10 @@ class _QuickManifestState extends State<QuickManifest> {
                                                   isSaveEnabled = parsedValue != null && parsedValue >= 500 && parsedValue <= 10000;
                                                 });
                                               }
-                      
+
                                               return AlertDialog(
-                                                title: const Text('Enter Allowable Weight'),
+                                                backgroundColor: AppColors.textFieldColor,
+                                                title: Text('Enter Allowable Weight', style: TextStyle(color: AppColors.textColorPrimary)),
                                                 content: TextField(
                                                   controller: keyboardController,
                                                   keyboardType: TextInputType.number,
@@ -1046,10 +1063,18 @@ class _QuickManifestState extends State<QuickManifest> {
                                                       lastInputFromSlider = false;
                                                     });
                                                   },
-                                                  decoration: const InputDecoration(
+                                                  decoration: InputDecoration(
                                                     hintText: 'Up to 9,999 lbs',
+                                                    hintStyle: TextStyle(color: AppColors.textColorPrimary),
+                                                    filled: true,
+                                                    fillColor: AppColors.textFieldColor,
+                                                    // Background color of the text field
                                                     counterText: '',
-                                                    border: OutlineInputBorder(),
+                                                    border: const OutlineInputBorder(),
+                                                  ),
+                                                  style: TextStyle(
+                                                    color: AppColors.textColorPrimary, // Color of the typed text
+                                                    fontSize: 18, // Font size for the typed text
                                                   ),
                                                 ),
                                                 actions: [
@@ -1059,7 +1084,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                       keyboardController.text = originalValue;
                                                       Navigator.of(context).pop();
                                                     },
-                                                    child: const Text('Cancel'),
+                                                    child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
                                                   ),
                                                   TextButton(
                                                     onPressed: isSaveEnabled
@@ -1076,7 +1101,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                     child: Text(
                                                       'Save',
                                                       style: TextStyle(
-                                                        color: isSaveEnabled ? Colors.blue : Colors.grey, // Show enabled/disabled state
+                                                        color: isSaveEnabled ? AppColors.saveButtonAllowableWeight : Colors.grey, // Show enabled/disabled state
                                                       ),
                                                     ),
                                                   ),
@@ -1087,13 +1112,13 @@ class _QuickManifestState extends State<QuickManifest> {
                                         },
                                       );
                                     },
-                                    icon: const Icon(FontAwesomeIcons.keyboard, size: 32, color: Colors.black),
+                                    icon: Icon(FontAwesomeIcons.keyboard, size: 32, color: Colors.black),
                                   ),
                                 ],
                               ),
                             ),
                           ),
-                      
+
                           // Allowable Slider
                           Padding(
                             padding: const EdgeInsets.only(top: 0.0, right: 16.0, left: 16.0),
@@ -1103,8 +1128,8 @@ class _QuickManifestState extends State<QuickManifest> {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.white, // Background color
-                                      border: Border.all(color: Colors.black, width: 2), // Black outline
+                                      color: AppColors.textFieldColor, // Background color
+                                      border: Border.all(color: AppColors.borderPrimary, width: 2), // Black outline
                                       borderRadius: BorderRadius.circular(8), // Rounded corners
                                     ),
                                   ),
@@ -1121,14 +1146,14 @@ class _QuickManifestState extends State<QuickManifest> {
                                             onPressed: _decrementSlider,
                                             style: ElevatedButton.styleFrom(
                                               foregroundColor: Colors.black,
-                                              backgroundColor: Colors.deepOrangeAccent,
+                                              backgroundColor: AppColors.fireColor,
                                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                               elevation: 15,
                                               shadowColor: Colors.black,
-                                              side: const BorderSide(color: Colors.black, width: 2),
+                                              side: BorderSide(color: Colors.black, width: 2),
                                               shape: CircleBorder(),
                                             ),
-                                            child: const Icon(Icons.remove, color: Colors.black, size: 32),
+                                            child: Icon(Icons.remove, color: Colors.black, size: 32),
                                           ),
                                           const Spacer(),
                                           Stack(
@@ -1139,10 +1164,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                 visible: lastInputFromSlider,
                                                 child: Text(
                                                   '${_sliderValue.toStringAsFixed(0)} lbs',
-                                                  style: const TextStyle(
-                                                    fontSize: 32,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                                 ),
                                               ),
                                               // Keyboard input value
@@ -1150,10 +1172,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                 visible: !lastInputFromSlider,
                                                 child: Text(
                                                   '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lbs',
-                                                  style: const TextStyle(
-                                                    fontSize: 32,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                                 ),
                                               ),
                                             ],
@@ -1163,14 +1182,14 @@ class _QuickManifestState extends State<QuickManifest> {
                                             onPressed: _incrementSlider,
                                             style: ElevatedButton.styleFrom(
                                               foregroundColor: Colors.black,
-                                              backgroundColor: Colors.deepOrangeAccent,
+                                              backgroundColor: AppColors.fireColor,
                                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                               elevation: 15,
                                               shadowColor: Colors.black,
                                               side: const BorderSide(color: Colors.black, width: 2),
                                               shape: CircleBorder(),
                                             ),
-                                            child: const Icon(Icons.add, color: Colors.black, size: 32),
+                                            child: Icon(Icons.add, color: Colors.black, size: 32),
                                           ),
                                         ],
                                       ),
@@ -1188,7 +1207,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                           allowableController.text = _sliderValue.toStringAsFixed(0);
                                         });
                                       },
-                                      activeColor: Colors.deepOrange,
+                                      activeColor: AppColors.fireColor,
                                       // Color when the slider is active
                                       inactiveColor: Colors.grey, // Color for the inactive part
                                     ),
@@ -1205,14 +1224,17 @@ class _QuickManifestState extends State<QuickManifest> {
                             child: ElevatedButton(
                               onPressed: isCalculateButtonEnabled
                                   ? () {
-                                      saveTripData(); // Call saveTripData first
+                                      saveTripData(() {
+                                        if (mounted) {
+                                          widget.onSwitchTab(1); // Switch to Saved Trips tab
+                                        }
+                                      });
                                     }
-                                  : null, // Button is only enabled if there is input
-                              style: style, // Main button theme
+                                  : null,
+                              style: style,
                               child: const Text('Calculate'),
                             ),
                           ),
-
                         ],
                       ),
                     ),

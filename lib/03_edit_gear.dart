@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'Data/crew.dart';
 import 'Data/gear.dart';
 import 'package:hive/hive.dart';
-import 'Functions/functions.dart';
+import 'CodeShare/functions.dart';
 
 class EditGear extends StatefulWidget {
   // THis page requires a gear item to be passed to it - to edit it

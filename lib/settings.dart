@@ -1,38 +1,49 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'CodeShare/colors.dart';
+
 
 class SettingsView extends StatefulWidget {
-  const SettingsView({super.key});
+  final bool isDarkMode;
+  final Function(bool) onThemeChanged;
+
+  const SettingsView({super.key, required this.isDarkMode, required this.onThemeChanged});
 
   @override
   State<SettingsView> createState() => _SettingsState();
 }
 
 class _SettingsState extends State<SettingsView> {
+  late bool isDarkMode;
 
   @override
   void initState() {
     super.initState();
+    isDarkMode = widget.isDarkMode;
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title:  Text(
           'Settings',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
-        backgroundColor: Colors.deepOrangeAccent,
+        backgroundColor: AppColors.appBarColor,
       ),
       body: Stack(
         children: [
           Container(
-            child: ImageFiltered(
+            color: AppColors.isDarkMode ? Colors.black.withValues(alpha: 0.90) : Colors.transparent, // Black background in dark mode
+            child: AppColors.isDarkMode
+                ? null // No child if dark mode is enabled
+                : ImageFiltered(
               imageFilter: ImageFilter.blur(sigmaX: 60.0, sigmaY: 60.0),
               child: Image.asset(
                 'assets/images/logo1.png',
-                fit: BoxFit.cover,
+                fit: BoxFit.cover, // Cover the entire background
                 width: double.infinity,
                 height: double.infinity,
               ),
@@ -57,11 +68,11 @@ class _SettingsState extends State<SettingsView> {
                     children: [
                       TextButton(
                         onPressed: () => null,
-                        child: const Text('Quick Guide', style: TextStyle(color: Colors.white, fontSize: 20)),
+                        child: const Text('Quick Guide', style: TextStyle(color: Colors.white, fontSize: 18)),
                       ),
                       TextButton(
                         onPressed: () => null,
-                        child: const Text('Submit feedback', style: TextStyle(color: Colors.white, fontSize: 20)),
+                        child: const Text('Submit feedback', style: TextStyle(color: Colors.white, fontSize: 18)),
                       ),
                     ],
                   ),
@@ -80,9 +91,33 @@ class _SettingsState extends State<SettingsView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextButton(
-                        onPressed: () => null,
-                        child: const Text('Display', style: TextStyle(color: Colors.white, fontSize: 20)),
+                      ListTile(
+                        title: const Text(
+                          'Dark Mode',
+                          style: TextStyle(fontSize: 18, color: Colors.white), // White text for the label
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min, // Ensure the row takes only as much space as needed
+                          children: [
+                            Text(
+                              isDarkMode ? 'ON' : 'OFF', // Display ON or OFF
+                              style: const TextStyle(fontSize: 16, color: Colors.white), // White text for ON/OFF
+                            ),
+                            const SizedBox(width: 8), // Add some space between text and switch
+                            Switch(
+                              value: isDarkMode,
+                              onChanged: (value) {
+                                widget.onThemeChanged(value); // Notify parent widget
+                                setState(() {
+                                  isDarkMode = value;
+                                });
+                              },
+                              activeColor: Colors.green, // Green when ON
+                              inactiveThumbColor: Colors.grey, // Grey thumb when OFF
+                              inactiveTrackColor: Colors.white24, // Lighter grey for the track
+                            ),
+                          ],
+                        ),
                       ),
 
                     ],
@@ -141,7 +176,7 @@ class _SettingsState extends State<SettingsView> {
                           },
                           child: const Text(
                             'Terms and Conditions',
-                            style: TextStyle(color: Colors.white, fontSize: 20),
+                            style: TextStyle(color: Colors.white, fontSize: 18),
                           ),
                         ),
                       ],

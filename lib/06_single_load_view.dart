@@ -11,6 +11,7 @@ import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 
+import 'CodeShare/colors.dart';
 import 'Data/crewmember.dart';
 import 'Data/customItem.dart';
 import 'Data/gear.dart';
@@ -40,8 +41,7 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, String? helicopter
     pageFormat = PdfPageFormat.letter;
   } else if (manifestForm == 'of252') {
     imagePath = 'assets/images/helicopter_manifest_form.jpg';
-    fillFormFields = (load, pageIndex, totalPages, pageItems) =>
-        fillFormFieldsOF252(load, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer);
+    fillFormFields = (load, pageIndex, totalPages, pageItems) => fillFormFieldsOF252(load, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer);
     pageFormat = PdfPageFormat.a4;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
@@ -109,7 +109,7 @@ void previewPDF(BuildContext context, Load load, String manifestForm, String? he
     pdfBytes = await generatePDF(load, 'pms245', null, null, null, null);
     pageFormat = PdfPageFormat.letter; // PMS245 requires Letter format
   } else if (manifestForm == 'of252') {
-    pdfBytes = await generatePDF(load, 'of252', helicopterNum, departure,destination, manifestPreparer);
+    pdfBytes = await generatePDF(load, 'of252', helicopterNum, departure, destination, manifestPreparer);
     pageFormat = PdfPageFormat.a4; // OF252 requires A4 format
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
@@ -119,7 +119,7 @@ void previewPDF(BuildContext context, Load load, String manifestForm, String? he
   await Printing.layoutPdf(
     onLayout: (PdfPageFormat format) async => pdfBytes,
     usePrinterSettings: false, // Enforce the specified format
-    format: pageFormat,        // Dynamically set the format based on the manifest type
+    format: pageFormat, // Dynamically set the format based on the manifest type
   );
 }
 
@@ -416,27 +416,33 @@ class _SingleLoadViewState extends State<SingleLoadView> {
       resizeToAvoidBottomInset: false,
       // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
       appBar: AppBar(
-        backgroundColor: Colors.deepOrangeAccent,
+        backgroundColor: AppColors.appBarColor,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back, // The back arrow icon
+            color: AppColors.textColorPrimary, // Set the desired color
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(); // Navigate back when pressed
+          },
+        ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               children: [
                 Text(
-                'Load ${widget.load.loadNumber}',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+                  'Load ${widget.load.loadNumber}',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                ),
                 Text(
                   ' • ${widget.load.weight} lbs',
-                  style: TextStyle(fontSize: 20, color: Colors.black),
+                  style: TextStyle(fontSize: 20, color: AppColors.textColorPrimary),
                 ),
-        ],
+              ],
             ),
             IconButton(
-              icon: Icon(
-                Icons.ios_share,
-                size: 28,
-              ),
+              icon: Icon(Icons.ios_share, size: 28, color: AppColors.textColorPrimary),
               // Does this work for android, i dont know
               onPressed: () {
                 showDialog(
@@ -445,11 +451,13 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                     int selectedIndex = 0; // Initial selection index
 
                     return AlertDialog(
-                      title: const Text(
+                      backgroundColor: AppColors.textFieldColor,
+                      title: Text(
                         'Select Manifest Type',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
+                          color: AppColors.textColorPrimary,
                         ),
                       ),
                       content: SizedBox(
@@ -459,9 +467,9 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                           onSelectedItemChanged: (int index) {
                             selectedIndex = index;
                           },
-                          children: const [
-                            Center(child: Text('Helicopter Manifest', style: TextStyle(fontSize: 18))),
-                            Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: 18))),
+                          children: [
+                            Center(child: Text('Helicopter Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                            Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
                           ],
                         ),
                       ),
@@ -470,9 +478,9 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
-                          child: const Text(
+                          child: Text(
                             'Cancel',
-                            style: TextStyle(fontSize: 18),
+                            style: TextStyle(fontSize: 16, color: AppColors.cancelButton),
                           ),
                         ),
                         TextButton(
@@ -485,11 +493,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AdditionalInfoDialog(
-                                    onConfirm: (
-                                        String helicopterNum,
-                                        String departure,
-                                        String destination,
-                                        String manifestPreparer) {
+                                    onConfirm: (String helicopterNum, String departure, String destination, String manifestPreparer) {
                                       previewPDF(context, widget.load, 'of252', helicopterNum, departure, destination, manifestPreparer);
                                     },
                                   );
@@ -500,9 +504,9 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                               previewPDF(context, widget.load, 'pms245', null, null, null, null);
                             }
                           },
-                          child: const Text(
+                          child: Text(
                             'Export',
-                            style: TextStyle(fontSize: 18),
+                            style: TextStyle(fontSize: 16, color: AppColors.saveButtonAllowableWeight),
                           ),
                         ),
                       ],
@@ -519,15 +523,18 @@ class _SingleLoadViewState extends State<SingleLoadView> {
       body: Stack(
         children: [
           Container(
-            child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                // Blur effect
-                child: Image.asset(
-                  'assets/images/logo1.png',
-                  fit: BoxFit.cover, // Cover  entire background
-                  width: double.infinity,
-                  height: double.infinity,
-                )),
+            color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Black background in dark mode
+            child: AppColors.isDarkMode
+                ? null // No child if dark mode is enabled
+                : ImageFiltered(
+                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                    child: Image.asset(
+                      'assets/images/logo1.png',
+                      fit: BoxFit.cover, // Cover the entire background
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
           ),
           Column(
             children: [
@@ -543,11 +550,11 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                       final crewmember = widget.load.loadPersonnel[index];
                       return Container(
                         decoration: BoxDecoration(
-                          color: Colors.white, // Background color
+                          color: AppColors.textFieldColor2, // Background color
                           border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
                         ),
                         child: ListTile(
-                          iconColor: Colors.black,
+                          iconColor: AppColors.primaryColor,
                           title: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -556,15 +563,17 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                 children: [
                                   Text(
                                     crewmember.name,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
+                                      color: AppColors.textColorPrimary,
                                     ),
                                   ),
                                   Text(
                                     'Flight Weight: ${crewmember.flightWeight} lbs',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 18,
+                                      color: AppColors.textColorPrimary,
                                     ),
                                   ),
                                 ],
@@ -580,9 +589,9 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                       final gearItem = widget.load.loadGear[gearIndex];
                       return Container(
                         decoration: BoxDecoration(
-                            color: gearItem.isPersonalTool
-                                ? Colors.blue[100] // Color for personal tools
-                                : Colors.orange[100], // Background color
+                          color: gearItem.isPersonalTool
+                              ? AppColors.toolBlue // Color for personal tools
+                              : AppColors.gearYellow, // Background color
                           border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
                         ),
                         child: ListTile(
@@ -597,23 +606,22 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                     children: [
                                       Text(
                                         gearItem.name,
-                                        style: const TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold,
+                                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,                                         color: Colors.black
                                         ),
                                       ),
                                       Text(
                                         ' (x${gearItem.quantity})',
-                                        style: const TextStyle(
-                                          fontSize: 18,
+                                        style: TextStyle(fontSize: 18,                                         color: Colors.black
                                         ),
                                       ),
                                     ],
                                   ),
                                   Text(
                                     'Weight: ${gearItem.totalGearWeight} lbs',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 18,
+                                        color: Colors.black
+
                                     ),
                                   ),
                                 ],
@@ -675,12 +683,9 @@ class _SingleLoadViewState extends State<SingleLoadView> {
     );
   }
 }
+
 class AdditionalInfoDialog extends StatefulWidget {
-  final Function(
-      String helicopterNum,
-      String departure,
-      String destination,
-      String manifestPreparer) onConfirm;
+  final Function(String helicopterNum, String departure, String destination, String manifestPreparer) onConfirm;
 
   const AdditionalInfoDialog({required this.onConfirm, super.key});
 
@@ -706,72 +711,78 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24), // Adjust padding
-      title: const Text(
+      backgroundColor: AppColors.textFieldColor,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      // Adjust padding
+      title: Text(
         'Additional Information',
-        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
       ),
-      content: SingleChildScrollView( // Wrap content in a scrollable view
+      content: SingleChildScrollView(
+        // Wrap content in a scrollable view
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
                 controller: _helicopterNumController,
-                decoration: const InputDecoration(
-                  labelText: 'Enter helicopter tail #:',
-                ),
-                maxLines: 1, // Single-line input
-                textCapitalization: TextCapitalization.characters, // Automatically capitalize all characters
+                decoration: InputDecoration(labelText: 'Enter helicopter tail #:', labelStyle: TextStyle(color: AppColors.textColorPrimary)),
+                maxLines: 1,
+                // Single-line input
+                textCapitalization: TextCapitalization.characters,
+                // Automatically capitalize all characters
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(6), // Limit to 25 characters
                 ],
+                style: TextStyle(color: AppColors.textColorPrimary),
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
                 controller: _departureController,
-                decoration: const InputDecoration(
-                  labelText: 'Enter departure:',
-                ),
-                maxLines: 1, // Single-line input
-                textCapitalization: TextCapitalization.words, // Capitalize only the first character
+                decoration: InputDecoration(labelText: 'Enter departure:', labelStyle: TextStyle(color: AppColors.textColorPrimary)),
+                maxLines: 1,
+                // Single-line input
+                textCapitalization: TextCapitalization.words,
+                // Capitalize only the first character
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(16), // Limit to 25 characters
                 ],
+                style: TextStyle(color: AppColors.textColorPrimary),
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
                 controller: _destinationController,
-                textCapitalization: TextCapitalization.words, // Capitalize only the first character
-                decoration: const InputDecoration(
-                  labelText: 'Enter destination:',
-                ),
-                maxLines: 1, // Single-line input
+                textCapitalization: TextCapitalization.words,
+                // Capitalize only the first character
+                decoration: InputDecoration(labelText: 'Enter destination:', labelStyle: TextStyle(color: AppColors.textColorPrimary)),
+                maxLines: 1,
+                // Single-line input
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(16), // Limit to 25 characters
                 ],
+                style: TextStyle(color: AppColors.textColorPrimary),
               ),
-            ),Padding(
+            ),
+            Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
                 controller: _manifestPreparerController,
-                decoration: const InputDecoration(
-                  labelText: 'Enter manifest preparer:',
-                ),
-                maxLines: 1, // Single-line input
-                textCapitalization: TextCapitalization.words, // Capitalize only the first character
+                decoration: InputDecoration(labelText: 'Enter manifest preparer:', labelStyle: TextStyle(color: AppColors.textColorPrimary)),
+                maxLines: 1,
+                // Single-line input
+                textCapitalization: TextCapitalization.words,
+                // Capitalize only the first character
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(20), // Limit to 25 characters
                 ],
+                style: TextStyle(color: AppColors.textColorPrimary),
               ),
             ),
-
           ],
         ),
       ),
@@ -780,9 +791,9 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text(
+          child: Text(
             'Cancel',
-            style: TextStyle(fontSize: 18),
+            style: TextStyle(fontSize: 16, color: AppColors.cancelButton),
           ),
         ),
         TextButton(
@@ -794,13 +805,12 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
             widget.onConfirm(helicopterNum, departure, destination, manifestPreparer); // Pass collected data to the callback
             Navigator.of(context).pop();
           },
-          child: const Text(
+          child: Text(
             'Confirm',
-            style: TextStyle(fontSize: 18),
+            style: TextStyle(fontSize: 16, color: AppColors.saveButtonAllowableWeight),
           ),
         ),
       ],
     );
   }
-
 }

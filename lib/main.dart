@@ -19,7 +19,7 @@ import 'Data/saved_preferences.dart';
 import 'Data/crewMemberList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import 'CodeShare/colors.dart'; // Your colors.dart.dart file
 
 void main() async {
   // Set up for Hive that needs to run before starting app
@@ -51,7 +51,7 @@ void main() async {
   // Load data from Hive
   crew.loadCrewDataFromHive();
   savedPreferences.loadPreferencesFromHive();
-  savedTrips.loadTripDataFromHive();  // do we need to load trip data as well?
+  savedTrips.loadTripDataFromHive(); // do we need to load trip data as well?
 
   // Test data for user testing
   if (crew.crewMembers.isEmpty && crew.gear.isEmpty) {
@@ -63,6 +63,8 @@ void main() async {
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool agreedToTerms = prefs.getBool('agreedToTerms') ?? false;
+  // Initialize the dark mode setting
+  AppColors.isDarkMode = await ThemePreferences.getTheme();
 
   // start app
   runApp(MyApp(showDisclaimer: !agreedToTerms));
@@ -78,11 +80,80 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fire Manifest App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.fireColor),
         useMaterial3: true,
         // for theme based text-> style: Theme.of(context).textTheme.headlineMedium,
       ),
       home: showDisclaimer ? const DisclaimerScreen() : const MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _selectedIndex = 0; // To track the currently selected tab
+
+  // Use a getter to dynamically create the pages list
+  List<Widget> get _pages => [
+        CreateNewManifest(onSwitchTab: _onItemTapped), // Pass the callback
+        SavedTripsView(),
+        EditCrew(),
+        SettingsView(
+          isDarkMode: AppColors.isDarkMode,
+          onThemeChanged: _toggleTheme,
+        ),
+      ];
+
+  void _toggleTheme(bool isDarkMode) async {
+    setState(() {
+      AppColors.isDarkMode = isDarkMode;
+    });
+    await ThemePreferences.setTheme(isDarkMode);
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_selectedIndex], // Display the selected page
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
+        // Ensures all icons are visible
+        selectedItemColor: AppColors.primaryColor,
+        unselectedItemColor: AppColors.tabIconColor,
+        backgroundColor: AppColors.appBarColor,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment),
+            label: 'Manifest',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(FontAwesomeIcons.helicopter),
+            label: 'Trips',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: 'Crew',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+      ),
     );
   }
 }
@@ -102,9 +173,9 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Center(
-          child: const Text('Terms and Conditions', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+          child:  Text('Terms and Conditions', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary)),
         ),
-        backgroundColor: Colors.deepOrangeAccent,
+        backgroundColor: AppColors.appBarColor,
       ),
       body: Stack(
         children: [
@@ -131,7 +202,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
                   Expanded(
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.all(16.0),
-                      child: const Text(
+                      child:  Text(
                         'The calculations provided by this app are intended for informational purposes only. '
                         'While every effort has been made to ensure accuracy, users must independently verify and validate '
                         'all data before relying on it for operational or decision-making purposes. The developers assume no '
@@ -147,6 +218,12 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
                   Row(
                     children: [
                       Checkbox(
+                        activeColor: Colors.black,
+                        checkColor: Colors.white,
+                        side: BorderSide(
+                          color: Colors.black, // Outline color
+                          width: 2.0, // Outline width
+                        ),//
                         value: userAgreed,
                         onChanged: (value) {
                           setState(() {
@@ -155,7 +232,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
                         },
                       ),
                       Flexible(
-                        child: const Text(
+                        child: Text(
                           'I agree to the terms and conditions',
                           style: TextStyle(
                             color: Colors.black,
@@ -183,14 +260,14 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
-                        backgroundColor: Colors.deepOrangeAccent,
+                        backgroundColor: AppColors.textFieldColor,
                         padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
                       ),
                       child: const Text(
                         'Continue',
                         style: TextStyle(
                           fontSize: 20,
-                          color: Colors.black,
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -204,66 +281,6 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
     );
   }
 }
-
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 0; // To track the currently selected tab
-
-  // Define the pages for each tab
-  static const List<Widget> _pages = <Widget>[
-    CreateNewManifest(), // Manifest screen
-    SavedTripsView(),    // Trips screen
-    EditCrew(),          // Crew screen
-    SettingsView(),      // Settings screen
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex], // Display the selected page
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed, // Ensures all icons are visible
-        selectedItemColor: Colors.deepOrangeAccent,
-        unselectedItemColor: Colors.grey[200],
-        backgroundColor: Colors.grey[900],
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Manifest',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(FontAwesomeIcons.helicopter),
-            label: 'Trips',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Crew',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 
 Future<void> updateAllTripPreferencesFromBoxes() async {
   var crewMemberBox = Hive.box<CrewMember>('crewmemberBox');
