@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/link.dart';
 import 'CodeShare/colors.dart';
 
 
@@ -26,6 +28,80 @@ class _SettingsState extends State<SettingsView> {
     isDarkMode = widget.isDarkMode;
     enableBackgroundImage = widget.enableBackgroundImage;
 
+  }
+
+  Future<void> _sendFeedback() async {
+    final TextEditingController feedbackController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColors.textFieldColor,
+          title: Text(
+            'Report Bugs',
+            style: TextStyle(color: AppColors.textColorPrimary),
+          ),
+          content: TextField(
+            controller: feedbackController,
+            maxLines: 5,
+            decoration: InputDecoration(
+              hintText: "Describe any bugs you've experienced here...",
+              hintStyle: TextStyle(color: AppColors.textColorPrimary),
+              filled: true,
+              fillColor: AppColors.textFieldColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppColors.textColorPrimary, width: 1),
+              ),
+            ),
+            style: TextStyle(color: AppColors.textColorPrimary),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: AppColors.cancelButton),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                final feedback = feedbackController.text.trim();
+                if (feedback.isNotEmpty) {
+                  final String subject = Uri.encodeComponent('FIRE MANIFESTING APP: Bug Fixes');
+                  final String body = Uri.encodeComponent(feedback);
+
+                  final Uri emailUri = Uri(
+                    scheme: 'mailto',
+                    path: 'dawsonak85@gmail.com', // Replace with your email address
+                    query: 'subject=$subject&body=$body',
+                  );
+
+                  try {
+                    if (await canLaunchUrl(emailUri)) {
+                      await launchUrl(emailUri);
+                    } else {
+                      throw 'Could not launch $emailUri';
+                    }
+                  } catch (e) {
+                    print('Error launching email: $e');
+                  }
+                }
+
+                Navigator.of(context).pop(); // Close the dialog after submission
+              },
+              child: Text(
+                'Send',
+                style: TextStyle(color: AppColors.saveButtonAllowableWeight),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -108,8 +184,8 @@ class _SettingsState extends State<SettingsView> {
                           child: const Text('Quick Guide', style: TextStyle(color: Colors.white, fontSize: 18)),
                         ),
                         TextButton(
-                          onPressed: () => null,
-                          child: const Text('Submit feedback', style: TextStyle(color: Colors.white, fontSize: 18)),
+                          onPressed: _sendFeedback,
+                          child: const Text('Report Bugs', style: TextStyle(color: Colors.white, fontSize: 18)),
                         ),
                       ],
                     ),
