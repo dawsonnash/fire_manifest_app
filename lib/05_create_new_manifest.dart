@@ -1,24 +1,120 @@
 import 'dart:ui';
+import 'package:fire_app/CodeShare/colors.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import '../Data/trip.dart';
+import '05_define_constraints_manifest.dart';
 import 'Data/crewmember.dart';
 import 'Data/gear.dart';
 import 'Data/load_calculator.dart';
 import 'Data/trip_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class CreateNewManifest extends StatefulWidget {
-  const CreateNewManifest({super.key});
+class CreateNewManifest extends StatelessWidget {
+  final void Function(int) onSwitchTab; // Callback to switch tabs
+
+  const CreateNewManifest({super.key, required this.onSwitchTab});
 
   @override
-  State<CreateNewManifest> createState() => _CreateNewManifestState();
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2, // Number of tabs
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: AppBar(
+              backgroundColor: AppColors.appBarColor, // Transparent to show the background
+              elevation: 0,
+              toolbarHeight: 0,
+              bottom: TabBar(
+                labelColor: AppColors.primaryColor, // Selected text and icon color
+                unselectedLabelColor: AppColors.tabIconColor, // Unselected text and icon color
+                indicatorColor: AppColors.primaryColor, // Tab indicator color
+                tabs: const [
+                  Tab(
+                    text: 'Quick Manifest',
+                    icon: Icon(Icons.bolt),
+                  ),
+                  Tab(
+                    text: 'Build Your Own',
+                    icon: Icon(Icons.build),
+                  ),
+                ],
+              ),
+            ),
+            backgroundColor: Colors.transparent, // Transparent to ensure the background is visible
+            body: Stack(
+              children: [
+                Container(
+                  color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
+                  child: AppColors.isDarkMode
+                      ? (AppColors.enableBackgroundImage
+                      ? Stack(
+                    children: [
+                      ImageFiltered(
+                        imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                        child: Image.asset(
+                          'assets/images/logo1.png',
+                          fit: BoxFit.cover, // Cover the entire background
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      ),
+                      Container(
+                        color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                        width: double.infinity,
+                        height: double.infinity,
+                      ),
+                    ],
+                  )
+                      : null) // No image if background is disabled
+                      : ImageFiltered(
+                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+                    child: Image.asset(
+                      'assets/images/logo1.png',
+                      fit: BoxFit.cover, // Cover the entire background
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
+                ),
+
+                GestureDetector(
+                  onTap: () {
+                    FocusScope.of(context).unfocus(); // Dismiss the keyboard
+                  },
+                  onVerticalDragStart: (_) {
+                    FocusScope.of(context).unfocus(); // Dismiss the keyboard on vertical swipe
+                  },
+                  child: TabBarView(
+                    children: [
+                      QuickManifest(onSwitchTab: onSwitchTab), // Your first screen
+                      const DesignNewManifest(), // Replace with your second screen widget
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-class _CreateNewManifestState extends State<CreateNewManifest> {
+class QuickManifest extends StatefulWidget {
+  final void Function(int) onSwitchTab;
+
+  const QuickManifest({super.key, required this.onSwitchTab});
+
+  @override
+  State<QuickManifest> createState() => _QuickManifestState();
+}
+
+class _QuickManifestState extends State<QuickManifest> {
   late final Box<Gear> gearBox;
   late final Box<CrewMember> crewmemberBox;
 
@@ -60,8 +156,6 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
     // Initialize allowableController with the default slider value
     allowableController.text = _sliderValue.toStringAsFixed(0);
 
-
-
     loadItems();
 
     // Initialize selectedItems with all crew and gear items
@@ -77,7 +171,6 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
   }
 
   void _showSelectionDialog() async {
-
     List<CrewMember> sortedCrewList = sortCrewListByPosition(crewList);
     List<Gear> sortedGearList = sortGearListAlphabetically(gearList);
     bool isCrewExpanded = false;
@@ -99,10 +192,10 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
             }
 
             return AlertDialog(
-              backgroundColor: Colors.white,
-              title: const Text(
+              backgroundColor: AppColors.textFieldColor2,
+              title: Text(
                 'Select Crew Members and Gear',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textColorPrimary),
               ),
               contentPadding: const EdgeInsets.all(16),
               content: ConstrainedBox(
@@ -118,15 +211,23 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                         Container(
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: Colors.black, // Outline color
-                              width: 1.0,         // Outline thickness
+                              color: AppColors.primaryColor, // Outline color
+                              width: 1.0, // Outline thickness
                             ),
-                        //    borderRadius: BorderRadius.circular(8.0), // Rounded corners (optional)
+                            //    borderRadius: BorderRadius.circular(8.0), // Rounded corners (optional)
                           ),
                           child: CheckboxListTile(
-                            title: const Text(
+                            activeColor: AppColors.textColorPrimary,
+                            // Checkbox outline color when active
+                            checkColor: AppColors.textColorSecondary,
+                            side: BorderSide(
+                              color: AppColors.textColorPrimary, // Outline color
+                              width: 2.0, // Outline width
+                            ),
+                            // Checkmark color
+                            title: Text(
                               'Select All',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textColorPrimary),
                             ),
                             value: isSelectAllChecked,
                             onChanged: (bool? isChecked) {
@@ -163,14 +264,14 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                           children: [
                             ExpansionPanel(
                               isExpanded: isCrewExpanded,
-                              backgroundColor: Colors.deepOrangeAccent,
+                              backgroundColor: AppColors.fireColor,
                               // Set background color
                               headerBuilder: (context, isExpanded) {
                                 return Container(
                                   child: ListTile(
-                                    title: const Text(
+                                    title: Text(
                                       'Crew Members',
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                     ),
                                   ),
                                 );
@@ -180,7 +281,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                   return Container(
                                     //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: AppColors.textFieldColor,
                                       borderRadius: BorderRadius.circular(0.0),
                                       // Rounded corners
                                       boxShadow: [
@@ -193,14 +294,22 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                       ],
                                     ),
                                     child: CheckboxListTile(
+                                      activeColor: AppColors.textColorPrimary,
+                                      // Checkbox outline color when active
+                                      checkColor: AppColors.textColorSecondary,
+                                      // Checkmark color
+                                      side: BorderSide(
+                                        color: AppColors.textColorPrimary, // Outline color
+                                        width: 2.0, // Outline width
+                                      ),
                                       title: Text(
                                         '${crew.name}, ${crew.flightWeight} lbs',
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                         textAlign: TextAlign.start,
                                       ),
                                       subtitle: Text(
                                         crew.getPositionTitle(crew.position),
-                                        style: const TextStyle(fontStyle: FontStyle.italic),
+                                        style: TextStyle(fontStyle: FontStyle.italic, color: AppColors.textColorPrimary),
                                       ),
                                       value: selectedItems.contains(crew),
                                       onChanged: (bool? isChecked) {
@@ -234,7 +343,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                           children: [
                             ExpansionPanel(
                               isExpanded: isGearExpanded,
-                              backgroundColor: Colors.deepOrangeAccent,
+                              backgroundColor: AppColors.fireColor,
                               // Set background color
                               headerBuilder: (context, isExpanded) {
                                 return Container(
@@ -254,9 +363,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                   return Container(
                                     //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
                                     decoration: BoxDecoration(
-                                      color: gear.isPersonalTool
-                                          ? Colors.blue[100] // Color for personal tools
-                                          : Colors.orange[100],
+                                      color: AppColors.textFieldColor,
                                       borderRadius: BorderRadius.circular(0.0),
                                       // Rounded corners
                                       boxShadow: [
@@ -269,6 +376,13 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                       ],
                                     ),
                                     child: CheckboxListTile(
+                                      activeColor: AppColors.textColorPrimary,
+                                      // Checkbox outline color when active
+                                      checkColor: AppColors.textColorSecondary,
+                                      side: BorderSide(
+                                        color: AppColors.textColorPrimary, // Outline color
+                                        width: 2.0, // Outline width
+                                      ),
                                       title: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
@@ -278,9 +392,10 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                                 Flexible(
                                                   child: Text(
                                                     gear.name,
-                                                    style: const TextStyle(
+                                                    style: TextStyle(
                                                       fontSize: 16,
                                                       fontWeight: FontWeight.bold,
+                                                      color: AppColors.textColorPrimary,
                                                     ),
                                                     overflow: TextOverflow.ellipsis,
                                                   ),
@@ -290,7 +405,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.bold,
-                                                    color: Colors.black,
+                                                    color: AppColors.textColorPrimary,
                                                   ),
                                                 ),
                                               ],
@@ -306,7 +421,11 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                                       context: context,
                                                       builder: (BuildContext context) {
                                                         return AlertDialog(
-                                                          title: Text('Select Quantity for ${gear.name}'),
+                                                          backgroundColor: AppColors.textFieldColor2,
+                                                          title: Text(
+                                                            'Select Quantity for ${gear.name}',
+                                                            style: TextStyle(color: AppColors.textColorPrimary),
+                                                          ),
                                                           content: SizedBox(
                                                             height: 150,
                                                             child: CupertinoPicker(
@@ -322,15 +441,23 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                                               children: List<Widget>.generate(
                                                                 gear.quantity,
                                                                 // Use the full quantity for selection
-                                                                    (int index) {
+                                                                (int index) {
                                                                   return Center(
-                                                                    child: Text('${index + 1}'),
+                                                                    child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                   );
                                                                 },
                                                               ),
                                                             ),
                                                           ),
                                                           actions: [
+
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(context).pop();
+                                                              },
+                                                              child:  Text('Cancel',style: TextStyle(color: AppColors.cancelButton) ),
+                                                            ),
+
                                                             TextButton(
                                                               onPressed: () {
                                                                 // Finalize the selection
@@ -340,13 +467,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                                                 });
                                                                 Navigator.of(context).pop();
                                                               },
-                                                              child: const Text('Confirm'),
-                                                            ),
-                                                            TextButton(
-                                                              onPressed: () {
-                                                                Navigator.of(context).pop();
-                                                              },
-                                                              child: const Text('Cancel'),
+                                                              child:  Text('Confirm', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
                                                             ),
                                                           ],
                                                         );
@@ -359,13 +480,13 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                                                     if (gear.quantity > 1)
                                                       Text(
                                                         'Qty: ${selectedGearQuantities[gear] ?? 1}',
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
                                                           fontWeight: FontWeight.bold,
                                                           fontSize: 14,
-                                                          color: Colors.black,
+                                                          color: AppColors.textColorPrimary,
                                                         ),
                                                       ),
-                                                    if (gear.quantity > 1) const Icon(Icons.arrow_drop_down, color: Colors.black),
+                                                    if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorPrimary),
                                                   ],
                                                 ),
                                               ),
@@ -391,7 +512,6 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                             ),
                           ],
                         ),
-
                       ],
                     ),
                   ),
@@ -400,9 +520,28 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
               actions: [
                 TextButton(
                   onPressed: () {
+                    setState(() {
+                      if (selectedItems.isEmpty) {
+                        // Select all items again
+                        selectedItems = [
+                          ...crewList,
+                          ...gearList,
+                        ];
+                        selectedGearQuantities = {
+                          for (var gear in gearList) gear: gear.quantity,
+                        };
+
+                        // Update trip lists to reflect the selection
+                        thisTripCrewMemberList = crewList.map((crew) => crew.copy()).toList();
+                        thisTripGearList = gearList.map((gear) => gear.copyWith()).toList();
+                      }
+                    });
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Cancel'),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: AppColors.cancelButton),
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
@@ -410,9 +549,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                     thisTripCrewMemberList = selectedItems.whereType<CrewMember>().toList();
 
                     // Update thisTripGearList with only selected gear items and quantities
-                    thisTripGearList = selectedItems
-                        .whereType<Gear>()
-                        .map((gear) {
+                    thisTripGearList = selectedItems.whereType<Gear>().map((gear) {
                       final selectedQuantity = selectedGearQuantities[gear] ?? 1; // Get selected quantity
                       return Gear(
                         name: gear.name,
@@ -420,15 +557,13 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
                         weight: gear.weight,
                         isPersonalTool: gear.isPersonalTool,
                       );
-                    })
-                        .toList();
+                    }).toList();
 
                     // Close the dialog
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Select'),
+                  child: Text('Select', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
                 ),
-
               ],
             );
           },
@@ -489,7 +624,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
   }
 
   // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
-  void saveTripData() {
+  void saveTripData(VoidCallback onSuccess) {
     // Take what the trip name contrller has saved
     final String tripName = tripNameController.text;
 
@@ -525,29 +660,57 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
 
     // Deep copy crewMembers and gear into the new Trip
     newTrip.crewMembers = thisTripCrewMemberList.map((member) => member.copy()).toList();
-    newTrip.gear =  thisTripGearList.map((item) => item.copyWith()).toList();
+    newTrip.gear = thisTripGearList.map((item) => item.copyWith()).toList();
 
     newTrip.calculateTotalCrewWeight();
-
-    if (newTrip.crewMembers.isEmpty){
+    if (crewList.isEmpty) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return StatefulBuilder(
             builder: (context, setState) {
-
               return AlertDialog(
-                title: const Text('No Crew Members Selected'),
-                content: Text('Select at least one crew member and try again.'
+                backgroundColor: AppColors.textFieldColor2,
+                title: Text(
+                  'No Crew Members Available',
+                  style: TextStyle(color: AppColors.textColorPrimary),
                 ),
+                content: Text('There are no existing crew members. Create at least one to begin manifesting.', style: TextStyle(color: AppColors.textColorPrimary)),
                 actions: [
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: const Text('OK'),
+                    child: Text('OK', style: TextStyle(color: AppColors.textColorPrimary)),
                   ),
-
+                ],
+              );
+            },
+          );
+        },
+      );
+      return;
+    }
+    if (newTrip.crewMembers.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                backgroundColor: AppColors.textFieldColor2,
+                title: Text(
+                  'No Crew Members Selected',
+                  style: TextStyle(color: AppColors.textColorPrimary),
+                ),
+                content: Text('Select at least one crew member and try again.', style: TextStyle(color: AppColors.textColorPrimary)),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK', style: TextStyle(color: AppColors.textColorPrimary)),
+                  ),
                 ],
               );
             },
@@ -591,12 +754,8 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
       allowableController.text = _sliderValue.toStringAsFixed(0); // Sync the allowableController with the slider
     });
 
-    // // Debug for LogCat
-    // print("--------------------------");
-    // print("Trip Name: $tripName");
-    // print("Allowable: $allowable");
-    // print("--------------------------");
-    // savedTrips.printTripDetails();
+    // Notify parent widget
+    // onSuccess();
   }
 
   void _incrementSlider() {
@@ -619,7 +778,7 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
     final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
         textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        backgroundColor: Colors.deepOrangeAccent,
+        backgroundColor: Colors.green,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         //surfaceTintColor: Colors.grey,
         elevation: 15,
@@ -630,14 +789,8 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
         fixedSize: Size(MediaQuery.of(context).size.width / 2, MediaQuery.of(context).size.height / 10));
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       resizeToAvoidBottomInset: false, // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
-      appBar: AppBar(
-        backgroundColor: Colors.deepOrangeAccent,
-        title: const Text(
-          'Create New Manifest',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-      ),
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus(); // Dismiss the keyboard
@@ -650,509 +803,498 @@ class _CreateNewManifestState extends State<CreateNewManifest> {
           children: [
             Expanded(
               // Takes up all available space
-              child: Stack(
-                children: [
-                  // Background image
-                  Container(
-                    child: ImageFiltered(
-                        imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                        // Blur effect
-                        child: Image.asset(
-                          'assets/images/logo1.png',
-                          fit: BoxFit.cover, // Cover  entire background
-                          width: double.infinity,
-                          height: double.infinity,
-                        )),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    color: Colors.white.withValues(alpha: 0.1),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const Spacer(flex: 1),
-
-
-                        // Trip Name input field
-                        Padding(
-                            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                            child: TextField(
-                              controller: tripNameController,
-                              maxLength: 20,
-                              textCapitalization: TextCapitalization.words,
-                              decoration: InputDecoration(
-                                labelText: 'Enter Trip Name',
-                                labelStyle: const TextStyle(
-                                  color: Colors.black, // Label color when not focused
-                                  fontSize: 18, // Label font size
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                filled: true,
-                                fillColor: Colors.white.withValues(alpha: 0.9),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.black,
-                                    // Border color when the TextField is not focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(4.0), // Rounded corners
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.black,
-                                    // Border color when the TextField is focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(4.0),
-                                ),
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: Colors.white.withValues(alpha: 0.05),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 16),
+                      // Trip Name input field
+                      Padding(
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                          child: TextField(
+                            controller: tripNameController,
+                            maxLength: 20,
+                            textCapitalization: TextCapitalization.words,
+                            decoration: InputDecoration(
+                              labelText: 'Enter Trip Name',
+                              labelStyle: TextStyle(
+                                color: AppColors.textColorPrimary, // Label color when not focused
+                                fontSize: 18, // Label font size
                               ),
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )),
-
-                        // Available Seats input field
-                        Padding(
-                            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
-                            child: TextField(
-                              controller: availableSeatsController,
-                              keyboardType: TextInputType.number,
-                              maxLength: 1,
-                              // Only show numeric keyboard
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.digitsOnly,
-                                // Allow only digits
-                              ],
-                              decoration: InputDecoration(
-                                labelText: 'Enter # of Available Seats',
-                                labelStyle: const TextStyle(
-                                  color: Colors.black, // Label color when not focused
-                                  fontSize: 18, // Label font size
-                                  fontWeight: FontWeight.bold,
+                              filled: true,
+                              fillColor: AppColors.textFieldColor,
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: AppColors.borderPrimary,
+                                  // Border color when the TextField is not focused
+                                  width: 2.0, // Border width
                                 ),
-                                filled: true,
-                                fillColor: Colors.white.withValues(alpha: 0.9),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.black,
-                                    // Border color when the TextField is not focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(4.0), // Rounded corners
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.black,
-                                    // Border color when the TextField is focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(4.0),
-                                ),
+                                borderRadius: BorderRadius.circular(4.0), // Rounded corners
                               ),
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: AppColors.primaryColor,
+                                  // Border color when the TextField is focused
+                                  width: 2.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(4.0),
                               ),
-                            )),
-
-                        // Select All/Some Crew
-                        Padding(
-                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.9),
-                              borderRadius: BorderRadius.circular(4.0),
-                              border: Border.all(color: Colors.black, width: 2.0),
                             ),
-                            alignment: Alignment.centerLeft,
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    selectedItems.length == (crewList.length + gearList.length)
-                                        ? Icons.check_box // Fully selected
-                                        : Icons.check_box_outline_blank, // Partially or none selected
-                                    color: Colors.black,
-                                    size: 24, // Adjust size as needed
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      if (selectedItems.length != (crewList.length + gearList.length)) {
-                                        // Select all items again
-                                        selectedItems = [
-                                          ...crewList,
-                                          ...gearList,
-                                        ];
-                                        selectedGearQuantities = {
-                                          for (var gear in gearList) gear: gear.quantity,
-                                        };
+                            style: TextStyle(
+                              color: AppColors.textColorPrimary,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )),
 
-                                        // Update trip lists to reflect the selection
-                                        thisTripCrewMemberList = crewList.map((crew) => crew.copy()).toList();
-                                        thisTripGearList = gearList.map((gear) => gear.copyWith()).toList();
-                                      } else {
-                                        // Clear selections
-                                        thisTripCrewMemberList.clear();
-                                        thisTripGearList.clear();
-                                        selectedItems.clear();
-                                        selectedGearQuantities.clear();
-                                        _showSelectionDialog();
-                                      }
-                                    });
-
-                                  },
+                      // Available Seats input field
+                      Padding(
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
+                          child: TextField(
+                            controller: availableSeatsController,
+                            keyboardType: TextInputType.number,
+                            maxLength: 1,
+                            // Only show numeric keyboard
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly,
+                              // Allow only digits
+                            ],
+                            decoration: InputDecoration(
+                              labelText: 'Enter # of Available Seats',
+                              labelStyle: TextStyle(
+                                color: AppColors.textColorPrimary, // Label color when not focused
+                                fontSize: 18, // Label font size
+                              ),
+                              filled: true,
+                              fillColor: AppColors.textFieldColor,
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: AppColors.borderPrimary,
+                                  // Border color when the TextField is not focused
+                                  width: 2.0, // Border width
                                 ),
+                                borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: AppColors.primaryColor,
+                                  // Border color when the TextField is focused
+                                  width: 2.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                            ),
+                            style: TextStyle(
+                              color: AppColors.textColorPrimary,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )),
 
-                                const Text(
-                                ' Select All Crew',
+                      // Select All/Some Crew
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: AppColors.textFieldColor,
+                            borderRadius: BorderRadius.circular(4.0),
+                            border: Border.all(color: AppColors.borderPrimary, width: 2.0),
+                          ),
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            children: [
+                              // Checkbox
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Icon(
+                                  selectedItems.length == (crewList.length + gearList.length)
+                                      ? Icons.check_box // Fully selected
+                                      : Icons.check_box_outline_blank, // Partially or none selected
+                                  color: AppColors.textColorPrimary,
+                                  size: 28, // Adjust size as needed
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    if (selectedItems.length != (crewList.length + gearList.length)) {
+                                      // Select all items again
+                                      selectedItems = [
+                                        ...crewList,
+                                        ...gearList,
+                                      ];
+                                      selectedGearQuantities = {
+                                        for (var gear in gearList) gear: gear.quantity,
+                                      };
+
+                                      // Update trip lists to reflect the selection
+                                      thisTripCrewMemberList = crewList.map((crew) => crew.copy()).toList();
+                                      thisTripGearList = gearList.map((gear) => gear.copyWith()).toList();
+                                    } else {
+                                      // Clear selections
+                                      thisTripCrewMemberList.clear();
+                                      thisTripGearList.clear();
+                                      selectedItems.clear();
+                                      selectedGearQuantities.clear();
+                                      _showSelectionDialog();
+                                    }
+                                  });
+                                },
+                              ),
+
+                              Text(
+                                'Select All Crew',
                                 style: TextStyle(
                                   fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                                  color: AppColors.textColorPrimary,
                                 ),
                               ),
-                                const Spacer(), // Pushes the arrow icon to the far right
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.list,
-                                    color: Colors.black,
-                                    size: 32,
-                                  ), onPressed: () {
-                                    _showSelectionDialog();
-                                    setState(() {
 
-                                    });
-                                    },
+                              const Spacer(),
+
+                              // List icon
+                              IconButton(
+                                icon: Icon(
+                                  Icons.list,
+                                  color: AppColors.textColorPrimary,
+                                  size: 32,
                                 ),
+                                onPressed: () {
+                                  _showSelectionDialog();
+                                  setState(() {});
+                                },
+                              ),
                             ],
-                            ),
                           ),
                         ),
+                      ),
 
-                        // Choose Trip Preference text box
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0, bottom: 0.0),
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.deepOrangeAccent,
-                              border: Border.all(color: Colors.black, width: 2),
-                              borderRadius: BorderRadius.circular(4),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.5),
-                                  spreadRadius: 1,
-                                  blurRadius: 8,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                            //alignment: Alignment.center,
-                            child: Text(
-                              'Choose Trip Preference',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                      // Choose Trip Preference text box
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0, bottom: 0.0),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: AppColors.fireColor,
+                            border: Border.all(color: Colors.black, width: 2),
+                            borderRadius: BorderRadius.circular(4),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.5),
+                                spreadRadius: 1,
+                                blurRadius: 8,
+                                offset: Offset(0, 3),
                               ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                          //alignment: Alignment.center,
+                          child: Text(
+                            'Choose Trip Preference',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
                           ),
                         ),
+                      ),
 
-                        // Choose Trip Preference
-                        Padding(
-                          padding: const EdgeInsets.only(top: 0.0, left: 16.0, right: 16.0, bottom: 5.0),
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.9),
-                              borderRadius: BorderRadius.circular(4.0),
-                              border: Border.all(color: Colors.black, width: 2.0),
+                      // Choose Trip Preference
+                      Padding(
+                        padding: const EdgeInsets.only(top: 0.0, left: 16.0, right: 16.0, bottom: 5.0),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.textFieldColor,
+                            borderRadius: BorderRadius.circular(4.0),
+                            border: Border.all(color: AppColors.borderPrimary, width: 2.0),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                              child: DropdownButton<TripPreference?>(
+                            value: selectedTripPreference,
+                            dropdownColor: AppColors.textFieldColor,
+                            style: TextStyle(
+                              color: AppColors.textColorPrimary,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
                             ),
-                            child: DropdownButtonHideUnderline(
-                                child: DropdownButton<TripPreference?>(
-                              value: selectedTripPreference,
-                              dropdownColor: Colors.white,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                            iconEnabledColor: AppColors.textColorPrimary,
+                            items: [
+                              DropdownMenuItem<TripPreference?>(
+                                value: null, // Represents the "None" option
+                                child: const Text("None"),
                               ),
-                              iconEnabledColor: Colors.black,
-                              items: [
-                                DropdownMenuItem<TripPreference?>(
-                                  value: null, // Represents the "None" option
-                                  child: const Text("None"),
-                                ),
-                                ...savedPreferences.tripPreferences.map((entry) {
-                                  return DropdownMenuItem<TripPreference>(
-                                    value: entry,
-                                    child: Text(entry.tripPreferenceName),
-                                  );
-                                }),
-                              ],
-                              onChanged: (TripPreference? newValue) {
-                                setState(() {
-                                  selectedTripPreference = newValue;
-                                  _checkInput();
-                                });
-                              },
-                            )),
-                          ),
+                              ...savedPreferences.tripPreferences.map((entry) {
+                                return DropdownMenuItem<TripPreference>(
+                                  value: entry,
+                                  child: Text(entry.tripPreferenceName),
+                                );
+                              }),
+                            ],
+                            onChanged: (TripPreference? newValue) {
+                              setState(() {
+                                selectedTripPreference = newValue;
+                                _checkInput();
+                              });
+                            },
+                          )),
                         ),
+                      ),
 
-
-                        // Choose allowable text box
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.deepOrangeAccent,
-                              border: Border.all(color: Colors.black, width: 2),
-                              borderRadius: BorderRadius.circular(4),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.5),
-                                  spreadRadius: 1,
-                                  blurRadius: 8,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5), // Reduced padding
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: Text(
-                                    'Choose Allowable',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
+                      // Choose allowable text box
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: AppColors.fireColor,
+                            border: Border.all(color: Colors.black, width: 2),
+                            borderRadius: BorderRadius.circular(4),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.5),
+                                spreadRadius: 1,
+                                blurRadius: 8,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5), // Reduced padding
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  'Choose Allowable',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
                                   ),
                                 ),
-                                IconButton(
-                                  onPressed: () {
-                                    // Clear the keyboardController before opening the dialog
-                                    keyboardController.text = '';
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  // Clear the keyboardController before opening the dialog
+                                  keyboardController.text = '';
 
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        // Save the original value in case of cancel
-                                        String originalValue = allowableController.text;
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      // Save the original value in case of cancel
+                                      String originalValue = allowableController.text;
 
-                                        // Track if the Save button should be enabled
-                                        bool isSaveEnabled = false;
+                                      // Track if the Save button should be enabled
+                                      bool isSaveEnabled = false;
 
-                                        return StatefulBuilder(
-                                          builder: (context, setState) {
-                                            // Function to validate input and enable/disable Save button
-                                            void validateInput(String value) {
-                                              final int? parsedValue = int.tryParse(value);
-                                              setState(() {
-                                                isSaveEnabled = parsedValue != null && parsedValue >= 500 && parsedValue <= 10000;
-                                              });
-                                            }
+                                      return StatefulBuilder(
+                                        builder: (context, setState) {
+                                          // Function to validate input and enable/disable Save button
+                                          void validateInput(String value) {
+                                            final int? parsedValue = int.tryParse(value);
+                                            setState(() {
+                                              isSaveEnabled = parsedValue != null && parsedValue >= 500 && parsedValue <= 10000;
+                                            });
+                                          }
 
-                                            return AlertDialog(
-                                              title: const Text('Enter Allowable Weight'),
-                                              content: TextField(
-                                                controller: keyboardController,
-                                                keyboardType: TextInputType.number,
-                                                maxLength: 4,
-                                                inputFormatters: [
-                                                  FilteringTextInputFormatter.digitsOnly,
-                                                ],
-                                                onChanged: (value) {
-                                                  validateInput(value); // Validate the input
-                                                  setState(() {
-                                                    lastInputFromSlider = false;
-                                                  });
-                                                },
-                                                decoration: const InputDecoration(
-                                                  hintText: 'Up to 9,999 lbs',
-                                                  counterText: '',
-                                                  border: OutlineInputBorder(),
-                                                ),
+                                          return AlertDialog(
+                                            backgroundColor: AppColors.textFieldColor2,
+                                            title: Text('Enter Allowable Weight', style: TextStyle(color: AppColors.textColorPrimary)),
+                                            content: TextField(
+                                              controller: keyboardController,
+                                              keyboardType: TextInputType.number,
+                                              maxLength: 4,
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter.digitsOnly,
+                                              ],
+                                              onChanged: (value) {
+                                                validateInput(value); // Validate the input
+                                                setState(() {
+                                                  lastInputFromSlider = false;
+                                                });
+                                              },
+                                              decoration: InputDecoration(
+                                                hintText: 'Up to 9,999 lbs',
+                                                hintStyle: TextStyle(color: AppColors.textColorPrimary),
+                                                filled: true,
+                                                fillColor: AppColors.textFieldColor,
+                                                // Background color of the text field
+                                                counterText: '',
+                                                border: const OutlineInputBorder(),
                                               ),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () {
-                                                    // Revert to the original value on cancel
-                                                    keyboardController.text = originalValue;
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: const Text('Cancel'),
-                                                ),
-                                                TextButton(
-                                                  onPressed: isSaveEnabled
-                                                      ? () {
-                                                          setState(() {
-                                                            if (keyboardController.text.isNotEmpty) {
-                                                              _sliderValue = double.parse(keyboardController.text).clamp(1000, 5000);
-                                                              allowableController.text = keyboardController.text;
-                                                            }
-                                                          });
-                                                          Navigator.of(context).pop();
-                                                        }
-                                                      : null, // Disable Save if input is invalid
-                                                  child: Text(
-                                                    'Save',
-                                                    style: TextStyle(
-                                                      color: isSaveEnabled ? Colors.blue : Colors.grey, // Show enabled/disabled state
-                                                    ),
+                                              style: TextStyle(
+                                                color: AppColors.textColorPrimary, // Color of the typed text
+                                                fontSize: 18, // Font size for the typed text
+                                              ),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  // Revert to the original value on cancel
+                                                  keyboardController.text = originalValue;
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                              ),
+                                              TextButton(
+                                                onPressed: isSaveEnabled
+                                                    ? () {
+                                                        setState(() {
+                                                          if (keyboardController.text.isNotEmpty) {
+                                                            _sliderValue = double.parse(keyboardController.text).clamp(1000, 5000);
+                                                            allowableController.text = keyboardController.text;
+                                                          }
+                                                        });
+                                                        Navigator.of(context).pop();
+                                                      }
+                                                    : null, // Disable Save if input is invalid
+                                                child: Text(
+                                                  'Save',
+                                                  style: TextStyle(
+                                                    color: isSaveEnabled ? AppColors.saveButtonAllowableWeight : Colors.grey, // Show enabled/disabled state
                                                   ),
                                                 ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      },
-                                    );
-                                  },
-                                  icon: const Icon(FontAwesomeIcons.keyboard, size: 32, color: Colors.black),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        // Allowable Slider
-                        Padding(
-                          padding: const EdgeInsets.only(top: 0.0, right: 16.0, left: 16.0),
-                          child: Stack(
-                            children: [
-                              // Background container with white background, black outline, and rounded corners
-                              Positioned.fill(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white, // Background color
-                                    border: Border.all(color: Colors.black, width: 2), // Black outline
-                                    borderRadius: BorderRadius.circular(8), // Rounded corners
-                                  ),
-                                ),
-                              ),
-                              // Column with existing widgets
-                              Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 20.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: _decrementSlider,
-                                          style: ElevatedButton.styleFrom(
-                                            foregroundColor: Colors.black,
-                                            backgroundColor: Colors.deepOrangeAccent,
-                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                            elevation: 15,
-                                            shadowColor: Colors.black,
-                                            side: const BorderSide(color: Colors.black, width: 2),
-                                            shape: CircleBorder(),
-                                          ),
-                                          child: const Icon(Icons.remove, color: Colors.black, size: 32),
-                                        ),
-                                        const Spacer(),
-                                        Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            // Slider value
-                                            Visibility(
-                                              visible: lastInputFromSlider,
-                                              child: Text(
-                                                '${_sliderValue.toStringAsFixed(0)} lbs',
-                                                style: const TextStyle(
-                                                  fontSize: 32,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
                                               ),
-                                            ),
-                                            // Keyboard input value
-                                            Visibility(
-                                              visible: !lastInputFromSlider,
-                                              child: Text(
-                                                '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lbs',
-                                                style: const TextStyle(
-                                                  fontSize: 32,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const Spacer(),
-                                        ElevatedButton(
-                                          onPressed: _incrementSlider,
-                                          style: ElevatedButton.styleFrom(
-                                            foregroundColor: Colors.black,
-                                            backgroundColor: Colors.deepOrangeAccent,
-                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                            elevation: 15,
-                                            shadowColor: Colors.black,
-                                            side: const BorderSide(color: Colors.black, width: 2),
-                                            shape: CircleBorder(),
-                                          ),
-                                          child: const Icon(Icons.add, color: Colors.black, size: 32),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Slider(
-                                    value: _sliderValue,
-                                    min: 1000,
-                                    max: 5000,
-                                    divisions: 40,
-                                    label: null,
-                                    onChanged: (double value) {
-                                      setState(() {
-                                        _sliderValue = value;
-                                        lastInputFromSlider = true;
-                                        allowableController.text = _sliderValue.toStringAsFixed(0);
-                                      });
+                                            ],
+                                          );
+                                        },
+                                      );
                                     },
-                                    activeColor: Colors.deepOrange,
-                                    // Color when the slider is active
-                                    inactiveColor: Colors.grey, // Color for the inactive part
-                                  ),
-                                ],
+                                  );
+                                },
+                                icon: Icon(FontAwesomeIcons.keyboard, size: 32, color: Colors.black),
                               ),
                             ],
                           ),
                         ),
+                      ),
 
-                        const Spacer(flex: 6),
-
-                        // Calculate Button
-                        Padding(
-                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
-                          child: ElevatedButton(
-                            onPressed: isCalculateButtonEnabled
-                                ? () {
-                                    saveTripData(); // Call saveTripData first
-                                  }
-                                : null, // Button is only enabled if there is input
-                            style: style, // Main button theme
-                            child: const Text('Calculate'),
-                          ),
+                      // Allowable Slider
+                      Padding(
+                        padding: const EdgeInsets.only(top: 0.0, right: 16.0, left: 16.0),
+                        child: Stack(
+                          children: [
+                            // Background container with white background, black outline, and rounded corners
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.textFieldColor, // Background color
+                                  border: Border.all(color: AppColors.borderPrimary, width: 2), // Black outline
+                                  borderRadius: BorderRadius.circular(8), // Rounded corners
+                                ),
+                              ),
+                            ),
+                            // Column with existing widgets
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 20.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: _decrementSlider,
+                                        style: ElevatedButton.styleFrom(
+                                          foregroundColor: Colors.black,
+                                          backgroundColor: AppColors.fireColor,
+                                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                          elevation: 15,
+                                          shadowColor: Colors.black,
+                                          side: BorderSide(color: Colors.black, width: 2),
+                                          shape: CircleBorder(),
+                                        ),
+                                        child: Icon(Icons.remove, color: Colors.black, size: 32),
+                                      ),
+                                      const Spacer(),
+                                      Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          // Slider value
+                                          Visibility(
+                                            visible: lastInputFromSlider,
+                                            child: Text(
+                                              '${_sliderValue.toStringAsFixed(0)} lbs',
+                                              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                            ),
+                                          ),
+                                          // Keyboard input value
+                                          Visibility(
+                                            visible: !lastInputFromSlider,
+                                            child: Text(
+                                              '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lbs',
+                                              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const Spacer(),
+                                      ElevatedButton(
+                                        onPressed: _incrementSlider,
+                                        style: ElevatedButton.styleFrom(
+                                          foregroundColor: Colors.black,
+                                          backgroundColor: AppColors.fireColor,
+                                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                          elevation: 15,
+                                          shadowColor: Colors.black,
+                                          side: const BorderSide(color: Colors.black, width: 2),
+                                          shape: CircleBorder(),
+                                        ),
+                                        child: Icon(Icons.add, color: Colors.black, size: 32),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Slider(
+                                  value: _sliderValue,
+                                  min: 1000,
+                                  max: 5000,
+                                  divisions: 40,
+                                  label: null,
+                                  onChanged: (double value) {
+                                    setState(() {
+                                      _sliderValue = value;
+                                      lastInputFromSlider = true;
+                                      allowableController.text = _sliderValue.toStringAsFixed(0);
+                                    });
+                                  },
+                                  activeColor: AppColors.fireColor,
+                                  // Color when the slider is active
+                                  inactiveColor: Colors.grey, // Color for the inactive part
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+
+                      SizedBox(height: 16),
+                      // Calculate Button
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
+                        child: ElevatedButton(
+                          onPressed: isCalculateButtonEnabled
+                              ? () {
+                                  saveTripData(() {
+                                    if (mounted) {
+                                      widget.onSwitchTab(1); // Switch to Saved Trips tab
+                                    }
+                                  });
+                                }
+                              : null,
+                          style: style,
+                          child: const Text('Calculate'),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ],

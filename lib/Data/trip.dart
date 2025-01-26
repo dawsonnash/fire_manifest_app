@@ -120,6 +120,12 @@ class SavedTrips {
       print('Name: ${trip.tripName}, Allowable: ${trip.allowable}');
     }
   }
+
+  // Load all preferences from Hive to in-memory lists
+  void loadTripDataFromHive() {
+    var tripBox = Hive.box<Trip>('tripBox');
+    savedTrips = tripBox.values.toList(); // Load into memory
+  }
 }
 
 // Global object for all saved trips. All created trips will be stored here

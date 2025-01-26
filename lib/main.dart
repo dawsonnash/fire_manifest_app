@@ -1,7 +1,8 @@
 import 'dart:ui';
 
-import 'package:fire_app/05_manifest.dart';
+import 'package:fire_app/05_create_new_manifest.dart';
 import 'package:fire_app/06_saved_trips.dart';
+import 'package:fire_app/settings.dart';
 import 'package:flutter/material.dart';
 import '../01_edit_crew.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -16,9 +17,11 @@ import 'Data/positional_preferences.dart';
 import 'Data/gear_preferences.dart';
 import 'Data/saved_preferences.dart';
 import 'Data/crewMemberList.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'CodeShare/colors.dart'; // Your colors.dart.dart file
 
 void main() async {
-
   // Set up for Hive that needs to run before starting app
   WidgetsFlutterBinding.ensureInitialized();
   // Disable Impeller
@@ -36,7 +39,6 @@ void main() async {
   Hive.registerAdapter(PositionalPreferenceAdapter());
   Hive.registerAdapter(GearPreferenceAdapter());
 
-
   // Open a Hive boxes to store objects
   await Hive.openBox<Gear>('gearBox');
   await Hive.openBox<CrewMember>('crewmemberBox');
@@ -49,37 +51,42 @@ void main() async {
   // Load data from Hive
   crew.loadCrewDataFromHive();
   savedPreferences.loadPreferencesFromHive();
-
-  // do we need to load trip data as well?how does that work
+  savedTrips.loadTripDataFromHive(); // do we need to load trip data as well?
 
   // Test data for user testing
   if (crew.crewMembers.isEmpty && crew.gear.isEmpty) {
     initializeTestData();
   }
 
-
   // Load all preferences and update them
   //await updateAllTripPreferencesFromBoxes();
 
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool agreedToTerms = prefs.getBool('agreedToTerms') ?? false;
+  // Initialize the dark mode and background image setting
+  AppColors.isDarkMode = await ThemePreferences.getTheme();
+  AppColors.enableBackgroundImage = await ThemePreferences.getBackgroundImagePreference();
+  AppData.crewName = await ThemePreferences.getCrewName(); // Initialize AppData.crewName
+
   // start app
-  runApp(const MyApp());
+  runApp(MyApp(showDisclaimer: !agreedToTerms));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool showDisclaimer;
 
-  // This widget is the root of your application.
+  const MyApp({super.key, required this.showDisclaimer});
+
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'Fire Manifest App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.fireColor),
         useMaterial3: true,
         // for theme based text-> style: Theme.of(context).textTheme.headlineMedium,
       ),
-      home: const MyHomePage(),
+      home: showDisclaimer ? const DisclaimerScreen() : const MyHomePage(),
     );
   }
 }
@@ -87,173 +94,213 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int _selectedIndex = 0; // To track the currently selected tab
 
-  // APP FUNCTIONS
+  // Use a getter to dynamically create the pages list
+  List<Widget> get _pages => [
+        CreateNewManifest(onSwitchTab: _onItemTapped), // Pass the callback
+        SavedTripsView(),
+        EditCrew(
+        ),
+        SettingsView(
+          isDarkMode: AppColors.isDarkMode,
+          enableBackgroundImage: AppColors.enableBackgroundImage,
+          crewName: AppData.crewName,
+          onThemeChanged: _toggleTheme,
+          onBackgroundImageChange: _toggleBackgroundImage,
+          onCrewNameChanged: _changeCrewName,
 
-  // Home Page UI
+        ),
+      ];
+
+  void _toggleTheme(bool isDarkMode) async {
+    setState(() {
+      AppColors.isDarkMode = isDarkMode;
+    });
+    await ThemePreferences.setTheme(isDarkMode);
+  }
+  void _toggleBackgroundImage(bool enableBackgroundImage) async {
+    setState(() {
+      AppColors.enableBackgroundImage = enableBackgroundImage;
+    });
+    await ThemePreferences.setBackgroundImagePreference(enableBackgroundImage);
+  }
+  void _changeCrewName(String crewName) async {
+    setState(() {
+      AppData.crewName = crewName;
+    });
+    await ThemePreferences.setCrewName(crewName);
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    // Style for elevated buttons. Should probably figure out a way
-    // to make this universal so we don't have to declare it in every page
-    final ButtonStyle style =
-    ElevatedButton.styleFrom(
-        foregroundColor: Colors.black,
-        textStyle: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-        backgroundColor: Colors.deepOrangeAccent,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        //surfaceTintColor: Colors.grey,
-        elevation: 15,
-        shadowColor: Colors.black,
-        side: const BorderSide(color: Colors.black, width: 2),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12)),
-        // Maybe change? Dynamic button size based on screen size
-        fixedSize: Size(MediaQuery.of(context).size.width / 1.7, MediaQuery.of(context).size.height / 10)
-    );
-
     return Scaffold(
-
-      // appBar: AppBar(
-      //
-      //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      //
-      //   title: Text(widget.title),
-      // ),
-      body: Column(
-
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            width: double.infinity,
-            height: MediaQuery.of(context).size.height * 0.3, // Scales based on 30% of screen height
-            color: Colors.deepOrangeAccent,
-            child: const Center(
-              // Fitted box automatically scales text based on available space
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Padding(
-                  padding:  EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Text(
-                      'Fire Manifesting',
-                      textAlign: TextAlign.center,
-                      // style: Theme.of(context).textTheme.headlineLarge,
-                      style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
-                    ),
-                      Text(
-                        'App',
-                        textAlign: TextAlign.center,
-                        // style: Theme.of(context).textTheme.headlineLarge,
-                        style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, ),
-                      ),
-                  ],
-                  ),
-                ),
-              ),
-            ),
+      body: _pages[_selectedIndex], // Display the selected page
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
+        // Ensures all icons are visible
+        selectedItemColor: AppColors.primaryColor,
+        unselectedItemColor: AppColors.tabIconColor,
+        backgroundColor: AppColors.appBarColor,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment),
+            label: 'Manifest',
           ),
-          Expanded(
-            child: Stack(
-              children: [
-
-                Positioned.fill(
-                  child: Image.asset('assets/images/logo1.png',
-                    fit: BoxFit.cover,  // Cover  entire background
-                  ),
-                ),
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.white.withValues(alpha: 0.1),
-                  child: Column(
-
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-
-                      // Manifest
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const ManifestHome()),
-                              );
-                              },
-                            style: style,
-                            child: const Text(
-                                'Manifest',
-                            )
-                        ),
-                      ),
-
-                      // View Trips
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const SavedTripsView()),
-                              );
-                            },
-                            style: style,
-                            child: const Text(
-                                'View Trips'
-                            )
-                        ),
-                      ),
-
-                      // Edit Crew
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const EditCrew()),
-                              );
-                              },
-                            style: style,
-                            child: const Text(
-                                'Edit Crew'
-                            )
-                        ),
-                      ),
-                      SizedBox(height:10),
-
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          BottomNavigationBarItem(
+            icon: Icon(FontAwesomeIcons.helicopter),
+            label: 'Trips',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: 'Crew',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
           ),
         ],
-
       ),
-
     );
   }
 }
 
+class DisclaimerScreen extends StatefulWidget {
+  const DisclaimerScreen({super.key});
+
+  @override
+  State<DisclaimerScreen> createState() => _DisclaimerScreenState();
+}
+
+class _DisclaimerScreenState extends State<DisclaimerScreen> {
+  bool userAgreed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Center(
+          child:  Text('Terms and Conditions', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary)),
+        ),
+        backgroundColor: AppColors.appBarColor,
+      ),
+      body: Stack(
+        children: [
+          Container(
+            child: ImageFiltered(
+                imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                // Blur effect
+                child: Image.asset(
+                  'assets/images/logo1.png',
+                  fit: BoxFit.cover, // Cover  entire background
+                  width: double.infinity,
+                  height: double.infinity,
+                )),
+          ),
+          Padding(
+            padding: EdgeInsets.all(18.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4.0),
+              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(16.0),
+                      child:  Text(
+                        'The calculations provided by this app are intended for informational purposes only. '
+                        'While every effort has been made to ensure accuracy, users must independently verify and validate '
+                        'all data before relying on it for operational or decision-making purposes. The developers assume no '
+                        'liability for errors, omissions, or any outcomes resulting from the use of this app. By continuing, '
+                        'you acknowledge and accept full responsibility for reviewing and confirming all calculations.',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 22,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Checkbox(
+                        activeColor: Colors.black,
+                        checkColor: Colors.white,
+                        side: BorderSide(
+                          color: Colors.black, // Outline color
+                          width: 2.0, // Outline width
+                        ),//
+                        value: userAgreed,
+                        onChanged: (value) {
+                          setState(() {
+                            userAgreed = value!;
+                          });
+                        },
+                      ),
+                      Flexible(
+                        child: Text(
+                          'I agree to the terms and conditions',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            // fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ElevatedButton(
+                      onPressed: userAgreed
+                          ? () async {
+                              SharedPreferences prefs = await SharedPreferences.getInstance();
+                              await prefs.setBool('agreedToTerms', true);
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => const MyHomePage()),
+                              );
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        backgroundColor: AppColors.textFieldColor,
+                        padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                      ),
+                      child: const Text(
+                        'Continue',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
 
 Future<void> updateAllTripPreferencesFromBoxes() async {
   var crewMemberBox = Hive.box<CrewMember>('crewmemberBox');
@@ -270,7 +317,7 @@ Future<void> updateAllTripPreferencesFromBoxes() async {
         if (member is CrewMember) {
           // Match by name and update attributes
           var updatedMember = crewMemberBox.values.firstWhere(
-                (cm) => cm.name == member.name,
+            (cm) => cm.name == member.name,
             orElse: () => member, // Fallback to the current member if not found
           );
 
@@ -279,7 +326,7 @@ Future<void> updateAllTripPreferencesFromBoxes() async {
           // If it's a group (like a Saw Team), update each member
           for (int j = 0; j < member.length; j++) {
             var updatedMember = crewMemberBox.values.firstWhere(
-                  (cm) => cm.name == member[j].name,
+              (cm) => cm.name == member[j].name,
               orElse: () => member[j],
             );
             member[j] = updatedMember;
@@ -295,7 +342,7 @@ Future<void> updateAllTripPreferencesFromBoxes() async {
 
         // Match by name and update attributes
         var updatedGear = gearBox.values.firstWhere(
-              (g) => g.name == gearItem.name,
+          (g) => g.name == gearItem.name,
           orElse: () => gearItem, // Fallback to the current gear if not found
         );
 
@@ -310,3 +357,7 @@ Future<void> updateAllTripPreferencesFromBoxes() async {
   }
 }
 
+Future<void> resetAgreeToTerms() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('agreedToTerms', false);
+}

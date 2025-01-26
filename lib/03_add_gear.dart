@@ -2,9 +2,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
+import 'CodeShare/colors.dart';
 import 'Data/crew.dart';
 import 'Data/gear.dart';
-import 'Functions/functions.dart';
+import 'CodeShare/functions.dart';
 
 // Tester data
 class AddGear extends StatefulWidget {
@@ -85,19 +86,20 @@ class _AddGearState extends State<AddGear> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Gear Conflict'),
+              backgroundColor: AppColors.textFieldColor2,
+              title:  Text('Gear Conflict', style: TextStyle(color: AppColors.textColorPrimary),),
               content: Text(
                 '$capitalizedGearName already exists as a tool. To add this item, it must be of the same weight, ${personalToolsList.firstWhere((gear) => gear.name.toLowerCase() == gearName.toLowerCase()).weight} lbs.',
-                style: const TextStyle(fontSize: 16),
+                style:  TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
               ),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text(
+                  child:  Text(
                     'Cancel',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: AppColors.cancelButton),
                   ),
                 ),
               ],
@@ -114,19 +116,20 @@ class _AddGearState extends State<AddGear> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Gear Conflict'),
+            backgroundColor: AppColors.textFieldColor2,
+            title:  Text('Gear Conflict', style: TextStyle(color: AppColors.textColorPrimary)),
             content: Text(
               '$matchingGearName already exists. If you would like to add more, edit the item quantity in "Edit Gear" page.',
-              style: const TextStyle(fontSize: 16),
+              style:  TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
             ),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text(
+                child:  Text(
                   'Cancel',
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(color: AppColors.cancelButton),
                 ),
               ),
             ],
@@ -191,10 +194,20 @@ class _AddGearState extends State<AddGear> {
     return Scaffold(
       resizeToAvoidBottomInset: false, // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
       appBar: AppBar(
-        backgroundColor: Colors.deepOrangeAccent,
-        title: const Text(
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back, // The back arrow icon
+            color: AppColors.textColorPrimary, // Set the desired color
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(); // Navigate back when pressed
+          },
+        ),
+        backgroundColor: AppColors.appBarColor,
+        title:  Text(
           'Add Gear',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
       ),
       body: GestureDetector(
@@ -213,20 +226,43 @@ class _AddGearState extends State<AddGear> {
                 children: [
                   // Background image
                   Container(
-                    child: ImageFiltered(
-                        imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                        // Blur effect
-                        child: Image.asset(
-                          'assets/images/logo1.png',
-                          fit: BoxFit.cover, // Cover  entire background
+                    color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
+                    child: AppColors.isDarkMode
+                        ? (AppColors.enableBackgroundImage
+                        ? Stack(
+                      children: [
+                        ImageFiltered(
+                          imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                          child: Image.asset(
+                            'assets/images/logo1.png',
+                            fit: BoxFit.cover, // Cover the entire background
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ),
+                        Container(
+                          color: AppColors.logoImageOverlay, // Semi-transparent overlay
                           width: double.infinity,
                           height: double.infinity,
-                        )),
+                        ),
+                      ],
+                    )
+                        : null) // No image if background is disabled
+                        : ImageFiltered(
+                      imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+                      child: Image.asset(
+                        'assets/images/logo1.png',
+                        fit: BoxFit.cover, // Cover the entire background
+                        width: double.infinity,
+                        height: double.infinity,
+                      ),
+                    ),
                   ),
+
                   Container(
                     width: double.infinity,
                     height: double.infinity,
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.05),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -239,32 +275,32 @@ class _AddGearState extends State<AddGear> {
                               textCapitalization: TextCapitalization.words,
                               decoration: InputDecoration(
                                 labelText: 'Gear Name',
-                                labelStyle: const TextStyle(
-                                  color: Colors.black,
+                                labelStyle:  TextStyle(
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 22,
                                   //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: AppColors.textFieldColor,
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.black,
+                                  borderSide:  BorderSide(
+                                    color: AppColors.borderPrimary,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
                                   borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.white,
+                                  borderSide:  BorderSide(
+                                    color: AppColors.primaryColor,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
                                   ),
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
                               ),
-                              style: const TextStyle(
-                                color: Colors.black,
+                              style:  TextStyle(
+                                color: AppColors.textColorPrimary,
                                 fontSize: 28,
                               ),
                             )),
@@ -284,36 +320,36 @@ class _AddGearState extends State<AddGear> {
                               decoration: InputDecoration(
                                 labelText: 'Weight',
                                 hintText: 'Up to 500 lbs',
-                                hintStyle: const TextStyle(
-                                  color: Colors.black,
+                                hintStyle:  TextStyle(
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 20,
                                 ),
-                                labelStyle: const TextStyle(
-                                  color: Colors.black,
+                                labelStyle:  TextStyle(
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 22,
                                   //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: AppColors.textFieldColor,
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.black,
+                                  borderSide:  BorderSide(
+                                    color: AppColors.borderPrimary,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
                                   borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.white,
+                                  borderSide:  BorderSide(
+                                    color: AppColors.primaryColor,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
                                   ),
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
                               ),
-                              style: const TextStyle(
-                                color: Colors.black,
+                              style:  TextStyle(
+                                color: AppColors.textColorPrimary,
                                 fontSize: 28,
                               ),
                             )),
@@ -333,36 +369,36 @@ class _AddGearState extends State<AddGear> {
                               decoration: InputDecoration(
                                 labelText: 'Quantity',
                                 hintText: 'Up to 99',
-                                hintStyle: const TextStyle(
-                                  color: Colors.white,
+                                hintStyle:  TextStyle(
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 20,
                                 ),
-                                labelStyle: const TextStyle(
-                                  color: Colors.black,
+                                labelStyle:  TextStyle(
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 22,
                                   //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: AppColors.textFieldColor,
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.black,
+                                  borderSide:  BorderSide(
+                                    color: AppColors.borderPrimary,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
                                   borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.white,
+                                  borderSide:  BorderSide(
+                                    color: AppColors.primaryColor,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
                                   ),
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
                               ),
-                              style: const TextStyle(
-                                color: Colors.black,
+                              style:  TextStyle(
+                                color: AppColors.textColorPrimary,
                                 fontSize: 28,
                               ),
                             )),

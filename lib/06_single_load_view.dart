@@ -11,6 +11,7 @@ import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 
+import 'CodeShare/colors.dart';
 import 'Data/crewmember.dart';
 import 'Data/customItem.dart';
 import 'Data/gear.dart';
@@ -40,8 +41,7 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, String? helicopter
     pageFormat = PdfPageFormat.letter;
   } else if (manifestForm == 'of252') {
     imagePath = 'assets/images/helicopter_manifest_form.jpg';
-    fillFormFields = (load, pageIndex, totalPages, pageItems) =>
-        fillFormFieldsOF252(load, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer);
+    fillFormFields = (load, pageIndex, totalPages, pageItems) => fillFormFieldsOF252(load, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer);
     pageFormat = PdfPageFormat.a4;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
@@ -109,7 +109,7 @@ void previewPDF(BuildContext context, Load load, String manifestForm, String? he
     pdfBytes = await generatePDF(load, 'pms245', null, null, null, null);
     pageFormat = PdfPageFormat.letter; // PMS245 requires Letter format
   } else if (manifestForm == 'of252') {
-    pdfBytes = await generatePDF(load, 'of252', helicopterNum, departure,destination, manifestPreparer);
+    pdfBytes = await generatePDF(load, 'of252', helicopterNum, departure, destination, manifestPreparer);
     pageFormat = PdfPageFormat.a4; // OF252 requires A4 format
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
@@ -119,7 +119,7 @@ void previewPDF(BuildContext context, Load load, String manifestForm, String? he
   await Printing.layoutPdf(
     onLayout: (PdfPageFormat format) async => pdfBytes,
     usePrinterSettings: false, // Enforce the specified format
-    format: pageFormat,        // Dynamically set the format based on the manifest type
+    format: pageFormat, // Dynamically set the format based on the manifest type
   );
 }
 
@@ -416,271 +416,324 @@ class _SingleLoadViewState extends State<SingleLoadView> {
       resizeToAvoidBottomInset: false,
       // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
       appBar: AppBar(
-        backgroundColor: Colors.deepOrangeAccent,
+        centerTitle: true,
+        backgroundColor: AppColors.appBarColor,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back, // The back arrow icon
+            color: AppColors.textColorPrimary, // Set the desired color
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(); // Navigate back when pressed
+          },
+        ),
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              children: [
-                Text(
-                'Load ${widget.load.loadNumber}',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-                Text(
-                  ' • ${widget.load.weight} lbs',
-                  style: TextStyle(fontSize: 20, color: Colors.black),
-                ),
-        ],
+
+            Text(
+              'Load ${widget.load.loadNumber}',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
-            IconButton(
-              icon: Icon(
-                Icons.ios_share,
-                size: 28,
-              ),
-              // Does this work for android, i dont know
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    int selectedIndex = 0; // Initial selection index
-
-                    return AlertDialog(
-                      title: const Text(
-                        'Select Manifest Type',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      content: SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.15, // Dynamic height
-                        child: CupertinoPicker(
-                          itemExtent: 50, // Height of each item in the picker
-                          onSelectedItemChanged: (int index) {
-                            selectedIndex = index;
-                          },
-                          children: const [
-                            Center(child: Text('Helicopter Manifest', style: TextStyle(fontSize: 18))),
-                            Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: 18))),
-                          ],
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text(
-                            'Cancel',
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-
-                            if (selectedIndex == 0) {
-                              // Show additional input dialog for `of252`
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AdditionalInfoDialog(
-                                    onConfirm: (
-                                        String helicopterNum,
-                                        String departure,
-                                        String destination,
-                                        String manifestPreparer) {
-                                      previewPDF(context, widget.load, 'of252', helicopterNum, departure, destination, manifestPreparer);
-                                    },
-                                  );
-                                },
-                              );
-                            } else {
-                              // Fixed-Wing manifest
-                              previewPDF(context, widget.load, 'pms245', null, null, null, null);
-                            }
-                          },
-                          child: const Text(
-                            'Export',
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-
-              tooltip: 'Export all loads to a manifest form',
+            Text(
+              ' • ${widget.load.weight} lbs',
+              style: TextStyle(fontSize: 20, color: AppColors.textColorPrimary),
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.ios_share, size: 28, color: AppColors.textColorPrimary),
+            // Does this work for android, i dont know
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  int selectedIndex = 0; // Initial selection index
+
+                  return AlertDialog(
+                    backgroundColor: AppColors.textFieldColor2,
+                    title: Text(
+                      'Select Manifest Type',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textColorPrimary,
+                      ),
+                    ),
+                    content: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.15, // Dynamic height
+                      child: CupertinoPicker(
+                        itemExtent: 50, // Height of each item in the picker
+                        onSelectedItemChanged: (int index) {
+                          selectedIndex = index;
+                        },
+                        children: [
+                          Center(child: Text('Helicopter Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                          Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                        ],
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(fontSize: 16, color: AppColors.cancelButton),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+
+                          if (selectedIndex == 0) {
+                            // Show additional input dialog for `of252`
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AdditionalInfoDialog(
+                                  onConfirm: (String helicopterNum, String departure, String destination, String manifestPreparer) {
+                                    previewPDF(context, widget.load, 'of252', helicopterNum, departure, destination, manifestPreparer);
+                                  },
+                                );
+                              },
+                            );
+                          } else {
+                            // Fixed-Wing manifest
+                            previewPDF(context, widget.load, 'pms245', null, null, null, null);
+                          }
+                        },
+                        child: Text(
+                          'Export',
+                          style: TextStyle(fontSize: 16, color: AppColors.saveButtonAllowableWeight),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+
+            tooltip: 'Export all loads to a manifest form',
+          ),
+        ],
       ),
       body: Stack(
         children: [
           Container(
-            child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                // Blur effect
-                child: Image.asset(
-                  'assets/images/logo1.png',
-                  fit: BoxFit.cover, // Cover  entire background
-                  width: double.infinity,
-                  height: double.infinity,
-                )),
+            color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
+            child: AppColors.isDarkMode
+                ? (AppColors.enableBackgroundImage
+                    ? Stack(
+                        children: [
+                          ImageFiltered(
+                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                            child: Image.asset(
+                              'assets/images/logo1.png',
+                              fit: BoxFit.cover, // Cover the entire background
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                          Container(
+                            color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ],
+                      )
+                    : null) // No image if background is disabled
+                : ImageFiltered(
+                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+                    child: Image.asset(
+                      'assets/images/logo1.png',
+                      fit: BoxFit.cover, // Cover the entire background
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
           ),
-          Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: widget.load.loadPersonnel.length + widget.load.loadGear.length + widget.load.customItems.length,
-                  itemBuilder: (context, index) {
-                    int numCrewMembers = widget.load.loadPersonnel.length;
-                    int numGearItems = widget.load.loadGear.length;
+          Container(
+            color: Colors.white.withValues(alpha: 0.05),
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: widget.load.loadPersonnel.length + widget.load.loadGear.length + widget.load.customItems.length,
+                    itemBuilder: (context, index) {
+                      int numCrewMembers = widget.load.loadPersonnel.length;
+                      int numGearItems = widget.load.loadGear.length;
 
-                    if (index < numCrewMembers) {
-                      // Display a crew member
-                      final crewmember = widget.load.loadPersonnel[index];
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white, // Background color
-                          border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
-                        ),
-                        child: ListTile(
-                          iconColor: Colors.black,
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    crewmember.name,
-                                    style: const TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Flight Weight: ${crewmember.flightWeight} lbs',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                      if (index < numCrewMembers) {
+                        // Display a crew member
+                        final crewmember = widget.load.loadPersonnel[index];
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.textFieldColor, // Background color
+                            border: Border(top: BorderSide(color: Colors.black, width: 1)), // Add a border
                           ),
-                          leading: Icon(Icons.person),
-                        ),
-                      );
-                    } else if (index < numCrewMembers + numGearItems) {
-                      // Display a gear item
-                      final gearIndex = index - numCrewMembers;
-                      final gearItem = widget.load.loadGear[gearIndex];
-                      return Container(
-                        decoration: BoxDecoration(
-                            color: gearItem.isPersonalTool
-                                ? Colors.blue[100] // Color for personal tools
-                                : Colors.orange[100], // Background color
-                          border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
-                        ),
-                        child: ListTile(
-                          iconColor: Colors.black,
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          child: GestureDetector(
+                            onLongPress: () {
+                              // Show a crew member's position when the tile is held
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '${crewmember.name} • ${crewmember.getPositionTitle(crewmember.position)}',
+                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
+                                  ),
+                                  backgroundColor: AppColors.textFieldColor2,
+                                  duration: Duration(seconds: 2), // How long the message appears
+                                ),
+                              );
+                            },
+                            child: ListTile(
+                              iconColor: AppColors.primaryColor,
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        gearItem.name,
-                                        style: const TextStyle(
+                                        crewmember.name,
+                                        style: TextStyle(
                                           fontSize: 22,
                                           fontWeight: FontWeight.bold,
+                                          color: AppColors.textColorPrimary,
                                         ),
                                       ),
                                       Text(
-                                        ' (x${gearItem.quantity})',
-                                        style: const TextStyle(
+                                        'Flight Weight: ${crewmember.flightWeight} lbs',
+                                        style: TextStyle(
                                           fontSize: 18,
+                                          color: AppColors.textColorPrimary,
                                         ),
                                       ),
                                     ],
                                   ),
-                                  Text(
-                                    'Weight: ${gearItem.totalGearWeight} lbs',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                    ),
-                                  ),
                                 ],
                               ),
-                            ],
+                              leading: Icon(Icons.person),
+                            ),
                           ),
-                          leading: Icon(Icons.work_outline_outlined),
-                        ),
-                      );
-                    } else {
-                      // Display a custom item
-                      final customItemIndex = index - numCrewMembers - numGearItems;
-                      final customItem = widget.load.customItems[customItemIndex];
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white, // Background color
-                          border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
-                        ),
-                        child: ListTile(
-                          iconColor: Colors.black,
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                        );
+                      } else if (index < numCrewMembers + numGearItems) {
+                        // Display a gear item
+                        final gearIndex = index - numCrewMembers;
+                        final gearItem = widget.load.loadGear[gearIndex];
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: gearItem.isPersonalTool
+                                ? AppColors.toolBlue.withValues(alpha: 0.9) // Color for personal tools
+                                : AppColors.gearYellow.withValues(alpha: 0.9), // Background color
+                            border: Border(bottom: BorderSide(color: Colors.black, width: 1)), // Add a border
+                          ),
+                          child: GestureDetector(
+                            onLongPress: () {
+                              // Show a crew member's position when the tile is held
+                              if (gearItem.quantity > 1) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '${gearItem.name} • ${gearItem.weight} lbs each',
+                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
+                                  ),
+                                  backgroundColor: AppColors.textFieldColor2,
+                                  duration: Duration(seconds: 2), // How long the message appears
+                                ),
+                              );
+                              }
+                            },
+                            child: ListTile(
+                              iconColor: Colors.black,
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            gearItem.name,
+                                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
+                                          ),
+                                          Text(
+                                            ' (x${gearItem.quantity})',
+                                            style: TextStyle(fontSize: 18, color: Colors.black),
+                                          ),
+                                        ],
+                                      ),
                                       Text(
-                                        customItem.name,
-                                        style: const TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        'Weight: ${gearItem.totalGearWeight} lbs',
+                                        style: TextStyle(fontSize: 18, color: Colors.black),
                                       ),
                                     ],
                                   ),
-                                  Text(
-                                    'Weight: ${customItem.weight} lbs',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                    ),
-                                  ),
                                 ],
                               ),
-                            ],
+                              leading: Icon(Icons.work_outline_outlined),
+                            ),
                           ),
-                          leading: Icon(Icons.inventory_2_outlined),
-                        ),
-                      );
-                    }
-                  },
+                        );
+                      } else {
+                        // Display a custom item
+                        final customItemIndex = index - numCrewMembers - numGearItems;
+                        final customItem = widget.load.customItems[customItemIndex];
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white, // Background color
+                            border: Border(bottom: BorderSide(color: Colors.black, width: 1)), // Add a border
+                          ),
+                          child: ListTile(
+                            iconColor: Colors.black,
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          customItem.name,
+                                          style: const TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      'Weight: ${customItem.weight} lbs',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            leading: Icon(Icons.inventory_2_outlined),
+                          ),
+                        );
+                      }
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 }
+
 class AdditionalInfoDialog extends StatefulWidget {
-  final Function(
-      String helicopterNum,
-      String departure,
-      String destination,
-      String manifestPreparer) onConfirm;
+  final Function(String helicopterNum, String departure, String destination, String manifestPreparer) onConfirm;
 
   const AdditionalInfoDialog({required this.onConfirm, super.key});
 
@@ -706,72 +759,78 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24), // Adjust padding
-      title: const Text(
+      backgroundColor: AppColors.textFieldColor,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      // Adjust padding
+      title: Text(
         'Additional Information',
-        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
       ),
-      content: SingleChildScrollView( // Wrap content in a scrollable view
+      content: SingleChildScrollView(
+        // Wrap content in a scrollable view
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
                 controller: _helicopterNumController,
-                decoration: const InputDecoration(
-                  labelText: 'Enter helicopter tail #:',
-                ),
-                maxLines: 1, // Single-line input
-                textCapitalization: TextCapitalization.characters, // Automatically capitalize all characters
+                decoration: InputDecoration(labelText: 'Enter helicopter tail #:', labelStyle: TextStyle(color: AppColors.textColorPrimary)),
+                maxLines: 1,
+                // Single-line input
+                textCapitalization: TextCapitalization.characters,
+                // Automatically capitalize all characters
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(6), // Limit to 25 characters
                 ],
+                style: TextStyle(color: AppColors.textColorPrimary),
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
                 controller: _departureController,
-                decoration: const InputDecoration(
-                  labelText: 'Enter departure:',
-                ),
-                maxLines: 1, // Single-line input
-                textCapitalization: TextCapitalization.words, // Capitalize only the first character
+                decoration: InputDecoration(labelText: 'Enter departure:', labelStyle: TextStyle(color: AppColors.textColorPrimary)),
+                maxLines: 1,
+                // Single-line input
+                textCapitalization: TextCapitalization.words,
+                // Capitalize only the first character
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(16), // Limit to 25 characters
                 ],
+                style: TextStyle(color: AppColors.textColorPrimary),
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
                 controller: _destinationController,
-                textCapitalization: TextCapitalization.words, // Capitalize only the first character
-                decoration: const InputDecoration(
-                  labelText: 'Enter destination:',
-                ),
-                maxLines: 1, // Single-line input
+                textCapitalization: TextCapitalization.words,
+                // Capitalize only the first character
+                decoration: InputDecoration(labelText: 'Enter destination:', labelStyle: TextStyle(color: AppColors.textColorPrimary)),
+                maxLines: 1,
+                // Single-line input
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(16), // Limit to 25 characters
                 ],
+                style: TextStyle(color: AppColors.textColorPrimary),
               ),
-            ),Padding(
+            ),
+            Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
                 controller: _manifestPreparerController,
-                decoration: const InputDecoration(
-                  labelText: 'Enter manifest preparer:',
-                ),
-                maxLines: 1, // Single-line input
-                textCapitalization: TextCapitalization.words, // Capitalize only the first character
+                decoration: InputDecoration(labelText: 'Enter manifest preparer:', labelStyle: TextStyle(color: AppColors.textColorPrimary)),
+                maxLines: 1,
+                // Single-line input
+                textCapitalization: TextCapitalization.words,
+                // Capitalize only the first character
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(20), // Limit to 25 characters
                 ],
+                style: TextStyle(color: AppColors.textColorPrimary),
               ),
             ),
-
           ],
         ),
       ),
@@ -780,9 +839,9 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text(
+          child: Text(
             'Cancel',
-            style: TextStyle(fontSize: 18),
+            style: TextStyle(fontSize: 16, color: AppColors.cancelButton),
           ),
         ),
         TextButton(
@@ -794,13 +853,12 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
             widget.onConfirm(helicopterNum, departure, destination, manifestPreparer); // Pass collected data to the callback
             Navigator.of(context).pop();
           },
-          child: const Text(
+          child: Text(
             'Confirm',
-            style: TextStyle(fontSize: 18),
+            style: TextStyle(fontSize: 16, color: AppColors.saveButtonAllowableWeight),
           ),
         ),
       ],
     );
   }
-
 }

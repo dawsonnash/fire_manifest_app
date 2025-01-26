@@ -1,6 +1,7 @@
 import 'package:fire_app/Data/positional_preferences.dart';
 import 'package:flutter/material.dart';
 
+import '../CodeShare/colors.dart';
 import '../main.dart';
 import 'gear_preferences.dart';
 import 'trip.dart';
@@ -528,22 +529,23 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: AppColors.textFieldColor,
           title: Text(
             "Load Calculation Error",
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("$errorMessage\n"),
+              Text("$errorMessage\n", style: TextStyle(color: AppColors.textColorPrimary)),
               if (crewMembersCopy.isNotEmpty)
                 RichText(
                   text: TextSpan(
                     text: "Remaining crew members:\n",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: AppColors.textColorPrimary,
                       fontSize: 16,
                     ),
                     children: [
@@ -553,7 +555,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                             .join(', '),
                         style: TextStyle(
                           fontWeight: FontWeight.normal,
-                          color: Colors.black,
+                          color: AppColors.textColorPrimary,
                         ),
                       ),
                     ],
@@ -566,7 +568,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                     text: "Remaining gear items:\n",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: AppColors.textColorPrimary,
                       fontSize: 16,
                     ),
                     children: [
@@ -574,7 +576,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                         text: gearCopy.map((item) => item.name).join(', '),
                         style: TextStyle(
                           fontWeight: FontWeight.normal,
-                          color: Colors.black,
+                          color: AppColors.textColorPrimary,
                         ),
                       ),
                     ],
@@ -587,7 +589,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text("OK"),
+              child: Text("OK", style: TextStyle(color: AppColors.textColorPrimary)),
             ),
           ],
         );

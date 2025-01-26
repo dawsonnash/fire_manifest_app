@@ -5,228 +5,410 @@ import 'package:fire_app/02_crewmembers_view.dart';
 import 'package:fire_app/03_gear_view.dart';
 import 'package:fire_app/04_trip_preferences_view.dart';
 import '03_add_gear.dart';
+import 'CodeShare/colors.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import 'Data/crew.dart';
 
-// This layout needs work to have dynamically adjusted UI. Needs user-testing
-
-class EditCrew extends StatelessWidget {
+class EditCrew extends StatefulWidget {
   const EditCrew({super.key});
+
+
+
+  @override
+  State<EditCrew> createState() => _EditCrewState();
+}
+
+class _EditCrewState extends State<EditCrew> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final double panelHeight = 125.0; // Height for the panels
+    final double panelWidth = screenWidth * 0.8; // 80% of the screen width
 
-    final double buttonWidth = screenWidth / 2 - 24;
-    final double buttonHeight = screenHeight * 0.1;
-
-    // Button style for all buttons
-    final ButtonStyle buttonStyle = ElevatedButton.styleFrom(
-      foregroundColor: Colors.black,
-      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      // temp fix, should make dynamic
-      backgroundColor: Colors.deepOrangeAccent,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      elevation: 15,
-      shadowColor: Colors.black,
-      side: const BorderSide(color: Colors.black, width: 2),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(6),
+    BoxDecoration panelDecoration = BoxDecoration(
+      color: AppColors.panelColor,
+      borderRadius: BorderRadius.circular(10),
+      border: Border.all(
+        color: Colors.black, // Outline color
+        width: 2.0, // Outline width
       ),
-      fixedSize: Size(buttonWidth, buttonHeight),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.2),
+          blurRadius: 10,
+          offset: const Offset(0, 4),
+        ),
+      ],
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.deepOrangeAccent,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Edit Crew',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-          ],
+    TextStyle panelTextStyle = TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+      color: AppColors.textColorPrimary,
+    );
+
+    TextStyle headerTextStyle = TextStyle(
+      fontSize: 28,
+      fontWeight: FontWeight.bold,
+      color: AppColors.textColorPrimary,
+      // decoration: TextDecoration.underline,
+      // decorationColor: AppColors.primaryColor, // Set the color of the underline
+      shadows: [
+        Shadow(
+          offset: Offset(0, 0),
+          blurRadius: 80.0,
+          color: Colors.black,
         ),
-      ),
-      body: Stack(
+      ],
+    );
+
+    TextStyle subHeaderTextStyle = TextStyle(
+      fontSize: 18,
+      color: AppColors.textColorPrimary,
+    );
+    return DefaultTabController(
+      length: 2,
+      child: Stack(
         children: [
-          // Background image
+          // Background
           Container(
-            child: ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-              child: Image.asset(
-                'assets/images/logo1.png',
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: double.infinity,
+            color: AppColors.isDarkMode ? Colors.black : Colors.transparent,
+            child: AppColors.isDarkMode
+                ? (AppColors.enableBackgroundImage
+                    ? Stack(
+                        children: [
+                          ImageFiltered(
+                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                            child: Image.asset(
+                              'assets/images/logo1.png',
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                          Container(
+                            color: AppColors.logoImageOverlay,
+                          ),
+                        ],
+                      )
+                    : null)
+                : ImageFiltered(
+                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                    child: Image.asset(
+                      'assets/images/logo1.png',
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
+          ),
+
+          Scaffold(
+            resizeToAvoidBottomInset: true, // Allow resizing when keyboard opens
+
+            appBar: AppBar(
+              backgroundColor: AppColors.appBarColor,
+              toolbarHeight: 0,
+              bottom: TabBar(
+                labelColor: AppColors.primaryColor,
+                unselectedLabelColor: AppColors.tabIconColor,
+                indicatorColor: AppColors.primaryColor,
+                tabs: [
+                  Tab(text: 'Add', icon: Icon(Icons.add)),
+                  Tab(text: 'Edit', icon: Icon(Icons.edit)),
+                ],
               ),
             ),
-          ),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: screenHeight * 0.05,
-                ),
-                Expanded(
-                  child: GridView.count(
-                    padding: const EdgeInsets.all(16.0),
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    shrinkWrap: true, // Makes GridView adapt to its content
-                    physics: NeverScrollableScrollPhysics(), // Disables scrolling
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const AddCrewmember()),
-                          );
-                        },
-                        style: buttonStyle,
-                        child: Row(
+            backgroundColor: Colors.transparent,
+            body: Container(
+              color: Colors.white.withValues(alpha: 0.05),
+              child: Column(
+                children: [
+                  // Crew Name and Total Weight
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: (screenWidth - panelWidth) / 2, vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        // children: [
+                        //   GestureDetector(
+                        //     onTap: () {
+                        //       setState(() {
+                        //         isEditing = true; // Enter editing mode on tap
+                        //       });
+                        //     },
+                        //     onDoubleTap: () {
+                        //       setState(() {
+                        //         isEditing = true; // Enter editing mode on double-tap
+                        //       });
+                        //     },
+                        //     onLongPress: () {
+                        //       setState(() {
+                        //         isEditing = true; // Enter editing mode on long press
+                        //       });
+                        //     },
+                        //     child: isEditing
+                        //         ? TextField(
+                        //       autofocus: true,
+                        //       controller: TextEditingController(text: crewName),
+                        //       style: headerTextStyle,
+                        //       textAlign: TextAlign.center,
+                        //       onSubmitted: (value) {
+                        //         if (value.trim().isNotEmpty) {
+                        //           setState(() {
+                        //             crewName = value.trim(); // Update the crew name
+                        //             isEditing = false; // Exit editing mode
+                        //           });
+                        //           widget.onCrewNameChanged(crewName); // Notify parent of the change
+                        //         } else {
+                        //           setState(() {
+                        //             isEditing = false; // Exit editing mode without saving
+                        //           });
+                        //         }
+                        //       },
+                        //       onEditingComplete: () {
+                        //         setState(() {
+                        //           isEditing = false; // Exit editing mode
+                        //         });
+                        //       },
+                        //       decoration: InputDecoration(
+                        //         border: InputBorder.none, // No borders for a seamless look
+                        //         hintText: 'Enter crew name',
+                        //       ),
+                        //     )
+                        //         :
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end, // Aligns the text and underline to the right
                           children: [
-                            const Icon(
-                              Icons.add,
-                              color: Colors.black,
-                              size: 32,
-                            ),
-                            //const SizedBox(width: 8),
-                            Flexible(
-                              // Allows text to be wrapped
-                              child: Text(
-                                'Crew Member',
-                                textAlign: TextAlign.center,
-                                softWrap: true,
+                            IntrinsicWidth(
+                              child: Container(
+                                padding: EdgeInsets.only(bottom: 4.0),
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(color: AppColors.fireColor, width: 2.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  AppData.crewName,
+                                  style: headerTextStyle,
+                                  textAlign: TextAlign.left, // No center alignment needed since it's right-aligned by the Row
+                                ),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const CrewmembersView()),
-                          );
-                        },
-                        style: buttonStyle,
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.edit,
-                              color: Colors.black,
-                              size: 32,
-                            ),
-                            //const SizedBox(width: 8),
-                            Flexible(
-                              // Allows text to be wrapped
-                              child: Text(
-                                'Crew Members',
-                                textAlign: TextAlign.center,
-                                softWrap: true,
-                              ),
-                            ),
-                          ],
+
+                        Padding(
+                          padding: EdgeInsets.only(top: 4.0),
+                          child: Text(
+                            '${crew.crewMembers.length} persons',
+                            style: subHeaderTextStyle,
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const AddGear()),
-                          );
-                        },
-                        style: buttonStyle,
-                        child: Row(
-                          //mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.add,
-                              color: Colors.black,
-                              size: 32,
-                            ),
-                            const SizedBox(width: 8),
-                            Flexible(
-                              // Allows text to be wrapped
-                              child: Text(
-                                'Gear',
-                                textAlign: TextAlign.center,
-                                softWrap: true,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          '${crew.totalCrewWeight.toInt()} lbs',
+                          style: subHeaderTextStyle,
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const GearView()),
-                          );
-                        },
-                        style: buttonStyle,
-                        child: Row(
-                          //mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.edit,
-                              color: Colors.black,
-                              size: 32,
-                            ),
-                            const SizedBox(width: 8),
-                            Flexible(
-                              // Allows text to be wrapped
-                              child: Text(
-                                'Gear',
-                                textAlign: TextAlign.center,
-                                softWrap: true,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(
-                  width: screenWidth * 0.9, // 90% of screen width
-                  height: buttonHeight * 2.2, // This 2.2 was just trialed and errored until it matched the height. Could be a downfall matching multiple device aspect ratios
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-                    child: ElevatedButton(
-                      onPressed: () {
+
+                  Flexible(
+                    child: TabBarView(
+                      children: [
+                        // Add Tab
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const AddCrewmember()),
+                                  );
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: panelWidth,
+                                  height: panelHeight,
+                                  decoration: panelDecoration,
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                                    children: [
+                                      Icon(
+                                        Icons.add, // Add icon
+                                        color: AppColors.primaryColor,
+                                        size: 32, // Adjust size as needed
+                                      ),
+                                      const SizedBox(width: 8), // Space between the icon and text
+                                      Text(
+                                        'Crew Member',
+                                        style: panelTextStyle,
+                                        textAlign: TextAlign.center,
+                                        softWrap: true,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 40),
+                              GestureDetector(
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const AddGear()),
+                                  );
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: panelWidth,
+                                  height: panelHeight,
+                                  decoration: panelDecoration,
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                                    children: [
+                                      Icon(
+                                        Icons.add, // Add icon
+                                        color: AppColors.primaryColor,
+                                        size: 32, // Adjust size as needed
+                                      ),
+                                      const SizedBox(width: 8), // Space between the icon and text
+                                      Text(
+                                        'Gear',
+                                        style: panelTextStyle,
+                                        textAlign: TextAlign.center,
+                                        softWrap: true,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Edit Tab
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const CrewmembersView()),
+                                  );
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: panelWidth,
+                                  height: panelHeight,
+                                  decoration: panelDecoration,
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                                    children: [
+                                      Icon(
+                                        Icons.edit, // Add icon
+                                        color: AppColors.primaryColor,
+                                        size: 32, // Adjust size as needed
+                                      ),
+                                      const SizedBox(width: 8), // Space between the icon and text
+                                      Text(
+                                        'Crew Member',
+                                        style: panelTextStyle,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 40),
+                              GestureDetector(
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const GearView()),
+                                  );
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: panelWidth,
+                                  height: panelHeight,
+                                  decoration: panelDecoration,
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                                    children: [
+                                      Icon(
+                                        Icons.edit, // Add icon
+                                        color: AppColors.primaryColor,
+                                        size: 32, // Adjust size as needed
+                                      ),
+                                      const SizedBox(width: 8), // Space between the icon and text
+                                      Text(
+                                        'Gear',
+                                        style: panelTextStyle,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Trip Preferences Panel
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: GestureDetector(
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => const TripPreferences()),
                         );
                       },
-                      style: buttonStyle, // Same style as other buttons
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.settings,
-                            color: Colors.black,
-                            size: 32,
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Trip Preferences',
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                      child: Container(
+                        width: screenWidth * 0.9,
+                        height: panelHeight,
+                        decoration: panelDecoration,
+                        alignment: Alignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                          children: [
+                            Icon(
+                              FontAwesomeIcons.sliders, // Add icon
+                              color: AppColors.primaryColor,
+                              size: 28, // Adjust size as needed
+                            ),
+                            const SizedBox(width: 8), // Space between the icon and text
+                            Text(
+                              'Trip Preferences',
+                              style: panelTextStyle,
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: screenHeight * 0.05,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

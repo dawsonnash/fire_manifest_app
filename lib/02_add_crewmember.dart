@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
+import 'CodeShare/colors.dart';
 import 'Data/crew.dart';
 import 'Data/crewmember.dart';
 import 'Data/gear.dart';
@@ -75,6 +76,27 @@ class _AddCrewmemberState extends State<AddCrewmember> {
     final String toolName = toolNameController.text;
     final int toolWeight = int.parse(toolWeightController.text);
 
+    // Check for duplicate tool names
+    final bool isDuplicate = addedTools?.any(
+          (tool) => tool.name.toLowerCase() == toolName.toLowerCase(),
+    ) ??
+        false;
+
+    if (isDuplicate) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Center(
+            child: Text(
+              'Tool Already Added',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.black),
+            ),
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return; // Exit function if the tool is a duplicate
+    }
     if (toolName.isNotEmpty && toolWeight > 0) {
       setState(() {
         addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true));
@@ -108,8 +130,8 @@ class _AddCrewmemberState extends State<AddCrewmember> {
     // Take what the name contrller has saved
     final String name = nameController.text;
 
-    // Check if crew member name already exists
-    bool crewMemberNameExists = crew.crewMembers.any((member) => member.name == name);
+  // Check if crew member name already exists (case-insensitive)
+    bool crewMemberNameExists = crew.crewMembers.any((member) => member.name.toLowerCase() == name.toLowerCase());
 
     if (crewMemberNameExists) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -195,10 +217,20 @@ class _AddCrewmemberState extends State<AddCrewmember> {
     return Scaffold(
       resizeToAvoidBottomInset: false, // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
       appBar: AppBar(
-        backgroundColor: Colors.deepOrangeAccent,
-        title: const Text(
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back, // The back arrow icon
+            color: AppColors.textColorPrimary, // Set the desired color
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(); // Navigate back when pressed
+          },
+        ),
+        backgroundColor: AppColors.appBarColor,
+        title:  Text(
           'Add Crew Member',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
       ),
       body: GestureDetector(
@@ -217,20 +249,42 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                 children: [
                   // Background image
                   Container(
-                    child: ImageFiltered(
-                        imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                        // Blur effect
-                        child: Image.asset(
-                          'assets/images/logo1.png',
-                          fit: BoxFit.cover, // Cover  entire background
+                    color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
+                    child: AppColors.isDarkMode
+                        ? (AppColors.enableBackgroundImage
+                        ? Stack(
+                      children: [
+                        ImageFiltered(
+                          imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                          child: Image.asset(
+                            'assets/images/logo1.png',
+                            fit: BoxFit.cover, // Cover the entire background
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ),
+                        Container(
+                          color: AppColors.logoImageOverlay, // Semi-transparent overlay
                           width: double.infinity,
                           height: double.infinity,
-                        )),
+                        ),
+                      ],
+                    )
+                        : null) // No image if background is disabled
+                        : ImageFiltered(
+                      imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+                      child: Image.asset(
+                        'assets/images/logo1.png',
+                        fit: BoxFit.cover, // Cover the entire background
+                        width: double.infinity,
+                        height: double.infinity,
+                      ),
+                    ),
                   ),
                   Container(
                     width: double.infinity,
                     height: double.infinity,
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.05),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -243,32 +297,32 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                               maxLength: 12,
                               decoration: InputDecoration(
                                 labelText: 'Last Name',
-                                labelStyle: const TextStyle(
-                                  color: Colors.black,
+                                labelStyle: TextStyle(
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 22,
                                   //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: AppColors.textFieldColor,
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.black,
+                                  borderSide: BorderSide(
+                                    color: AppColors.borderPrimary,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
                                   borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.white,
+                                  borderSide:  BorderSide(
+                                    color: AppColors.primaryColor,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
                                   ),
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
                               ),
-                              style: const TextStyle(
-                                color: Colors.black,
+                              style:  TextStyle(
+                                color: AppColors.textColorPrimary,
                                 fontSize: 28,
                               ),
                             )),
@@ -288,36 +342,36 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                               decoration: InputDecoration(
                                 labelText: 'Flight Weight',
                                 hintText: 'Up to 500 lbs',
-                                hintStyle: const TextStyle(
-                                  color: Colors.black,
+                                hintStyle:  TextStyle(
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 20,
                                 ),
-                                labelStyle: const TextStyle(
-                                  color: Colors.black,
+                                labelStyle:  TextStyle(
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 22,
                                   //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: AppColors.textFieldColor,
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.black,
+                                  borderSide:  BorderSide(
+                                    color: AppColors.borderPrimary,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
                                   borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Colors.white,
+                                  borderSide:  BorderSide(
+                                    color: AppColors.primaryColor,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
                                   ),
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
                               ),
-                              style: const TextStyle(
-                                color: Colors.black,
+                              style:  TextStyle(
+                                color: AppColors.textColorPrimary,
                                 fontSize: 28,
                               ),
                             )),
@@ -329,26 +383,26 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.textFieldColor,
                               borderRadius: BorderRadius.circular(12.0),
-                              border: Border.all(color: Colors.black, width: 2.0),
+                              border: Border.all(color:AppColors.borderPrimary, width: 2.0),
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<int>(
                                 value: selectedPosition,
-                                hint: const Text(
+                                hint:  Text(
                                   'Primary Position',
                                   style: TextStyle(
-                                    color: Colors.black,
+                                    color: AppColors.textColorPrimary,
                                     fontSize: 22,
                                   ),
                                 ),
-                                dropdownColor: Colors.white,
-                                style: const TextStyle(
-                                  color: Colors.black,
+                                dropdownColor: AppColors.textFieldColor2,
+                                style:  TextStyle(
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 22,
                                 ),
-                                iconEnabledColor: Colors.black,
+                                iconEnabledColor: AppColors.textColorPrimary,
                                 items: positionMap.entries.map((entry) {
                                   return DropdownMenuItem<int>(
                                     value: entry.key,
@@ -385,24 +439,41 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                   return StatefulBuilder(
                                     builder: (BuildContext context, StateSetter setState) {
                                       return AlertDialog(
-                                        backgroundColor: Colors.white,
-                                        title: const Text(
+                                        backgroundColor: AppColors.textFieldColor2,
+                                        title:  Text(
                                           '+ Add Personal Tool',
-                                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                         ),
                                         content: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             DropdownButtonFormField<String>(
                                               value: selectedTool,
+                                              dropdownColor: AppColors.textFieldColor2,
+
                                               decoration: InputDecoration(
                                                 labelText: 'Select a Tool',
+                                                labelStyle: TextStyle(color: AppColors.textColorPrimary),
                                                 filled: true,
-                                                fillColor: Colors.grey[200],
-                                                border: OutlineInputBorder(
+                                                fillColor: AppColors.textFieldColor2,
+                                                enabledBorder: OutlineInputBorder(
                                                   borderRadius: BorderRadius.circular(8),
-                                                  borderSide: const BorderSide(color: Colors.grey, width: 2),
+                                                  borderSide:  BorderSide(color: AppColors.textColorPrimary, width: 2),
                                                 ),
+                                                focusedBorder: OutlineInputBorder(
+                                                  borderSide:  BorderSide(
+                                                    color: AppColors.primaryColor,
+                                                    // Border color when the TextField is focused
+                                                    width: 2.0, // Border width
+                                                  ),
+                                                  borderRadius: BorderRadius.circular(12.0),
+                                                ),
+
+                                              ),
+                                              style:  TextStyle(
+                                                color: AppColors.textColorPrimary,
+                                                  fontSize: 16
+
                                               ),
                                               items: [
                                                 ...personalToolsList.map((tool) {
@@ -439,12 +510,17 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                                 enabled: false, // Non-editable field
                                                 decoration: InputDecoration(
                                                   labelText: 'Tool Weight (lbs)',
+                                                  labelStyle: TextStyle(color: AppColors.textColorPrimary),
                                                   filled: true,
-                                                  fillColor: Colors.grey[200],
-                                                  border: OutlineInputBorder(
+                                                  fillColor: AppColors.textFieldColor2,
+                                                  disabledBorder: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(8),
-                                                    borderSide: const BorderSide(color: Colors.grey, width: 1),
+                                                    borderSide: BorderSide(color: AppColors.textColorPrimary, width: 2), // Border for disabled state
                                                   ),
+                                                ),
+                                                style:  TextStyle(
+                                                  color: AppColors.textColorPrimary,
+                                                  fontSize: 16
                                                 ),
                                               ),
                                           ],
@@ -454,9 +530,9 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                             onPressed: () {
                                               Navigator.of(context).pop(); // Close the dialog
                                             },
-                                            child: const Text(
+                                            child:  Text(
                                               'Cancel',
-                                              style: TextStyle(color: Colors.grey),
+                                              style: TextStyle(color: AppColors.cancelButton),
                                             ),
                                           ),
                                           if (selectedTool != null && selectedTool != '+ Add/Edit Tool')
@@ -465,9 +541,9 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                                 addTool(); // Save tool logic
                                                 Navigator.of(context).pop(); // Close current dialog
                                               },
-                                              child: const Text(
+                                              child:  Text(
                                                 'Add',
-                                                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                                style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold),
                                               ),
                                             ),
                                         ],
@@ -481,7 +557,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               decoration: BoxDecoration(
-                                color: Colors.blue[100],
+                                color: AppColors.toolBlue,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: Colors.black, // Black outline color
@@ -512,12 +588,11 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                 final tool = addedTools?[index];
                                 return Card(
                                   elevation: 4,
-                                  color: Colors.white,
+                                  color: AppColors.textFieldColor,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.white, // Background color (optional)
                                       border: Border.all(
-                                        color: Colors.black, // Border color
+                                        color: AppColors.borderPrimary, // Border color
                                         width: 2.0, // Border thickness
                                       ),
                                       borderRadius: BorderRadius.circular(12), // Rounded corners (optional)
@@ -525,11 +600,11 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                     child: ListTile(
                                       title: Text(
                                         tool!.name,
-                                        style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: 20, fontWeight: FontWeight.bold),
                                       ),
                                       subtitle: Text(
                                         '${tool.weight} lbs',
-                                        style: const TextStyle(color: Colors.black, fontSize: 20),
+                                        style:  TextStyle(color: AppColors.textColorPrimary, fontSize: 20),
                                       ),
                                       trailing: IconButton(
                                         icon: const Icon(Icons.delete, color: Colors.red, size: 28),
@@ -601,10 +676,10 @@ void _showAddToolDialog(
       return StatefulBuilder(
         builder: (BuildContext dialogContext, StateSetter dialogSetState) {
           return AlertDialog(
-            backgroundColor: Colors.white,
-            title: const Text(
+            backgroundColor: AppColors.textFieldColor2,
+            title:  Text(
               'Add/Edit Tool',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -613,23 +688,34 @@ void _showAddToolDialog(
                   value: selectedTool,
                   decoration: InputDecoration(
                     labelText: 'Select a Tool',
+                    labelStyle: TextStyle(color: AppColors.textColorPrimary),
                     filled: true,
-                    fillColor: Colors.grey[200],
-                    border: OutlineInputBorder(
+                    fillColor: AppColors.textFieldColor2,
+                    enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Colors.grey, width: 2),
+                      borderSide: BorderSide(color: AppColors.textColorPrimary, width: 2),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: AppColors.primaryColor,
+                        // Border color when the TextField is focused
+                        width: 2.0, // Border width
+                      ),
+                      borderRadius: BorderRadius.circular(8.0),
                     ),
                   ),
+                dropdownColor: AppColors.textFieldColor2,
                   items: [
                     ...personalToolsList.map((tool) {
+
                       return DropdownMenuItem<String>(
                         value: tool.name,
-                        child: Text(tool.name),
+                        child: Text(tool.name, style: TextStyle(color: AppColors.textColorPrimary, fontSize: 16)),
                       );
                     }),
-                    const DropdownMenuItem<String>(
+                     DropdownMenuItem<String>(
                       value: '+ New Tool',
-                      child: Text('+ New Tool'),
+                      child: Text('+ New Tool', style: TextStyle(color: AppColors.textColorPrimary, fontSize: 16)),
                     ),
                   ],
                   onChanged: (value) {
@@ -641,7 +727,7 @@ void _showAddToolDialog(
                 ),
                 const SizedBox(height: 12),
                 if (selectedTool != null && selectedTool != '+ New Tool')
-                  const Padding(
+                   Padding(
                     padding: EdgeInsets.only(bottom: 8.0),
                     child: Align(
                       alignment: Alignment.centerLeft,
@@ -650,7 +736,7 @@ void _showAddToolDialog(
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blueGrey,
+                          color: AppColors.textColorEditToolDetails,
                         ),
                       ),
                     ),
@@ -661,13 +747,27 @@ void _showAddToolDialog(
                   maxLength: 12,
                   decoration: InputDecoration(
                     labelText: 'Tool Name',
+                    labelStyle: TextStyle(color: AppColors.textColorPrimary,),
                     filled: true,
-                    fillColor: Colors.grey[200],
+                    fillColor: AppColors.textFieldColor2,
                     errorText: toolNameErrorMessage,
-                    border: OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Colors.grey, width: 2),
+                      borderSide:  BorderSide(color: AppColors.textColorPrimary, width: 2),
                     ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: AppColors.primaryColor,
+                        // Border color when the TextField is focused
+                        width: 2.0, // Border width
+                      ),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+
+                  ),
+                  style: TextStyle(
+                    color: AppColors.textColorPrimary,
+                      fontSize: 16
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -678,13 +778,26 @@ void _showAddToolDialog(
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   decoration: InputDecoration(
                     labelText: 'Tool Weight (lbs)',
+                    labelStyle: TextStyle(color: AppColors.textColorPrimary),
                     filled: true,
-                    fillColor: Colors.grey[200],
+                    fillColor: AppColors.textFieldColor2,
                     errorText: toolWeightErrorMessage,
-                    border: OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Colors.grey, width: 1),
+                      borderSide:  BorderSide(color: AppColors.textColorPrimary, width: 2),
                     ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: AppColors.primaryColor,
+                        // Border color when the TextField is focused
+                        width: 2.0, // Border width
+                      ),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  style: TextStyle(
+                    color: AppColors.textColorPrimary,
+                      fontSize: 16
                   ),
                 ),
               ],
@@ -694,9 +807,9 @@ void _showAddToolDialog(
                 onPressed: () {
                   Navigator.of(dialogContext).pop(); // Close only this dialog
                 },
-                child: const Text(
+                child:  Text(
                   'Cancel',
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(color: AppColors.cancelButton),
                 ),
               ),
               if (selectedTool != null && selectedTool != '+ New Tool')
@@ -708,19 +821,20 @@ void _showAddToolDialog(
                         context: dialogContext,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: const Text('Confirm Deletion'),
+                            backgroundColor: AppColors.textFieldColor2,
+                            title:  Text('Confirm Deletion', style: TextStyle(color: AppColors.textColorPrimary),),
                             content: Text(
-                              'The tool "$selectedTool" will be removed from all crew members who have it. Do you want to proceed?',
-                              style: const TextStyle(fontSize: 16),
+                              'The tool, $selectedTool, will be removed from all crew members who have it. Do you want to proceed?',
+                              style:  TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
                             ),
                             actions: [
                               TextButton(
                                 onPressed: () {
                                   Navigator.of(context).pop(); // Close the confirmation dialog
                                 },
-                                child: const Text(
+                                child:  Text(
                                   'Cancel',
-                                  style: TextStyle(color: Colors.grey),
+                                  style: TextStyle(color: AppColors.cancelButton),
                                 ),
                               ),
                               TextButton(
@@ -898,19 +1012,20 @@ void _showAddToolDialog(
                       context: dialogContext,
                       builder: (BuildContext confirmationContext) {
                         return AlertDialog(
-                          title: const Text('Confirm Update'),
+                          backgroundColor: AppColors.textFieldColor2,
+                          title:  Text('Confirm Update', style:  TextStyle(color: AppColors.textColorPrimary),),
                           content: Text(
                             'Updating $selectedTool will modify this tool for all crew members who have it, and will update it in your gear inventory if it exists. Do you want to proceed?',
-                            style: const TextStyle(fontSize: 16),
+                            style:  TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
                           ),
                           actions: [
                             TextButton(
                               onPressed: () {
                                 Navigator.of(confirmationContext).pop(); // Close the confirmation dialog
                               },
-                              child: const Text(
+                              child:  Text(
                                 'Cancel',
-                                style: TextStyle(color: Colors.grey),
+                                style: TextStyle(color: AppColors.cancelButton),
                               ),
                             ),
                             TextButton(
@@ -979,9 +1094,9 @@ void _showAddToolDialog(
                                 parentSetState(() {}); // Reflect changes in the parent state
                                 Navigator.of(dialogContext).pop(); // Close the main dialog
                               },
-                              child: const Text(
+                              child:  Text(
                                 'Update',
-                                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold),
                               ),
                             ),
                           ],
@@ -990,9 +1105,9 @@ void _showAddToolDialog(
                     );
                   }
                 },
-                child: const Text(
+                child:  Text(
                   'Save',
-                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
