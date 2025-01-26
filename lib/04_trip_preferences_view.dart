@@ -4,9 +4,9 @@ import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '04_edit_trip_preference.dart';
+import 'CodeShare/colors.dart';
 import 'Data/trip_preferences.dart';
 import 'package:hive/hive.dart';
-
 
 class TripPreferences extends StatefulWidget {
   const TripPreferences({super.key});
@@ -14,8 +14,8 @@ class TripPreferences extends StatefulWidget {
   @override
   State<TripPreferences> createState() => _TripPreferencesState();
 }
-class _TripPreferencesState extends State<TripPreferences>{
 
+class _TripPreferencesState extends State<TripPreferences> {
   // late final Box<CrewMember> crewmemberBox;
   List<TripPreference> tripPreferenceList = [];
   late final Box<TripPreference> tripPreferenceBox;
@@ -26,8 +26,7 @@ class _TripPreferencesState extends State<TripPreferences>{
     // Open the Hive box and load the list of Gear items
     tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
     loadTripPreferenceList();
-   // savedPreferences.printTripPreferencesFromHive();
-
+    // savedPreferences.printTripPreferencesFromHive();
   }
 
   // Function to load all trip preferences upon screen opening
@@ -36,293 +35,322 @@ class _TripPreferencesState extends State<TripPreferences>{
       tripPreferenceList = tripPreferenceBox.values.toList();
     });
   }
+
   @override
   Widget build(BuildContext context) {
-
     // Should probably keep this in a style file so we don't have to keep using it over and over again
-    final ButtonStyle style =
-    ElevatedButton.styleFrom(
-        foregroundColor: Colors.black,
-        textStyle: const TextStyle(
-            fontSize: 24,
-            fontWeight:
-            FontWeight.bold),
-        backgroundColor: Colors.deepOrangeAccent,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        //surfaceTintColor: Colors.grey,
-        elevation: 15,
-        shadowColor: Colors.black,
-        side: const BorderSide(color: Colors.black, width: 2),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12)),
-        // Maybe change? Dynamic button size based on screen size
-        fixedSize: Size(MediaQuery.of(context).size.width / 1.6, MediaQuery.of(context).size.height / 10)
+    final screenWidth = MediaQuery.of(context).size.width;
+    final double panelHeight = 80.0; // Height for the panels
+    final double panelWidth = screenWidth * 0.6;
+
+    BoxDecoration panelDecoration = BoxDecoration(
+      color: AppColors.panelColor,
+      borderRadius: BorderRadius.circular(10),
+      border: Border.all(
+        color: Colors.black, // Outline color
+        width: 2.0, // Outline width
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.2),
+          blurRadius: 10,
+          offset: const Offset(0, 4),
+        ),
+      ],
     );
 
+    TextStyle panelTextStyle = TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+      color: AppColors.textColorPrimary,
+    );
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Trip Preferences',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back, // The back arrow icon
+            color: AppColors.textColorPrimary, // Set the desired color
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(); // Navigate back when pressed
+          },
         ),
-        backgroundColor: Colors.deepOrangeAccent,
+        backgroundColor: AppColors.appBarColor,
+        title: Text(
+          'Trip Preferences',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+        ),
       ),
       body: Stack(
         children: [
           Container(
-            child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                // Blur effect
-                child: Image.asset('assets/images/logo1.png',
-                  fit: BoxFit.cover, // Cover  entire background
-                  width: double.infinity,
-                  height: double.infinity,
-                )
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Expanded(
-                  child:
-                  Stack(
-                    children: [
-                      ListView.builder(
-                      itemCount: tripPreferenceList.length,
-                      itemBuilder: (context, index) {
-
-                        final tripPreference = tripPreferenceList[index];
-
-                        // Display TripPreference data in a scrollable list
-                        return Card(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              // Could change color here
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(9),
-                            ),
-                            child: ListTile(
-                              iconColor: Colors.black,
-                              title: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      tripPreference.tripPreferenceName,
-                                      style: const TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold
-                                      ),
-                                        overflow: TextOverflow.ellipsis, // Add this
-                                        maxLines: 1,
-                                    ),
-                                  ),
-                                  IconButton(
-                                      icon: const Icon(
-                                          Icons.edit,
-                                          color: Colors.black,
-                                          size: 32
-                                      ),
-                                    onPressed: () async {
-                                      // Awaits the result from the next page so it updates in real time
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => EditTripPreference(tripPreference: tripPreference, onUpdate: loadTripPreferenceList),
-                                        ),
-                                      );
-                                      // Calls the update function after returning from AddTripPreference
-                                      loadTripPreferenceList();
-                                    },
-                                  )
-                                ],
-                              ),
-                              leading: FaIcon(FontAwesomeIcons.fire),
-                              trailing: IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red),
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text(
-                                            'Delete ${tripPreference.tripPreferenceName}?',
-                                            style: const TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                            )
-                                        ),
-                                        content: Text('This trip preference data (${tripPreference.tripPreferenceName}) will be erased!',
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                            )),
-                                        actions: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();  // Dismiss dialog
-                                                },
-                                                child: const Text('Cancel',
-                                                    style: TextStyle(
-                                                      fontSize: 22,
-                                                    )),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-
-                                                  // // Remove item from the Hive box
-                                                  // final keyToRemove = crewmemberBox.keys.firstWhere(
-                                                  //       (key) => crewmemberBox.get(key) == widget.crewMember,
-                                                  //   orElse: () => null,
-                                                  // );
-                                                  //
-                                                  // if (keyToRemove != null) {
-                                                  //   crewmemberBox.delete(keyToRemove);
-                                                  // }
-
-                                                  // Remove the crew member
-                                                  savedPreferences.removeTripPreference(tripPreference);
-
-                                                  // Show deletion pop-up
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(
-                                                      content: Center(
-                                                        child: Text('Trip Preference Deleted!',
-                                                          // Maybe change look
-                                                          style: const TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 32,
-                                                            fontWeight: FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      duration: Duration(seconds: 2),
-                                                      backgroundColor: Colors.red,
-                                                    ),
-                                                  );
-
-                                                  Navigator.of(context).pop();  // Dismiss the dialog
-                                                  loadTripPreferenceList();
-                                                },
-                                                child: const Text('OK',
-                                                    style: TextStyle(
-                                                      fontSize: 22,
-                                                    )),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-
-                              ),
+            color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
+            child: AppColors.isDarkMode
+                ? (AppColors.enableBackgroundImage
+                    ? Stack(
+                        children: [
+                          ImageFiltered(
+                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                            child: Image.asset(
+                              'assets/images/logo1.png',
+                              fit: BoxFit.cover, // Cover the entire background
+                              width: double.infinity,
+                              height: double.infinity,
                             ),
                           ),
-                        );
-                      },
+                          Container(
+                            color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ],
+                      )
+                    : null) // No image if background is disabled
+                : ImageFiltered(
+                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+                    child: Image.asset(
+                      'assets/images/logo1.png',
+                      fit: BoxFit.cover, // Cover the entire background
+                      width: double.infinity,
+                      height: double.infinity,
                     ),
-                      Positioned(
-                        bottom: 10,
-                        left: 16,
-                        right: 16,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            // Awaits the result from the next page so it updates in real time
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AddTripPreference(onUpdate: loadTripPreferenceList),
-                              ),
-                            );
-                            // Calls the update function after returning from AddTripPreference
-                            loadTripPreferenceList();
-                          },
-
-                          style: style,
-                          child: Row(
-                            children: [
-                              const Icon(
-                                  Icons.add,
-                                  color: Colors.black,
-                                  size: 32
-                              ),
-
-                              Flexible( // Allows text to be wrapped
-                                child: Text(
-                                  'Trip Preference',
-                                  textAlign: TextAlign.center,
-                                  softWrap: true,
+                  ),
+          ),
+          Stack(
+            children: [
+              Container(
+                color: Colors.white.withValues(alpha: 0.05),
+              ),
+              Container(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min, // Ensures the column only takes required space
+                    children: [
+                      Flexible(
+                        child: tripPreferenceList.isEmpty
+                            ? Card(
+                                color: AppColors.textFieldColor,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(9),
+                                  ),
+                                  child: ListTile(
+                                    iconColor: AppColors.primaryColor,
+                                    title: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            'No Trip Preferences created...',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.textColorPrimary,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
+                              )
+                            : ListView.builder(
+                                shrinkWrap: true, // Ensures the list takes only the necessary height
+
+                                itemCount: tripPreferenceList.length,
+                                itemBuilder: (context, index) {
+                                  final tripPreference = tripPreferenceList[index];
+
+                                  // Display TripPreference data in a scrollable list
+                                  return Card(
+                                    color: AppColors.textFieldColor,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        // Could change color here
+                                        borderRadius: BorderRadius.circular(9),
+                                      ),
+                                      child: ListTile(
+                                        iconColor: AppColors.primaryColor,
+                                        title: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                tripPreference.tripPreferenceName,
+                                                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                                overflow: TextOverflow.ellipsis, // Add this
+                                                maxLines: 1,
+                                              ),
+                                            ),
+                                            IconButton(
+                                                icon: Icon(Icons.more_vert, color: AppColors.textColorPrimary, size: 32),
+                                                onPressed: () {
+                                                  showModalBottomSheet(
+                                                    backgroundColor: AppColors.textFieldColor2,
+                                                    context: context,
+                                                    builder: (BuildContext context) {
+                                                      return Column(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: <Widget>[
+                                                          ListTile(
+                                                            leading: Icon(Icons.edit, color: AppColors.textColorPrimary),
+                                                            title: Text(
+                                                              'Edit Trip Preference',
+                                                              style: TextStyle(color: AppColors.textColorPrimary),
+                                                            ),
+                                                            onTap: () async {
+                                                              Navigator.of(context).pop(); //
+
+                                                              // Awaits the result from the next page so it updates in real time
+                                                              await Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder: (context) => EditTripPreference(tripPreference: tripPreference, onUpdate: loadTripPreferenceList),
+                                                                ),
+                                                              );
+                                                              // Calls the update function after returning from AddTripPreference
+                                                              loadTripPreferenceList();
+                                                            },
+                                                          ),
+                                                          ListTile(
+                                                            leading: Icon(Icons.delete, color: Colors.red),
+                                                            title: Text(
+                                                              'Delete Trip Preference',
+                                                              style: TextStyle(color: AppColors.textColorPrimary),
+                                                            ),
+                                                            onTap: () {
+                                                              Navigator.of(context).pop(); // Close the dialog without deleting
+
+                                                              showDialog(
+                                                                context: context,
+                                                                builder: (BuildContext context) {
+                                                                  return AlertDialog(
+                                                                    backgroundColor: AppColors.textFieldColor2,
+                                                                    title: Text(
+                                                                      'Confirm Deletion',
+                                                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                                                    ),
+                                                                    content: Text(
+                                                                      'This Trip Preference will be erased!',
+                                                                      style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                                                    ),
+                                                                    actions: [
+                                                                      TextButton(
+                                                                        onPressed: () {
+                                                                          Navigator.of(context).pop(); // Close the dialog without deleting
+                                                                        },
+                                                                        child: Text(
+                                                                          'Cancel',
+                                                                          style: TextStyle(color: AppColors.cancelButton),
+                                                                        ),
+                                                                      ),
+                                                                      TextButton(
+                                                                        onPressed: () {
+                                                                          savedPreferences.removeTripPreference(tripPreference);
+
+                                                                          // Show deletion pop-up
+                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                            SnackBar(
+                                                                              content: Center(
+                                                                                child: Text(
+                                                                                  'Trip Preference Deleted!',
+                                                                                  // Maybe change look
+                                                                                  style: const TextStyle(
+                                                                                    color: Colors.black,
+                                                                                    fontSize: 32,
+                                                                                    fontWeight: FontWeight.bold,
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              duration: Duration(seconds: 2),
+                                                                              backgroundColor: Colors.red,
+                                                                            ),
+                                                                          );
+
+                                                                          Navigator.of(context).pop(); // Dismiss the dialog
+                                                                          loadTripPreferenceList();
+                                                                        },
+                                                                        child: const Text(
+                                                                          'Delete',
+                                                                          style: TextStyle(color: Colors.red),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  );
+                                                                },
+                                                              );
+                                                            },
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                })
+                                          ],
+                                        ),
+                                        leading: FaIcon(FontAwesomeIcons.fire),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
+                      SizedBox(height: 8), // Adds spacing between the list and the panel
+
+                      GestureDetector(
+                        onTap: () async {
+                          // Awaits the result from the next page so it updates in real time
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddTripPreference(onUpdate: loadTripPreferenceList),
+                            ),
+                          );
+                          // Calls the update function after returning from AddTripPreference
+                          loadTripPreferenceList();
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4), // Padding around the text and icon
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(8), // Rounded corners
+                            boxShadow: AppColors.isDarkMode
+                                ? [] // No shadow in dark mode
+                                : [
+                              BoxShadow(
+                                color: Colors.white.withValues(alpha: 0.5), // Shadow color
+                                spreadRadius: 0, // Spread of the shadow
+                                blurRadius: 20, // Blur effect
+                                offset: Offset(0, 0), // Offset in x and y direction
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min, // Ensures the container width is only as wide as its content
+                            children: [
+                              Icon(FontAwesomeIcons.circlePlus, color: AppColors.primaryColor,),
+                              SizedBox(width: 8), // Space between the icon and the text
+                              Text(
+                                'Trip Preference',
+                                textAlign: TextAlign.center,
+                                softWrap: true,
+                                style: panelTextStyle,
                               ),
                             ],
                           ),
                         ),
                       ),
-
                     ],
                   ),
-
                 ),
-
-                // + Add Load Preference
-                // Make scrollable with the list of loadouts
-
-                // Delete All Button
-                // Padding(
-                //   padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-                //   child: Container(
-                //     width: double.infinity,
-                //     decoration: BoxDecoration(
-                //       color: Colors.deepOrangeAccent,
-                //       border: Border.all(color: Colors.black, width: 2),
-                //       borderRadius: BorderRadius.circular(4),
-                //       boxShadow: [
-                //         BoxShadow(
-                //           color: Colors.black.withOpacity(0.5),
-                //           spreadRadius: 1,
-                //           blurRadius: 8,
-                //           offset: Offset(0, 3),
-                //         ),
-                //       ],
-                //     ),
-                //     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                //     //alignment: Alignment.center,
-                //     child: Row(
-                //       children: [
-                //         Text(
-                //           'Delete all',
-                //           style: const TextStyle(
-                //             fontSize: 24,
-                //             fontWeight: FontWeight.bold,
-                //             color: Colors.black,
-                //           ),
-                //         ),
-                //         Spacer(),
-                //         IconButton(
-                //             icon: const Icon(
-                //                 Icons.delete,
-                //                 color: Colors.black,
-                //                 size: 32
-                //             ),
-                //             onPressed: (){
-                //               savedPreferences.deleteAllTripPreferences();
-                //               loadTripPreferenceList();
-                //             }
-                //         )
-                //       ],
-                //     ),
-                //   ),
-                // ),
-
-              ],
-            ),
+              ),
+            ],
           ),
-
         ],
       ),
     );

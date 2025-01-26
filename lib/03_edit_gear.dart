@@ -123,10 +123,13 @@ class _EditGearState extends State<EditGear> {
           builder: (BuildContext context) {
             return AlertDialog(
               backgroundColor: AppColors.textFieldColor2,
-              title:  Text('Gear Conflict', style: TextStyle(color: AppColors.textColorPrimary),),
+              title: Text(
+                'Gear Conflict',
+                style: TextStyle(color: AppColors.textColorPrimary),
+              ),
               content: Text(
                 '$capitalizedGearName must be of the weight, ${personalToolsList.firstWhere((gear) => gear.name.toLowerCase() == newGearName.toLowerCase()).weight} lbs. To edit this weight, do so in the "Add Crew Member" page.',
-                style:  TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
               ),
               actions: [
                 TextButton(
@@ -154,10 +157,10 @@ class _EditGearState extends State<EditGear> {
         builder: (BuildContext context) {
           return AlertDialog(
             backgroundColor: AppColors.textFieldColor2,
-            title:  Text('Gear Conflict', style: TextStyle(color: AppColors.textColorPrimary)),
+            title: Text('Gear Conflict', style: TextStyle(color: AppColors.textColorPrimary)),
             content: Text(
               "$matchingGearName already exists. If you would like to add more, edit the existing item's quantity.",
-              style:  TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
             ),
             actions: [
               TextButton(
@@ -250,10 +253,112 @@ class _EditGearState extends State<EditGear> {
           },
         ),
         backgroundColor: AppColors.appBarColor,
-        title:  Text(
+        title: Text(
           'Edit Gear',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  backgroundColor: AppColors.textFieldColor2,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        ListTile(
+                          leading: Icon(Icons.delete, color: Colors.red),
+                          title: Text(
+                            'Delete Gear',
+                            style: TextStyle(color: AppColors.textColorPrimary),
+                          ),
+                          onTap: () {
+                            Navigator.of(context).pop(); // Close the dialog without deleting
+
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  backgroundColor: AppColors.textFieldColor2,
+                                  title: Text(
+                                    'Confirm Deletion',
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                  ),
+                                  content: Text(
+                                    'This gear data ($oldGearName) and any gear preference data containing it will be erased!',
+                                    style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(); // Close the dialog without deleting
+                                      },
+                                      child: Text(
+                                        'Cancel',
+                                        style: TextStyle(color: AppColors.cancelButton),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        // Remove item from the Hive box
+                                        final keyToRemove = gearBox.keys.firstWhere(
+                                          (key) => gearBox.get(key) == widget.gear,
+                                          orElse: () => null,
+                                        );
+
+                                        if (keyToRemove != null) {
+                                          gearBox.delete(keyToRemove);
+                                        }
+
+                                        // Remove the crew member from local memory
+                                        crew.removeGear(widget.gear);
+
+                                        widget.onUpdate(); // Callback function to update UI with new data
+
+                                        // Show deletion pop-up
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Center(
+                                              child: Text(
+                                                '$oldGearName Deleted!',
+                                                // Maybe change look
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 32,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            duration: Duration(seconds: 2),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+
+                                        Navigator.of(context).pop(); // Dismiss the dialog
+                                        Navigator.of(context).pop(); // Return to previous screen
+                                      },
+                                      child: const Text(
+                                        'Delete',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              icon: Icon(
+                Icons.more_vert,
+                color: AppColors.textColorPrimary,
+              ))
+        ],
       ),
       body: GestureDetector(
         onTap: () {
@@ -274,34 +379,34 @@ class _EditGearState extends State<EditGear> {
                     color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
                     child: AppColors.isDarkMode
                         ? (AppColors.enableBackgroundImage
-                        ? Stack(
-                      children: [
-                        ImageFiltered(
-                          imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                          child: Image.asset(
-                            'assets/images/logo1.png',
-                            fit: BoxFit.cover, // Cover the entire background
-                            width: double.infinity,
-                            height: double.infinity,
-                          ),
-                        ),
-                        Container(
-                          color: AppColors.logoImageOverlay, // Semi-transparent overlay
-                          width: double.infinity,
-                          height: double.infinity,
-                        ),
-                      ],
-                    )
-                        : null) // No image if background is disabled
+                            ? Stack(
+                                children: [
+                                  ImageFiltered(
+                                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                                    child: Image.asset(
+                                      'assets/images/logo1.png',
+                                      fit: BoxFit.cover, // Cover the entire background
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                    ),
+                                  ),
+                                  Container(
+                                    color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  ),
+                                ],
+                              )
+                            : null) // No image if background is disabled
                         : ImageFiltered(
-                      imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
-                      child: Image.asset(
-                        'assets/images/logo1.png',
-                        fit: BoxFit.cover, // Cover the entire background
-                        width: double.infinity,
-                        height: double.infinity,
-                      ),
-                    ),
+                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+                            child: Image.asset(
+                              'assets/images/logo1.png',
+                              fit: BoxFit.cover, // Cover the entire background
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
                   ),
 
                   Container(
@@ -320,14 +425,14 @@ class _EditGearState extends State<EditGear> {
                               maxLength: 20,
                               decoration: InputDecoration(
                                 labelText: 'Edit gear name',
-                                labelStyle:  TextStyle(
+                                labelStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
                                   fontSize: 22,
                                 ),
                                 filled: true,
                                 fillColor: AppColors.textFieldColor,
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide:  BorderSide(
+                                  borderSide: BorderSide(
                                     color: AppColors.borderPrimary,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
@@ -335,7 +440,7 @@ class _EditGearState extends State<EditGear> {
                                   borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide:  BorderSide(
+                                  borderSide: BorderSide(
                                     color: AppColors.primaryColor,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
@@ -343,7 +448,7 @@ class _EditGearState extends State<EditGear> {
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
                               ),
-                              style:  TextStyle(
+                              style: TextStyle(
                                 color: AppColors.textColorPrimary,
                                 fontSize: 28,
                               ),
@@ -364,11 +469,11 @@ class _EditGearState extends State<EditGear> {
                               decoration: InputDecoration(
                                 labelText: 'Edit weight',
                                 hintText: 'Up to 500 lbs',
-                                hintStyle:  TextStyle(
+                                hintStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
                                   fontSize: 20,
                                 ),
-                                labelStyle:  TextStyle(
+                                labelStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
                                   fontSize: 22,
                                   //fontWeight: FontWeight.bold,
@@ -376,7 +481,7 @@ class _EditGearState extends State<EditGear> {
                                 filled: true,
                                 fillColor: AppColors.textFieldColor,
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide:  BorderSide(
+                                  borderSide: BorderSide(
                                     color: AppColors.borderPrimary,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
@@ -384,7 +489,7 @@ class _EditGearState extends State<EditGear> {
                                   borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide:  BorderSide(
+                                  borderSide: BorderSide(
                                     color: AppColors.primaryColor,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
@@ -392,7 +497,7 @@ class _EditGearState extends State<EditGear> {
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
                               ),
-                              style:  TextStyle(
+                              style: TextStyle(
                                 color: AppColors.textColorPrimary,
                                 fontSize: 28,
                               ),
@@ -413,11 +518,11 @@ class _EditGearState extends State<EditGear> {
                               decoration: InputDecoration(
                                 labelText: 'Edit quantity',
                                 hintText: 'Up to 99',
-                                hintStyle:  TextStyle(
+                                hintStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
                                   fontSize: 20,
                                 ),
-                                labelStyle:  TextStyle(
+                                labelStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
                                   fontSize: 22,
                                   //fontWeight: FontWeight.bold,
@@ -425,7 +530,7 @@ class _EditGearState extends State<EditGear> {
                                 filled: true,
                                 fillColor: AppColors.textFieldColor,
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide:  BorderSide(
+                                  borderSide: BorderSide(
                                     color: AppColors.borderPrimary,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
@@ -433,7 +538,7 @@ class _EditGearState extends State<EditGear> {
                                   borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide:  BorderSide(
+                                  borderSide: BorderSide(
                                     color: AppColors.primaryColor,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
@@ -441,7 +546,7 @@ class _EditGearState extends State<EditGear> {
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
                               ),
-                              style:  TextStyle(
+                              style: TextStyle(
                                 color: AppColors.textColorPrimary,
                                 fontSize: 28,
                               ),
@@ -455,98 +560,12 @@ class _EditGearState extends State<EditGear> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Spacer(flex: 2),
+                              const Spacer(),
                               ElevatedButton(
                                   onPressed: isSaveButtonEnabled ? () => saveData() : null, // Button is only enabled if there is input
                                   style: style, // Main button theme
                                   child: const Text('Save')),
-                              const Spacer(flex: 1),
-                              IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red, size: 32),
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        backgroundColor: AppColors.textFieldColor2,
-                                        title: Text('Delete $oldGearName?',
-                                            style:  TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.textColorPrimary
-                                            )),
-                                        content: Text('This gear data ($oldGearName) and any gear preference data containing it will be erased!',
-                                            style:  TextStyle(
-                                              fontSize: 18,
-                                              color: AppColors.textColorPrimary
-                                            )),
-                                        actions: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop(); // Dismiss the dialog
-                                                },
-                                                child:  Text('Cancel',
-                                                    style: TextStyle(
-                                                      fontSize: 22,
-                                                      color: AppColors.cancelButton
-                                                    )),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-                                                  // Remove item from the Hive box
-                                                  final keyToRemove = gearBox.keys.firstWhere(
-                                                    (key) => gearBox.get(key) == widget.gear,
-                                                    orElse: () => null,
-                                                  );
-
-                                                  if (keyToRemove != null) {
-                                                    gearBox.delete(keyToRemove);
-                                                  }
-
-                                                  // Remove the crew member from local memory
-                                                  crew.removeGear(widget.gear);
-
-                                                  widget.onUpdate(); // Callback function to update UI with new data
-
-                                                  // Show deletion pop-up
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(
-                                                      content: Center(
-                                                        child: Text(
-                                                          '$oldGearName Deleted!',
-                                                          // Maybe change look
-                                                          style: const TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 32,
-                                                            fontWeight: FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      duration: Duration(seconds: 2),
-                                                      backgroundColor: Colors.red,
-                                                    ),
-                                                  );
-
-                                                  Navigator.of(context).pop(); // Dismiss the dialog
-                                                  Navigator.of(context).pop(); // Return to previous screen
-                                                },
-                                                child:  Text('OK',
-                                                    style: TextStyle(
-                                                      fontSize: 22,
-                                                      color: AppColors.saveButtonAllowableWeight
-                                                    )),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                              )
+                              const Spacer(),
                             ],
                           ),
                         ),

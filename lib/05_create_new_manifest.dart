@@ -663,7 +663,34 @@ class _QuickManifestState extends State<QuickManifest> {
     newTrip.gear = thisTripGearList.map((item) => item.copyWith()).toList();
 
     newTrip.calculateTotalCrewWeight();
-
+    if (crewList.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                backgroundColor: AppColors.textFieldColor2,
+                title: Text(
+                  'No Crew Members Available',
+                  style: TextStyle(color: AppColors.textColorPrimary),
+                ),
+                content: Text('There are no existing crew members. Create at least one to begin manifesting.', style: TextStyle(color: AppColors.textColorPrimary)),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK', style: TextStyle(color: AppColors.textColorPrimary)),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+      return;
+    }
     if (newTrip.crewMembers.isEmpty) {
       showDialog(
         context: context,
@@ -751,7 +778,7 @@ class _QuickManifestState extends State<QuickManifest> {
     final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
         textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        backgroundColor: AppColors.fireColor,
+        backgroundColor: Colors.green,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         //surfaceTintColor: Colors.grey,
         elevation: 15,

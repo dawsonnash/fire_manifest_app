@@ -25,9 +25,16 @@ class AppColors {
   static bool enableBackgroundImage = false; // Default to background image disabled
 }
 
+class AppData {
+  static String crewName = 'Crew Name';
+
+}
+
+
 class ThemePreferences {
   static const _key = 'isDarkMode';
   static const _backgroundImageKey = 'enableBackgroundImage';
+  static const _crewNameKey = '';
 
   static Future<bool> getTheme() async {
     final prefs = await SharedPreferences.getInstance();
@@ -48,4 +55,16 @@ class ThemePreferences {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_backgroundImageKey, value);
   }
+
+  static Future<String> getCrewName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_crewNameKey) ?? '';
+  }
+
+  static Future<void> setCrewName(String crewName) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_crewNameKey, crewName);
+  }
+
+
 }

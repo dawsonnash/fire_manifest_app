@@ -66,7 +66,6 @@ class _SavedTripsState extends State<SavedTripsView> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true, // Centers the title
-
         title:
             Text(
               'Saved Trips',
@@ -133,7 +132,6 @@ class _SavedTripsState extends State<SavedTripsView> {
 
                                           // Close the dialogs
                                           Navigator.of(context).pop(); // Close confirmation dialog
-                                          Navigator.of(context).pop(); // Close bottom sheet
                                         },
                                         child: const Text(
                                           'Delete',
@@ -191,26 +189,36 @@ class _SavedTripsState extends State<SavedTripsView> {
           ),
           // Saved Trips list
           if (savedTrips.savedTrips.isEmpty)
-            Container(
-              child: Center(
-                child: Text(
-                  "No trips created...",
-                  style: TextStyle(
-                    color: AppColors.textColorPrimary,
-                    fontSize: 20,
-                    shadows: AppColors.isDarkMode
-                        ? null // No shadow in dark mode
-                        : [
-                            Shadow(
-                              offset: Offset(0, 0),
-                              blurRadius: 60.0,
-                              color: Colors.white,
-                            ),
-                          ],
+            Center( // Ensure the card is centered on the screen
+              child: Card(
+                color: AppColors.isDarkMode ? Colors.transparent : Colors.white, // White card only in light mode
+                elevation: AppColors.isDarkMode ? 0 : 4, // Add elevation for light mode
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4), // Optional rounded corners
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(12), // Padding inside the card
+                  child: Text(
+                    "No trips created...",
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: 20,
+                      fontWeight: AppColors.isDarkMode ? FontWeight.normal : FontWeight.bold,
+                      shadows: AppColors.isDarkMode
+                          ? null // No shadow in dark mode
+                          : [
+                        Shadow(
+                          offset: Offset(0, 0),
+                          blurRadius: 60.0,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
+
 
           Container(
             color: Colors.white.withValues(alpha: 0.05),

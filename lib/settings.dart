@@ -11,8 +11,10 @@ class SettingsView extends StatefulWidget {
   final bool enableBackgroundImage;
   final Function(bool) onThemeChanged;
   final Function(bool) onBackgroundImageChange;
+  final String crewName;
+  final Function(String) onCrewNameChanged;
 
-  const SettingsView({super.key, required this.isDarkMode, required this.onThemeChanged, required this.enableBackgroundImage, required this.onBackgroundImageChange});
+  const SettingsView({super.key, required this.isDarkMode, required this.onThemeChanged, required this.enableBackgroundImage, required this.onBackgroundImageChange, required this.crewName, required this.onCrewNameChanged});
 
   @override
   State<SettingsView> createState() => _SettingsState();
@@ -21,13 +23,20 @@ class SettingsView extends StatefulWidget {
 class _SettingsState extends State<SettingsView> {
   late bool isDarkMode;
   late bool enableBackgroundImage;
+  late TextEditingController crewNameController;
 
   @override
   void initState() {
     super.initState();
     isDarkMode = widget.isDarkMode;
     enableBackgroundImage = widget.enableBackgroundImage;
+    crewNameController = TextEditingController(text: widget.crewName); // Initialize with the current crew name
 
+  }
+  @override
+  void dispose() {
+    crewNameController.dispose(); // Dispose the controller to free resources
+    super.dispose();
   }
 
   Future<void> _sendFeedback() async {
@@ -206,63 +215,50 @@ class _SettingsState extends State<SettingsView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Dark Mode Toggle
-                        ListTile(
-                          title: const Text(
-                            'Dark Mode',
+                        // Display Dropdown
+                        ExpansionTile(
+                          title:  Text(
+                            'Display',
                             style: TextStyle(fontSize: 18, color: Colors.white), // White text for the label
                           ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min, // Ensure the row takes only as much space as needed
-                            children: [
-                              Text(
-                                isDarkMode ? 'ON' : 'OFF', // Display ON or OFF
-                                style: const TextStyle(fontSize: 16, color: Colors.white), // White text for ON/OFF
+                          trailing: Icon(
+                            Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
+                            color: Colors.white,       // Match the arrow color with the text color
+                            size: 24,                  // Set a fixed size for consistency
+                          ),
+                          children: [
+                            // Dark Mode Toggle
+                            ListTile(
+                              title: const Text(
+                                'Dark Mode',
+                                style: TextStyle(fontSize: 18, color: Colors.white),
                               ),
-                              const SizedBox(width: 8), // Add some space between text and switch
-                              Switch(
+                              trailing: Switch(
                                 value: isDarkMode,
                                 onChanged: (value) {
                                   widget.onThemeChanged(value); // Notify parent widget
                                   setState(() {
                                     isDarkMode = value;
-                                    // Disable background image if dark mode is off
                                     if (!isDarkMode) {
                                       enableBackgroundImage = false;
                                       ThemePreferences.setBackgroundImagePreference(false);
                                     }
-                                    // Disable background image if dark mode is enabled
-                                    if (isDarkMode) {
-                                      enableBackgroundImage = false;
-                                      ThemePreferences.setBackgroundImagePreference(false);
-                                      widget.onBackgroundImageChange(false); // Notify parent widget of the change
-                                    }
+                                    ThemePreferences.setTheme(value); // Save dark mode preference
                                   });
-                                  ThemePreferences.setTheme(value); // Save dark mode preference
                                 },
-                                activeColor: Colors.green, // Green when ON
-                                inactiveThumbColor: Colors.grey, // Grey thumb when OFF
-                                inactiveTrackColor: Colors.white24, // Lighter grey for the track
+                                activeColor: Colors.green,
+                                inactiveThumbColor: Colors.grey,
+                                inactiveTrackColor: Colors.white24,
                               ),
-                            ],
-                          ),
-                        ),
-                        // Enable Background Image Toggle (Visible only if Dark Mode is ON)
-                        if (isDarkMode)
-                          ListTile(
-                            title: const Text(
-                              'Enable Background Image',
-                              style: TextStyle(fontSize: 18, color: Colors.white), // White text for the label
                             ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min, // Ensure the row takes only as much space as needed
-                              children: [
-                                Text(
-                                  enableBackgroundImage ? 'ON' : 'OFF', // Display ON or OFF
-                                  style: const TextStyle(fontSize: 16, color: Colors.white), // White text for ON/OFF
+                            // Enable Background Image Toggle (Visible only if Dark Mode is ON)
+                            if (isDarkMode)
+                              ListTile(
+                                title: const Text(
+                                  'Enable Background Image',
+                                  style: TextStyle(fontSize: 18, color: Colors.white),
                                 ),
-                                const SizedBox(width: 8), // Add some space between text and switch
-                                Switch(
+                                trailing: Switch(
                                   value: enableBackgroundImage,
                                   onChanged: (value) {
                                     widget.onBackgroundImageChange(value); // Notify parent widget
@@ -271,16 +267,64 @@ class _SettingsState extends State<SettingsView> {
                                     });
                                     ThemePreferences.setBackgroundImagePreference(value); // Save preference
                                   },
-                                  activeColor: Colors.green, // Green when ON
-                                  inactiveThumbColor: Colors.grey, // Grey thumb when OFF
-                                  inactiveTrackColor: Colors.white24, // Lighter grey for the track
+                                  activeColor: Colors.green,
+                                  inactiveThumbColor: Colors.grey,
+                                  inactiveTrackColor: Colors.white24,
                                 ),
-                              ],
-                            ),
-                          ),
+                              ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
+                  // Crew Name
+                  Padding(
+                    padding: const EdgeInsets.only(left: 48.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Crew Name Section
+
+                        ExpansionTile(
+                          title: Text('Crew Name', style: TextStyle(color: Colors.white, fontSize: 18),),
+                          trailing: Icon(
+                            Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
+                            color: Colors.white,       // Match the arrow color with the text color
+                            size: 24,                  // Set a fixed size for consistency
+                          ),
+                          children: [
+                            ListTile(
+                            title:  TextField(
+                              controller: crewNameController, // Pre-fill with current crew name
+                              style: const TextStyle(color: Colors.white, fontSize: 18),
+                              decoration: InputDecoration(
+
+                                hintText: 'Enter Crew Name',
+                                hintStyle: const TextStyle(color: Colors.white54),
+                                enabledBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white54),
+                                ),
+                                focusedBorder:  UnderlineInputBorder(
+                                  borderSide: BorderSide(color: AppColors.fireColor),
+                                ),
+                              ),
+                              onSubmitted: (value) {
+                                setState(() {
+                                  if (value.trim().isNotEmpty) {
+                                    widget.onCrewNameChanged(value.trim()); // Notify parent widget of the change
+                                  }
+                                });
+                                // Call a callback or save preference
+                                ThemePreferences.setCrewName(value.trim()); // Save crew name preference (optional)
+                              },
+                            ),
+                          ),
+            ],
+                        ),
+                      ],
+                    ),
+                  ),
+
                   Divider(color: Colors.white),
                   // Legal Section
                   ListTile(

@@ -66,6 +66,7 @@ void main() async {
   // Initialize the dark mode and background image setting
   AppColors.isDarkMode = await ThemePreferences.getTheme();
   AppColors.enableBackgroundImage = await ThemePreferences.getBackgroundImagePreference();
+  AppData.crewName = await ThemePreferences.getCrewName(); // Initialize AppData.crewName
 
   // start app
   runApp(MyApp(showDisclaimer: !agreedToTerms));
@@ -104,12 +105,16 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Widget> get _pages => [
         CreateNewManifest(onSwitchTab: _onItemTapped), // Pass the callback
         SavedTripsView(),
-        EditCrew(),
+        EditCrew(
+        ),
         SettingsView(
           isDarkMode: AppColors.isDarkMode,
           enableBackgroundImage: AppColors.enableBackgroundImage,
+          crewName: AppData.crewName,
           onThemeChanged: _toggleTheme,
           onBackgroundImageChange: _toggleBackgroundImage,
+          onCrewNameChanged: _changeCrewName,
+
         ),
       ];
 
@@ -124,6 +129,12 @@ class _MyHomePageState extends State<MyHomePage> {
       AppColors.enableBackgroundImage = enableBackgroundImage;
     });
     await ThemePreferences.setBackgroundImagePreference(enableBackgroundImage);
+  }
+  void _changeCrewName(String crewName) async {
+    setState(() {
+      AppData.crewName = crewName;
+    });
+    await ThemePreferences.setCrewName(crewName);
   }
 
   void _onItemTapped(int index) {

@@ -2,9 +2,11 @@ import 'dart:ui';
 import 'package:fire_app/03_edit_gear.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import '03_add_gear.dart';
 import 'CodeShare/colors.dart';
 import 'Data/crew.dart';
 import 'Data/gear.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class GearView extends StatefulWidget {
   const GearView({super.key});
@@ -36,6 +38,12 @@ class _GearViewState extends State<GearView> {
   @override
   Widget build(BuildContext context) {
     List<Gear> sortedGearList = sortGearListAlphabetically(gearList);
+
+    TextStyle panelTextStyle = TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+      color: AppColors.textColorPrimary,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -98,7 +106,6 @@ class _GearViewState extends State<GearView> {
                                         setState(() {});
                                         Navigator.of(context).pop();
                                         Navigator.of(context).pop();
-                                        Navigator.of(context).pop();
                                       },
                                       child: const Text(
                                         'Delete',
@@ -154,74 +161,139 @@ class _GearViewState extends State<GearView> {
                     ),
                   ),
           ),
-          Column(
-            children: [
-              Expanded(
-                child: Stack(
-                  children: [
-                    // ListView
-                    ListView.builder(
-                      itemCount: sortedGearList.length,
-                      padding: EdgeInsets.only(
-                        bottom: 80, // Ensure space for the button at the bottom
-                      ),
-                      itemBuilder: (context, index) {
-                        final gear = sortedGearList[index];
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.textFieldColor, // Background color
-                            border: Border(top: BorderSide(color: Colors.black, width: 1)), // Add a border
-                          ),
-                          child: ListTile(
-                            iconColor: AppColors.primaryColor,
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Container(
+            color: Colors.white.withValues(alpha: 0.05),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Stack(
+                    children: [
+                      gearList.isEmpty
+                          ? Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
                               children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                Card(
+                                                        color: AppColors.textFieldColor,
+                                                        child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(9),
+                                ),
+                                child: ListTile(
+                                  iconColor: AppColors.primaryColor,
+                                  title: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        gear.name,
-                                        style:  TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                      ),
-                                      Text(
-                                        '${gear.weight} lbs x ${gear.quantity}',
-                                        style:  TextStyle(
-                                          fontSize: 16,
-                                            color: AppColors.textColorPrimary
+                                      Expanded(
+                                        child: Text(
+                                          'No gear created...',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.textColorPrimary,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
                                         ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ],
                                   ),
                                 ),
-                                IconButton(
-                                  icon:  Icon(Icons.edit, color: AppColors.textColorPrimary, size: 32),
-                                  onPressed: () {
+                                                        ),
+                                                      ),
+                                SizedBox(height: 8), // Adds spacing between the list and the panel
+
+                                GestureDetector(
+                                  onTap: ()  {
+                                    Navigator.of(context).pop(); // Navigate back when pressed
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(
-                                        builder: (context) => EditGear(
-                                          gear: gear,
-                                          onUpdate: loadGearList, // Refresh the list on return
-                                        ),
-                                      ),
+                                      MaterialPageRoute(builder: (context) => const AddGear()),
                                     );
                                   },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                                    children: [
+                                      Icon(FontAwesomeIcons.circlePlus, color: AppColors.primaryColor,),
+                                      SizedBox(width: 8), // Space between the icon and the text
+                                      Text(
+                                        'Gear',
+                                        textAlign: TextAlign.center,
+                                        softWrap: true,
+                                        style: panelTextStyle,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                            leading:  Icon(Icons.work_outline_outlined),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                          )
+                          :
+                      // ListView
+                      ListView.builder(
+                        itemCount: sortedGearList.length,
+                        padding: EdgeInsets.only(
+                          bottom: 80, // Ensure space for the button at the bottom
+                        ),
+                        itemBuilder: (context, index) {
+                          final gear = sortedGearList[index];
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.textFieldColor, // Background color
+                              border: Border(top: BorderSide(color: Colors.black, width: 1)), // Add a border
+                            ),
+                            child: ListTile(
+                              iconColor: AppColors.primaryColor,
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          gear.name,
+                                          style:  TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                        ),
+                                        Text(
+                                          '${gear.weight} lbs x ${gear.quantity}',
+                                          style:  TextStyle(
+                                            fontSize: 16,
+                                              color: AppColors.textColorPrimary
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon:  Icon(Icons.edit, color: AppColors.textColorPrimary, size: 32),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => EditGear(
+                                            gear: gear,
+                                            onUpdate: loadGearList, // Refresh the list on return
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                              leading:  Icon(Icons.work_outline_outlined),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

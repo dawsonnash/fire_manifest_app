@@ -574,34 +574,49 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                             color: AppColors.textFieldColor, // Background color
                             border: Border(top: BorderSide(color: Colors.black, width: 1)), // Add a border
                           ),
-                          child: ListTile(
-                            iconColor: AppColors.primaryColor,
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      crewmember.name,
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textColorPrimary,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Flight Weight: ${crewmember.flightWeight} lbs',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: AppColors.textColorPrimary,
-                                      ),
-                                    ),
-                                  ],
+                          child: GestureDetector(
+                            onLongPress: () {
+                              // Show a crew member's position when the tile is held
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '${crewmember.name} • ${crewmember.getPositionTitle(crewmember.position)}',
+                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
+                                  ),
+                                  backgroundColor: AppColors.textFieldColor2,
+                                  duration: Duration(seconds: 2), // How long the message appears
                                 ),
-                              ],
+                              );
+                            },
+                            child: ListTile(
+                              iconColor: AppColors.primaryColor,
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        crewmember.name,
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textColorPrimary,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Flight Weight: ${crewmember.flightWeight} lbs',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: AppColors.textColorPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              leading: Icon(Icons.person),
                             ),
-                            leading: Icon(Icons.person),
                           ),
                         );
                       } else if (index < numCrewMembers + numGearItems) {
@@ -615,35 +630,52 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                 : AppColors.gearYellow.withValues(alpha: 0.9), // Background color
                             border: Border(bottom: BorderSide(color: Colors.black, width: 1)), // Add a border
                           ),
-                          child: ListTile(
-                            iconColor: Colors.black,
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          gearItem.name,
-                                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
-                                        ),
-                                        Text(
-                                          ' (x${gearItem.quantity})',
-                                          style: TextStyle(fontSize: 18, color: Colors.black),
-                                        ),
-                                      ],
-                                    ),
-                                    Text(
-                                      'Weight: ${gearItem.totalGearWeight} lbs',
-                                      style: TextStyle(fontSize: 18, color: Colors.black),
-                                    ),
-                                  ],
+                          child: GestureDetector(
+                            onLongPress: () {
+                              // Show a crew member's position when the tile is held
+                              if (gearItem.quantity > 1) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '${gearItem.name} • ${gearItem.weight} lbs each',
+                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
+                                  ),
+                                  backgroundColor: AppColors.textFieldColor2,
+                                  duration: Duration(seconds: 2), // How long the message appears
                                 ),
-                              ],
+                              );
+                              }
+                            },
+                            child: ListTile(
+                              iconColor: Colors.black,
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            gearItem.name,
+                                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
+                                          ),
+                                          Text(
+                                            ' (x${gearItem.quantity})',
+                                            style: TextStyle(fontSize: 18, color: Colors.black),
+                                          ),
+                                        ],
+                                      ),
+                                      Text(
+                                        'Weight: ${gearItem.totalGearWeight} lbs',
+                                        style: TextStyle(fontSize: 18, color: Colors.black),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              leading: Icon(Icons.work_outline_outlined),
                             ),
-                            leading: Icon(Icons.work_outline_outlined),
                           ),
                         );
                       } else {
