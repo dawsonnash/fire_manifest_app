@@ -11,6 +11,7 @@ class AppColors {
   static Color get textFieldColor2 => isDarkMode ? Colors.grey[900]! : Colors.white;
   static Color get textColorPrimary => isDarkMode ? Colors.white : Colors.black;
   static Color get textColorSecondary => isDarkMode ? Colors.black : Colors.white;
+  static Color get textColorEditToolDetails => isDarkMode ? Colors.white : Colors.blue;
   static Color get tabIconColor => isDarkMode ? Colors.grey[300]! :  Colors.grey[800]!;
   static Color get borderPrimary => isDarkMode ? Colors.grey[900]! : Colors.black;
   static Color get saveButtonAllowableWeight => isDarkMode ? Colors.deepOrangeAccent : Colors.blue;

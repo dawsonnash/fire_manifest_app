@@ -96,6 +96,8 @@ class _SavedTripsState extends State<SavedTripsView> {
                                 Navigator.of(context).pop(); // Close confirmation dialog
                                 return;
                               }
+                              Navigator.of(context).pop(); // Close the dialog without deleting
+
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
@@ -337,12 +339,11 @@ class _SavedTripsState extends State<SavedTripsView> {
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),
-                                                    const Text(
+                                                     Text(
                                                       '•',
                                                       style: TextStyle(
                                                         fontSize: 22,
-                                                        fontWeight: FontWeight.bold,
-                                                        color: Colors.white,
+                                                        color: AppColors.textColorPrimary,
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),

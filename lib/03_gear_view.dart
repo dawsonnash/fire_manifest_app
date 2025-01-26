@@ -2,20 +2,18 @@ import 'dart:ui';
 import 'package:fire_app/03_edit_gear.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'CodeShare/colors.dart';
 import 'Data/crew.dart';
 import 'Data/gear.dart';
-
 
 class GearView extends StatefulWidget {
   const GearView({super.key});
 
-
-
   @override
   State<GearView> createState() => _GearViewState();
 }
-class _GearViewState extends State<GearView>{
 
+class _GearViewState extends State<GearView> {
   late final Box<Gear> gearBox;
   List<Gear> gearList = [];
 
@@ -37,100 +35,125 @@ class _GearViewState extends State<GearView>{
 
   @override
   Widget build(BuildContext context) {
-
     List<Gear> sortedGearList = sortGearListAlphabetically(gearList);
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            const Text(
-            'Gear',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        centerTitle: true,
+        backgroundColor: AppColors.appBarColor,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back, // The back arrow icon
+            color: AppColors.textColorPrimary, // Set the desired color
           ),
-            Spacer(),
-            IconButton(
-                onPressed: (){
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          ListTile(
-                            leading: Icon(Icons.delete),
-                            title: Text('Delete All Gear'),
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text(
-                                      'Confirm Deletion',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    content: const Text(
-                                      'Are you sure you want to delete all gear?',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .pop(); // Close the dialog without deleting
-                                        },
-                                        child: const Text(
-                                          'Cancel',
-                                          style: TextStyle(
-                                              color: Colors.grey),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          crew.deleteAllGear();
-                                          setState(() {});
-                                          Navigator.of(context).pop();
-                                          Navigator.of(context).pop();
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text(
-                                          'Delete',
-                                          style: TextStyle(
-                                              color: Colors.red),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },                        ),
-                        ],
-                      );
-                    },
-                  );
-                },
-
-                icon: Icon(Icons.more_vert))
-        ],
+          onPressed: () {
+            Navigator.of(context).pop(); // Navigate back when pressed
+          },
         ),
-        backgroundColor: Colors.deepOrangeAccent,
-
+        title: Text(
+          'Gear',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+        ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  backgroundColor: AppColors.textFieldColor2,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        ListTile(
+                          leading: Icon(Icons.delete, color: Colors.red),
+                          title: Text('Delete All Gear', style: TextStyle(color: AppColors.textColorPrimary)),
+                          onTap: () {
+                            Navigator.of(context).pop(); // Close the dialog without deleting
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  backgroundColor: AppColors.textFieldColor2 ,
+                                  title:  Text(
+                                    'Confirm Deletion',
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                  ),
+                                  content:  Text(
+                                    'Are you sure you want to delete all gear?',
+                                    style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(); // Close the dialog without deleting
+                                      },
+                                      child:  Text(
+                                        'Cancel',
+                                        style: TextStyle(color: AppColors.cancelButton),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        crew.deleteAllGear();
+                                        setState(() {});
+                                        Navigator.of(context).pop();
+                                        Navigator.of(context).pop();
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text(
+                                        'Delete',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              icon: Icon(Icons.more_vert,  color: AppColors.textColorPrimary,))
+        ],
       ),
       body: Stack(
         children: [
           Container(
-            child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                // Blur effect
-                child: Image.asset('assets/images/logo1.png',
-                  fit: BoxFit.cover, // Cover  entire background
-                  width: double.infinity,
-                  height: double.infinity,
-                )
-            ),
+            color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
+            child: AppColors.isDarkMode
+                ? (AppColors.enableBackgroundImage
+                    ? Stack(
+                        children: [
+                          ImageFiltered(
+                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                            child: Image.asset(
+                              'assets/images/logo1.png',
+                              fit: BoxFit.cover, // Cover the entire background
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                          Container(
+                            color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ],
+                      )
+                    : null) // No image if background is disabled
+                : ImageFiltered(
+                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+                    child: Image.asset(
+                      'assets/images/logo1.png',
+                      fit: BoxFit.cover, // Cover the entire background
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
           ),
-
           Column(
             children: [
               Expanded(
@@ -146,11 +169,11 @@ class _GearViewState extends State<GearView>{
                         final gear = sortedGearList[index];
                         return Container(
                           decoration: BoxDecoration(
-                            color: Colors.white, // Background color
-                            border: Border(bottom: BorderSide(color: Colors.grey, width: 1)), // Add a border
+                            color: AppColors.textFieldColor, // Background color
+                            border: Border(top: BorderSide(color: Colors.black, width: 1)), // Add a border
                           ),
                           child: ListTile(
-                            iconColor: Colors.black,
+                            iconColor: AppColors.primaryColor,
                             title: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -160,13 +183,13 @@ class _GearViewState extends State<GearView>{
                                     children: [
                                       Text(
                                         gear.name,
-                                        style: const TextStyle(
-                                            fontSize: 22, fontWeight: FontWeight.bold),
+                                        style:  TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                       ),
                                       Text(
                                         '${gear.weight} lbs x ${gear.quantity}',
-                                        style: const TextStyle(
+                                        style:  TextStyle(
                                           fontSize: 16,
+                                            color: AppColors.textColorPrimary
                                         ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
@@ -175,7 +198,7 @@ class _GearViewState extends State<GearView>{
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.black, size: 32),
+                                  icon:  Icon(Icons.edit, color: AppColors.textColorPrimary, size: 32),
                                   onPressed: () {
                                     Navigator.push(
                                       context,
@@ -190,7 +213,7 @@ class _GearViewState extends State<GearView>{
                                 ),
                               ],
                             ),
-                            leading: const Icon(Icons.work_outline_outlined),
+                            leading:  Icon(Icons.work_outline_outlined),
                           ),
                         );
                       },
@@ -198,11 +221,8 @@ class _GearViewState extends State<GearView>{
                   ],
                 ),
               ),
-
-
-              ],
+            ],
           ),
-
         ],
       ),
     );
