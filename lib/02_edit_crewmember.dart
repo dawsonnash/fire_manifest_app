@@ -1121,6 +1121,11 @@ void _showAddToolDialog(
                     final isDuplicate = personalToolsList.any(
                           (tool) => tool.name.toLowerCase() == toolName.toLowerCase(),
                     );
+                    // Check for duplicate gear names with different weights (case-insensitive)
+                    final isDuplicateWithDifferentWeight = crew.gear.any(
+                          (tool) => tool.name.toLowerCase() == toolName.toLowerCase() &&
+                          tool.weight != int.parse(toolWeightText), // Check if weight is different
+                    );
 
                     if (isDuplicate) {
                       dialogSetState(() {
@@ -1134,6 +1139,24 @@ void _showAddToolDialog(
                       });
                       return;
                     }
+                    if (isDuplicateWithDifferentWeight) {
+                      // Find the first conflicting gear item to retrieve its weight
+                      final conflictingGear = crew.gear.firstWhere(
+                            (tool) => tool.name.toLowerCase() == toolName.toLowerCase() &&
+                            tool.weight != int.parse(toolWeightText),
+                      );
+                      dialogSetState(() {
+                        toolWeightErrorMessage = 'Must match gear weight: ${conflictingGear.weight} lbs'; // Set error message
+                      });
+
+                      Future.delayed(const Duration(seconds: 2), () {
+                        dialogSetState(() {
+                          toolWeightErrorMessage = null; // Clear error message
+                        });
+                      });
+                      return;
+                    }
+
 
                     final weight = int.parse(toolWeightText);
 

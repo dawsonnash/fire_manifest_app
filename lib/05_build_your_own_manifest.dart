@@ -751,6 +751,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
 
           Container(
+            color: Colors.white.withValues(alpha: 0.05),
+
             child: Scrollbar(
               child: ListView(
                 padding: const EdgeInsets.all(8.0),

@@ -73,3 +73,14 @@ List<Gear> sortGearListAlphabetically(List<Gear> gearList) {
   gearList.sort((a, b) => a.name.compareTo(b.name));
   return gearList;
 }
+
+final List<Map<String, dynamic>> gearDropdownItems = [
+  {'name': 'Chainsaw', 'weight': 10},
+  {'name': 'Fuel Canister', 'weight': 5},
+  {'name': 'First Aid Kit', 'weight': 3},
+  {'name': 'Fire Shelter', 'weight': 4},
+  {'name': 'Backpack Pump', 'weight': 8},
+  {'name': 'Hose Pack', 'weight': 7},
+  {'name': 'Radio', 'weight': 2},
+  {'name': 'GPS Device', 'weight': 1},
+];
