@@ -122,6 +122,9 @@ class _QuickManifestState extends State<QuickManifest> {
   List<Gear> gearList = [];
   List<CrewMember> crewList = [];
 
+  String? tripNameErrorMessage;
+  String? availableSeatsErrorMessage;
+
   // Lists for actual crew going into trip object
   List<CrewMember> thisTripCrewMemberList = [];
   List<Gear> thisTripGearList = [];
@@ -614,7 +617,14 @@ class _QuickManifestState extends State<QuickManifest> {
 
   // Function to check if input is valid and update button state
   void _checkInput() {
-    final isTripNameValid = tripNameController.text.isNotEmpty;
+    final String tripName = tripNameController.text;
+// Validate trip name existence (case-insensitive)
+    final bool isTripNameUnique = !savedTrips.savedTrips.any(
+          (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
+    );
+
+
+    final bool isTripNameValid = tripName.isNotEmpty && isTripNameUnique;
     final isAvailableSeatsValid = availableSeatsController.text.isNotEmpty && int.tryParse(availableSeatsController.text) != null && int.parse(availableSeatsController.text) > 0;
 
     setState(() {
@@ -629,7 +639,16 @@ class _QuickManifestState extends State<QuickManifest> {
     final String tripName = tripNameController.text;
 
     // Check if crew member name already exists
-    bool tripNameExists = savedTrips.savedTrips.any((member) => member.tripName == tripName);
+    bool tripNameExists = savedTrips.savedTrips.any(
+          (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
+    );
+
+    final String tripNameCapitalized = tripNameController.text
+        .toLowerCase() // Ensure the rest of the string is lowercase
+        .split(' ') // Split by spaces into words
+        .map((word) => word.isNotEmpty ? '${word[0].toUpperCase()}${word.substring(1)}' : '')
+        .join(' '); // Join the words back with a space
+
 
     if (tripNameExists) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -656,7 +675,7 @@ class _QuickManifestState extends State<QuickManifest> {
     final int availableSeats = int.parse(availableSeatsController.text);
 
     // Creating a new Trip object
-    Trip newTrip = Trip(tripName: tripName, allowable: allowable, availableSeats: availableSeats);
+    Trip newTrip = Trip(tripName: tripNameCapitalized, allowable: allowable, availableSeats: availableSeats);
 
     // Deep copy crewMembers and gear into the new Trip
     newTrip.crewMembers = thisTripCrewMemberList.map((member) => member.copy()).toList();
@@ -819,12 +838,31 @@ class _QuickManifestState extends State<QuickManifest> {
                             controller: tripNameController,
                             maxLength: 20,
                             textCapitalization: TextCapitalization.words,
+                            onChanged: (value) {
+                              setState(() {
+                                // Check if the trip name exists in the savedTrips list (case-insensitive)
+                                final String tripName = tripNameController.text;
+
+                                // Check if crew member name already exists
+                                bool tripNameExists = savedTrips.savedTrips.any(
+                                      (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
+                                );
+
+                                // Validate the input and set error message
+                                if (tripNameExists) {
+                                  tripNameErrorMessage = 'Trip name already used';
+                                } else {
+                                  tripNameErrorMessage = null;
+                                }
+                              });
+                            },
                             decoration: InputDecoration(
                               labelText: 'Enter Trip Name',
                               labelStyle: TextStyle(
                                 color: AppColors.textColorPrimary, // Label color when not focused
                                 fontSize: 18, // Label font size
                               ),
+                              errorText: tripNameErrorMessage,
                               filled: true,
                               fillColor: AppColors.textFieldColor,
                               enabledBorder: OutlineInputBorder(
@@ -863,12 +901,23 @@ class _QuickManifestState extends State<QuickManifest> {
                               FilteringTextInputFormatter.digitsOnly,
                               // Allow only digits
                             ],
+                            onChanged: (value) {
+                              setState(() {
+                                // Validate the input and set error message
+                                if (value == '0') {
+                                  availableSeatsErrorMessage = 'Available seats cannot be 0.';
+                                } else {
+                                  availableSeatsErrorMessage = null;
+                                }
+                              });
+                            },
                             decoration: InputDecoration(
                               labelText: 'Enter # of Available Seats',
                               labelStyle: TextStyle(
                                 color: AppColors.textColorPrimary, // Label color when not focused
                                 fontSize: 18, // Label font size
                               ),
+                              errorText: availableSeatsErrorMessage,
                               filled: true,
                               fillColor: AppColors.textFieldColor,
                               enabledBorder: OutlineInputBorder(

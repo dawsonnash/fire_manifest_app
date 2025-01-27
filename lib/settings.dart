@@ -1,8 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/link.dart';
 import 'CodeShare/colors.dart';
 
 
@@ -240,8 +238,9 @@ class _SettingsState extends State<SettingsView> {
                                   setState(() {
                                     isDarkMode = value;
                                     if (!isDarkMode) {
+                                      widget.onBackgroundImageChange(value); // Notify parent widget
                                       enableBackgroundImage = false;
-                                      ThemePreferences.setBackgroundImagePreference(false);
+                                      ThemePreferences.setBackgroundImagePreference(value);
                                     }
                                     ThemePreferences.setTheme(value); // Save dark mode preference
                                   });
@@ -297,6 +296,7 @@ class _SettingsState extends State<SettingsView> {
                             title:  TextField(
                               controller: crewNameController, // Pre-fill with current crew name
                               style: const TextStyle(color: Colors.white, fontSize: 18),
+                              maxLength: 30,
                               decoration: InputDecoration(
 
                                 hintText: 'Enter Crew Name',

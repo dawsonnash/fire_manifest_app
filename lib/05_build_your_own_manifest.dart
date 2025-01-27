@@ -83,7 +83,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         return StatefulBuilder(
           builder: (context, dialogSetState) {
             return AlertDialog(
-              backgroundColor: AppColors.textFieldColor,
+              backgroundColor: AppColors.textFieldColor2,
               title:  Text(
                 'Add Crew Members and Gear',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textColorPrimary),
@@ -258,7 +258,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                       context: context,
                                                       builder: (BuildContext context) {
                                                         return AlertDialog(
-                                                          backgroundColor: AppColors.textFieldColor,
+                                                          backgroundColor: AppColors.textFieldColor2,
                                                           title: Text('Select Quantity for ${gear.name}', style: TextStyle(color: AppColors.textColorPrimary),),
                                                           content: SizedBox(
                                                             height: 150,
@@ -366,7 +366,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                 ),
                               ),
                               body: Container(
-                                color: AppColors.textFieldColor,
+                                color: AppColors.textFieldColor2,
                                 child: Column(
                                   children: [
                                     // Custom Item Name Field
@@ -1105,7 +1105,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                               int quantityToRemove = 1; // Default to 1 for selection
                                                               return StatefulBuilder(builder: (BuildContext context, StateSetter setDialogState) {
                                                                 return AlertDialog(
-                                                                  backgroundColor: AppColors.textFieldColor,
+                                                                  backgroundColor: AppColors.textFieldColor2,
                                                                   title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                   content: Column(
                                                                     mainAxisSize: MainAxisSize.min,
@@ -1113,7 +1113,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                       Text('Select the quantity to remove:', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                       SizedBox(height: 8),
                                                                       DropdownButton<int>(
-                                                                        dropdownColor: AppColors.textFieldColor,
+                                                                        dropdownColor: AppColors.textFieldColor2,
                                                                         value: quantityToRemove,
                                                                         items: List.generate(
                                                                           item.quantity,
@@ -1293,7 +1293,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         context: context,
                                         builder: (BuildContext context) {
                                           return AlertDialog(
-                                            backgroundColor: AppColors.textFieldColor,
+                                            backgroundColor: AppColors.textFieldColor2,
                                             title:  Text(
                                               'Confirm Deletion',
                                               style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),

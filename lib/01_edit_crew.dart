@@ -195,10 +195,18 @@ class _EditCrewState extends State<EditCrew> {
                                     bottom: BorderSide(color: AppColors.fireColor, width: 2.0),
                                   ),
                                 ),
-                                child: Text(
-                                  AppData.crewName,
-                                  style: headerTextStyle,
-                                  textAlign: TextAlign.left, // No center alignment needed since it's right-aligned by the Row
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: screenWidth * 0.8, // Limit the maximum width
+                                  ),
+                                  child: Text(
+                                    AppData.crewName,
+                                    style: headerTextStyle,
+                                    textAlign: TextAlign.right,
+                                    maxLines: 2, // Limit to 2 lines
+                                    overflow: TextOverflow.ellipsis, // Ellipsis if overflowed
+                                    softWrap: true, // Ensure wrapping
+                                  ),
                                 ),
                               ),
                             ),

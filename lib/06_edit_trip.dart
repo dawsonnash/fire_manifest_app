@@ -87,7 +87,7 @@ class _EditTripState extends State<EditTrip> {
         return StatefulBuilder(
           builder: (context, dialogSetState) {
             return AlertDialog(
-              backgroundColor: AppColors.textFieldColor,
+              backgroundColor: AppColors.textFieldColor2,
               title: Text(
                 'Add Crew Members and Gear',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textColorPrimary),
@@ -372,7 +372,7 @@ class _EditTripState extends State<EditTrip> {
                                 ),
                               ),
                               body: Container(
-                                color: AppColors.textFieldColor,
+                                color: AppColors.textFieldColor2,
                                 child: Column(
                                   children: [
                                     // Custom Item Name Field
@@ -1144,7 +1144,7 @@ class _EditTripState extends State<EditTrip> {
                                                                     return StatefulBuilder(
                                                                       builder: (BuildContext context, StateSetter setDialogState) {
                                                                         return AlertDialog(
-                                                                          backgroundColor: AppColors.textFieldColor,
+                                                                          backgroundColor: AppColors.textFieldColor2,
                                                                           title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                           content: Column(
                                                                             mainAxisSize: MainAxisSize.min,
@@ -1156,7 +1156,7 @@ class _EditTripState extends State<EditTrip> {
                                                                               SizedBox(height: 8),
                                                                               DropdownButton<int>(
                                                                                 value: quantityToRemove,
-                                                                                dropdownColor: AppColors.textFieldColor,
+                                                                                dropdownColor: AppColors.textFieldColor2,
                                                                                 items: List.generate(
                                                                                   item.quantity,
                                                                                   (index) => DropdownMenuItem(
@@ -1323,7 +1323,7 @@ class _EditTripState extends State<EditTrip> {
                                               context: context,
                                               builder: (BuildContext context) {
                                                 return AlertDialog(
-                                                  backgroundColor: AppColors.textFieldColor,
+                                                  backgroundColor: AppColors.textFieldColor2,
                                                   title: Text(
                                                     'Confirm Deletion',
                                                     style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
