@@ -521,7 +521,7 @@ class _AddGearState extends State<AddGear> {
                                           ),
                                           isExpanded: true,
                                           underline: SizedBox(),
-                                          items: gearDropdownItems.map((item) {
+                                          items: irpgItems.map((item) {
                                             return DropdownMenuItem<String>(
                                               value: item['name'],
                                               child: Row(
@@ -551,7 +551,7 @@ class _AddGearState extends State<AddGear> {
                                             setState(() {
                                               selectedGearName = value!;
                                               // Find the selected gear item in the dropdown list
-                                              final selectedGear = gearDropdownItems.firstWhere(
+                                              final selectedGear = irpgItems.firstWhere(
                                                     (item) => item['name'] == selectedGearName,
                                               );
                                               // Update the controllers with the selected gear's name and weight
@@ -560,7 +560,7 @@ class _AddGearState extends State<AddGear> {
                                             });
                                           },
                                           selectedItemBuilder: (BuildContext context) {
-                                            return gearDropdownItems.map((item) {
+                                            return irpgItems.map((item) {
                                               return Align(
                                                 alignment: Alignment.centerLeft,
                                                 child: Text(

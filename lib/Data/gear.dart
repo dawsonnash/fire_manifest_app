@@ -74,7 +74,7 @@ List<Gear> sortGearListAlphabetically(List<Gear> gearList) {
   return gearList;
 }
 
-final List<Map<String, dynamic>> gearDropdownItems = [
+final List<Map<String, dynamic>> irpgItems = [
   {'name': 'Chainsaw', 'weight': 10},
   {'name': 'Fuel Canister', 'weight': 5},
   {'name': 'First Aid Kit', 'weight': 3},
