@@ -73,14 +73,31 @@ List<Gear> sortGearListAlphabetically(List<Gear> gearList) {
   gearList.sort((a, b) => a.name.compareTo(b.name));
   return gearList;
 }
-
 final List<Map<String, dynamic>> irpgItems = [
-  {'name': 'Chainsaw', 'weight': 10},
-  {'name': 'Fuel Canister', 'weight': 5},
-  {'name': 'First Aid Kit', 'weight': 3},
-  {'name': 'Fire Shelter', 'weight': 4},
-  {'name': 'Backpack Pump', 'weight': 8},
-  {'name': 'Hose Pack', 'weight': 7},
-  {'name': 'Radio', 'weight': 2},
-  {'name': 'GPS Device', 'weight': 1},
+  {'name': 'Backpack pump (full)', 'weight': 45},
+  {'name': 'Cargo net (12’ x 12’)', 'weight': 20},
+  {'name': 'Cargo net (20’ x 20’)', 'weight': 45},
+  {'name': 'Cargo net (fish net)', 'weight': 5},
+  {'name': 'Cargo hook (1 hook)', 'weight': 35},
+  {'name': 'Jerry can/fuel (5 gal.)', 'weight': 45},
+  {'name': 'Canteen (1 gal.)', 'weight': 10},
+  {'name': 'Dolmar (full)', 'weight': 15},
+  {'name': 'Drip torch (full)', 'weight': 15},
+  {'name': 'Fusee (1 case)', 'weight': 36},
+  {'name': 'Hand tool', 'weight': 8},
+  {'name': 'Lead line (12’) ', 'weight': 10},
+  {'name': 'Long line (50’)', 'weight': 30},
+  {'name': 'Swivel', 'weight': 5},
+  {'name': 'Chainsaw', 'weight': 25},
+  {'name': 'Hose, 1½” syn. 100’', 'weight': 23},
+  {'name': 'Hose, 1” syn. 100’', 'weight': 11},
+  {'name': 'Hose, 3/4" syn. (1,000’/case)', 'weight': 30},
+  {'name': 'Hose, suction, 8’', 'weight': 10},
+  {'name': 'Mark 3 – Pump with kit ', 'weight': 150},
+  {'name': 'Stokes w/ backboard', 'weight': 40},
+  {'name': 'Trauma bag', 'weight': 35},
+  {'name': 'MRE, 1 case', 'weight': 25},
+  {'name': 'Cubee/water (5 gal.)', 'weight': 45},
+
 ];
+

@@ -363,11 +363,96 @@ class _EditTripState extends State<EditTrip> {
                             ExpansionPanel(
                               isExpanded: isCustomItemExpanded,
                               backgroundColor: AppColors.fireColor,
-                              headerBuilder: (context, isExpanded) => ListTile(
-                                title: const Text(
-                                  'Add Custom Item',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
+                              headerBuilder: (context, isExpanded) => GestureDetector(
+                                onLongPress: () {
+                                  showModalBottomSheet(
+                                    backgroundColor: AppColors.textFieldColor2,
+                                    context: context,
+                                    isScrollControlled: true,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                                    ),
+                                    builder: (BuildContext context) {
+                                      return Container(
+                                        padding: EdgeInsets.all(16.0),
+                                        height: MediaQuery.of(context).size.height * 0.7, // 70% of the screen height
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            // Modal Title
+                                            Text(
+                                              'IRPG Item Weights',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20,
+                                                color: AppColors.textColorPrimary,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 16),
+
+                                            // Scrollable List of IRPG Items
+                                            Expanded(
+                                              child: ListView.builder(
+                                                itemCount: irpgItems.length,
+                                                itemBuilder: (context, index) {
+                                                  final item = irpgItems[index];
+                                                  return Container(
+                                                    margin: EdgeInsets.symmetric(vertical: 4.0),
+                                                    child: ListTile(
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0.0),
+                                                      title: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            item['name'],
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                              color: AppColors.textColorPrimary,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            '${item['weight']} lbs',
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                              color: AppColors.textColorPrimary,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+
+                                            // Cancel Button
+                                            Align(
+                                              alignment: Alignment.bottomRight,
+                                              child: TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop(); // Close the modal
+                                                },
+                                                child: Text(
+                                                  'Cancel',
+                                                  style: TextStyle(
+                                                    color: AppColors.cancelButton,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+
+                                child: ListTile(
+                                  title: const Text(
+                                    'Custom Item',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                               ),

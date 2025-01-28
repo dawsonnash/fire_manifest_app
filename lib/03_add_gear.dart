@@ -516,7 +516,7 @@ class _AddGearState extends State<AddGear> {
                                             style: TextStyle(
                                               color: AppColors.textColorPrimary,
                                               fontWeight: FontWeight.normal,
-                                              fontSize: 22,
+                                              fontSize: 20,
                                             ),
                                           ),
                                           isExpanded: true,
@@ -532,7 +532,7 @@ class _AddGearState extends State<AddGear> {
                                                     style: TextStyle(
                                                       color: AppColors.textColorPrimary,
                                                       fontWeight: FontWeight.normal,
-                                                      fontSize: 22,
+                                                      fontSize: 18,
                                                     ),
                                                   ),
                                                   Text(
@@ -540,7 +540,7 @@ class _AddGearState extends State<AddGear> {
                                                     style: TextStyle(
                                                       color: AppColors.textColorPrimary,
                                                       fontWeight: FontWeight.normal,
-                                                      fontSize: 22,
+                                                      fontSize: 18,
                                                     ),
                                                   ),
                                                 ],
