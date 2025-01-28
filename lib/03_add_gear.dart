@@ -32,6 +32,8 @@ class _AddGearState extends State<AddGear> {
   bool isSaveButtonEnabledForIRPG = false;
 
   String? selectedGearName;
+  bool isHazmat = false;
+  bool isHazmatIRPG = false;
 
   @override
   void initState() {
@@ -104,15 +106,18 @@ class _AddGearState extends State<AddGear> {
     String gearName;
     int gearWeight;
     int gearQuantity;
+    bool isHazmatFinal;
 
     if (isCustom) {
       gearName = gearNameController.text;
       gearWeight = int.parse(gearWeightController.text);
       gearQuantity = int.parse(gearQuantityController.text);
+      isHazmatFinal = isHazmat;
     } else {
       gearName = irpgGearNameController.text;
       gearWeight = int.parse(irpgGearWeightController.text);
       gearQuantity = int.parse(irpgGearQuantityController.text);
+      isHazmatFinal = isHazmatIRPG;
     }
     String capitalizedGearName = capitalizeEveryWord(gearName);
 
@@ -183,9 +188,13 @@ class _AddGearState extends State<AddGear> {
       return; // Exit function if the gear name is already used
     }
 
-    // Creating a new gear object. Don't have hazmat yet
-    Gear newGearItem = Gear(name: capitalizedGearName, weight: gearWeight, quantity: gearQuantity);
-
+    // Creating a new gear object
+    Gear newGearItem;
+    if (isCustom) {
+      newGearItem = Gear(name: capitalizedGearName, weight: gearWeight, quantity: gearQuantity, isHazmat: isHazmat);
+    } else {
+      newGearItem = Gear(name: capitalizedGearName, weight: gearWeight, quantity: gearQuantity, isHazmat: isHazmat);
+    }
     // Add the new member to the global crew object
     crew.addGear(newGearItem);
 
@@ -212,6 +221,12 @@ class _AddGearState extends State<AddGear> {
     gearNameController.text = '';
     gearWeightController.text = '';
     gearQuantityController.text = '1';
+
+    irpgGearNameController.text = '';
+    irpgGearWeightController.text = '';
+    irpgGearQuantityController.text = '1';
+
+    selectedGearName = null;
 
     // Debug for LogCat
     // print("Gear Name: $gearName");
@@ -469,6 +484,52 @@ class _AddGearState extends State<AddGear> {
                                       fontSize: 28,
                                     ),
                                   )),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.textFieldColor,
+                                    borderRadius: BorderRadius.circular(12.0),
+                                    border: Border.all(color: AppColors.borderPrimary, width: 2.0),
+                                  ),
+                                  alignment: Alignment.centerLeft,
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'HAZMAT',
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          color: AppColors.textColorPrimary,
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      Text(
+                                        isHazmat ? 'Yes' : 'No', // Dynamic label
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: AppColors.textColorPrimary,
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      // Toggle Switch
+                                      Switch(
+                                        value: isHazmat,
+                                        onChanged: (bool value) {
+                                          setState(() {
+                                            isHazmat = value; // Update the state
+                                          });
+                                        },
+                                        activeColor: Colors.red,
+                                        inactiveThumbColor: AppColors.textColorPrimary,
+                                        inactiveTrackColor: AppColors.textFieldColor,
+                                      ),
+                                      // HAZMAT Label
+                                    ],
+                                  ),
+                                ),
+                              ),
 
                               const Spacer(flex: 6),
 
@@ -507,7 +568,7 @@ class _AddGearState extends State<AddGear> {
                                         ),
                                       ),
                                       child: Center(
-                                        child:DropdownButton<String>(
+                                        child: DropdownButton<String>(
                                           dropdownColor: AppColors.textFieldColor2,
                                           iconEnabledColor: AppColors.textColorPrimary,
                                           value: selectedGearName,
@@ -552,11 +613,12 @@ class _AddGearState extends State<AddGear> {
                                               selectedGearName = value!;
                                               // Find the selected gear item in the dropdown list
                                               final selectedGear = irpgItems.firstWhere(
-                                                    (item) => item['name'] == selectedGearName,
+                                                (item) => item['name'] == selectedGearName,
                                               );
                                               // Update the controllers with the selected gear's name and weight
                                               irpgGearNameController.text = selectedGear['name'];
                                               irpgGearWeightController.text = selectedGear['weight'].toString();
+                                              isHazmatIRPG = selectedGear['hazmat'];
                                             });
                                           },
                                           selectedItemBuilder: (BuildContext context) {
@@ -575,7 +637,6 @@ class _AddGearState extends State<AddGear> {
                                             }).toList();
                                           },
                                         ),
-
                                       ),
                                     ),
                                   ],
@@ -680,6 +741,60 @@ class _AddGearState extends State<AddGear> {
                                       fontSize: 28,
                                     ),
                                   )),
+
+                              Padding(
+                                padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.textFieldColor,
+                                    borderRadius: BorderRadius.circular(12.0),
+                                    border: Border.all(color: AppColors.borderPrimary, width: 2.0),
+                                  ),
+                                  alignment: Alignment.centerLeft,
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'HAZMAT',
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          color: AppColors.textColorPrimary,
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      Text(
+                                        isHazmatIRPG ? 'Yes' : 'No', // Dynamic label
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: AppColors.textColorPrimary,
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      // Toggle Switch
+                                      Switch(
+                                        value: isHazmatIRPG,
+                                        onChanged: (bool value) {
+                                          setState(() {
+                                            isHazmatIRPG = value; // Update the toggle state
+
+                                            // Find the selected gear item and update its isHazmat attribute
+                                            final selectedGear = irpgItems.firstWhere(
+                                              (item) => item['name'] == selectedGearName,
+                                            );
+                                            if (selectedGear != null) {
+                                              selectedGear['hazmat'] = value; // Update the isHazmat attribute
+                                            }
+                                          });
+                                        },
+                                        activeColor: Colors.red,
+                                        inactiveThumbColor: AppColors.textColorPrimary,
+                                        inactiveTrackColor: AppColors.textFieldColor,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
 
                               const Spacer(flex: 6),
 

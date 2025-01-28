@@ -340,18 +340,18 @@ void initializeTestData() {
 
   // Add Gear to Hive and in-memory
   List<Gear> testGear = [
-    Gear(name: 'Ammo Can', weight: 20, quantity: 1),
-    Gear(name: 'Camp Bag', weight: 75, quantity: 1),
-    Gear(name: 'Saw Bag', weight: 80, quantity: 1),
-    Gear(name: 'Commo Case', weight: 20, quantity: 1),
-    Gear(name: 'Bauman Bag', weight: 15, quantity: 1),
-    Gear(name: 'Trauma/AED/SKED', weight: 45, quantity: 1),
-    Gear(name: 'Trauma Bag', weight: 40, quantity: 1),
-    Gear(name: 'P-tool/Shovel/Rhino', weight: 25, quantity: 1),
-    Gear(name: 'SAT Phone', weight: 5, quantity: 2),
-    Gear(name: 'Shotgun', weight: 33, quantity: 1),
-    Gear(name: 'QB', weight: 45, quantity: 6),
-    Gear(name: 'MRE', weight: 25, quantity: 6),
+    Gear(name: 'Ammo Can', weight: 20, quantity: 1, isHazmat: true),
+    Gear(name: 'Camp Bag', weight: 75, quantity: 1, isHazmat: false),
+    Gear(name: 'Saw Bag', weight: 80, quantity: 1, isHazmat: false),
+    Gear(name: 'Commo Case', weight: 20, quantity: 1, isHazmat: false),
+    Gear(name: 'Bauman Bag', weight: 15, quantity: 1, isHazmat: false),
+    Gear(name: 'Trauma/AED/SKED', weight: 45, quantity: 1, isHazmat: false),
+    Gear(name: 'Trauma Bag', weight: 40, quantity: 1, isHazmat: false),
+    Gear(name: 'P-tool/Shovel/Rhino', weight: 25, quantity: 1, isHazmat: false),
+    Gear(name: 'SAT Phone', weight: 5, quantity: 2, isHazmat: false),
+    Gear(name: 'Shotgun', weight: 33, quantity: 1, isHazmat: false),
+    Gear(name: 'QB', weight: 45, quantity: 6, isHazmat: false),
+    Gear(name: 'MRE', weight: 25, quantity: 6, isHazmat: false),
 
   ];
 
