@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../Data/crew.dart';
 import '../Data/crewmember.dart';
 import 'package:hive/hive.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'CodeShare/colors.dart';
 import 'Data/gear.dart';
@@ -791,9 +792,26 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                   ),
 
                                     child: ListTile(
-                                      title: Text(
-                                        tool!.name,
-                                        style:  TextStyle(color: AppColors.textColorPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                                      title: Row(
+                                        children: [
+                                          Text(
+                                            tool!.name,
+                                            style:  TextStyle(color: AppColors.textColorPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                                          ),
+                                          if (tool.isHazmat)
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 8.0), // Add spacing between text and icon
+                                              child: Tooltip(
+                                                message: 'HAZMAT', // The hint displayed on long-press
+                                                waitDuration: const Duration(milliseconds: 500), // Time before the tooltip shows
+                                                child: Icon(
+                                                  FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                  color: Colors.red, // Red color for hazard
+                                                  size: 18, // Icon size
+                                                ),
+                                              ),
+                                            ),
+                                        ],
                                       ),
                                       subtitle: Text(
                                         '${tool.weight} lbs',

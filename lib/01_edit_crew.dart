@@ -757,9 +757,15 @@ class _EditCrewState extends State<EditCrew> {
                                                         final isDuplicate = personalToolsList.any(
                                                           (tool) => tool.name.toLowerCase() == toolName.toLowerCase(),
                                                         );
-                                                        // Check for duplicate gear names with different weights (case-insensitive)
                                                         final isDuplicateWithDifferentWeight = crew.gear.any(
-                                                          (tool) => tool.name.toLowerCase() == toolName.toLowerCase() && tool.weight != int.parse(toolWeightText), // Check if weight is different
+                                                              (tool) => tool.name.toLowerCase() == toolName.toLowerCase() &&
+                                                              tool.weight != int.parse(toolWeightText), // Check if weight is different
+                                                        );
+
+// Check for duplicate gear names with different hazmat values (case-insensitive)
+                                                        final isDuplicateWithDifferentHazmat = crew.gear.any(
+                                                              (tool) => tool.name.toLowerCase() == toolName.toLowerCase() &&
+                                                              tool.isHazmat != isHazmat, // Check if hazmat value is different
                                                         );
 
                                                         if (isDuplicate) {
@@ -774,22 +780,67 @@ class _EditCrewState extends State<EditCrew> {
                                                           });
                                                           return;
                                                         }
-                                                        if (isDuplicateWithDifferentWeight) {
-                                                          // Find the first conflicting gear item to retrieve its weight
-                                                          final conflictingGear = crew.gear.firstWhere(
-                                                            (tool) => tool.name.toLowerCase() == toolName.toLowerCase() && tool.weight != int.parse(toolWeightText),
-                                                          );
-                                                          dialogSetState(() {
-                                                            toolWeightErrorMessage = 'Must match gear weight: ${conflictingGear.weight} lbs'; // Set error message
-                                                          });
+                                                        // Check for duplicate gear names with different weights (case-insensitive)
 
-                                                          Future.delayed(const Duration(seconds: 2), () {
-                                                            dialogSetState(() {
-                                                              toolWeightErrorMessage = null; // Clear error message
-                                                            });
-                                                          });
-                                                          return;
+// Combine both checks
+                                                        if (isDuplicateWithDifferentWeight || isDuplicateWithDifferentHazmat) {
+                                                          String weightConflict = '';
+                                                          String hazmatConflict = '';
+
+                                                          // Add weight conflict message if applicable
+                                                          if (isDuplicateWithDifferentWeight) {
+                                                            final conflictingTool = crew.gear.firstWhere(
+                                                                  (tool) => tool.name.toLowerCase() == toolName.toLowerCase() && tool.weight != int.parse(toolWeightText),
+                                                            );
+                                                            weightConflict = 'This tool must match the same weight of the $toolName in your gear inventory: ${conflictingTool.weight} lbs.';
+                                                          }
+
+                                                          // Add hazmat conflict message if applicable
+                                                          if (isDuplicateWithDifferentHazmat) {
+                                                            final conflictingTool = crew.gear.firstWhere(
+                                                                  (tool) => tool.name.toLowerCase() == toolName.toLowerCase() && tool.isHazmat != isHazmat,
+                                                            );
+                                                            hazmatConflict = 'This tool must match the same HAZMAT value of the $toolName in your gear inventory: ${conflictingTool.isHazmat ? 'TRUE' : 'FALSE'}.';
+                                                          }
+
+                                                          // Combine messages with the universal message
+                                                          String combinedError = [weightConflict, hazmatConflict].where((msg) => msg.isNotEmpty).join('\n\n');
+                                                          if (combinedError.isNotEmpty) {
+                                                            combinedError = '$combinedError';
+                                                          }
+
+                                                          // Show a single AlertDialog
+                                                          showDialog(
+                                                            context: context,
+                                                            builder: (BuildContext context) {
+                                                              return AlertDialog(
+                                                                backgroundColor: AppColors.textFieldColor2,
+                                                                title: Text(
+                                                                  'Gear Conflict',
+                                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                                ),
+                                                                content: Text(
+                                                                  combinedError,
+                                                                  style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                                                ),
+                                                                actions: [
+                                                                  TextButton(
+                                                                    onPressed: () {
+                                                                      Navigator.of(context).pop();
+                                                                    },
+                                                                    child: Text(
+                                                                      'Cancel',
+                                                                      style: TextStyle(color: AppColors.cancelButton),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              );
+                                                            },
+                                                          );
+
+                                                          return; // Stop further execution
                                                         }
+
 
                                                         final weight = int.parse(toolWeightText);
 

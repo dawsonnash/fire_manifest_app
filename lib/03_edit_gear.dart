@@ -134,7 +134,7 @@ class _EditGearState extends State<EditGear> {
               style: TextStyle(color: AppColors.textColorPrimary),
             ),
             content: Text(
-              '$capitalizedGearName also exists as a tool. Any gear that is also a personal tool must be edited within the Tool panel under the Crew tab. If you would like to add a gear item of the same name ($capitalizedGearName) do so within the Add Gear panel.',
+              '$capitalizedGearName also exists as a tool. Any gear that is also a personal tool must be edited within the Tool panel under the Crew tab.',
               style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
             ),
             actions: [
