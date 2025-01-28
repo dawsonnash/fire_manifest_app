@@ -102,7 +102,7 @@ final List<Map<String, dynamic>> irpgItems = [
   {'name': 'Hose, 1” syn. 100’', 'weight': 11, 'hazmat': false},
   {'name': 'Hose, 3/4" syn. (1,000’/case)', 'weight': 30, 'hazmat': false},
   {'name': 'Hose, suction, 8’', 'weight': 10, 'hazmat': false},
-  {'name': 'Mark 3 – Pump with kit ', 'weight': 150, 'hazmat': true},
+  {'name': 'Mark 3 – Pump with kit ', 'weight': 150, 'hazmat': false},
   {'name': 'Stokes w/ backboard', 'weight': 40, 'hazmat': false},
   {'name': 'Trauma bag', 'weight': 35, 'hazmat': false},
   {'name': 'MRE, 1 case', 'weight': 25, 'hazmat': false},

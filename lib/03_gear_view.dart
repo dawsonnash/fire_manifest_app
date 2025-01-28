@@ -269,6 +269,20 @@ class _GearViewState extends State<GearView> {
                                             ),
                                             // Hazard icon (conditionally rendered)
                                             // Hazard icon with Tooltip
+
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              '${gear.weight} lbs x ${gear.quantity}',
+                                              style:  TextStyle(
+                                                fontSize: 16,
+                                                  color: AppColors.textColorPrimary
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                             if (gear.isHazmat)
                                               Padding(
                                                 padding: const EdgeInsets.only(left: 8.0), // Add spacing between text and icon
@@ -276,22 +290,13 @@ class _GearViewState extends State<GearView> {
                                                   message: 'HAZMAT', // The hint displayed on long-press
                                                   waitDuration: const Duration(milliseconds: 500), // Time before the tooltip shows
                                                   child: Icon(
-                                                    Icons.warning, // Hazard icon
+                                                    FontAwesomeIcons.triangleExclamation, // Hazard icon
                                                     color: Colors.red, // Red color for hazard
-                                                    size: 24, // Icon size
+                                                    size: 18, // Icon size
                                                   ),
                                                 ),
                                               ),
                                           ],
-                                        ),
-                                        Text(
-                                          '${gear.weight} lbs x ${gear.quantity}',
-                                          style:  TextStyle(
-                                            fontSize: 16,
-                                              color: AppColors.textColorPrimary
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
                                     ),

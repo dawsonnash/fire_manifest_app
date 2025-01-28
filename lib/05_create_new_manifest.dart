@@ -836,7 +836,9 @@ class _QuickManifestState extends State<QuickManifest> {
                           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: TextField(
                             controller: tripNameController,
-                            maxLength: 20,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(20),
+                            ],
                             textCapitalization: TextCapitalization.words,
                             onChanged: (value) {
                               setState(() {
@@ -889,17 +891,17 @@ class _QuickManifestState extends State<QuickManifest> {
                             ),
                           )),
 
+                      SizedBox(height: AppData.spacingStandard),
+
                       // Available Seats input field
                       Padding(
-                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: TextField(
                             controller: availableSeatsController,
                             keyboardType: TextInputType.number,
-                            maxLength: 1,
-                            // Only show numeric keyboard
-                            inputFormatters: <TextInputFormatter>[
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(1),
                               FilteringTextInputFormatter.digitsOnly,
-                              // Allow only digits
                             ],
                             onChanged: (value) {
                               setState(() {
@@ -943,6 +945,8 @@ class _QuickManifestState extends State<QuickManifest> {
                               fontWeight: FontWeight.bold,
                             ),
                           )),
+
+                      SizedBox(height: AppData.spacingStandard),
 
                       // Select All/Some Crew
                       Padding(
@@ -1022,9 +1026,11 @@ class _QuickManifestState extends State<QuickManifest> {
                         ),
                       ),
 
+                      SizedBox(height: AppData.spacingStandard),
+
                       // Choose Trip Preference text box
                       Padding(
-                        padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0, bottom: 0.0),
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
@@ -1053,9 +1059,10 @@ class _QuickManifestState extends State<QuickManifest> {
                         ),
                       ),
 
+
                       // Choose Trip Preference
                       Padding(
-                        padding: const EdgeInsets.only(top: 0.0, left: 16.0, right: 16.0, bottom: 5.0),
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -1096,9 +1103,11 @@ class _QuickManifestState extends State<QuickManifest> {
                         ),
                       ),
 
+                      SizedBox(height: AppData.spacingStandard),
+
                       // Choose allowable text box
                       Padding(
-                        padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
@@ -1227,7 +1236,7 @@ class _QuickManifestState extends State<QuickManifest> {
 
                       // Allowable Slider
                       Padding(
-                        padding: const EdgeInsets.only(top: 0.0, right: 16.0, left: 16.0),
+                        padding: const EdgeInsets.only(right: 16.0, left: 16.0),
                         child: Stack(
                           children: [
                             // Background container with white background, black outline, and rounded corners
@@ -1323,7 +1332,7 @@ class _QuickManifestState extends State<QuickManifest> {
                         ),
                       ),
 
-                      SizedBox(height: 16),
+                      SizedBox(height: AppData.spacingStandard *2),
                       // Calculate Button
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),

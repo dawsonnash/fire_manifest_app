@@ -486,10 +486,12 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                       children: [
                         // Edit Name
                         Padding(
-                            padding: const EdgeInsets.only(top: 16.0, bottom: 4.0, left: 16.0, right: 16.0),
+                            padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
                             child: TextField(
                               controller: nameController,
-                              maxLength: 12,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(23),
+                              ],
                               textCapitalization: TextCapitalization.words,
                               decoration: InputDecoration(
                                 labelText: 'Edit name',
@@ -523,18 +525,20 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                               ),
                             )),
 
+                        SizedBox(height: AppData.spacingStandard),
+
                         // Edit Flight Weight
                         Padding(
-                            padding: const EdgeInsets.only(top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
+                            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                             child: TextField(
                               controller: flightWeightController,
-                              maxLength: 3,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(3),
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
                               keyboardType: TextInputType.number,
                               // Only show numeric keyboard
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.digitsOnly,
-                                // Allow only digits
-                              ],
+
                               decoration: InputDecoration(
                                 labelText: 'Edit flight weight',
                                 labelStyle:  TextStyle(
@@ -572,9 +576,11 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                               ),
                             )),
 
+                        SizedBox(height: AppData.spacingStandard),
+
                         // Enter Position(s)
                         Padding(
-                          padding: const EdgeInsets.only(top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: Container(
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -611,11 +617,11 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                           ),
                         ),
 
-                        SizedBox(height: 16),
+                        SizedBox(height: AppData.spacingStandard),
 
                         // Enter tool(s) & weight
                         Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: GestureDetector(
                             onTap: () {
                               String? selectedTool = personalToolsList.isNotEmpty ? personalToolsList.first.name : null; // Default to first tool
@@ -689,7 +695,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                                 fontSize: 16,
                                               ),
                                             ),
-                                            const SizedBox(height: 12),
+                                            SizedBox(height: AppData.spacingStandard),
                                             if (selectedTool != null)
                                               TextField(
                                                 controller: newToolWeightController,
@@ -761,7 +767,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                           ),
                         ),
 
-                        SizedBox(height: 16),
+                        SizedBox(height: AppData.spacingStandard),
 
                         // Display added tools
                         Expanded(

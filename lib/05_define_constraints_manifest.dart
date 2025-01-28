@@ -159,7 +159,9 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: TextField(
                             controller: tripNameController,
-                            maxLength: 20,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(20),
+                            ],
                             textCapitalization: TextCapitalization.words,
                             onChanged: (value) {
                               setState(() {
@@ -212,17 +214,17 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                             ),
                           )),
 
+                      SizedBox(height: AppData.spacingStandard),
+
                       // Enter Available Seats Input Field
                       Padding(
-                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: TextField(
                             controller: availableSeatsController,
                             keyboardType: TextInputType.number,
-                            maxLength: 1,
-                            // Only show numeric keyboard
-                            inputFormatters: <TextInputFormatter>[
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(1),
                               FilteringTextInputFormatter.digitsOnly,
-                              // Allow only digits
                             ],
                             onChanged: (value) {
                               setState(() {
@@ -267,9 +269,11 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                             ),
                           )),
 
+                      SizedBox(height: AppData.spacingStandard),
+
                       // Choose Allowable Text Field
                       Padding(
-                        padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
@@ -504,7 +508,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                         ),
                       ),
 
-                      SizedBox(height: 16.0),
+                      SizedBox(height: AppData.spacingStandard),
 
                       // Build Button
                       Padding(

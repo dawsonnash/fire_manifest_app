@@ -30,13 +30,14 @@ class _EditGearState extends State<EditGear> {
   late TextEditingController gearNameController;
   late TextEditingController gearWeightController;
   late TextEditingController gearQuantityController;
-
+  late bool newHazmatValue;
   bool isSaveButtonEnabled = false; // Controls whether saving button is showing
 
   // Store old gear info for ensuring user only can save if they change data
   late String oldGearName;
   late int oldGearWeight;
   late int oldGearQuantity;
+  late bool oldGearHazmatValue;
 
   // initialize HiveBox for Gear
   late final Box<Gear> gearBox;
@@ -55,11 +56,13 @@ class _EditGearState extends State<EditGear> {
     gearNameController = TextEditingController(text: widget.gear.name);
     gearWeightController = TextEditingController(text: widget.gear.weight.toString());
     gearQuantityController = TextEditingController(text: widget.gear.quantity.toString());
+    newHazmatValue = widget.gear.isHazmat;
 
     // Store original gear data
     oldGearName = widget.gear.name;
     oldGearWeight = widget.gear.weight;
     oldGearQuantity = widget.gear.quantity;
+    oldGearHazmatValue = widget.gear.isHazmat;
 
     // Listeners to the TextControllers
     gearNameController.addListener(_checkInput);
@@ -92,11 +95,12 @@ class _EditGearState extends State<EditGear> {
     final isGearQuantityValid =
         gearQuantityController.text.isNotEmpty && int.tryParse(gearQuantityController.text) != null && int.parse(gearQuantityController.text) >= 1 && int.parse(gearQuantityController.text) < 100;
     final isGearQuantityChanged = gearQuantityController.text != oldGearQuantity.toString();
+    final isGearHazmatValueChanged = newHazmatValue != oldGearHazmatValue;
 
     setState(() {
       // Need to adjust for position as well
       // Only enables saving if name is changed and is not empty
-      isSaveButtonEnabled = (isNameValid && isGearWeightValid && isGearQuantityValid) && (isNameChanged || isGearWeightChanged || isGearQuantityChanged);
+      isSaveButtonEnabled = (isNameValid && isGearWeightValid && isGearQuantityValid) && (isNameChanged || isGearWeightChanged || isGearQuantityChanged || isGearHazmatValueChanged);
     });
   }
 
@@ -105,6 +109,7 @@ class _EditGearState extends State<EditGear> {
     // Get  updated gear name from the TextField
     final String newGearName = gearNameController.text;
     final String originalGearName = widget.gear.name;
+    final String newGearQuantity = gearQuantityController.text;
     final String capitalizedGearName = capitalizeEveryWord(newGearName);
 
     // Check if the new gear name already exists in the crew's gear list,
@@ -114,52 +119,22 @@ class _EditGearState extends State<EditGear> {
     );
 
     bool personalToolExists = personalToolsList.any((gear) => gear.name.toLowerCase() == newGearName.toLowerCase());
+    bool quantityChanged = (oldGearName.toLowerCase() == newGearName.toLowerCase()) && (oldGearHazmatValue == newHazmatValue) && (oldGearQuantity.toString() != newGearQuantity);
 
-    if (personalToolExists) {
-      int personalToolWeight = personalToolsList.firstWhere((gear) => gear.name.toLowerCase() == newGearName.toLowerCase()).weight;
-      if (personalToolWeight != (int.parse(gearWeightController.text))) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              backgroundColor: AppColors.textFieldColor2,
-              title: Text(
-                'Gear Conflict',
-                style: TextStyle(color: AppColors.textColorPrimary),
-              ),
-              content: Text(
-                '$capitalizedGearName must be of the weight, ${personalToolsList.firstWhere((gear) => gear.name.toLowerCase() == newGearName.toLowerCase()).weight} lbs. To edit this weight, do so in the "Add Crew Member" page.',
-                style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(color: AppColors.cancelButton),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-        return;
-      }
-    }
+    if (personalToolExists && !quantityChanged && !gearNameExists) {
 
-    if (gearNameExists) {
-      String matchingGearName = crew.gear.firstWhere((gear) => gear.name.toLowerCase() == newGearName.toLowerCase()).name;
-
+      // Show a single AlertDialog
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             backgroundColor: AppColors.textFieldColor2,
-            title: Text('Gear Conflict', style: TextStyle(color: AppColors.textColorPrimary)),
+            title: Text(
+              'Gear Conflict',
+              style: TextStyle(color: AppColors.textColorPrimary),
+            ),
             content: Text(
-              "$matchingGearName already exists. If you would like to add more, edit the existing item's quantity.",
+              '$capitalizedGearName also exists as a tool. Any gear that is also a personal tool must be edited within the Tool panel under the Crew tab. If you would like to add a gear item of the same name ($capitalizedGearName) do so within the Add Gear panel.',
               style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
             ),
             actions: [
@@ -176,6 +151,94 @@ class _EditGearState extends State<EditGear> {
           );
         },
       );
+
+      // Reset values for both conditions if applicable
+      setState(() {
+        gearNameController.text = oldGearName;
+        gearWeightController.text = oldGearWeight.toString();
+        gearQuantityController.text = oldGearQuantity.toString();
+        newHazmatValue = oldGearHazmatValue;
+        _checkInput(); // Re-validate inputs
+      });
+
+      return;
+    }
+    if (personalToolExists && !quantityChanged && gearNameExists) {
+
+      // Show a single AlertDialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: AppColors.textFieldColor2,
+            title: Text(
+              'Gear Conflict',
+              style: TextStyle(color: AppColors.textColorPrimary),
+            ),
+            content: Text(
+              '$capitalizedGearName exists both as a tool and item in your gear inventory. Any gear that is also a personal tool must be edited within the Tool panel under the Crew tab. If you would like to add more to your gear inventory, do so within the Edit Gear panel.',
+              style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: AppColors.cancelButton),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+
+      // Reset values for both conditions if applicable
+      setState(() {
+        gearNameController.text = oldGearName;
+        gearWeightController.text = oldGearWeight.toString();
+        gearQuantityController.text = oldGearQuantity.toString();
+        newHazmatValue = oldGearHazmatValue;
+        _checkInput(); // Re-validate inputs
+      });
+
+      return;
+    }
+    if (gearNameExists) {
+      String matchingGearName = crew.gear.firstWhere((gear) => gear.name.toLowerCase() == newGearName.toLowerCase()).name;
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: AppColors.textFieldColor2,
+            title: Text('Gear Conflict', style: TextStyle(color: AppColors.textColorPrimary)),
+            content: Text(
+              '$matchingGearName already exists in your gear inventory. If you would like to add more, edit the item quantity in the Edit Gear panel.',
+              style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: AppColors.cancelButton),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+      setState(() {
+        gearNameController.text = oldGearName;
+        gearWeightController.text = oldGearWeight.toString();
+        gearQuantityController.text = oldGearQuantity.toString();
+        newHazmatValue = oldGearHazmatValue;
+
+        _checkInput(); // Re-validate inputs
+      });
       return; // Exit function if the gear name is already used
     }
 
@@ -183,6 +246,7 @@ class _EditGearState extends State<EditGear> {
     widget.gear.name = capitalizedGearName;
     widget.gear.weight = int.parse(gearWeightController.text);
     widget.gear.quantity = int.parse(gearQuantityController.text);
+    widget.gear.isHazmat = newHazmatValue;
 
     // Find the key for this item, if it's not a new item, update it in Hive
     final key = gearBox.keys.firstWhere(
@@ -418,11 +482,13 @@ class _EditGearState extends State<EditGear> {
                       children: [
                         // Edit Name
                         Padding(
-                            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 4.0),
+                            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
                             child: TextField(
                               controller: gearNameController,
                               textCapitalization: TextCapitalization.words,
-                              maxLength: 20,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(25),
+                              ],
                               decoration: InputDecoration(
                                 labelText: 'Edit gear name',
                                 labelStyle: TextStyle(
@@ -454,17 +520,17 @@ class _EditGearState extends State<EditGear> {
                               ),
                             )),
 
+                        SizedBox(height: AppData.spacingStandard),
+
                         // Edit Weight
                         Padding(
-                            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 4.0, bottom: 4.0),
+                            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                             child: TextField(
                               controller: gearWeightController,
                               keyboardType: TextInputType.number,
-                              maxLength: 3,
-                              // Only show numeric keyboard
-                              inputFormatters: <TextInputFormatter>[
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(3),
                                 FilteringTextInputFormatter.digitsOnly,
-                                // Allow only digits
                               ],
                               decoration: InputDecoration(
                                 labelText: 'Edit weight',
@@ -503,17 +569,17 @@ class _EditGearState extends State<EditGear> {
                               ),
                             )),
 
+                        SizedBox(height: AppData.spacingStandard),
+
                         // Edit Quantity
                         Padding(
                             padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 4.0, bottom: 4.0),
                             child: TextField(
                               controller: gearQuantityController,
                               keyboardType: TextInputType.number,
-                              maxLength: 2,
-                              // Only show numeric keyboard
-                              inputFormatters: <TextInputFormatter>[
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(2),
                                 FilteringTextInputFormatter.digitsOnly,
-                                // Allow only digits
                               ],
                               decoration: InputDecoration(
                                 labelText: 'Edit quantity',
@@ -552,6 +618,56 @@ class _EditGearState extends State<EditGear> {
                               ),
                             )),
 
+                        SizedBox(height: AppData.spacingStandard),
+
+                        // HAZMAT
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 5.0),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.textFieldColor,
+                              borderRadius: BorderRadius.circular(12.0),
+                              border: Border.all(color: AppColors.borderPrimary, width: 2.0),
+                            ),
+                            alignment: Alignment.centerLeft,
+                            child: Row(
+                              children: [
+                                Text(
+                                  'HAZMAT',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    color: AppColors.textColorPrimary,
+                                  ),
+                                ),
+                                Spacer(),
+                                Text(
+                                  newHazmatValue ? 'Yes' : 'No', // Dynamic label
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: AppColors.textColorPrimary,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                // Toggle Switch
+                                Switch(
+                                  value: newHazmatValue,
+                                  onChanged: (bool value) {
+                                    setState(() {
+                                      newHazmatValue = value; // Update the state
+                                      _checkInput();
+                                    });
+                                  },
+                                  activeColor: Colors.red,
+                                  inactiveThumbColor: AppColors.textColorPrimary,
+                                  inactiveTrackColor: AppColors.textFieldColor,
+                                ),
+                                // HAZMAT Label
+                              ],
+                            ),
+                          ),
+                        ),
                         const Spacer(flex: 6),
 
                         // Save Button

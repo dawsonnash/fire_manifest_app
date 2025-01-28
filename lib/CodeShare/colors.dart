@@ -27,7 +27,7 @@ class AppColors {
 
 class AppData {
   static String crewName = 'Crew Name';
-
+  static double spacingStandard = 12.0;
 }
 
 

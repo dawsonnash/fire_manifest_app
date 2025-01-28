@@ -125,50 +125,20 @@ class _AddGearState extends State<AddGear> {
     bool gearNameExists = crew.gear.any((gear) => gear.name.toLowerCase() == gearName.toLowerCase());
     bool personalToolExists = personalToolsList.any((gear) => gear.name.toLowerCase() == gearName.toLowerCase());
 
-    if (personalToolExists) {
-      int personalToolWeight = personalToolsList.firstWhere((gear) => gear.name.toLowerCase() == gearName.toLowerCase()).weight;
-      if (personalToolWeight != gearWeight) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              backgroundColor: AppColors.textFieldColor2,
-              title: Text(
-                'Gear Conflict',
-                style: TextStyle(color: AppColors.textColorPrimary),
-              ),
-              content: Text(
-                '$capitalizedGearName already exists as a tool. To add this item, it must be of the same weight, ${personalToolsList.firstWhere((gear) => gear.name.toLowerCase() == gearName.toLowerCase()).weight} lbs.',
-                style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(color: AppColors.cancelButton),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-        return;
-      }
-    }
+    if (personalToolExists && gearNameExists) {
 
-    if (gearNameExists) {
-      String matchingGearName = crew.gear.firstWhere((gear) => gear.name.toLowerCase() == gearName.toLowerCase()).name;
+      // Show a single AlertDialog
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             backgroundColor: AppColors.textFieldColor2,
-            title: Text('Gear Conflict', style: TextStyle(color: AppColors.textColorPrimary)),
+            title: Text(
+              'Gear Conflict',
+              style: TextStyle(color: AppColors.textColorPrimary),
+            ),
             content: Text(
-              '$matchingGearName already exists. If you would like to add more, edit the item quantity in "Edit Gear" page.',
+              '$capitalizedGearName already exists as both a tool and an item in your inventory. Any gear that is also a personal tool must be edited in the Tool panel under the Crew tab. If you would like to add more to your gear inventory, do so within the Edit Gear panel.',
               style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
             ),
             actions: [
@@ -185,15 +155,136 @@ class _AddGearState extends State<AddGear> {
           );
         },
       );
+
+      // Reset values for both conditions if applicable
+        setState(() {
+          gearNameController.text = '';
+          gearWeightController.text = '';
+            isHazmat = false;
+          _checkInput(); // Re-validate inputs
+        });
+
+        return;
+
+
+    }
+
+    if (personalToolExists) {
+      int personalToolWeight = personalToolsList.firstWhere((gear) => gear.name.toLowerCase() == gearName.toLowerCase()).weight;
+      bool personalToolisHazmat = personalToolsList.firstWhere((gear) => gear.name.toLowerCase() == gearName.toLowerCase()).isHazmat;
+
+      if (personalToolWeight != int.parse(gearWeightController.text) || personalToolisHazmat != isHazmatFinal) {
+        // Determine the appropriate error messages based on which condition(s) failed
+        String weightError = '';
+        String hazmatError = '';
+        const String universalMessage = 'Any gear that is also a personal tool can be added to your gear inventory, but it must be of the same weight and HAZMAT value.';
+
+        if (personalToolWeight != int.parse(gearWeightController.text)) {
+          weightError = '$capitalizedGearName must be of the weight, $personalToolWeight lbs.';
+        }
+
+        if (personalToolisHazmat != isHazmatFinal) {
+          hazmatError = '$capitalizedGearName must have a HAZMAT value of ${personalToolisHazmat ? 'TRUE' : 'FALSE'}.';
+        }
+
+        // Combine error messages
+        String combinedError = [weightError, hazmatError].where((msg) => msg.isNotEmpty).join('\n\n');
+
+        // Append the universal message once
+        if (combinedError.isNotEmpty) {
+          combinedError = '$combinedError\n\n$universalMessage';
+        } else {
+          combinedError = universalMessage;
+        }
+
+        // Show a single AlertDialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: AppColors.textFieldColor2,
+              title: Text(
+                'Gear Conflict',
+                style: TextStyle(color: AppColors.textColorPrimary),
+              ),
+              content: Text(
+                combinedError,
+                style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: AppColors.cancelButton),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+
+        // Reset values for both conditions if applicable
+        setState(() {
+          if (personalToolWeight != int.parse(gearWeightController.text)) {
+            gearWeightController.text = personalToolWeight.toString();
+          }
+          if (personalToolisHazmat != isHazmatFinal) {
+            isHazmat = personalToolisHazmat;
+          }
+          _checkInput(); // Re-validate inputs
+        });
+
+        return;
+      }
+
+    }
+
+    if (gearNameExists) {
+      String matchingGearName = crew.gear.firstWhere((gear) => gear.name.toLowerCase() == gearName.toLowerCase()).name;
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: AppColors.textFieldColor2,
+            title: Text('Gear Conflict', style: TextStyle(color: AppColors.textColorPrimary)),
+            content: Text(
+              '$matchingGearName already exists in your gear inventory. If you would like to add more, edit the item quantity in the Edit Gear panel.',
+              style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: AppColors.cancelButton),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+      setState(() {
+        gearNameController.text = '';
+        gearWeightController.text = '';
+        gearQuantityController.text = '1';
+        isHazmat = false;
+
+        _checkInput(); // Re-validate inputs
+      });
       return; // Exit function if the gear name is already used
     }
 
     // Creating a new gear object
     Gear newGearItem;
     if (isCustom) {
-      newGearItem = Gear(name: capitalizedGearName, weight: gearWeight, quantity: gearQuantity, isHazmat: isHazmat);
+      newGearItem = Gear(name: capitalizedGearName, weight: gearWeight, quantity: gearQuantity, isHazmat: isHazmatFinal);
     } else {
-      newGearItem = Gear(name: capitalizedGearName, weight: gearWeight, quantity: gearQuantity, isHazmat: isHazmat);
+      newGearItem = Gear(name: capitalizedGearName, weight: gearWeight, quantity: gearQuantity, isHazmat: isHazmatFinal);
     }
     // Add the new member to the global crew object
     crew.addGear(newGearItem);
@@ -227,6 +318,8 @@ class _AddGearState extends State<AddGear> {
     irpgGearQuantityController.text = '1';
 
     selectedGearName = null;
+    isHazmatIRPG = false;
+    isHazmat = false;
 
     // Debug for LogCat
     // print("Gear Name: $gearName");
@@ -341,6 +434,7 @@ class _AddGearState extends State<AddGear> {
 
                     TabBarView(
                       children: [
+                        // Custom
                         Container(
                           width: double.infinity,
                           height: double.infinity,
@@ -350,10 +444,12 @@ class _AddGearState extends State<AddGear> {
                             children: [
                               // Enter Name
                               Padding(
-                                  padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 4.0),
+                                  padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
                                   child: TextField(
                                     controller: gearNameController,
-                                    maxLength: 20,
+                                    inputFormatters: [
+                                      LengthLimitingTextInputFormatter(25),
+                                    ],
                                     textCapitalization: TextCapitalization.words,
                                     decoration: InputDecoration(
                                       labelText: 'Gear Name',
@@ -386,16 +482,19 @@ class _AddGearState extends State<AddGear> {
                                       fontSize: 28,
                                     ),
                                   )),
-
+                              SizedBox(height: AppData.spacingStandard),
                               // Enter Gear Weight
                               Padding(
-                                  padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 4.0, bottom: 4.0),
+                                  padding: const EdgeInsets.only(
+                                    left: 16.0,
+                                    right: 16.0,
+                                  ),
                                   child: TextField(
                                     controller: gearWeightController,
                                     keyboardType: TextInputType.number,
-                                    maxLength: 3,
                                     // Only show numeric keyboard
                                     inputFormatters: <TextInputFormatter>[
+                                      LengthLimitingTextInputFormatter(3),
                                       FilteringTextInputFormatter.digitsOnly,
                                       // Allow only digits
                                     ],
@@ -436,17 +535,17 @@ class _AddGearState extends State<AddGear> {
                                     ),
                                   )),
 
+                              SizedBox(height: AppData.spacingStandard),
+
                               // Enter quantity
                               Padding(
-                                  padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 4.0, bottom: 4.0),
+                                  padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                                   child: TextField(
                                     controller: gearQuantityController,
                                     keyboardType: TextInputType.number,
-                                    maxLength: 2,
-                                    // Only show numeric keyboard
-                                    inputFormatters: <TextInputFormatter>[
+                                    inputFormatters: [
+                                      LengthLimitingTextInputFormatter(2),
                                       FilteringTextInputFormatter.digitsOnly,
-                                      // Allow only digits
                                     ],
                                     decoration: InputDecoration(
                                       labelText: 'Quantity',
@@ -484,6 +583,9 @@ class _AddGearState extends State<AddGear> {
                                       fontSize: 28,
                                     ),
                                   )),
+                              SizedBox(height: AppData.spacingStandard),
+
+                              // HAZMAT
                               Padding(
                                 padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
                                 child: Container(
@@ -544,6 +646,8 @@ class _AddGearState extends State<AddGear> {
                             ],
                           ),
                         ),
+
+                        // IRPG
                         Container(
                           width: double.infinity,
                           height: double.infinity,
@@ -553,7 +657,7 @@ class _AddGearState extends State<AddGear> {
                             children: [
                               // Enter Name
                               Padding(
-                                padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 4.0),
+                                padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -643,18 +747,16 @@ class _AddGearState extends State<AddGear> {
                                 ),
                               ),
 
-                              SizedBox(height: 16),
+                              SizedBox(height: AppData.spacingStandard),
                               // Enter Gear Weight
                               Padding(
-                                  padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 4.0, bottom: 4.0),
+                                  padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                                   child: TextField(
                                     controller: irpgGearWeightController,
                                     keyboardType: TextInputType.number,
-                                    maxLength: 3,
-                                    // Only show numeric keyboard
-                                    inputFormatters: <TextInputFormatter>[
+                                    inputFormatters: [
+                                      LengthLimitingTextInputFormatter(3),
                                       FilteringTextInputFormatter.digitsOnly,
-                                      // Allow only digits
                                     ],
                                     decoration: InputDecoration(
                                       labelText: 'Weight',
@@ -692,18 +794,17 @@ class _AddGearState extends State<AddGear> {
                                       fontSize: 28,
                                     ),
                                   )),
+                              SizedBox(height: AppData.spacingStandard),
 
                               // Enter quantity
                               Padding(
-                                  padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 4.0, bottom: 4.0),
+                                  padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                                   child: TextField(
                                     controller: irpgGearQuantityController,
                                     keyboardType: TextInputType.number,
-                                    maxLength: 2,
-                                    // Only show numeric keyboard
-                                    inputFormatters: <TextInputFormatter>[
+                                    inputFormatters: [
+                                      LengthLimitingTextInputFormatter(2),
                                       FilteringTextInputFormatter.digitsOnly,
-                                      // Allow only digits
                                     ],
                                     decoration: InputDecoration(
                                       labelText: 'Quantity',
@@ -741,6 +842,7 @@ class _AddGearState extends State<AddGear> {
                                       fontSize: 28,
                                     ),
                                   )),
+                              SizedBox(height: AppData.spacingStandard),
 
                               Padding(
                                 padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
