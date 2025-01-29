@@ -561,7 +561,7 @@ class _EditTripState extends State<EditTrip> {
                                 name: item.name,
                                 quantity: selectedQuantity,
                                 weight: item.weight, // Per-item weight, not total weight
-                                isPersonalTool: item.isPersonalTool,
+                                isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat
                               ),
                             );
                           }
@@ -594,7 +594,7 @@ class _EditTripState extends State<EditTrip> {
                                     name: tool.name,
                                     quantity: tool.quantity,
                                     weight: tool.weight, // Per-item weight
-                                    isPersonalTool: tool.isPersonalTool,
+                                    isPersonalTool: tool.isPersonalTool, isHazmat: tool.isHazmat
                                   ),
                                 );
                               }
@@ -644,7 +644,7 @@ class _EditTripState extends State<EditTrip> {
               name: gear.name,
               quantity: remainingQuantity > 0 ? remainingQuantity : 0,
               weight: gear.weight,
-              isPersonalTool: gear.isPersonalTool,
+              isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat
             );
           })
           .where((gear) => gear.quantity > 0)
@@ -671,7 +671,7 @@ class _EditTripState extends State<EditTrip> {
             name: gear.name,
             quantity: gear.quantity,
             weight: gear.weight,
-            isPersonalTool: gear.isPersonalTool,
+            isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat
           )),
       ...load.customItems.map((customItem) => CustomItem(
             name: customItem.name,
@@ -1117,7 +1117,7 @@ class _EditTripState extends State<EditTrip> {
                                                           name: item.name,
                                                           quantity: 0,
                                                           weight: item.weight, // Per-item weight
-                                                          isPersonalTool: item.isPersonalTool,
+                                                          isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat
                                                         ),
                                                       );
 
@@ -1280,7 +1280,7 @@ class _EditTripState extends State<EditTrip> {
                                                                                         name: item.name,
                                                                                         quantity: 0,
                                                                                         weight: item.weight, // Per-item weight
-                                                                                        isPersonalTool: item.isPersonalTool,
+                                                                                        isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat
                                                                                       ),
                                                                                     );
 
@@ -1319,7 +1319,7 @@ class _EditTripState extends State<EditTrip> {
                                                                       name: item.name,
                                                                       quantity: 0,
                                                                       weight: item.weight, // Per-item weight
-                                                                      isPersonalTool: item.isPersonalTool,
+                                                                      isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat
                                                                     ),
                                                                   );
 
@@ -1447,7 +1447,7 @@ class _EditTripState extends State<EditTrip> {
                                                                   // General gear: update or add back to gearList
                                                                   final existingGear = gearList.firstWhere(
                                                                     (gear) => gear.name == item.name && !gear.isPersonalTool,
-                                                                    orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight ~/ item.quantity),
+                                                                    orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight ~/ item.quantity, isHazmat: item.isHazmat),
                                                                   );
 
                                                                   existingGear.quantity += item.quantity;

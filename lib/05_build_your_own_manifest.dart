@@ -552,7 +552,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                 name: item.name,
                                 quantity: selectedQuantity,
                                 weight: item.weight * selectedQuantity, // Calculate total weight
-                                isPersonalTool: item.isPersonalTool,
+                                isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat
                               ),
                             );
                           }
@@ -585,7 +585,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                     name: tool.name,
                                     quantity: tool.quantity,
                                     weight: tool.weight * tool.quantity,
-                                    isPersonalTool: tool.isPersonalTool,
+                                    isPersonalTool: tool.isPersonalTool, isHazmat: tool.isHazmat
                                   ),
                                 );
                               }
@@ -618,7 +618,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
           name: gear.name,
           quantity: gear.quantity,
           weight: gear.weight,
-          isPersonalTool: gear.isPersonalTool,
+          isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat
         );
       }).toList();
 
@@ -1076,6 +1076,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                   quantity: 0,
                                                   weight: item.weight ~/ item.quantity, // Correct per-unit weight
                                                   isPersonalTool: item.isPersonalTool,
+                                                    isHazmat: item.isHazmat
                                                 ),
                                               );
 
@@ -1240,6 +1241,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                               quantity: 0,
                                                                               weight: 0,
                                                                               isPersonalTool: item.isPersonalTool,
+                                                                                isHazmat: item.isHazmat
                                                                             ),
                                                                           );
 
@@ -1275,6 +1277,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                               quantity: 0,
                                                               weight: item.weight ~/ item.quantity, // Correct per-unit weight
                                                               isPersonalTool: item.isPersonalTool,
+                                                                isHazmat: item.isHazmat
                                                             ),
                                                           );
 
@@ -1416,7 +1419,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                           // General gear: update or add back to gearList
                                                           final existingGear = gearList.firstWhere(
                                                             (gear) => gear.name == item.name && !gear.isPersonalTool,
-                                                            orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight ~/ item.quantity),
+                                                            orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight ~/ item.quantity, isHazmat: item.isHazmat),
                                                           );
 
                                                           existingGear.quantity += item.quantity;

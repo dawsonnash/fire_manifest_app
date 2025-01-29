@@ -38,6 +38,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
           weight: tool.weight,
           quantity: tool.quantity,
           isPersonalTool: tool.isPersonalTool,
+          isHazmat: tool.isHazmat
         );
       }).toList(),
     );
@@ -51,7 +52,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
   for (var gear in trip.gear) {
     for (int i = 0; i < gear.quantity; i++) {
       // Create copy of gear item for each quantity
-      gearCopy.add(Gear(name: gear.name, weight: gear.weight, quantity: 1,  isPersonalTool: gear.isPersonalTool));
+      gearCopy.add(Gear(name: gear.name, weight: gear.weight, quantity: 1,  isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat));
     }
   }
   // Initialize all Loads
@@ -91,7 +92,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                         name: tool.name,
                         weight: tool.weight,
                         quantity: tool.quantity,
-                        isPersonalTool: tool.isPersonalTool,
+                        isPersonalTool: tool.isPersonalTool, isHazmat: tool.isHazmat
                       );
                     }).toList(),
                   ));
@@ -123,7 +124,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                           name: tool.name,
                           weight: tool.weight,
                           quantity: tool.quantity,
-                          isPersonalTool: tool.isPersonalTool,
+                          isPersonalTool: tool.isPersonalTool, isHazmat: tool.isHazmat
                         );
                       }).toList(),
                     );
@@ -163,7 +164,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                         name: tool.name,
                         weight: tool.weight,
                         quantity: tool.quantity,
-                        isPersonalTool: tool.isPersonalTool,
+                        isPersonalTool: tool.isPersonalTool, isHazmat: tool.isHazmat
                       );
                     }).toList(),
                   ));
@@ -193,7 +194,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                           name: tool.name,
                           weight: tool.weight,
                           quantity: tool.quantity,
-                          isPersonalTool: tool.isPersonalTool,
+                          isPersonalTool: tool.isPersonalTool, isHazmat: tool.isHazmat
                         );
                       }).toList(),
                     );
@@ -239,7 +240,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                         name: tool.name,
                         weight: tool.weight,
                         quantity: tool.quantity,
-                        isPersonalTool: tool.isPersonalTool,
+                        isPersonalTool: tool.isPersonalTool, isHazmat: tool.isHazmat
                       );
                     }).toList(),
                   ));
@@ -300,7 +301,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                             name: tool.name,
                             weight: tool.weight,
                             quantity: tool.quantity,
-                            isPersonalTool: tool.isPersonalTool,
+                            isPersonalTool: tool.isPersonalTool, isHazmat: tool.isHazmat
                           );
                         }).toList(),
                       );
@@ -342,7 +343,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                     load.weight + gear.weight <= maxLoadWeight) {
                   // Add the gear item to the load
                   load.loadGear.add(
-                      Gear(name: gear.name, weight: gear.weight, quantity: 1, isPersonalTool: gear.isPersonalTool));
+                      Gear(name: gear.name, weight: gear.weight, quantity: 1, isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat));
                   load.weight += gear.weight;
                   addedQuantity++;
                   // Remove one instance of the gear from gearCopy
@@ -368,7 +369,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                 if (gearCopy.isNotEmpty &&
                     load.weight + gear.weight <= maxLoadWeight) {
                   load.loadGear.add(
-                      Gear(name: gear.name, weight: gear.weight, quantity: 1,  isPersonalTool: gear.isPersonalTool));
+                      Gear(name: gear.name, weight: gear.weight, quantity: 1,  isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat));
                   load.weight += gear.weight;
                   addedQuantity++;
                   gearCopy.removeAt(
@@ -402,7 +403,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                     gearCopy.any((item) => item.name == gear.name)) {
                   // Add one item of this specific gear type to the current load
                   load.loadGear.add(
-                      Gear(name: gear.name, weight: gear.weight, quantity: 1,  isPersonalTool: gear.isPersonalTool));
+                      Gear(name: gear.name, weight: gear.weight, quantity: 1,  isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat));
                   load.weight += gear.weight;
                   addedQuantity++;
 
@@ -454,6 +455,8 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
             weight: tool.weight,
             quantity: tool.quantity,
             isPersonalTool: tool.isPersonalTool,
+              isHazmat: tool.isHazmat
+
           );
         }).toList(),
       ));
@@ -496,7 +499,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
     for (var gear in load.loadGear) {
       var existingGear = consolidatedGear.firstWhere(
             (item) => item.name == gear.name,
-        orElse: () => Gear(name: gear.name, weight: gear.weight, quantity: 0,   isPersonalTool: gear.isPersonalTool),
+        orElse: () => Gear(name: gear.name, weight: gear.weight, quantity: 0,   isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat),
       );
 
       if (existingGear.quantity == 0) {
