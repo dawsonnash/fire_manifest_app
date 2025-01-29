@@ -37,7 +37,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
   late List<TextEditingController> toolWeightControllers = [];
   late TextEditingController newToolNameController;
   late TextEditingController newToolWeightController;
-
+  late bool isHazmatTool;
   int? selectedPosition;
   List<Gear>? addedTools = [];
 
@@ -60,6 +60,13 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     // Initialize crewmemberBox variable here
     crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
     loadPersonalToolsList();
+
+    // Set default isHazmatTool value
+    if (personalToolsList.isNotEmpty) {
+      isHazmatTool = personalToolsList.first.isHazmat; // Initialize from the first tool in the list
+    } else {
+      isHazmatTool = false; // Default to false if the list is empty
+    }
 
     // Initializing the controllers with the current crew member's data to be edited
     nameController = TextEditingController(text: widget.crewMember.name);
@@ -109,8 +116,14 @@ class _EditCrewmemberState extends State<EditCrewmember> {
   }
 
   void addTool() {
-    final String toolName = newToolNameController.text.trim(); // Trim whitespace
-    final int? toolWeight = int.tryParse(newToolWeightController.text);
+    final String toolName = newToolNameController.text;
+    final int toolWeight = int.parse(newToolWeightController.text);
+
+    // Find the selected tool in the personalToolsList
+    final Gear selectedGear = personalToolsList.firstWhere(
+          (tool) => tool.name == toolName,
+      orElse: () => Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true, isHazmat: false),
+    );
 
     // Check for duplicate tool names
     final bool isDuplicate = addedTools?.any(
@@ -134,38 +147,17 @@ class _EditCrewmemberState extends State<EditCrewmember> {
       return; // Exit function if the tool is a duplicate
     }
 
-    if (toolName.isNotEmpty && toolWeight != null && toolWeight > 0) {
-      setState(() {
-        addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true));
-        toolNameControllers.add(TextEditingController(text: toolName));
-        toolWeightControllers.add(TextEditingController(text: toolWeight.toString()));
-        newToolNameController.clear();
-        newToolWeightController.clear();
-      });
-      _checkInput(); // Call _checkInput() to update the button state
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Center(
-            child: Text(
-              'Enter all/correct tool info',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.black),
-            ),
-          ),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
+    setState(() {
+      addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true, isHazmat: selectedGear.isHazmat));
+      newToolNameController.clear();
+      newToolWeightController.clear();
+      setState(() {});
+    });
   }
 
   void removeTool(int index) {
     setState(() {
       addedTools?.removeAt(index);
-      toolNameControllers[index].dispose();
-      toolWeightControllers[index].dispose();
-      toolNameControllers.removeAt(index);
-      toolWeightControllers.removeAt(index);
       _checkInput();
     });
   }
@@ -208,10 +200,9 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     final String newCrewMemberName = nameController.text;
     final String originalCrewMemberName = widget.crewMember.name;
 
-    // Check if new crew member name already exists in the crew list, ignoring the current crew member's original name (case-insensitive)
+    // Check if new crew member name already exists
     bool crewMemberNameExists = crew.crewMembers.any(
-          (member) =>
-      member.name.toLowerCase() == newCrewMemberName.toLowerCase() &&
+          (member) => member.name.toLowerCase() == newCrewMemberName.toLowerCase() &&
           member.name.toLowerCase() != originalCrewMemberName.toLowerCase(),
     );
 
@@ -233,48 +224,41 @@ class _EditCrewmemberState extends State<EditCrewmember> {
           backgroundColor: Colors.red,
         ),
       );
-      return; // Exit function if the crew member name is already used
+      return;
     }
 
-    // Update exisiting data
+    // ✅ Update crew member details
     widget.crewMember.name = nameController.text;
     widget.crewMember.flightWeight = int.parse(flightWeightController.text);
-    widget.crewMember.position = selectedPosition!; // Update position
+    widget.crewMember.position = selectedPosition ?? widget.crewMember.position; // Keep old position if not changed
 
-    // Update all personal tools
-    List<Gear> updatedTools = addedTools?.asMap().entries.map((entry) {
-          return Gear(
-              name: toolNameControllers[entry.key].text,
-              weight: int.parse(toolWeightControllers[entry.key].text),
-              quantity: 1, // To be changed
-              isPersonalTool: true);
-        }).toList() ??
-        [];
-    widget.crewMember.personalTools = updatedTools;
+    // ✅ Directly update `personalTools` with `addedTools`
+    widget.crewMember.personalTools = List.from(addedTools ?? []);
 
-    // Find the key for this item, if it's not a new item, update it in Hive
+    // ✅ Update Hive with the new list of tools
     final key = crewmemberBox.keys.firstWhere(
-      (key) => crewmemberBox.get(key) == widget.crewMember,
+          (key) => crewmemberBox.get(key) == widget.crewMember,
       orElse: () => null,
     );
+
     if (key != null) {
-      // Update existing Hive item
       crewmemberBox.put(key, widget.crewMember);
     } else {
-      // Add new item to Hive
       crewmemberBox.add(widget.crewMember);
     }
+
+    // ✅ Ensure the total crew weight is updated
     crew.updateTotalCrewWeight();
-    // Callback function, Update previous page UI with setState()
+
+    // Callback to update UI
     widget.onUpdate();
 
-    // Show successful save popup
+    // Show confirmation message
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Center(
           child: Text(
             'Crew Member Updated!',
-            // Maybe change look
             style: TextStyle(
               color: Colors.black,
               fontSize: 32,
@@ -286,7 +270,9 @@ class _EditCrewmemberState extends State<EditCrewmember> {
         backgroundColor: Colors.green,
       ),
     );
-    Navigator.of(context).pop(); // Return to previous screen
+
+    // ✅ Navigate back to previous screen
+    Navigator.of(context).pop();
   }
 
   @override
@@ -684,10 +670,10 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                                 setState(() {
                                                   // Select existing tool and update weight
                                                   selectedTool = value;
-                                                  newToolWeightController.text =
-                                                      personalToolsList.firstWhere((tool) => tool.name == value!).weight.toString();
-                                                  newToolNameController.text =
-                                                      personalToolsList.firstWhere((tool) => tool.name == value).name;
+                                                  final selectedGear = personalToolsList.firstWhere((tool) => tool.name == value);
+                                                  newToolWeightController.text = selectedGear.weight.toString();
+                                                  newToolNameController.text = selectedGear.name;
+                                                  isHazmatTool = selectedGear.isHazmat; // Correctly update isHazmatTool
                                                 });
                                               }
                                                   : null, // Disable dropdown if no tools are available

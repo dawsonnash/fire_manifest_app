@@ -6,7 +6,6 @@ import 'CodeShare/colors.dart';
 import 'Data/crew.dart';
 import 'Data/gear.dart';
 import 'CodeShare/functions.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 // Tester data
 class AddGear extends StatefulWidget {
@@ -158,9 +157,17 @@ class _AddGearState extends State<AddGear> {
 
       // Reset values for both conditions if applicable
         setState(() {
-          gearNameController.text = '';
-          gearWeightController.text = '';
+          if(isCustom) {
+            gearNameController.text = '';
+            gearWeightController.text = '';
             isHazmat = false;
+          }
+          else{
+            irpgGearNameController.text = '';
+            irpgGearWeightController.text = '';
+            selectedGearName = null;
+            isHazmatIRPG = false;
+          }
           _checkInput(); // Re-validate inputs
         });
 
@@ -228,11 +235,21 @@ class _AddGearState extends State<AddGear> {
 
         // Reset values for both conditions if applicable
         setState(() {
-          if (personalToolWeight != int.parse(gearWeightController.text)) {
-            gearWeightController.text = personalToolWeight.toString();
+          if (isCustom) {
+            if (personalToolWeight != int.parse(gearWeightController.text)) {
+              gearWeightController.text = personalToolWeight.toString();
+            }
+            if (personalToolisHazmat != isHazmatFinal) {
+              isHazmat = personalToolisHazmat;
+            }
           }
-          if (personalToolisHazmat != isHazmatFinal) {
-            isHazmat = personalToolisHazmat;
+          else{
+            if (personalToolWeight != int.parse(gearWeightController.text)) {
+              irpgGearWeightController.text = personalToolWeight.toString();
+            }
+            if (personalToolisHazmat != isHazmatFinal) {
+              isHazmatIRPG = personalToolisHazmat;
+            }
           }
           _checkInput(); // Re-validate inputs
         });
@@ -269,23 +286,27 @@ class _AddGearState extends State<AddGear> {
         },
       );
       setState(() {
-        gearNameController.text = '';
-        gearWeightController.text = '';
-        gearQuantityController.text = '1';
-        isHazmat = false;
-
+        if(isCustom) {
+          gearNameController.text = '';
+          gearWeightController.text = '';
+          gearQuantityController.text = '1';
+          isHazmat = false;
+        }
+        else{
+          irpgGearNameController.text = '';
+          irpgGearWeightController.text = '';
+          irpgGearQuantityController.text = '1';
+          selectedGearName = null;
+          isHazmatIRPG = false;
+        }
         _checkInput(); // Re-validate inputs
       });
       return; // Exit function if the gear name is already used
     }
 
     // Creating a new gear object
-    Gear newGearItem;
-    if (isCustom) {
-      newGearItem = Gear(name: capitalizedGearName, weight: gearWeight, quantity: gearQuantity, isHazmat: isHazmatFinal);
-    } else {
-      newGearItem = Gear(name: capitalizedGearName, weight: gearWeight, quantity: gearQuantity, isHazmat: isHazmatFinal);
-    }
+    Gear newGearItem =  Gear(name: capitalizedGearName, weight: gearWeight, quantity: gearQuantity, isHazmat: isHazmatFinal);
+
     // Add the new member to the global crew object
     crew.addGear(newGearItem);
 

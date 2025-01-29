@@ -6,6 +6,7 @@ import 'CodeShare/colors.dart';
 import 'Data/crew.dart';
 import 'Data/crewmember.dart';
 import 'Data/gear.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AddCrewmember extends StatefulWidget {
   const AddCrewmember({super.key});
@@ -25,6 +26,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
   final TextEditingController toolWeightController = TextEditingController();
   bool isSaveButtonEnabled = false; // Controls whether saving button is showing
   int? selectedPosition;
+  late bool isHazmatTool;
   List<Gear>? addedTools = []; // List to hold added Gear objects, i.e., personal tools
 
   @override
@@ -35,6 +37,12 @@ class _AddCrewmemberState extends State<AddCrewmember> {
     personalToolsBox = Hive.box<Gear>('personalToolsBox');
     loadPersonalToolsList();
 
+    // Set default isHazmatTool value
+    if (personalToolsList.isNotEmpty) {
+      isHazmatTool = personalToolsList.first.isHazmat; // Initialize from the first tool in the list
+    } else {
+      isHazmatTool = false; // Default to false if the list is empty
+    }
     // Listeners to the TextControllers
     nameController.addListener(_checkInput);
     flightWeightController.addListener(_checkInput);
@@ -76,6 +84,12 @@ class _AddCrewmemberState extends State<AddCrewmember> {
     final String toolName = toolNameController.text;
     final int toolWeight = int.parse(toolWeightController.text);
 
+    // Find the selected tool in the personalToolsList
+    final Gear selectedGear = personalToolsList.firstWhere(
+          (tool) => tool.name == toolName,
+      orElse: () => Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true, isHazmat: false),
+    );
+
     // Check for duplicate tool names
     final bool isDuplicate = addedTools?.any(
           (tool) => tool.name.toLowerCase() == toolName.toLowerCase(),
@@ -97,26 +111,13 @@ class _AddCrewmemberState extends State<AddCrewmember> {
       );
       return; // Exit function if the tool is a duplicate
     }
-    if (toolName.isNotEmpty && toolWeight > 0) {
+
       setState(() {
-        addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true));
+        addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true, isHazmat: selectedGear.isHazmat));
         toolNameController.clear();
         toolWeightController.clear();
         setState(() {});
       });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Center(
-            child: Text(
-              'Please enter all tool info',
-              style: TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),
-            ),
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
   }
 
   void removeTool(int index) {
@@ -489,8 +490,10 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                                       setState(() {
                                                         // Select existing tool and update weight
                                                         selectedTool = value;
-                                                        toolWeightController.text = personalToolsList.firstWhere((tool) => tool.name == value!).weight.toString();
-                                                        toolNameController.text = personalToolsList.firstWhere((tool) => tool.name == value).name;
+                                                        final selectedGear = personalToolsList.firstWhere((tool) => tool.name == value);
+                                                        toolWeightController.text = selectedGear.weight.toString();
+                                                        toolNameController.text = selectedGear.name;
+                                                        isHazmatTool = selectedGear.isHazmat; // Correctly update isHazmatTool
                                                       });
                                                     }
                                                   : null,
@@ -592,9 +595,26 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                       borderRadius: BorderRadius.circular(12), // Rounded corners (optional)
                                     ),
                                     child: ListTile(
-                                      title: Text(
-                                        tool!.name,
-                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                                      title: Row(
+                                        children: [
+                                          Text(
+                                            tool!.name,
+                                            style: TextStyle(color: AppColors.textColorPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                                          ),
+                                          if (tool.isHazmat)
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 8.0), // Add spacing between text and icon
+                                              child: Tooltip(
+                                                message: 'HAZMAT', // The hint displayed on long-press
+                                                waitDuration: const Duration(milliseconds: 500), // Time before the tooltip shows
+                                                child: Icon(
+                                                  FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                  color: Colors.red, // Red color for hazard
+                                                  size: 18, // Icon size
+                                                ),
+                                              ),
+                                            ),
+                                        ],
                                       ),
                                       subtitle: Text(
                                         '${tool.weight} lbs',

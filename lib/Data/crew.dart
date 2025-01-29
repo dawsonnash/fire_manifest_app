@@ -293,17 +293,16 @@ void initializeTestData() {
 
   // Define common personal tools
   List<Gear> sawyer = [
-    Gear(name: 'Chainsaw', weight: 25, quantity: 1, isPersonalTool: true),
-    Gear(name: 'P-tool', weight: 8, quantity: 1, isPersonalTool: true),
+    Gear(name: 'Chainsaw', weight: 25, quantity: 1, isPersonalTool: true, isHazmat: true),
+    Gear(name: 'P-tool', weight: 8, quantity: 1, isPersonalTool: true, isHazmat: false),
   ];
 
   List<Gear> swamper = [
-    Gear(name: 'Dolmar', weight: 15, quantity: 1, isPersonalTool: true),
-    Gear(name: 'P-tool', weight: 8, quantity: 1, isPersonalTool: true),
+    Gear(name: 'Dolmar', weight: 15, quantity: 1, isPersonalTool: true, isHazmat: true),
   ];
 
   List<Gear> dig = [
-    Gear(name: 'P-tool', weight: 8, quantity: 1, isPersonalTool: true),
+    Gear(name: 'P-tool', weight: 8, quantity: 1, isPersonalTool: true, isHazmat: false),
   ];
 
   // Add Crew Members to Hive and in-memory
