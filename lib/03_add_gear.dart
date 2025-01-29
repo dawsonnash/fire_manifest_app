@@ -180,13 +180,13 @@ class _AddGearState extends State<AddGear> {
       int personalToolWeight = personalToolsList.firstWhere((gear) => gear.name.toLowerCase() == gearName.toLowerCase()).weight;
       bool personalToolisHazmat = personalToolsList.firstWhere((gear) => gear.name.toLowerCase() == gearName.toLowerCase()).isHazmat;
 
-      if (personalToolWeight != int.parse(gearWeightController.text) || personalToolisHazmat != isHazmatFinal) {
+      if (personalToolWeight != gearWeight || personalToolisHazmat != isHazmatFinal) {
         // Determine the appropriate error messages based on which condition(s) failed
         String weightError = '';
         String hazmatError = '';
         const String universalMessage = 'Any gear that is also a personal tool can be added to your gear inventory, but it must be of the same weight and HAZMAT value.';
 
-        if (personalToolWeight != int.parse(gearWeightController.text)) {
+        if (personalToolWeight != gearWeight) {
           weightError = '$capitalizedGearName must be of the weight, $personalToolWeight lbs.';
         }
 
@@ -236,7 +236,7 @@ class _AddGearState extends State<AddGear> {
         // Reset values for both conditions if applicable
         setState(() {
           if (isCustom) {
-            if (personalToolWeight != int.parse(gearWeightController.text)) {
+            if (personalToolWeight != gearWeight) {
               gearWeightController.text = personalToolWeight.toString();
             }
             if (personalToolisHazmat != isHazmatFinal) {
@@ -244,7 +244,7 @@ class _AddGearState extends State<AddGear> {
             }
           }
           else{
-            if (personalToolWeight != int.parse(gearWeightController.text)) {
+            if (personalToolWeight != gearWeight) {
               irpgGearWeightController.text = personalToolWeight.toString();
             }
             if (personalToolisHazmat != isHazmatFinal) {
@@ -503,6 +503,7 @@ class _AddGearState extends State<AddGear> {
                                       fontSize: 28,
                                     ),
                                   )),
+
                               SizedBox(height: AppData.spacingStandard),
                               // Enter Gear Weight
                               Padding(
@@ -815,6 +816,7 @@ class _AddGearState extends State<AddGear> {
                                       fontSize: 28,
                                     ),
                                   )),
+
                               SizedBox(height: AppData.spacingStandard),
 
                               // Enter quantity
