@@ -1,9 +1,23 @@
 import 'dart:ui';
+import 'package:fire_app/Data/saved_preferences.dart';
+import 'package:fire_app/Data/trip_preferences.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/link.dart';
 import 'CodeShare/colors.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:intl/intl.dart';
+import 'Data/crew.dart';
+import 'dart:convert';
+import 'package:file_picker/file_picker.dart';
+
+import 'Data/crewmember.dart';
+import 'Data/gear.dart';
 
 
 class SettingsView extends StatefulWidget {
@@ -39,6 +53,207 @@ class _SettingsState extends State<SettingsView> {
     super.dispose();
   }
 
+  Future<void> exportCrewData() async {
+    try {
+      // Convert crew object to JSON string
+      String jsonData = jsonEncode(crew.toJson());
+
+      // Get directory for temporary storage
+      Directory directory = await getApplicationDocumentsDirectory();
+
+      // Get the current date in "dd_MMM" format
+      String formattedDate = DateFormat('MMM_dd').format(DateTime.now());
+
+      // Construct the file path with date suffix
+      String filePath = '${directory.path}/CrewData_$formattedDate.json';
+
+      // Write JSON data to file
+      File file = File(filePath);
+      await file.writeAsString(jsonData);
+
+      // Share the file
+      Share.shareXFiles([XFile(filePath)], text: 'Exported crew data');
+    } catch (e) {
+      print('Error exporting data: $e');
+    }
+  }
+
+  void selectFileForImport() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['json'], // Restrict to JSON files
+    );
+
+    if (result != null) {
+      PlatformFile file = result.files.first;
+     confirmDataWipe(file);
+    } else {
+      print("File selection canceled.");
+    }
+  }
+  void confirmDataWipe(PlatformFile file) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColors.textFieldColor2,
+          title: Text(
+            'Warning',
+            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'Importing this file will delete all existing data besides your Saved Trips. This action is irreversible. Proceed?',
+            style: TextStyle(color: AppColors.textColorPrimary),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cancel
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: AppColors.cancelButton),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the warning dialog
+                importCrewData(file); // Proceed with import
+                // Show successful save popup
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Center(
+                      child: Text(
+                        'Crew Imported!',
+                        // Maybe change look
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    duration: Duration(seconds: 1),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              child: Text(
+                'Confirm',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  void importCrewData(PlatformFile file) async {
+    try {
+      // Read file contents
+      String jsonString = await File(file.path!).readAsString();
+
+      // Decode JSON safely
+      Map<String, dynamic> jsonData;
+      try {
+        jsonData = jsonDecode(jsonString);
+      } catch (e) {
+        showErrorDialog("Invalid JSON file. Could not be read.");
+        return;
+      }
+
+      // Validate required fields
+      if (!jsonData.containsKey("crewMembers") ||
+          !jsonData.containsKey("gear") ||
+          !jsonData.containsKey("personalTools") ||
+          !jsonData.containsKey("totalCrewWeight")) {
+        showErrorDialog("Invalid JSON format. Missing required fields.");
+        return;
+      }
+
+      // Validate data types
+      if (jsonData["crewMembers"] is! List ||
+          jsonData["gear"] is! List ||
+          jsonData["personalTools"] is! List ||
+          jsonData["totalCrewWeight"] is! num) {
+        showErrorDialog("Invalid JSON format. Incorrect data types.");
+        return;
+      }
+
+      // Convert JSON to Crew object
+      Crew importedCrew;
+      try {
+        importedCrew = Crew.fromJson(jsonData);
+      } catch (e) {
+        showErrorDialog("Error processing data. Ensure the file is in the correct format.");
+        return;
+      }
+
+      // Clear old data first
+      await Hive.box<CrewMember>('crewmemberBox').clear();
+      await Hive.box<Gear>('gearBox').clear();
+      await Hive.box<Gear>('personalToolsBox').clear();
+      await Hive.box<TripPreference>('tripPreferenceBox').clear();
+      savedPreferences.deleteAllTripPreferences();
+
+      // Save imported data to Hive
+      var crewMemberBox = Hive.box<CrewMember>('crewmemberBox');
+      for (var member in importedCrew.crewMembers) {
+        await crewMemberBox.add(member);
+      }
+
+      var gearBox = Hive.box<Gear>('gearBox');
+      for (var gearItem in importedCrew.gear) {
+        await gearBox.add(gearItem);
+      }
+
+      var personalToolsBox = Hive.box<Gear>('personalToolsBox');
+      for (var tool in importedCrew.personalTools) {
+        await personalToolsBox.add(tool);
+      }
+
+      // Reload crew data from Hive
+      await crew.loadCrewDataFromHive();
+      setState(() {});
+
+      print("Import successful! Crew data updated.");
+
+    } catch (e) {
+      showErrorDialog("Unexpected error during import: $e");
+    }
+  }
+
+// Helper function to show an error dialog
+  void showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.red.shade900,
+          title: Text(
+            'Import Error',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            message,
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'OK',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _sendFeedback() async {
     final TextEditingController feedbackController = TextEditingController();
 
@@ -46,7 +261,7 @@ class _SettingsState extends State<SettingsView> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: AppColors.textFieldColor,
+          backgroundColor: AppColors.textFieldColor2,
           title: Text(
             'Report Bugs',
             style: TextStyle(color: AppColors.textColorPrimary),
@@ -113,6 +328,142 @@ class _SettingsState extends State<SettingsView> {
     );
   }
 
+  void importExportDialog(){
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        int selectedIndex = 0; // Initial selection index
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: AppColors.textFieldColor2,
+              title: Row(
+                children: [
+                  Text(
+                    'Select an option',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textColorPrimary,
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.info_outline, // Info icon
+                      color: Colors.white,
+                      size: 22, // Adjust size if needed
+                    ),
+                    onPressed: () {
+                      // Show an info dialog or tooltip when clicked
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            backgroundColor: AppColors.textFieldColor2,
+                            title: Text("Crew Sharing", style: TextStyle(color: AppColors.textColorPrimary),),
+                            content: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min, // Prevents excessive height
+                                children: [
+                                  Text("Crew sharing allows you to share your crew data (Crew Members, Gear, and Tools) with other users. To share:\n", style: TextStyle(color: AppColors.textColorPrimary)),
+                                  Text("1. For exporting, select the 'Export' option, save to your files, and then send to the  other user. If on iOS, this can be done directly through Air Drop, but must still be saved to your files. The exported file will be be titled CrewData along with today's date and will have a .json extension.\n", style: TextStyle(color: AppColors.textColorPrimary)),
+                                  Text("2. For importing, select the 'Import' option and find the CrewData JSON file in your files.", style: TextStyle(color: AppColors.textColorPrimary)),
+                                ],
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // Close the dialog
+                                },
+                                child: Text("OK", style: TextStyle(color: AppColors.textColorPrimary),),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+
+                ],
+              ),
+              content: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.15, // Dynamic height
+                child: CupertinoPicker(
+                  itemExtent: 50, // Height of each item in the picker
+                  onSelectedItemChanged: (int index) {
+                    setState(() {
+                      selectedIndex = index;
+                    });
+                  },
+                  children: [
+                    Center(child: Text('Export', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                    Center(child: Text('Import', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(fontSize: 16, color: AppColors.cancelButton),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+
+                    // Export
+                    if (selectedIndex == 0) {
+
+                      if (crew.crewMembers.isEmpty && crew.gear.isEmpty){
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              backgroundColor: AppColors.textFieldColor2,
+                              title: Text("No crew to export", style: TextStyle(color: AppColors.textColorPrimary),),
+                              content: Text("There are no Crew Members or Gear in your inventory. Before exporting, create a crew.", style: TextStyle(color: AppColors.textColorPrimary)),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(); // Close the dialog
+                                  },
+                                  child: Text("OK", style: TextStyle(color: AppColors.textColorPrimary),),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                      else {
+                        exportCrewData();
+                      }
+                    }
+                    // Import
+                    else {
+                      selectFileForImport();
+                    }
+                  },
+                  child: Text(
+
+                   selectedIndex == 0 ? 'Export' : 'Import',
+                    style: TextStyle(fontSize: 16, color: AppColors.saveButtonAllowableWeight),
+                  ),
+                ),
+              ],
+            );
+          }
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,7 +471,7 @@ class _SettingsState extends State<SettingsView> {
         title:  Center(
           child: Text(
             'Settings',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+            style: TextStyle(fontSize: 24, color: AppColors.textColorPrimary),
           ),
         ),
         backgroundColor: AppColors.appBarColor,
@@ -177,7 +528,7 @@ class _SettingsState extends State<SettingsView> {
               padding: const EdgeInsets.all(8.0),
               child: ListView(
                 children: [
-                  // Help Section
+                  // Help Title
                   ListTile(
                     leading: Icon(Icons.help_outline, color: Colors.white),
                     title: const Text(
@@ -185,13 +536,15 @@ class _SettingsState extends State<SettingsView> {
                       style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
+
+                  // Help Section
                   Padding(
                     padding: const EdgeInsets.only(left: 48.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         TextButton(
-                          onPressed: () => null,
+                          onPressed: () => crew.printPersonalTools(),
                           child: const Text('Quick Guide', style: TextStyle(color: Colors.white, fontSize: 18)),
                         ),
                         TextButton(
@@ -201,8 +554,10 @@ class _SettingsState extends State<SettingsView> {
                       ],
                     ),
                   ),
+
                   Divider(color: Colors.white),
-                  // Settings Section
+
+                  // Settings Title
                   ListTile(
                     leading: Icon(Icons.settings, color: Colors.white),
                     title: const Text(
@@ -210,12 +565,13 @@ class _SettingsState extends State<SettingsView> {
                       style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
+
+                  // Settings Sectioin
                   Padding(
-                    padding: const EdgeInsets.only(left: 48.0),
+                    padding: EdgeInsets.only(left: 48),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Display Dropdown
                         ExpansionTile(
                           title:  Text(
                             'Display',
@@ -240,8 +596,9 @@ class _SettingsState extends State<SettingsView> {
                                   setState(() {
                                     isDarkMode = value;
                                     if (!isDarkMode) {
+                                      widget.onBackgroundImageChange(value); // Notify parent widget
                                       enableBackgroundImage = false;
-                                      ThemePreferences.setBackgroundImagePreference(false);
+                                      ThemePreferences.setBackgroundImagePreference(value);
                                     }
                                     ThemePreferences.setTheme(value); // Save dark mode preference
                                   });
@@ -274,58 +631,177 @@ class _SettingsState extends State<SettingsView> {
                               ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                  // Crew Name
-                  Padding(
-                    padding: const EdgeInsets.only(left: 48.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Crew Name Section
 
+                        // Crew Details
                         ExpansionTile(
-                          title: Text('Crew Name', style: TextStyle(color: Colors.white, fontSize: 18),),
+                          title: Row(
+                            children: [
+
+                              Text('Crew Details', style: TextStyle(color: Colors.white, fontSize: 18),),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.info_outline, // Info icon
+                                  color: Colors.white,
+                                  size: 22, // Adjust size if needed
+                                ),
+                                onPressed: () {
+                                  // Show an info dialog or tooltip when clicked
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        backgroundColor: AppColors.textFieldColor2,
+                                        title: Text("Crew Details Info", style: TextStyle(color: AppColors.textColorPrimary),),
+                                        content: Text("This information is used to fill in the respective portions in the generated PDF manifests.", style: TextStyle(color: AppColors.textColorPrimary)),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop(); // Close the dialog
+                                            },
+                                            child: Text("OK", style: TextStyle(color: AppColors.textColorPrimary),),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                           trailing: Icon(
                             Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
                             color: Colors.white,       // Match the arrow color with the text color
                             size: 24,                  // Set a fixed size for consistency
                           ),
                           children: [
-                            ListTile(
-                            title:  TextField(
-                              controller: crewNameController, // Pre-fill with current crew name
-                              style: const TextStyle(color: Colors.white, fontSize: 18),
-                              decoration: InputDecoration(
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Crew Name Section
+                                    ExpansionTile(
+                                      title: Text('Crew Name', style: TextStyle(color: Colors.white, fontSize: 18),),
+                                      trailing: Icon(
+                                        Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
+                                        color: Colors.white,       // Match the arrow color with the text color
+                                        size: 24,                  // Set a fixed size for consistency
+                                      ),
+                                      children: [
+                                        ListTile(
+                                        title:  Container(
+                                          width: double.infinity, // Ensure it takes full width
+                                          decoration: BoxDecoration(
+                                            color: AppColors.settingsTabs,
+                                            border: Border.all(
+                                              color: Colors.white, // Outline color
+                                              width: 1, // Outline thickness
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.only(left: 8, right: 8),
+                                            child: TextField(
+                                              controller: crewNameController, // Pre-fill with current crew name
+                                              style: const TextStyle(color: Colors.white, fontSize: 18),
+                                              inputFormatters: [
+                                                LengthLimitingTextInputFormatter(30),
+                                              ],
+                                              decoration: InputDecoration(
 
-                                hintText: 'Enter Crew Name',
-                                hintStyle: const TextStyle(color: Colors.white54),
-                                enabledBorder: const UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white54),
+                                                hintText: 'Enter Crew Name',
+                                                hintStyle: const TextStyle(color: Colors.white54),
+                                                enabledBorder: const UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: Colors.white54),
+                                                ),
+                                                focusedBorder:  UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: AppColors.fireColor),
+                                                ),
+                                              ),
+                                              onSubmitted: (value) {
+                                                setState(() {
+                                                  if (value.trim().isNotEmpty) {
+                                                    widget.onCrewNameChanged(value.trim()); // Notify parent widget of the change
+                                                  }
+                                                });
+                                                // Call a callback or save preference
+                                                ThemePreferences.setCrewName(value.trim()); // Save crew name preference (optional)
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                          ],
+                                    ),
+
+                                    // User's Name
+                                    ExpansionTile(
+                                      title: Text('Your Name', style: TextStyle(color: Colors.white, fontSize: 18),),
+                                      trailing: Icon(
+                                        Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
+                                        color: Colors.white,       // Match the arrow color with the text color
+                                        size: 24,                  // Set a fixed size for consistency
+                                      ),
+                                      children: [
+                                        ListTile(
+                                          title:   Container(
+                                            width: double.infinity, // Ensure it takes full width
+                                            decoration: BoxDecoration(
+                                              color: AppColors.settingsTabs,
+                                              border: Border.all(
+                                                color: Colors.white, // Outline color
+                                                width: 1, // Outline thickness
+                                              ),
+                                            ),
+                                            child: Padding(
+                                              padding: EdgeInsets.only(left: 8, right: 8),
+                                              child: TextField(
+                                                //controller: userNameController, // Pre-fill with current crew name
+                                                style: const TextStyle(color: Colors.white, fontSize: 18),
+                                                inputFormatters: [
+                                                  LengthLimitingTextInputFormatter(30),
+                                                ],
+                                                decoration: InputDecoration(
+
+                                                  hintText: 'Enter Your Name',
+                                                  hintStyle: const TextStyle(color: Colors.white54),
+                                                  enabledBorder: const UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: Colors.white54),
+                                                  ),
+                                                  focusedBorder:  UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: AppColors.fireColor),
+                                                  ),
+                                                ),
+                                                onSubmitted: (value) {
+                                                  setState(() {
+                                                    // if (value.trim().isNotEmpty) {
+                                                    //   widget.onCrewNameChanged(value.trim()); // Notify parent widget of the change
+                                                    // }
+                                                  });
+                                                  // Call a callback or save preference
+                                                  //ThemePreferences.setCrewName(value.trim()); // Save crew name preference (optional)
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                focusedBorder:  UnderlineInputBorder(
-                                  borderSide: BorderSide(color: AppColors.fireColor),
-                                ),
-                              ),
-                              onSubmitted: (value) {
-                                setState(() {
-                                  if (value.trim().isNotEmpty) {
-                                    widget.onCrewNameChanged(value.trim()); // Notify parent widget of the change
-                                  }
-                                });
-                                // Call a callback or save preference
-                                ThemePreferences.setCrewName(value.trim()); // Save crew name preference (optional)
-                              },
+
+                              ],
                             ),
-                          ),
-            ],
+                          ],
                         ),
+
+
                       ],
                     ),
                   ),
 
                   Divider(color: Colors.white),
+
                   // Legal Section
                   ListTile(
                     leading: Icon(Icons.gavel, color: Colors.white),
@@ -334,6 +810,7 @@ class _SettingsState extends State<SettingsView> {
                       style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
+
                   GestureDetector(
                     child: Padding(
                       padding: const EdgeInsets.only(left: 48.0),
@@ -346,7 +823,7 @@ class _SettingsState extends State<SettingsView> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    backgroundColor: AppColors.textFieldColor, // Dark grey background
+                                    backgroundColor: AppColors.textFieldColor2, // Dark grey background
                                     title: Text(
                                       'Terms and Conditions',
                                       style: TextStyle(color: AppColors.textColorPrimary),
@@ -384,6 +861,19 @@ class _SettingsState extends State<SettingsView> {
                         ],
                       ),
                     ),
+                  ),
+
+                  Divider(color: Colors.white),
+
+                  // Share data
+                  Row(
+                    children: [
+                      IconButton(onPressed: importExportDialog, icon: Icon(Icons.sync, color: Colors.white, size: 28,)),
+                      TextButton(
+                        onPressed: importExportDialog,
+                        child: const Text('Share Crew', style: TextStyle(color: Colors.white, fontSize: 18)),
+                      ),
+                    ],
                   ),
                 ],
               ),

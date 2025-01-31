@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../Data/crew.dart';
 import '../Data/crewmember.dart';
 import 'package:hive/hive.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'CodeShare/colors.dart';
 import 'Data/gear.dart';
@@ -36,7 +37,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
   late List<TextEditingController> toolWeightControllers = [];
   late TextEditingController newToolNameController;
   late TextEditingController newToolWeightController;
-
+  late bool isHazmatTool;
   int? selectedPosition;
   List<Gear>? addedTools = [];
 
@@ -59,6 +60,13 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     // Initialize crewmemberBox variable here
     crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
     loadPersonalToolsList();
+
+    // Set default isHazmatTool value
+    if (personalToolsList.isNotEmpty) {
+      isHazmatTool = personalToolsList.first.isHazmat; // Initialize from the first tool in the list
+    } else {
+      isHazmatTool = false; // Default to false if the list is empty
+    }
 
     // Initializing the controllers with the current crew member's data to be edited
     nameController = TextEditingController(text: widget.crewMember.name);
@@ -108,8 +116,14 @@ class _EditCrewmemberState extends State<EditCrewmember> {
   }
 
   void addTool() {
-    final String toolName = newToolNameController.text.trim(); // Trim whitespace
-    final int? toolWeight = int.tryParse(newToolWeightController.text);
+    final String toolName = newToolNameController.text;
+    final int toolWeight = int.parse(newToolWeightController.text);
+
+    // Find the selected tool in the personalToolsList
+    final Gear selectedGear = personalToolsList.firstWhere(
+          (tool) => tool.name == toolName,
+      orElse: () => Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true, isHazmat: false),
+    );
 
     // Check for duplicate tool names
     final bool isDuplicate = addedTools?.any(
@@ -133,38 +147,17 @@ class _EditCrewmemberState extends State<EditCrewmember> {
       return; // Exit function if the tool is a duplicate
     }
 
-    if (toolName.isNotEmpty && toolWeight != null && toolWeight > 0) {
-      setState(() {
-        addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true));
-        toolNameControllers.add(TextEditingController(text: toolName));
-        toolWeightControllers.add(TextEditingController(text: toolWeight.toString()));
-        newToolNameController.clear();
-        newToolWeightController.clear();
-      });
-      _checkInput(); // Call _checkInput() to update the button state
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Center(
-            child: Text(
-              'Enter all/correct tool info',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.black),
-            ),
-          ),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
+    setState(() {
+      addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true, isHazmat: selectedGear.isHazmat));
+      newToolNameController.clear();
+      newToolWeightController.clear();
+      setState(() {});
+    });
   }
 
   void removeTool(int index) {
     setState(() {
       addedTools?.removeAt(index);
-      toolNameControllers[index].dispose();
-      toolWeightControllers[index].dispose();
-      toolNameControllers.removeAt(index);
-      toolWeightControllers.removeAt(index);
       _checkInput();
     });
   }
@@ -207,10 +200,9 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     final String newCrewMemberName = nameController.text;
     final String originalCrewMemberName = widget.crewMember.name;
 
-    // Check if new crew member name already exists in the crew list, ignoring the current crew member's original name (case-insensitive)
+    // Check if new crew member name already exists
     bool crewMemberNameExists = crew.crewMembers.any(
-          (member) =>
-      member.name.toLowerCase() == newCrewMemberName.toLowerCase() &&
+          (member) => member.name.toLowerCase() == newCrewMemberName.toLowerCase() &&
           member.name.toLowerCase() != originalCrewMemberName.toLowerCase(),
     );
 
@@ -232,48 +224,41 @@ class _EditCrewmemberState extends State<EditCrewmember> {
           backgroundColor: Colors.red,
         ),
       );
-      return; // Exit function if the crew member name is already used
+      return;
     }
 
-    // Update exisiting data
+    // ✅ Update crew member details
     widget.crewMember.name = nameController.text;
     widget.crewMember.flightWeight = int.parse(flightWeightController.text);
-    widget.crewMember.position = selectedPosition!; // Update position
+    widget.crewMember.position = selectedPosition ?? widget.crewMember.position; // Keep old position if not changed
 
-    // Update all personal tools
-    List<Gear> updatedTools = addedTools?.asMap().entries.map((entry) {
-          return Gear(
-              name: toolNameControllers[entry.key].text,
-              weight: int.parse(toolWeightControllers[entry.key].text),
-              quantity: 1, // To be changed
-              isPersonalTool: true);
-        }).toList() ??
-        [];
-    widget.crewMember.personalTools = updatedTools;
+    // ✅ Directly update `personalTools` with `addedTools`
+    widget.crewMember.personalTools = List.from(addedTools ?? []);
 
-    // Find the key for this item, if it's not a new item, update it in Hive
+    // ✅ Update Hive with the new list of tools
     final key = crewmemberBox.keys.firstWhere(
-      (key) => crewmemberBox.get(key) == widget.crewMember,
+          (key) => crewmemberBox.get(key) == widget.crewMember,
       orElse: () => null,
     );
+
     if (key != null) {
-      // Update existing Hive item
       crewmemberBox.put(key, widget.crewMember);
     } else {
-      // Add new item to Hive
       crewmemberBox.add(widget.crewMember);
     }
+
+    // ✅ Ensure the total crew weight is updated
     crew.updateTotalCrewWeight();
-    // Callback function, Update previous page UI with setState()
+
+    // Callback to update UI
     widget.onUpdate();
 
-    // Show successful save popup
+    // Show confirmation message
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Center(
           child: Text(
             'Crew Member Updated!',
-            // Maybe change look
             style: TextStyle(
               color: Colors.black,
               fontSize: 32,
@@ -285,7 +270,9 @@ class _EditCrewmemberState extends State<EditCrewmember> {
         backgroundColor: Colors.green,
       ),
     );
-    Navigator.of(context).pop(); // Return to previous screen
+
+    // ✅ Navigate back to previous screen
+    Navigator.of(context).pop();
   }
 
   @override
@@ -486,10 +473,12 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                       children: [
                         // Edit Name
                         Padding(
-                            padding: const EdgeInsets.only(top: 16.0, bottom: 4.0, left: 16.0, right: 16.0),
+                            padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
                             child: TextField(
                               controller: nameController,
-                              maxLength: 12,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(23),
+                              ],
                               textCapitalization: TextCapitalization.words,
                               decoration: InputDecoration(
                                 labelText: 'Edit name',
@@ -523,18 +512,20 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                               ),
                             )),
 
+                        SizedBox(height: AppData.spacingStandard),
+
                         // Edit Flight Weight
                         Padding(
-                            padding: const EdgeInsets.only(top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
+                            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                             child: TextField(
                               controller: flightWeightController,
-                              maxLength: 3,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(3),
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
                               keyboardType: TextInputType.number,
                               // Only show numeric keyboard
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.digitsOnly,
-                                // Allow only digits
-                              ],
+
                               decoration: InputDecoration(
                                 labelText: 'Edit flight weight',
                                 labelStyle:  TextStyle(
@@ -572,9 +563,11 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                               ),
                             )),
 
+                        SizedBox(height: AppData.spacingStandard),
+
                         // Enter Position(s)
                         Padding(
-                          padding: const EdgeInsets.only(top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: Container(
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -611,11 +604,11 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                           ),
                         ),
 
-                        SizedBox(height: 16),
+                        SizedBox(height: AppData.spacingStandard),
 
                         // Enter tool(s) & weight
                         Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: GestureDetector(
                             onTap: () {
                               String? selectedTool = personalToolsList.isNotEmpty ? personalToolsList.first.name : null; // Default to first tool
@@ -637,62 +630,60 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             DropdownButtonFormField<String>(
-                                              value: selectedTool,
-                                              dropdownColor: AppColors.textFieldColor2,
+                                              value: personalToolsList.isNotEmpty ? selectedTool : null, // Set to null if no tools are available
                                               decoration: InputDecoration(
                                                 labelText: 'Select a Tool',
-
                                                 labelStyle: TextStyle(color: AppColors.textColorPrimary),
                                                 filled: true,
-                                                fillColor:AppColors.textFieldColor2,
+                                                fillColor: AppColors.textFieldColor2,
                                                 enabledBorder: OutlineInputBorder(
                                                   borderRadius: BorderRadius.circular(8),
-                                                  borderSide:  BorderSide(color: AppColors.textColorPrimary, width: 2),
+                                                  borderSide: BorderSide(color: AppColors.textColorPrimary, width: 2),
                                                 ),
                                                 focusedBorder: OutlineInputBorder(
-                                                  borderSide:  BorderSide(
+                                                  borderSide: BorderSide(
                                                     color: AppColors.primaryColor,
-                                                    // Border color when the TextField is focused
-                                                    width: 2.0, // Border width
+                                                    width: 2.0,
                                                   ),
-                                                  borderRadius: BorderRadius.circular(12.0),
+                                                  borderRadius: BorderRadius.circular(8.0),
                                                 ),
                                               ),
-                                              style:  TextStyle(
-                                                  color: AppColors.textColorPrimary,
-                                                  fontSize: 16
-
-                                              ),
-                                              items: [
-                                                ...personalToolsList.map((tool) {
-                                                  return DropdownMenuItem<String>(
-                                                    value: tool.name,
-                                                    child: Text(tool.name),
-                                                  );
-                                                }),
-                                                const DropdownMenuItem<String>(
-                                                  value: '+ Add/Edit Tool',
-                                                  child: Text('+ Add/Edit Tool'),
+                                              dropdownColor: AppColors.textFieldColor2,
+                                              items: personalToolsList.isNotEmpty
+                                                  ? personalToolsList.map((tool) {
+                                                return DropdownMenuItem<String>(
+                                                  value: tool.name,
+                                                  child: Text(tool.name),
+                                                );
+                                              }).toList()
+                                                  : [
+                                                DropdownMenuItem<String>(
+                                                  value: null,
+                                                  child: Text(
+                                                    'No tools available',
+                                                    style: TextStyle(color: Colors.grey), // Optional styling for "No tools" message
+                                                  ),
                                                 ),
                                               ],
-                                              onChanged: (value) {
+                                              onChanged: personalToolsList.isNotEmpty
+                                                  ? (value) {
                                                 setState(() {
-                                                  if (value == '+ Add/Edit Tool') {
-                                                    // Open dialog to add a new tool
-                                                    Navigator.of(context).pop(); // Close current dialog
-                                                    _showAddToolDialog(
-                                                        context, setState, newToolNameController, newToolWeightController, personalToolsList, addedTools, personalToolsBox); // Show Add Tool dialog
-                                                  } else {
-                                                    // Select existing tool and update weight
-                                                    selectedTool = value;
-                                                    newToolWeightController.text = personalToolsList.firstWhere((tool) => tool.name == value).weight.toString();
-                                                    newToolNameController.text = personalToolsList.firstWhere((tool) => tool.name == value).name;
-                                                  }
+                                                  // Select existing tool and update weight
+                                                  selectedTool = value;
+                                                  final selectedGear = personalToolsList.firstWhere((tool) => tool.name == value);
+                                                  newToolWeightController.text = selectedGear.weight.toString();
+                                                  newToolNameController.text = selectedGear.name;
+                                                  isHazmatTool = selectedGear.isHazmat; // Correctly update isHazmatTool
                                                 });
-                                              },
+                                              }
+                                                  : null, // Disable dropdown if no tools are available
+                                              style: TextStyle(
+                                                color: AppColors.textColorPrimary,
+                                                fontSize: 16,
+                                              ),
                                             ),
-                                            const SizedBox(height: 12),
-                                            if (selectedTool != null && selectedTool != '+ Add/Edit Tool')
+                                            SizedBox(height: AppData.spacingStandard),
+                                            if (selectedTool != null)
                                               TextField(
                                                 controller: newToolWeightController,
                                                 enabled: false, // Non-editable field
@@ -723,7 +714,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                               style: TextStyle(color: AppColors.cancelButton),
                                             ),
                                           ),
-                                          if (selectedTool != null && selectedTool != '+ Add/Edit Tool')
+                                          if (selectedTool != null)
                                             TextButton(
                                               onPressed: () {
                                                 addTool(); // Save tool logic
@@ -753,7 +744,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                               ),
                               alignment: Alignment.center,
                               child:  Text(
-                                '+ Add/Edit Tools',
+                                '+ Add Tools',
                                 style: TextStyle(
                                   fontSize: 22,
                                   color: Colors.black,
@@ -763,7 +754,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                           ),
                         ),
 
-                        SizedBox(height: 16),
+                        SizedBox(height: AppData.spacingStandard),
 
                         // Display added tools
                         Expanded(
@@ -787,9 +778,26 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                   ),
 
                                     child: ListTile(
-                                      title: Text(
-                                        tool!.name,
-                                        style:  TextStyle(color: AppColors.textColorPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                                      title: Row(
+                                        children: [
+                                          Text(
+                                            tool!.name,
+                                            style:  TextStyle(color: AppColors.textColorPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                                          ),
+                                          if (tool.isHazmat)
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 8.0), // Add spacing between text and icon
+                                              child: Tooltip(
+                                                message: 'HAZMAT', // The hint displayed on long-press
+                                                waitDuration: const Duration(milliseconds: 500), // Time before the tooltip shows
+                                                child: Icon(
+                                                  FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                  color: Colors.red, // Red color for hazard
+                                                  size: 18, // Icon size
+                                                ),
+                                              ),
+                                            ),
+                                        ],
                                       ),
                                       subtitle: Text(
                                         '${tool.weight} lbs',
@@ -837,483 +845,4 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     );
   }
 }
-void _showAddToolDialog(
-    BuildContext context,
-    StateSetter parentSetState,
-    TextEditingController toolNameController,
-    TextEditingController toolWeightController,
-    List<Gear> personalToolsList,
-    List<Gear>? addedTools,
-    Box<Gear> personalToolsBox, // Pass the Hive box
-    ) {
-  String? selectedTool = '+ New Tool'; // Default to "+ New Tool"
-  String? toolNameErrorMessage;
-  String? toolWeightErrorMessage;
 
-  // Function to update fields based on selected tool
-  void updateFields(String? toolName) {
-    if (toolName != null && toolName != '+ New Tool') {
-      final tool = personalToolsList.firstWhere((tool) => tool.name == toolName);
-      toolNameController.text = tool.name;
-      toolWeightController.text = tool.weight.toString();
-    } else {
-      toolNameController.clear();
-      toolWeightController.clear();
-    }
-  }
-
-  // Pre-fill fields initially
-  updateFields(selectedTool);
-
-  showDialog(
-    context: context,
-    builder: (BuildContext dialogContext) {
-      return StatefulBuilder(
-        builder: (BuildContext dialogContext, StateSetter dialogSetState) {
-          return AlertDialog(
-            backgroundColor: AppColors.textFieldColor2,
-            title:  Text(
-              'Add/Edit Tool',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DropdownButtonFormField<String>(
-                  value: selectedTool,
-                  dropdownColor: AppColors.textFieldColor2,
-                  decoration: InputDecoration(
-                    labelText: 'Select a Tool',
-                    labelStyle: TextStyle(color: AppColors.textColorPrimary),
-                    filled: true,
-                    fillColor: AppColors.textFieldColor2,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: AppColors.textColorPrimary, width: 2),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: AppColors.primaryColor,
-                        // Border color when the TextField is focused
-                        width: 2.0, // Border width
-                      ),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  style:  TextStyle(
-                      color: AppColors.textColorPrimary,
-                      fontSize: 16
-
-                  ),
-                  items: [
-                    ...personalToolsList.map((tool) {
-                      return DropdownMenuItem<String>(
-                        value: tool.name,
-                        child: Text(tool.name),
-                      );
-                    }),
-                    const DropdownMenuItem<String>(
-                      value: '+ New Tool',
-                      child: Text('+ New Tool'),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    dialogSetState(() {
-                      selectedTool = value;
-                      updateFields(value);
-                    });
-                  },
-                ),
-                const SizedBox(height: 12),
-                if (selectedTool != null && selectedTool != '+ New Tool')
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Edit Tool Details',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textColorEditToolDetails,
-                        ),
-                      ),
-                    ),
-                  ),
-                TextField(
-                  controller: toolNameController,
-                  textCapitalization: TextCapitalization.words,
-                  maxLength: 12,
-                  decoration: InputDecoration(
-                    labelText: 'Tool Name',
-                    labelStyle: TextStyle(color: AppColors.textColorPrimary,),
-                    filled: true,
-                    fillColor: AppColors.textFieldColor2,
-                    errorText: toolNameErrorMessage,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide:  BorderSide(color: AppColors.textColorPrimary, width: 2),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: AppColors.primaryColor,
-                        // Border color when the TextField is focused
-                        width: 2.0, // Border width
-                      ),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  style: TextStyle(
-                      color: AppColors.textColorPrimary,
-                      fontSize: 16
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: toolWeightController,
-                  keyboardType: TextInputType.number,
-                  maxLength: 2,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: InputDecoration(
-                    labelText: 'Tool Weight (lbs)',
-                    labelStyle: TextStyle(color: AppColors.textColorPrimary),
-                    filled: true,
-                    fillColor: AppColors.textFieldColor2,
-                    errorText: toolWeightErrorMessage,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide:  BorderSide(color: AppColors.textColorPrimary, width: 2),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: AppColors.primaryColor,
-                        // Border color when the TextField is focused
-                        width: 2.0, // Border width
-                      ),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  style: TextStyle(
-                      color: AppColors.textColorPrimary,
-                      fontSize: 16
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(dialogContext).pop(); // Close only this dialog
-                },
-                child:  Text(
-                  'Cancel',
-                  style: TextStyle(color: AppColors.cancelButton),
-                ),
-              ),
-              if (selectedTool != null && selectedTool != '+ New Tool')
-                TextButton(
-                  onPressed: () {
-                    if (selectedTool != null && selectedTool != '+ New Tool') {
-                      // Show confirmation dialog
-                      showDialog(
-                        context: dialogContext,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            backgroundColor: AppColors.textFieldColor2,
-                            title:  Text('Confirm Deletion', style: TextStyle(color: AppColors.textColorPrimary),),
-                            content: Text(
-                              'The tool "$selectedTool" will be removed from all crew members who have it. Do you want to proceed?',
-                              style:  TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(); // Close the confirmation dialog
-                                },
-                                child:  Text(
-                                  'Cancel',
-                                  style: TextStyle(color: AppColors.cancelButton),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  // Proceed with deletion
-                                  // Delete from Hive and temporary page list and from addedTools if it exists
-                                  crew.removePersonalTool(selectedTool!);
-                                  personalToolsList.removeWhere((tool) => tool.name == selectedTool); // Remove from global tools
-                                  addedTools?.removeWhere((tool) => tool.name == selectedTool); // Remove from addedTools
-                                  // Iterate through all crew members and remove the tool from their personalTools list
-                                  for (var crewMember in crew.crewMembers) {
-                                    crewMember.personalTools?.removeWhere((tool) => tool.name == selectedTool);
-                                  }
-
-                                  // Close the confirmation dialog and the main dialog
-                                  Navigator.of(context).pop(); // Close confirmation dialog
-                                  Navigator.of(dialogContext).pop(); // Close main dialog
-
-                                  // Update parent state
-                                  parentSetState(() {});
-                                },
-                                child: const Text(
-                                  'Delete',
-                                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    }
-                  },
-                  child: const Text(
-                    'Delete',
-                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              TextButton(
-                onPressed: () {
-                  final toolNameRaw = toolNameController.text.trim();
-                  final toolWeightText = toolWeightController.text.trim();
-
-                  bool hasError = false;
-
-                  // Adding New Tools Check
-                  if (selectedTool == '+ New Tool') {
-                    // Validate tool name
-                    if (toolNameRaw.isEmpty) {
-                      dialogSetState(() {
-                        toolNameErrorMessage = 'Please enter tool name'; // Set error message
-                      });
-
-                      // Clear error after a delay
-                      Future.delayed(const Duration(seconds: 2), () {
-                        dialogSetState(() {
-                          toolNameErrorMessage = null; // Clear error message
-                        });
-                      });
-
-                      hasError = true;
-                    }
-
-                    // Validate tool weight
-                    if (toolWeightText.isEmpty || int.tryParse(toolWeightText) == null) {
-                      dialogSetState(() {
-                        toolWeightErrorMessage = 'Please enter valid tool weight'; // Set error message
-                      });
-
-                      // Clear error after a delay
-                      Future.delayed(const Duration(seconds: 2), () {
-                        dialogSetState(() {
-                          toolWeightErrorMessage = null; // Clear error message
-                        });
-                      });
-
-                      hasError = true;
-                    }
-
-                    // If there are errors, stop further execution
-                    if (hasError) return;
-
-                    // Ensure the tool name is capitalized (first letter uppercase)
-                    final toolName = toolNameRaw[0].toUpperCase() + toolNameRaw.substring(1).toLowerCase();
-
-                    // Check for duplicate tool names (case-insensitive)
-                    final isDuplicate = personalToolsList.any(
-                          (tool) => tool.name.toLowerCase() == toolName.toLowerCase(),
-                    );
-
-                    if (isDuplicate) {
-                      dialogSetState(() {
-                        toolNameErrorMessage = 'Tool name already exists'; // Set error message
-                      });
-
-                      Future.delayed(const Duration(seconds: 2), () {
-                        dialogSetState(() {
-                          toolNameErrorMessage = null; // Clear error message
-                        });
-                      });
-                      return;
-                    }
-
-                    final weight = int.parse(toolWeightText);
-
-                    // Create new tool
-                    final newTool = Gear(name: toolName, weight: weight, quantity: 1, isPersonalTool: true);
-
-                    // Add to Hive and temporary page list
-                    crew.addPersonalTool(newTool);
-                    personalToolsList.add(newTool);
-
-                    Navigator.of(dialogContext).pop(); // Close dialog
-                    parentSetState(() {}); // Reflect changes in the parent state
-                  }
-                  // Updating Tools Check
-                  else {
-                    // Validate tool name
-                    if (toolNameRaw.isEmpty) {
-                      dialogSetState(() {
-                        toolNameErrorMessage = 'Please enter tool name'; // Set error message
-                      });
-
-                      // Clear error after a delay
-                      Future.delayed(const Duration(seconds: 2), () {
-                        dialogSetState(() {
-                          toolNameErrorMessage = null; // Clear error message
-                        });
-                      });
-
-                      hasError = true;
-                    }
-
-                    // Validate tool weight
-                    if (toolWeightText.isEmpty || int.tryParse(toolWeightText) == null || int.parse(toolWeightText) <= 0) {
-                      dialogSetState(() {
-                        toolWeightErrorMessage = 'Please enter tool weight'; // Set error message
-                      });
-
-                      // Clear error after a delay
-                      Future.delayed(const Duration(seconds: 2), () {
-                        dialogSetState(() {
-                          toolWeightErrorMessage = null; // Clear error message
-                        });
-                      });
-
-                      hasError = true;
-                    }
-
-                    // Validate if tool name or weight are unchanged
-                    final existingTool = personalToolsList.firstWhere(
-                          (tool) => tool.name.toLowerCase() == selectedTool?.toLowerCase(),
-                    );
-
-                    if (existingTool != null && toolNameRaw.toLowerCase() == existingTool.name.toLowerCase() && int.parse(toolWeightText) == existingTool.weight) {
-                      dialogSetState(() {
-                        toolNameErrorMessage = 'Tool name is unchanged';
-                        toolWeightErrorMessage = 'Tool weight is unchanged';
-                      });
-
-                      Future.delayed(const Duration(seconds: 2), () {
-                        dialogSetState(() {
-                          toolNameErrorMessage = null;
-                          toolWeightErrorMessage = null;
-                        });
-                      });
-
-                      hasError = true;
-                    }
-
-                    // If there are errors, stop further execution
-                    if (hasError) return;
-
-                    // Show confirmation dialog
-                    showDialog(
-                      context: dialogContext,
-                      builder: (BuildContext confirmationContext) {
-                        return AlertDialog(
-                          backgroundColor: AppColors.textFieldColor2,
-                          title:  Text('Confirm Update', style:  TextStyle(color: AppColors.textColorPrimary),),
-                          content: Text(
-                            'Updating $selectedTool will modify this tool for all crew members who have it, and will update it in your gear inventory if it exists. Do you want to proceed?',
-                            style:  TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(confirmationContext).pop(); // Close the confirmation dialog
-                              },
-                              child:  Text(
-                                'Cancel',
-                                style: TextStyle(color: AppColors.cancelButton),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(confirmationContext).pop(); // Close confirmation dialog
-
-                                // Update the tool in Hive
-                                final personalToolsBox = Hive.box<Gear>('personalToolsBox');
-                                final keyToUpdate = personalToolsBox.keys.firstWhere(
-                                      (key) {
-                                    final storedTool = personalToolsBox.get(key);
-                                    return storedTool != null && storedTool.name.toLowerCase() == selectedTool!.toLowerCase();
-                                  },
-                                  orElse: () => null,
-                                );
-
-                                if (keyToUpdate != null) {
-                                  personalToolsBox.put(
-                                    keyToUpdate,
-                                    Gear(
-                                      name: toolNameRaw,
-                                      weight: int.parse(toolWeightText),
-                                      quantity: 1,
-                                      isPersonalTool: true,
-                                    ),
-                                  );
-                                }
-
-                                // Update the tool in personalToolsList
-                                final tool = personalToolsList.firstWhere(
-                                      (tool) => tool.name.toLowerCase() == selectedTool!.toLowerCase(),
-                                );
-                                tool.name = toolNameRaw;
-                                tool.weight = int.parse(toolWeightText);
-
-                                // Update the tool in all crew members who have it
-                                for (var crewMember in crew.crewMembers) {
-                                  if (crewMember.personalTools != null) {
-                                    for (var personalTool in crewMember.personalTools!) {
-                                      if (personalTool.name.toLowerCase() == selectedTool!.toLowerCase()) {
-                                        personalTool.name = toolNameRaw;
-                                        personalTool.weight = int.parse(toolWeightText);
-                                      }
-                                    }
-                                  }
-                                }
-                                // Update the tool in all gear items
-                                for (var gearItems in crew.gear) {
-                                  if (gearItems.name.toLowerCase() == selectedTool!.toLowerCase()) {
-                                    gearItems.name = toolNameRaw;
-                                    gearItems.weight = int.parse(toolWeightText);
-                                  }
-                                }
-
-                                // Update the tool in addedTools
-                                if (addedTools != null) {
-                                  for (var tool in addedTools) {
-                                    if (tool.name.toLowerCase() == selectedTool!.toLowerCase()) {
-                                      tool.name = toolNameRaw;
-                                      tool.weight = int.parse(toolWeightText);
-                                    }
-                                  }
-                                }
-
-                                Navigator.of(dialogContext).pop(); // Close the main dialog
-                                parentSetState(() {}); // Reflect changes in the parent state
-                                Navigator.of(dialogContext).pop(); // Close the main dialog
-
-
-                              },
-                              child:  Text(
-                                'Update',
-                                style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
-                },
-                child:  Text(
-                  'Save',
-                  style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          );
-        },
-      );
-    },
-  );
-}

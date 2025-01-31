@@ -25,6 +25,9 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
   final TextEditingController availableSeatsController = TextEditingController();
   final TextEditingController keyboardController = TextEditingController();
   double _sliderValue = 1000;
+  String? tripNameErrorMessage;
+  String? availableSeatsErrorMessage;
+
 
   bool isCalculateButtonEnabled = false; // Controls whether the save button shows
 
@@ -56,7 +59,14 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
   // Function to update trip based on input
   void _updateTrip() {
     setState(() {
-      final isTripNameValid = tripNameController.text.isNotEmpty;
+      final String tripName = tripNameController.text;
+// Validate trip name existence (case-insensitive)
+      final bool isTripNameUnique = !savedTrips.savedTrips.any(
+            (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
+      );
+
+
+      final bool isTripNameValid = tripName.isNotEmpty && isTripNameUnique;
       final isAllowableValid = allowableController.text.isNotEmpty && allowableController.text != '0';
       final isAvailableSeatsValid = availableSeatsController.text.isNotEmpty && availableSeatsController.text != '0';
 
@@ -65,11 +75,16 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
 
       // Update the trip instance if the button is enabled
       if (isCalculateButtonEnabled) {
-        final String tripName = tripNameController.text;
+        final String tripNameCapitalized = tripNameController.text
+            .toLowerCase() // Ensure the rest of the string is lowercase
+            .split(' ') // Split by spaces into words
+            .map((word) => word.isNotEmpty ? '${word[0].toUpperCase()}${word.substring(1)}' : '')
+            .join(' '); // Join the words back with a space
+
         final int allowable = int.parse(allowableController.text);
         final int availableSeats = int.parse(availableSeatsController.text);
         newTrip = Trip(
-          tripName: tripName,
+          tripName: tripNameCapitalized,
           allowable: allowable,
           availableSeats: availableSeats,
         );
@@ -98,7 +113,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
     final ButtonStyle style = ElevatedButton.styleFrom(
       foregroundColor: Colors.black,
       textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      backgroundColor: Colors.deepOrangeAccent,
+      backgroundColor: Colors.grey,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       elevation: 15,
       shadowColor: Colors.black,
@@ -144,10 +159,31 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: TextField(
                             controller: tripNameController,
-                            maxLength: 20,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(20),
+                            ],
                             textCapitalization: TextCapitalization.words,
+                            onChanged: (value) {
+                              setState(() {
+                                // Check if the trip name exists in the savedTrips list (case-insensitive)
+                                final String tripName = tripNameController.text;
+
+                                // Check if crew member name already exists
+                                bool tripNameExists = savedTrips.savedTrips.any(
+                                      (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
+                                );
+
+                                // Validate the input and set error message
+                                if (tripNameExists) {
+                                  tripNameErrorMessage = 'Trip name already used';
+                                } else {
+                                  tripNameErrorMessage = null;
+                                }
+                              });
+                            },
                             decoration: InputDecoration(
                               labelText: 'Enter Trip Name',
+                              errorText: tripNameErrorMessage,
                               labelStyle: TextStyle(
                                 color: AppColors.textColorPrimary, // Label color when not focused
                                 fontSize: 18, // Label font size
@@ -177,21 +213,32 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                               fontWeight: FontWeight.bold,
                             ),
                           )),
+
+                      SizedBox(height: AppData.spacingStandard),
 
                       // Enter Available Seats Input Field
                       Padding(
-                          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: TextField(
                             controller: availableSeatsController,
                             keyboardType: TextInputType.number,
-                            maxLength: 1,
-                            // Only show numeric keyboard
-                            inputFormatters: <TextInputFormatter>[
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(1),
                               FilteringTextInputFormatter.digitsOnly,
-                              // Allow only digits
                             ],
+                            onChanged: (value) {
+                              setState(() {
+                                // Validate the input and set error message
+                                if (value == '0') {
+                                  availableSeatsErrorMessage = 'Available seats cannot be 0.';
+                                } else {
+                                  availableSeatsErrorMessage = null;
+                                }
+                              });
+                            },
                             decoration: InputDecoration(
                               labelText: 'Enter # of Available Seats',
+                              errorText: availableSeatsErrorMessage,
                               labelStyle: TextStyle(
                                 color: AppColors.textColorPrimary, // Label color when not focused
                                 fontSize: 18, // Label font size
@@ -222,9 +269,11 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                             ),
                           )),
 
+                      SizedBox(height: AppData.spacingStandard),
+
                       // Choose Allowable Text Field
                       Padding(
-                        padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16.0),
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
@@ -459,7 +508,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                         ),
                       ),
 
-                      SizedBox(height: 16.0),
+                      SizedBox(height: AppData.spacingStandard),
 
                       // Build Button
                       Padding(
@@ -467,6 +516,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                         child: ElevatedButton(
                           onPressed: isCalculateButtonEnabled
                               ? () {
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(

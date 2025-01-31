@@ -83,7 +83,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         return StatefulBuilder(
           builder: (context, dialogSetState) {
             return AlertDialog(
-              backgroundColor: AppColors.textFieldColor,
+              backgroundColor: AppColors.textFieldColor2,
               title:  Text(
                 'Add Crew Members and Gear',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textColorPrimary),
@@ -258,7 +258,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                       context: context,
                                                       builder: (BuildContext context) {
                                                         return AlertDialog(
-                                                          backgroundColor: AppColors.textFieldColor,
+                                                          backgroundColor: AppColors.textFieldColor2,
                                                           title: Text('Select Quantity for ${gear.name}', style: TextStyle(color: AppColors.textColorPrimary),),
                                                           content: SizedBox(
                                                             height: 150,
@@ -357,16 +357,100 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                             ExpansionPanel(
                               isExpanded: isCustomItemExpanded,
                               backgroundColor: AppColors.fireColor,
-                              headerBuilder: (context, isExpanded) => ListTile(
-                                title: Text(
-                                  'Add Custom Item',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
+                              headerBuilder: (context, isExpanded) => GestureDetector(
+                                onLongPress: () {
+                                  showModalBottomSheet(
+                                    backgroundColor: AppColors.textFieldColor2,
+                                    context: context,
+                                    isScrollControlled: true,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                                    ),
+                                    builder: (BuildContext context) {
+                                      return Container(
+                                        padding: EdgeInsets.all(16.0),
+                                        height: MediaQuery.of(context).size.height * 0.7, // 70% of the screen height
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            // Modal Title
+                                            Text(
+                                              'IRPG Item Weights',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20,
+                                                color: AppColors.textColorPrimary,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 16),
+
+                                            // Scrollable List of IRPG Items
+                                            Expanded(
+                                              child: ListView.builder(
+                                                itemCount: irpgItems.length,
+                                                itemBuilder: (context, index) {
+                                                  final item = irpgItems[index];
+                                                  return Container(
+                                                    margin: EdgeInsets.symmetric(vertical: 4.0),
+                                                    child: ListTile(
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0.0),
+                                                      title: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            item['name'],
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                              color: AppColors.textColorPrimary,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            '${item['weight']} lbs',
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                              color: AppColors.textColorPrimary,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+
+                                            // Cancel Button
+                                            Align(
+                                              alignment: Alignment.bottomRight,
+                                              child: TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop(); // Close the modal
+                                                },
+                                                child: Text(
+                                                  'Cancel',
+                                                  style: TextStyle(
+                                                    color: AppColors.cancelButton,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                                child: ListTile(
+                                  title: Text(
+                                    'Custom Item',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                               ),
                               body: Container(
-                                color: AppColors.textFieldColor,
+                                color: AppColors.textFieldColor2,
                                 child: Column(
                                   children: [
                                     // Custom Item Name Field
@@ -468,7 +552,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                 name: item.name,
                                 quantity: selectedQuantity,
                                 weight: item.weight * selectedQuantity, // Calculate total weight
-                                isPersonalTool: item.isPersonalTool,
+                                isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat
                               ),
                             );
                           }
@@ -501,7 +585,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                     name: tool.name,
                                     quantity: tool.quantity,
                                     weight: tool.weight * tool.quantity,
-                                    isPersonalTool: tool.isPersonalTool,
+                                    isPersonalTool: tool.isPersonalTool, isHazmat: tool.isHazmat
                                   ),
                                 );
                               }
@@ -534,7 +618,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
           name: gear.name,
           quantity: gear.quantity,
           weight: gear.weight,
-          isPersonalTool: gear.isPersonalTool,
+          isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat
         );
       }).toList();
 
@@ -751,6 +835,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
 
           Container(
+            color: Colors.white.withValues(alpha: 0.05),
+
             child: Scrollbar(
               child: ListView(
                 padding: const EdgeInsets.all(8.0),
@@ -990,6 +1076,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                   quantity: 0,
                                                   weight: item.weight ~/ item.quantity, // Correct per-unit weight
                                                   isPersonalTool: item.isPersonalTool,
+                                                    isHazmat: item.isHazmat
                                                 ),
                                               );
 
@@ -1105,7 +1192,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                               int quantityToRemove = 1; // Default to 1 for selection
                                                               return StatefulBuilder(builder: (BuildContext context, StateSetter setDialogState) {
                                                                 return AlertDialog(
-                                                                  backgroundColor: AppColors.textFieldColor,
+                                                                  backgroundColor: AppColors.textFieldColor2,
                                                                   title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                   content: Column(
                                                                     mainAxisSize: MainAxisSize.min,
@@ -1113,7 +1200,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                       Text('Select the quantity to remove:', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                       SizedBox(height: 8),
                                                                       DropdownButton<int>(
-                                                                        dropdownColor: AppColors.textFieldColor,
+                                                                        dropdownColor: AppColors.textFieldColor2,
                                                                         value: quantityToRemove,
                                                                         items: List.generate(
                                                                           item.quantity,
@@ -1154,6 +1241,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                               quantity: 0,
                                                                               weight: 0,
                                                                               isPersonalTool: item.isPersonalTool,
+                                                                                isHazmat: item.isHazmat
                                                                             ),
                                                                           );
 
@@ -1189,6 +1277,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                               quantity: 0,
                                                               weight: item.weight ~/ item.quantity, // Correct per-unit weight
                                                               isPersonalTool: item.isPersonalTool,
+                                                                isHazmat: item.isHazmat
                                                             ),
                                                           );
 
@@ -1293,7 +1382,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         context: context,
                                         builder: (BuildContext context) {
                                           return AlertDialog(
-                                            backgroundColor: AppColors.textFieldColor,
+                                            backgroundColor: AppColors.textFieldColor2,
                                             title:  Text(
                                               'Confirm Deletion',
                                               style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
@@ -1330,7 +1419,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                           // General gear: update or add back to gearList
                                                           final existingGear = gearList.firstWhere(
                                                             (gear) => gear.name == item.name && !gear.isPersonalTool,
-                                                            orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight ~/ item.quantity),
+                                                            orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight ~/ item.quantity, isHazmat: item.isHazmat),
                                                           );
 
                                                           existingGear.quantity += item.quantity;

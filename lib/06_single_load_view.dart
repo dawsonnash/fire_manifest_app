@@ -18,15 +18,33 @@ import 'Data/gear.dart';
 
 const int maxItemsPerPage = 14; // Maximum items (crew + gear + custom) per page
 
-// Helper function to split load if greater than alloted pdf cells
-List<List<dynamic>> paginateItems(List<dynamic> items, int maxItems) {
+const int maxTotalItemsPerPage = 16;
+const int maxNormItemsPerPage = 14;
+
+// Helper function to split items into pages based on the required number of pages
+List<List<dynamic>> paginateItems(List<dynamic> items, int totalPages) {
   List<List<dynamic>> pages = [];
-  for (int i = 0; i < items.length; i += maxItems) {
-    pages.add(items.sublist(i, i + maxItems > items.length ? items.length : i + maxItems));
+  for (int i = 0; i < totalPages; i++) {
+    pages.add([]);
   }
+
+  int index = 0;
+  for (var item in items) {
+    pages[index ~/ maxTotalItemsPerPage].add(item);
+    index++;
+  }
+
   return pages;
 }
+// Function to calculate the required number of pages
+int calculatePagesNeeded(int totalItems, int numHaz) {
+  int numNorm = totalItems - numHaz;
 
+  int totalLengthPagesNeeded = (totalItems / maxTotalItemsPerPage).ceil();
+  int nonItemPagesNeeded = (numNorm / maxNormItemsPerPage).ceil();
+
+  return totalLengthPagesNeeded > nonItemPagesNeeded ? totalLengthPagesNeeded : nonItemPagesNeeded;
+}
 // Generates PDF
 Future<Uint8List> generatePDF(Load load, String manifestForm, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {
   final pdf = pw.Document();
@@ -58,8 +76,14 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, String? helicopter
     ...load.customItems,
   ];
 
+  // Count hazmat items
+  int numHaz = allItems.where((item) => item is Gear && item.isHazmat).length;
+
+  // Calculate the required number of pages
+  int totalPages = calculatePagesNeeded(allItems.length, numHaz);
+
   // Paginate items if `of252`
-  final paginatedItems = manifestForm == 'of252' ? paginateItems(allItems, maxItemsPerPage) : [allItems];
+  final paginatedItems = manifestForm == 'of252' ? paginateItems(allItems, totalPages): [allItems];
 
   // Generate pages based on pagination
   for (int i = 0; i < paginatedItems.length; i++) {
@@ -123,7 +147,217 @@ void previewPDF(BuildContext context, Load load, String manifestForm, String? he
   );
 }
 
-// Fills PDFs
+pw.Widget fillFormFieldsOF252(
+    Load load,
+    int pageIndex,
+    int totalPages,
+    List<dynamic> pageItems,
+    String? helicopterNum,
+    String? departure,
+    String? destination,
+    String? manifestPreparer) {
+  const double yOffset = 112; // Adjust this value to move everything vertically
+  const double xOffset = 6; // Adjust this value to move everything horizontally
+  const double itemSpacing = 27.4; // Adjust spacing between items
+  const double fontSizeOF252 = 18.0;
+  const double bottomOffset = 610; // Position for the total load weight
+  const int maxHazmatSlots = 2; // Number of hazmat slots per page
+
+  DateTime today = DateTime.now();
+  String formattedDate = DateFormat('MM/dd/yyyy').format(today);
+  String formattedTime = DateFormat('hh:mm a').format(today);
+
+  // Separate normal and hazmat items (assuming items are already sorted)
+  List<dynamic> hazmatItems = pageItems.where((item) => item is Gear && item.isHazmat).toList();
+  List<dynamic> normalItems = pageItems.where((item) => !(item is Gear && item.isHazmat)).toList();
+
+  // Start placing hazmat items from the bottom of the page, moving upward
+  double hazmatPosition = yOffset + bottomOffset - (hazmatItems.length * itemSpacing);
+
+  List<pw.Widget> hazmatWidgets = [];
+
+
+  double adjustedPosition = yOffset + 606; // Start from the bottom of the page
+
+// **Hazmat Items and Weights (Bottom-Up)**
+  for (var i = 0; i < hazmatItems.length; i++) {
+    // Move upwards instead of downwards
+    adjustedPosition -= itemSpacing;
+
+    // Add a slight extra offset after two items for better spacing
+    if (i >= 2) {
+      adjustedPosition -= 18; // Increase spacing upward
+    }
+
+    // **Hazmat Item Quantity**
+    hazmatWidgets.add(
+      pw.Positioned(
+        left: i < 2 ? xOffset - 8 : xOffset - 2, // (x1) should be farther left than just 1
+        top: adjustedPosition,
+        child: pw.Text(
+          i < 2 ? '(x${hazmatItems[i].quantity})' : '${hazmatItems[i].quantity}',
+          style: pw.TextStyle(fontSize: fontSizeOF252),
+        ),
+      ),
+    );
+
+    // **Hazmat Item Name**
+    hazmatWidgets.add(
+      pw.Positioned(
+        left: xOffset + 32, // Left-side placement for item names
+        top: adjustedPosition,
+        child: pw.Text(
+          i >= 2 ? '${hazmatItems[i].name} (HAZMAT)' : hazmatItems[i].name, // Fix condition
+          style: pw.TextStyle(fontSize: fontSizeOF252),
+        ),
+
+      ),
+    );
+
+    // **Hazmat Item Weight**
+    hazmatWidgets.add(
+      pw.Positioned(
+        left: xOffset + 442, // Right-side placement for weights
+        top: adjustedPosition,
+        child: pw.Text(
+          "${hazmatItems[i].totalGearWeight} lbs",
+          style: pw.TextStyle(fontSize: fontSizeOF252),
+        ),
+      ),
+    );
+  }
+
+  return pw.Stack(
+    children: [
+      // **Normal Items (Top-Down)**
+      for (var i = 0; i < normalItems.length; i++)
+        pw.Positioned(
+          left: xOffset + 32,
+          top: yOffset + 150 + (i * itemSpacing),
+          child: pw.Text(
+            normalItems[i] is CrewMember
+                ? normalItems[i].name
+                : normalItems[i] is Gear
+                ? normalItems[i].name
+                : normalItems[i].name,
+            style: pw.TextStyle(fontSize: fontSizeOF252),
+          ),
+        ),
+
+      ...hazmatWidgets,
+
+      // **Weights for All Items**
+      for (var i = 0; i < normalItems.length; i++)
+        pw.Positioned(
+          left: xOffset + 442,
+          top: yOffset + 150 + (i * itemSpacing),
+          child: pw.Text(
+            "${normalItems[i] is CrewMember ? normalItems[i].flightWeight : normalItems[i] is Gear ? normalItems[i].totalGearWeight : normalItems[i].totalGearWeight} lbs",
+            style: pw.TextStyle(fontSize: fontSizeOF252),
+          ),
+        ),
+
+
+
+      // **Gear Quantities**
+      for (var i = 0; i < normalItems.length; i++)
+        if (normalItems[i] is Gear)
+          pw.Positioned(
+            left: xOffset - 2,
+            top: yOffset + 150 + (i * itemSpacing),
+            child: pw.Text(
+              "${normalItems[i].quantity}",
+              style: pw.TextStyle(fontSize: fontSizeOF252),
+            ),
+          ),
+
+      // **Total Load Weight (Last Page Only)**
+      if (pageIndex == totalPages)
+        pw.Positioned(
+          left: xOffset + 442,
+          top: yOffset + 610,
+          child: pw.Text(
+            '${load.weight.toString()} lbs',
+            style: pw.TextStyle(fontSize: fontSizeOF252),
+          ),
+        ),
+
+      // **Current Date**
+      pw.Positioned(
+        left: xOffset + 459,
+        top: 15,
+        child: pw.Text(
+          formattedDate,
+          style: pw.TextStyle(fontSize: 14),
+        ),
+      ),
+
+      // **Current Time**
+      pw.Positioned(
+        left: xOffset + 350,
+        top: 15,
+        child: pw.Text(
+          formattedTime,
+          style: pw.TextStyle(fontSize: 14),
+        ),
+      ),
+
+      // **Page Number**
+      pw.Positioned(
+        left: xOffset - 6,
+        top: yOffset + 610,
+        child: pw.Text(
+          'Load #${load.loadNumber}, Page $pageIndex of $totalPages',
+          style: pw.TextStyle(
+            fontSize: 16,
+            color: PdfColors.black,
+          ),
+        ),
+      ),
+
+      // **Helicopter Tail Number**
+      pw.Positioned(
+        left: xOffset + 70,
+        top: 13,
+        child: pw.Text(
+          helicopterNum!,
+          style: pw.TextStyle(fontSize: 16),
+        ),
+      ),
+
+      // **Departure Location**
+      pw.Positioned(
+        left: xOffset + 56,
+        top: 55,
+        child: pw.Text(
+          departure!,
+          style: pw.TextStyle(fontSize: 16),
+        ),
+      ),
+
+      // **Destination**
+      pw.Positioned(
+        left: xOffset + 336,
+        top: 55,
+        child: pw.Text(
+          destination!,
+          style: pw.TextStyle(fontSize: 16),
+        ),
+      ),
+
+      // **Manifest Preparer**
+      pw.Positioned(
+        left: xOffset + 135,
+        top: yOffset + 656,
+        child: pw.Text(
+          manifestPreparer!,
+          style: pw.TextStyle(fontSize: 16),
+        ),
+      ),
+    ],
+  );
+}
+
 pw.Widget fillFormFieldsPMS245(Load load) {
   const double yOffset = 65; // Adjust this value to move everything down
   const double itemSpacing = 15; // Adjust this value to control spacing between items
@@ -251,142 +485,6 @@ pw.Widget fillFormFieldsPMS245(Load load) {
   );
 }
 
-pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dynamic> pageItems, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) {
-  const double yOffset = 112; // Adjust this value to move everything vertically
-  const double xOffset = 6; // Adjust this value to move everything horizontally
-  const double itemSpacing = 27.4; // Adjust spacing between items
-  const double fontSizeOF252 = 18.0;
-
-  DateTime today = DateTime.now();
-  String formattedDate = DateFormat('MM/dd/yyyy').format(today);
-  String formattedTime = DateFormat('hh:mm a').format(today);
-  return pw.Stack(
-    children: [
-      // Display names and quantities for Crew Members, Gear, and Custom Items
-      for (var i = 0; i < pageItems.length; i++)
-        pw.Positioned(
-          left: xOffset + 32,
-          top: yOffset + 150 + (i * itemSpacing),
-          child: pw.Text(
-            pageItems[i] is CrewMember
-                ? pageItems[i].name
-                : pageItems[i] is Gear
-                    ? pageItems[i].name
-                    : pageItems[i].name,
-            style: pw.TextStyle(fontSize: fontSizeOF252),
-          ),
-        ),
-
-      // Display weights for each item
-      for (var i = 0; i < pageItems.length; i++)
-        if (pageItems[i] is CrewMember || pageItems[i] is Gear || pageItems[i] is CustomItem)
-          pw.Positioned(
-            left: xOffset + 442,
-            top: yOffset + 150 + (i * itemSpacing),
-            child: pw.Text(
-              "${pageItems[i] is CrewMember ? pageItems[i].flightWeight : pageItems[i] is Gear ? pageItems[i].totalGearWeight : pageItems[i].totalGearWeight} lbs",
-              style: pw.TextStyle(fontSize: fontSizeOF252),
-            ),
-          ),
-
-      // Display gear quantities for items on the current page
-      for (var i = 0; i < pageItems.length; i++)
-        if (pageItems[i] is Gear)
-          pw.Positioned(
-            left: xOffset - 2,
-            top: yOffset + 150 + (i * itemSpacing),
-            child: pw.Text(
-              "${pageItems[i].quantity}",
-              style: pw.TextStyle(fontSize: fontSizeOF252),
-            ),
-          ),
-
-      // Total Load Weight
-      if (pageIndex == totalPages)
-        pw.Positioned(
-          left: xOffset + 442,
-          top: yOffset + 610,
-          child: pw.Text(
-            '${load.weight.toString()} lbs',
-            style: pw.TextStyle(fontSize: fontSizeOF252),
-          ),
-        ),
-
-      // Current date
-      pw.Positioned(
-        left: xOffset + 459,
-        top: 15,
-        child: pw.Text(
-          formattedDate,
-          style: pw.TextStyle(fontSize: 14),
-        ),
-      ),
-
-      // Current time
-      pw.Positioned(
-        left: xOffset + 350,
-        top: 15,
-        child: pw.Text(
-          formattedTime,
-          style: pw.TextStyle(fontSize: 14),
-        ),
-      ),
-
-      // Page number in the bottom-left corner
-      pw.Positioned(
-        left: xOffset - 6,
-        top: yOffset + 605,
-        child: pw.Text(
-          'Load #${load.loadNumber}, Page $pageIndex of $totalPages',
-          style: pw.TextStyle(
-            fontSize: 16,
-            color: PdfColors.black, // Optional: use a lighter color for page numbers
-          ),
-        ),
-      ),
-
-      // Helicopter Tail Number
-      pw.Positioned(
-        left: xOffset + 70,
-        top: 13,
-        child: pw.Text(
-          helicopterNum!,
-          style: pw.TextStyle(fontSize: 16),
-        ),
-      ),
-
-      // Departure
-      pw.Positioned(
-        left: xOffset + 56,
-        top: 55,
-        child: pw.Text(
-          departure!,
-          style: pw.TextStyle(fontSize: 16),
-        ),
-      ),
-
-      // Destintation
-      pw.Positioned(
-        left: xOffset + 336,
-        top: 55,
-        child: pw.Text(
-          destination!,
-          style: pw.TextStyle(fontSize: 16),
-        ),
-      ),
-
-      // Destintation
-      pw.Positioned(
-        left: xOffset + 135,
-        top: yOffset + 656,
-        child: pw.Text(
-          manifestPreparer!,
-          style: pw.TextStyle(fontSize: 16),
-        ),
-      ),
-    ],
-  );
-}
 
 class SingleLoadView extends StatefulWidget {
   // This page requires a trip to be passed to it
@@ -759,7 +857,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: AppColors.textFieldColor,
+      backgroundColor: AppColors.textFieldColor2,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       // Adjust padding
       title: Text(

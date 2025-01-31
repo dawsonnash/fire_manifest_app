@@ -252,22 +252,56 @@ class _GearViewState extends State<GearView> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          gear.name,
-                                          style:  TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                        Row(
+                                          children: [
+                                            // Gear name with ellipsis
+                                            Flexible(
+                                              child: Text(
+                                                gear.name,
+                                                style: TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.textColorPrimary,
+                                                ),
+                                                maxLines: 1, // Limit to one line
+                                                overflow: TextOverflow.ellipsis, // Show ellipsis if text overflows
+                                              ),
+                                            ),
+                                            // Hazard icon (conditionally rendered)
+                                            // Hazard icon with Tooltip
+
+                                          ],
                                         ),
-                                        Text(
-                                          '${gear.weight} lbs x ${gear.quantity}',
-                                          style:  TextStyle(
-                                            fontSize: 16,
-                                              color: AppColors.textColorPrimary
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                        Row(
+                                          children: [
+                                            Text(
+                                              '${gear.weight} lbs x ${gear.quantity}',
+                                              style:  TextStyle(
+                                                fontSize: 16,
+                                                  color: AppColors.textColorPrimary
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            if (gear.isHazmat)
+                                              Padding(
+                                                padding: const EdgeInsets.only(left: 8.0), // Add spacing between text and icon
+                                                child: Tooltip(
+                                                  message: 'HAZMAT', // The hint displayed on long-press
+                                                  waitDuration: const Duration(milliseconds: 500), // Time before the tooltip shows
+                                                  child: Icon(
+                                                    FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                    color: Colors.red, // Red color for hazard
+                                                    size: 18, // Icon size
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
                                         ),
                                       ],
                                     ),
                                   ),
+
                                   IconButton(
                                     icon:  Icon(Icons.edit, color: AppColors.textColorPrimary, size: 32),
                                     onPressed: () {

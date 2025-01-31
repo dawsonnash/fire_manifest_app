@@ -11,6 +11,53 @@ class Crew {
   List<Gear> personalTools = [];            // List of personal tool templates
   double totalCrewWeight = 0.0;
 
+  // Explicit constructor
+  Crew({
+    this.crewMembers = const [],
+    this.gear = const [],
+    this.personalTools = const [],
+    this.totalCrewWeight = 0.0,
+  });
+
+  // Convert Crew object to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      "crewMembers": crewMembers.map((member) => member.toJson()).toList(),
+      "gear": gear.map((g) => g.toJson()).toList(),
+      "personalTools": personalTools.map((p) => p.toJson()).toList(),
+      "totalCrewWeight": totalCrewWeight,
+    };
+  }
+
+  // Convert JSON back into Crew object
+  factory Crew.fromJson(Map<String, dynamic> json) {
+    Crew crew = Crew();
+    crew.crewMembers = (json["crewMembers"] as List)
+        .map((member) => CrewMember.fromJson(member))
+        .toList();
+    crew.gear = (json["gear"] as List)
+        .map((g) => Gear.fromJson(g))
+        .toList();
+    crew.personalTools = (json["personalTools"] as List)
+        .map((p) => Gear.fromJson(p))
+        .toList();
+    crew.totalCrewWeight = json["totalCrewWeight"];
+    return crew;
+  }
+
+  void printPersonalTools() {
+    if (personalTools.isEmpty) {
+      print('No personal tools found.');
+      return;
+    }
+
+    print('Personal Tools List:');
+    for (var tool in personalTools) {
+      print('- ${tool.name}, Weight: ${tool.weight}, Quantity: ${tool.quantity}');
+    }
+  }
+
+
   // Helper function to get saw teams
   List<CrewMember> getSawTeam(int teamNumber) {
     switch (teamNumber) {
@@ -246,20 +293,22 @@ class Crew {
 
   // This function loads all data stored in the hive for 'Crew' into the local in-memory
   // Seems to be an easier way to work with data for now.
-  void loadCrewDataFromHive() {
+  Future<void> loadCrewDataFromHive() async {
     var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
     var gearBox = Hive.box<Gear>('gearBox');
+    var personalToolsBox = Hive.box<Gear>('personalToolsBox');
 
-    // Load crew members from Hive into the in-memory list
+    // Wait for Hive to load values
     crew.crewMembers = crewmemberBox.values.toList();
-
-    // Load gear from Hive into the in-memory list
     crew.gear = gearBox.values.toList();
+    crew.personalTools = personalToolsBox.values.toList();
 
-    // Update the total weight after loading the data
+    // Update total weight
     crew.updateTotalCrewWeight();
-    //print('Crew data loaded from Hive. Total weight: ${crew.totalCrewWeight}');
+
+    print(' Crew data loaded from Hive. Total weight: ${crew.totalCrewWeight}');
   }
+
   void loadPersonalTools() {
     var personalToolsBox = Hive.box<Gear>('personalTools');
     personalTools = personalToolsBox.values.toList();
@@ -293,17 +342,16 @@ void initializeTestData() {
 
   // Define common personal tools
   List<Gear> sawyer = [
-    Gear(name: 'Chainsaw', weight: 25, quantity: 1, isPersonalTool: true),
-    Gear(name: 'P-tool', weight: 8, quantity: 1, isPersonalTool: true),
+    Gear(name: 'Chainsaw', weight: 25, quantity: 1, isPersonalTool: true, isHazmat: true),
+    Gear(name: 'P-tool', weight: 8, quantity: 1, isPersonalTool: true, isHazmat: false),
   ];
 
   List<Gear> swamper = [
-    Gear(name: 'Dolmar', weight: 15, quantity: 1, isPersonalTool: true),
-    Gear(name: 'P-tool', weight: 8, quantity: 1, isPersonalTool: true),
+    Gear(name: 'Dolmar', weight: 15, quantity: 1, isPersonalTool: true, isHazmat: true),
   ];
 
   List<Gear> dig = [
-    Gear(name: 'P-tool', weight: 8, quantity: 1, isPersonalTool: true),
+    Gear(name: 'P-tool', weight: 8, quantity: 1, isPersonalTool: true, isHazmat: false),
   ];
 
   // Add Crew Members to Hive and in-memory
@@ -340,18 +388,18 @@ void initializeTestData() {
 
   // Add Gear to Hive and in-memory
   List<Gear> testGear = [
-    Gear(name: 'Ammo Can', weight: 20, quantity: 1),
-    Gear(name: 'Camp Bag', weight: 75, quantity: 1),
-    Gear(name: 'Saw Bag', weight: 80, quantity: 1),
-    Gear(name: 'Commo Case', weight: 20, quantity: 1),
-    Gear(name: 'Bauman Bag', weight: 15, quantity: 1),
-    Gear(name: 'Trauma/AED/SKED', weight: 45, quantity: 1),
-    Gear(name: 'Trauma Bag', weight: 40, quantity: 1),
-    Gear(name: 'P-tool/Shovel/Rhino', weight: 25, quantity: 1),
-    Gear(name: 'SAT Phone', weight: 5, quantity: 2),
-    Gear(name: 'Shotgun', weight: 33, quantity: 1),
-    Gear(name: 'QB', weight: 45, quantity: 6),
-    Gear(name: 'MRE', weight: 25, quantity: 6),
+    Gear(name: 'Ammo Can', weight: 20, quantity: 1, isHazmat: true),
+    Gear(name: 'Camp Bag', weight: 75, quantity: 1, isHazmat: false),
+    Gear(name: 'Saw Bag', weight: 80, quantity: 1, isHazmat: false),
+    Gear(name: 'Commo Case', weight: 20, quantity: 1, isHazmat: false),
+    Gear(name: 'Bauman Bag', weight: 15, quantity: 1, isHazmat: false),
+    Gear(name: 'Trauma/AED/SKED', weight: 45, quantity: 1, isHazmat: false),
+    Gear(name: 'Trauma Bag', weight: 40, quantity: 1, isHazmat: false),
+    Gear(name: 'P-tool/Shovel/Rhino', weight: 25, quantity: 1, isHazmat: false),
+    Gear(name: 'SAT Phone', weight: 5, quantity: 2, isHazmat: false),
+    Gear(name: 'Shotgun', weight: 33, quantity: 1, isHazmat: false),
+    Gear(name: 'QB', weight: 45, quantity: 6, isHazmat: false),
+    Gear(name: 'MRE', weight: 25, quantity: 6, isHazmat: false),
 
   ];
 
