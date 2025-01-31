@@ -59,27 +59,25 @@ class CrewMember extends HiveObject {
     return positionMap[positionCode] ?? 'Unknown Position';
   }
 
-  // Convert object to JSON
+  // Convert CrewMember to JSON
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'name': name,
-      'flightWeight': flightWeight,
-      'position': position,
-      'personalTools': personalTools?.map((tool) => tool.toJson()).toList(),
+      "name": name,
+      "flightWeight": flightWeight,
+      "position": position,
+      "personalTools": personalTools?.map((p) => p.toJson()).toList(),
     };
   }
 
-  // Create object from JSON
+  // Convert JSON back into CrewMember
   factory CrewMember.fromJson(Map<String, dynamic> json) {
     return CrewMember(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      flightWeight: json['flightWeight'] as int,
-      position: json['position'] as int,
-      personalTools: (json['personalTools'] as List?)
-          ?.map((tool) => Gear.fromJson(tool as Map<String, dynamic>))
-          .toList(),
+      name: json["name"],
+      flightWeight: json["flightWeight"],
+      position: json["position"],
+      personalTools: json["personalTools"] != null
+          ? (json["personalTools"] as List).map((p) => Gear.fromJson(p)).toList()
+          : [],
     );
   }
 

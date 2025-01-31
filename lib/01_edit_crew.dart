@@ -239,15 +239,24 @@ class _EditCrewState extends State<EditCrew> {
                                   constraints: BoxConstraints(
                                     maxWidth: screenWidth * 0.8, // Limit the maximum width
                                   ),
-                                  child: Text(
-                                    AppData.crewName,
-                                    style: headerTextStyle,
-                                    textAlign: TextAlign.right,
-                                    maxLines: 2,
-                                    // Limit to 2 lines
-                                    overflow: TextOverflow.ellipsis,
-                                    // Ellipsis if overflowed
-                                    softWrap: true, // Ensure wrapping
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown, // Shrinks text to fit without overflowing
+                                          child: Text(
+                                            AppData.crewName,
+                                            style: headerTextStyle,
+                                            textAlign: TextAlign.right,
+                                            maxLines: 2,
+                                            // Limit to 2 lines
+                                            overflow: TextOverflow.ellipsis,
+                                            // Ellipsis if overflowed
+                                            softWrap: true, // Ensure wrapping
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -550,16 +559,13 @@ class _EditCrewState extends State<EditCrew> {
                                                 style: TextStyle(color: AppColors.textColorPrimary, fontSize: 16),
                                               ),
 
-                                               SizedBox(height: AppData.spacingStandard),
+                                              SizedBox(height: AppData.spacingStandard),
 
                                               // Tool weight
                                               TextField(
                                                 controller: toolWeightController,
                                                 keyboardType: TextInputType.number,
-                                                inputFormatters: [
-                                                  LengthLimitingTextInputFormatter(2),
-                                                  FilteringTextInputFormatter.digitsOnly
-                                                ],
+                                                inputFormatters: [LengthLimitingTextInputFormatter(2), FilteringTextInputFormatter.digitsOnly],
                                                 decoration: InputDecoration(
                                                   labelText: 'Tool Weight (lbs)',
                                                   labelStyle: TextStyle(color: AppColors.textColorPrimary),
@@ -582,7 +588,7 @@ class _EditCrewState extends State<EditCrew> {
                                                 style: TextStyle(color: AppColors.textColorPrimary, fontSize: 16),
                                               ),
 
-                                               SizedBox(height: AppData.spacingStandard),
+                                              SizedBox(height: AppData.spacingStandard),
 
                                               // HAZMAT
                                               Container(
@@ -758,14 +764,12 @@ class _EditCrewState extends State<EditCrew> {
                                                           (tool) => tool.name.toLowerCase() == toolName.toLowerCase(),
                                                         );
                                                         final isDuplicateWithDifferentWeight = crew.gear.any(
-                                                              (tool) => tool.name.toLowerCase() == toolName.toLowerCase() &&
-                                                              tool.weight != int.parse(toolWeightText), // Check if weight is different
+                                                          (tool) => tool.name.toLowerCase() == toolName.toLowerCase() && tool.weight != int.parse(toolWeightText), // Check if weight is different
                                                         );
 
 // Check for duplicate gear names with different hazmat values (case-insensitive)
                                                         final isDuplicateWithDifferentHazmat = crew.gear.any(
-                                                              (tool) => tool.name.toLowerCase() == toolName.toLowerCase() &&
-                                                              tool.isHazmat != isHazmat, // Check if hazmat value is different
+                                                          (tool) => tool.name.toLowerCase() == toolName.toLowerCase() && tool.isHazmat != isHazmat, // Check if hazmat value is different
                                                         );
 
                                                         if (isDuplicate) {
@@ -790,7 +794,7 @@ class _EditCrewState extends State<EditCrew> {
                                                           // Add weight conflict message if applicable
                                                           if (isDuplicateWithDifferentWeight) {
                                                             final conflictingTool = crew.gear.firstWhere(
-                                                                  (tool) => tool.name.toLowerCase() == toolName.toLowerCase() && tool.weight != int.parse(toolWeightText),
+                                                              (tool) => tool.name.toLowerCase() == toolName.toLowerCase() && tool.weight != int.parse(toolWeightText),
                                                             );
                                                             weightConflict = 'This tool must match the same weight of the $toolName in your gear inventory: ${conflictingTool.weight} lbs.';
                                                           }
@@ -798,9 +802,10 @@ class _EditCrewState extends State<EditCrew> {
                                                           // Add hazmat conflict message if applicable
                                                           if (isDuplicateWithDifferentHazmat) {
                                                             final conflictingTool = crew.gear.firstWhere(
-                                                                  (tool) => tool.name.toLowerCase() == toolName.toLowerCase() && tool.isHazmat != isHazmat,
+                                                              (tool) => tool.name.toLowerCase() == toolName.toLowerCase() && tool.isHazmat != isHazmat,
                                                             );
-                                                            hazmatConflict = 'This tool must match the same HAZMAT value of the $toolName in your gear inventory: ${conflictingTool.isHazmat ? 'TRUE' : 'FALSE'}.';
+                                                            hazmatConflict =
+                                                                'This tool must match the same HAZMAT value of the $toolName in your gear inventory: ${conflictingTool.isHazmat ? 'TRUE' : 'FALSE'}.';
                                                           }
 
                                                           // Combine messages with the universal message
@@ -840,7 +845,6 @@ class _EditCrewState extends State<EditCrew> {
 
                                                           return; // Stop further execution
                                                         }
-
 
                                                         final weight = int.parse(toolWeightText);
 
@@ -957,13 +961,7 @@ class _EditCrewState extends State<EditCrew> {
                                                                     if (keyToUpdate != null) {
                                                                       personalToolsBox.put(
                                                                         keyToUpdate,
-                                                                        Gear(
-                                                                          name: toolNameRaw,
-                                                                          weight: int.parse(toolWeightText),
-                                                                          quantity: 1,
-                                                                          isPersonalTool: true,
-                                                                          isHazmat: isHazmat
-                                                                        ),
+                                                                        Gear(name: toolNameRaw, weight: int.parse(toolWeightText), quantity: 1, isPersonalTool: true, isHazmat: isHazmat),
                                                                       );
                                                                     }
 

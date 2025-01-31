@@ -49,14 +49,14 @@ void main() async {
   await Hive.openBox<Gear>('personalToolsBox');
 
   // Load data from Hive
-  crew.loadCrewDataFromHive();
-  savedPreferences.loadPreferencesFromHive();
-  savedTrips.loadTripDataFromHive(); // do we need to load trip data as well?
+  await crew.loadCrewDataFromHive();
+  await savedPreferences.loadPreferencesFromHive();
+  await savedTrips.loadTripDataFromHive(); // do we need to load trip data as well?
 
   // Test data for user testing
-  if (crew.crewMembers.isEmpty && crew.gear.isEmpty) {
-    initializeTestData();
-  }
+  // if (crew.crewMembers.isEmpty && crew.gear.isEmpty) {
+  //   initializeTestData();
+  // }
 
   // Load all preferences and update them
   //await updateAllTripPreferencesFromBoxes();

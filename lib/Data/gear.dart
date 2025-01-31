@@ -51,27 +51,25 @@ class Gear extends HiveObject {
     );
   }
 
-  // Convert Gear object to a JSON-like map
+  // Convert Gear to JSON
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'name': name,
-      'weight': weight,
-      'quantity': quantity,
-      'isPersonalTool': isPersonalTool,
-      'isHazmat': isHazmat,
+      "name": name,
+      "weight": weight,
+      "quantity": quantity,
+      "isPersonalTool": isPersonalTool,
+      "isHazmat": isHazmat,
     };
   }
 
-  // Create a Gear object from a JSON-like map
+  // Convert JSON back into Gear
   factory Gear.fromJson(Map<String, dynamic> json) {
     return Gear(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      weight: json['weight'] as int,
-      quantity: json['quantity'] as int,
-      isPersonalTool: json['isPersonalTool'] as bool,
-      isHazmat: json['isHazmat'] as bool, // Parse isHazmat
+      name: json["name"],
+      weight: json["weight"],
+      quantity: json["quantity"],
+      isPersonalTool: json["isPersonalTool"],
+      isHazmat: json["isHazmat"],
     );
   }
 }

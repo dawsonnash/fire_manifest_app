@@ -11,6 +11,53 @@ class Crew {
   List<Gear> personalTools = [];            // List of personal tool templates
   double totalCrewWeight = 0.0;
 
+  // Explicit constructor
+  Crew({
+    this.crewMembers = const [],
+    this.gear = const [],
+    this.personalTools = const [],
+    this.totalCrewWeight = 0.0,
+  });
+
+  // Convert Crew object to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      "crewMembers": crewMembers.map((member) => member.toJson()).toList(),
+      "gear": gear.map((g) => g.toJson()).toList(),
+      "personalTools": personalTools.map((p) => p.toJson()).toList(),
+      "totalCrewWeight": totalCrewWeight,
+    };
+  }
+
+  // Convert JSON back into Crew object
+  factory Crew.fromJson(Map<String, dynamic> json) {
+    Crew crew = Crew();
+    crew.crewMembers = (json["crewMembers"] as List)
+        .map((member) => CrewMember.fromJson(member))
+        .toList();
+    crew.gear = (json["gear"] as List)
+        .map((g) => Gear.fromJson(g))
+        .toList();
+    crew.personalTools = (json["personalTools"] as List)
+        .map((p) => Gear.fromJson(p))
+        .toList();
+    crew.totalCrewWeight = json["totalCrewWeight"];
+    return crew;
+  }
+
+  void printPersonalTools() {
+    if (personalTools.isEmpty) {
+      print('No personal tools found.');
+      return;
+    }
+
+    print('Personal Tools List:');
+    for (var tool in personalTools) {
+      print('- ${tool.name}, Weight: ${tool.weight}, Quantity: ${tool.quantity}');
+    }
+  }
+
+
   // Helper function to get saw teams
   List<CrewMember> getSawTeam(int teamNumber) {
     switch (teamNumber) {
@@ -246,20 +293,22 @@ class Crew {
 
   // This function loads all data stored in the hive for 'Crew' into the local in-memory
   // Seems to be an easier way to work with data for now.
-  void loadCrewDataFromHive() {
+  Future<void> loadCrewDataFromHive() async {
     var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
     var gearBox = Hive.box<Gear>('gearBox');
+    var personalToolsBox = Hive.box<Gear>('personalToolsBox');
 
-    // Load crew members from Hive into the in-memory list
+    // Wait for Hive to load values
     crew.crewMembers = crewmemberBox.values.toList();
-
-    // Load gear from Hive into the in-memory list
     crew.gear = gearBox.values.toList();
+    crew.personalTools = personalToolsBox.values.toList();
 
-    // Update the total weight after loading the data
+    // Update total weight
     crew.updateTotalCrewWeight();
-    //print('Crew data loaded from Hive. Total weight: ${crew.totalCrewWeight}');
+
+    print(' Crew data loaded from Hive. Total weight: ${crew.totalCrewWeight}');
   }
+
   void loadPersonalTools() {
     var personalToolsBox = Hive.box<Gear>('personalTools');
     personalTools = personalToolsBox.values.toList();

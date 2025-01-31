@@ -20,6 +20,8 @@ class AppColors {
   static Color get buttonStyle1 => Colors.green;
   static Color get cancelButton => isDarkMode ? Colors.white : Colors.grey;
   static Color get logoImageOverlay => Colors.black.withValues(alpha: 0.6);
+  static Color get settingsTabs => Colors.white.withValues(alpha: 0.1);
+
 
   static bool isDarkMode = true; // This will be toggled based on SharedPreferences
   static bool enableBackgroundImage = false; // Default to background image disabled
