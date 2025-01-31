@@ -12,6 +12,7 @@ import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import '06_edit_trip.dart';
 import 'CodeShare/colors.dart';
+import 'Data/gear.dart';
 import 'Data/load.dart';
 
 // Generates PDF
@@ -40,6 +41,7 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, String? helico
 
   // Iterate through each load in the trip
   for (var load in trip.loads) {
+
     // Combine all items from the load
     final allItems = [
       ...load.loadPersonnel,
@@ -47,8 +49,14 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, String? helico
       ...load.customItems,
     ];
 
-    // Paginate items for `of252`, use a single page for `pms245`
-    final paginatedItems = manifestForm == 'of252' ? paginateItems(allItems, maxItemsPerPage) : [allItems];
+    // Count hazmat items
+    int numHaz = allItems.where((item) => item is Gear && item.isHazmat).length;
+
+    // Calculate the required number of pages
+    int totalPages = calculatePagesNeeded(allItems.length, numHaz);
+
+    // Paginate items if `of252`
+    final paginatedItems = manifestForm == 'of252' ? paginateItems(allItems, totalPages): [allItems];
 
     // Generate pages based on pagination
     for (int i = 0; i < paginatedItems.length; i++) {
@@ -68,12 +76,14 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, String? helico
                   ),
                 ),
                 pw.Padding(
-                  padding: manifestForm == 'pms245' ? const pw.EdgeInsets.all(32) : const pw.EdgeInsets.all(22),
+                  padding: manifestForm == 'pms245'
+                      ? const pw.EdgeInsets.all(32) // Adjust padding for PMS245
+                      : const pw.EdgeInsets.all(22), // Adjust padding for OF252
                   child: fillFormFields(
                     load,
-                    i + 1, // Current page index (1-based)
-                    paginatedItems.length, // Total pages for the current load
-                    paginatedItems[i], // Items for the current page
+                    i + 1, // Page index (1-based)
+                    paginatedItems.length, // Total pages
+                    paginatedItems[i], // Items on the current page
                   ),
                 ),
               ],
@@ -472,7 +482,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: AppColors.textFieldColor,
+      backgroundColor: AppColors.textFieldColor2,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       // Adjust padding
       title: Text(

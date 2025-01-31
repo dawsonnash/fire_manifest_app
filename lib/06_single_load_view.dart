@@ -305,7 +305,7 @@ pw.Widget fillFormFieldsOF252(
       // **Page Number**
       pw.Positioned(
         left: xOffset - 6,
-        top: yOffset + 605,
+        top: yOffset + 610,
         child: pw.Text(
           'Load #${load.loadNumber}, Page $pageIndex of $totalPages',
           style: pw.TextStyle(
@@ -857,7 +857,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: AppColors.textFieldColor,
+      backgroundColor: AppColors.textFieldColor2,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       // Adjust padding
       title: Text(

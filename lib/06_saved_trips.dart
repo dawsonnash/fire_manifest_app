@@ -258,7 +258,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                         style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                       ),
                                       content: Text(
-                                        'Are you sure you want to delete all trips?',
+                                        'Are you sure you want to delete this trip?',
                                         style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
                                       ),
                                       actions: [
