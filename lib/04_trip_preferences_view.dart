@@ -122,52 +122,121 @@ class _TripPreferencesState extends State<TripPreferences> {
               Container(
                 color: Colors.white.withValues(alpha: 0.05),
               ),
-              Container(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min, // Ensures the column only takes required space
-                    children: [
-                      Flexible(
-                        child: tripPreferenceList.isEmpty
-                            ? Card(
-                                color: AppColors.textFieldColor,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(9),
-                                  ),
-                                  child: ListTile(
-                                    iconColor: AppColors.primaryColor,
-                                    title: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            'No Trip Preferences created...',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.textColorPrimary,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // Ensures the column only takes required space
+                  children: [
+                    Flexible(
+                      child: tripPreferenceList.isEmpty
+                          ? Card(
+                              color: AppColors.textFieldColor,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(9),
+                                ),
+                                child: ListTile(
+                                  iconColor: AppColors.primaryColor,
+                                  title: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          'No Trip Preferences created...',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.textColorPrimary,
                                           ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              )
-                            : ListView.builder(
-                                shrinkWrap: true, // Ensures the list takes only the necessary height
+                              ),
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true, // Ensures the list takes only the necessary height
+                              itemCount: tripPreferenceList.length,
+                              itemBuilder: (context, index) {
+                                final tripPreference = tripPreferenceList[index];
 
-                                itemCount: tripPreferenceList.length,
-                                itemBuilder: (context, index) {
-                                  final tripPreference = tripPreferenceList[index];
+                                // Display TripPreference data in a scrollable list
+                                return GestureDetector(
+                                  onTap: () async {
 
-                                  // Display TripPreference data in a scrollable list
-                                  return Card(
+                                    // Awaits the result from the next page so it updates in real time
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EditTripPreference(tripPreference: tripPreference, onUpdate: loadTripPreferenceList),
+                                      ),
+                                    );
+                                    // Calls the update function after returning from AddTripPreference
+                                    loadTripPreferenceList();
+                                  },
+                                  child: Dismissible(
+                                    key: Key(tripPreference.tripPreferenceName), // Unique key for each item
+                                    direction: DismissDirection.endToStart, // Swipe from right to left
+                                    background: Container(
+                                      color: Colors.red, // Background color when swiping
+                                      alignment: Alignment.centerRight,
+                                      padding: EdgeInsets.symmetric(horizontal: 20),
+                                      child: Icon(Icons.delete, color: Colors.white, size: 30), // Delete icon
+                                    ),
+                                    confirmDismiss: (direction) async {
+                                      // Show a confirmation dialog before dismissing
+                                      return await showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            backgroundColor: AppColors.textFieldColor2,
+                                            title: Text(
+                                              'Confirm Deletion',
+                                              style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                            ),
+                                            content: Text(
+                                              'Are you sure you want to delete this Trip Preference?',
+                                              style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.of(context).pop(false), // Cancel dismissal
+                                                child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                              ),
+                                              TextButton(
+                                                onPressed: () => Navigator.of(context).pop(true), // Confirm dismissal
+                                                child: Text('Delete', style: TextStyle(color: Colors.red)),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                    onDismissed: (direction) {
+                                      // Perform the delete action after confirming
+                                      savedPreferences.removeTripPreference(tripPreference);
+                                      setState(() {
+                                        tripPreferenceList.remove(tripPreference); // Remove from the list
+                                      });
+
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Center(
+                                            child: Text(
+                                              'Trip Preference Deleted!',
+                                              style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          backgroundColor: Colors.red,
+                                          duration: Duration(seconds: 2),
+                                        ),
+                                      );
+                                    },
+                                  child: Card(
                                     color: AppColors.textFieldColor,
                                     child: Container(
                                       decoration: BoxDecoration(
@@ -296,57 +365,58 @@ class _TripPreferencesState extends State<TripPreferences> {
                                         leading: FaIcon(FontAwesomeIcons.fire),
                                       ),
                                     ),
-                                  );
-                                },
-                              ),
-                      ),
-                      SizedBox(height: 8), // Adds spacing between the list and the panel
-
-                      GestureDetector(
-                        onTap: () async {
-                          // Awaits the result from the next page so it updates in real time
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddTripPreference(onUpdate: loadTripPreferenceList),
+                                  ),
+                                ),
+                                );
+                              },
                             ),
-                          );
-                          // Calls the update function after returning from AddTripPreference
-                          loadTripPreferenceList();
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4), // Padding around the text and icon
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(8), // Rounded corners
-                            boxShadow: AppColors.isDarkMode
-                                ? [] // No shadow in dark mode
-                                : [
-                              BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.5), // Shadow color
-                                spreadRadius: 0, // Spread of the shadow
-                                blurRadius: 20, // Blur effect
-                                offset: Offset(0, 0), // Offset in x and y direction
-                              ),
-                            ],
+                    ),
+                    SizedBox(height: 8), // Adds spacing between the list and the panel
+
+                    GestureDetector(
+                      onTap: () async {
+                        // Awaits the result from the next page so it updates in real time
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddTripPreference(onUpdate: loadTripPreferenceList),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min, // Ensures the container width is only as wide as its content
-                            children: [
-                              Icon(FontAwesomeIcons.circlePlus, color: AppColors.primaryColor,),
-                              SizedBox(width: 8), // Space between the icon and the text
-                              Text(
-                                'Trip Preference',
-                                textAlign: TextAlign.center,
-                                softWrap: true,
-                                style: panelTextStyle,
-                              ),
-                            ],
-                          ),
+                        );
+                        // Calls the update function after returning from AddTripPreference
+                        loadTripPreferenceList();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4), // Padding around the text and icon
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(8), // Rounded corners
+                          boxShadow: AppColors.isDarkMode
+                              ? [] // No shadow in dark mode
+                              : [
+                            BoxShadow(
+                              color: Colors.white.withValues(alpha: 0.5), // Shadow color
+                              spreadRadius: 0, // Spread of the shadow
+                              blurRadius: 20, // Blur effect
+                              offset: Offset(0, 0), // Offset in x and y direction
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min, // Ensures the container width is only as wide as its content
+                          children: [
+                            Icon(FontAwesomeIcons.circlePlus, color: AppColors.primaryColor,),
+                            SizedBox(width: 8), // Space between the icon and the text
+                            Text(
+                              'Trip Preference',
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                              style: panelTextStyle,
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ],

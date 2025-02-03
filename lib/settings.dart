@@ -428,7 +428,7 @@ class _SettingsState extends State<SettingsView> {
                             return AlertDialog(
                               backgroundColor: AppColors.textFieldColor2,
                               title: Text("No crew to export", style: TextStyle(color: AppColors.textColorPrimary),),
-                              content: Text("There are no Crew Members or Gear in your inventory. Before exporting, create a crew.", style: TextStyle(color: AppColors.textColorPrimary)),
+                              content: Text("There are no Crew Members or Gear in your inventory.", style: TextStyle(color: AppColors.textColorPrimary)),
                               actions: [
                                 TextButton(
                                   onPressed: () {
