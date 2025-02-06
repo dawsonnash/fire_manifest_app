@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,6 +12,7 @@ class AppColors {
   static Color get textFieldColor => isDarkMode ? Colors.grey[900]!.withValues(alpha: 0.9) : Colors.white;
   static Color get textFieldColor2 => isDarkMode ? Colors.grey[900]! : Colors.white;
   static Color get textColorPrimary => isDarkMode ? Colors.white : Colors.black;
+  static Color get textColorPrimary2 => isDarkMode ? Colors.white : Colors.grey;
   static Color get textColorSecondary => isDarkMode ? Colors.black : Colors.white;
   static Color get textColorEditToolDetails => isDarkMode ? Colors.white : Colors.blue;
   static Color get tabIconColor => isDarkMode ? Colors.grey[300]! :  Colors.grey[800]!;
@@ -69,4 +72,20 @@ class ThemePreferences {
   }
 
 
+}
+
+// Outlines a text using shadows.
+List<Shadow> outlinedText({double strokeWidth = 1, Color strokeColor = Colors.black, int precision = 5}) {
+  Set<Shadow> result = HashSet();
+  for (int x = 1; x < strokeWidth + precision; x++) {
+    for(int y = 1; y < strokeWidth + precision; y++) {
+      double offsetX = x.toDouble();
+      double offsetY = y.toDouble();
+      result.add(Shadow(offset: Offset(-strokeWidth / offsetX, -strokeWidth / offsetY), color: strokeColor));
+      result.add(Shadow(offset: Offset(-strokeWidth / offsetX, strokeWidth / offsetY), color: strokeColor));
+      result.add(Shadow(offset: Offset(strokeWidth / offsetX, -strokeWidth / offsetY), color: strokeColor));
+      result.add(Shadow(offset: Offset(strokeWidth / offsetX, strokeWidth / offsetY), color: strokeColor));
+    }
+  }
+  return result.toList();
 }

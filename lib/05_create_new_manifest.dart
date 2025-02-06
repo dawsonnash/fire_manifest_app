@@ -30,9 +30,10 @@ class CreateNewManifest extends StatelessWidget {
               elevation: 0,
               toolbarHeight: 0,
               bottom: TabBar(
-                labelColor: AppColors.primaryColor, // Selected text and icon color
-                unselectedLabelColor: AppColors.tabIconColor, // Unselected text and icon color
-                indicatorColor: AppColors.primaryColor, // Tab indicator color
+                unselectedLabelColor: AppColors.tabIconColor,
+                labelColor: AppColors.primaryColor,
+                dividerColor: AppColors.appBarColor,
+                indicatorColor: AppColors.primaryColor,
                 tabs: const [
                   Tab(
                     text: 'Quick Manifest',

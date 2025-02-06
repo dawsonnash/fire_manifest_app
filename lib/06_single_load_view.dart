@@ -185,7 +185,7 @@ pw.Widget fillFormFieldsOF252(
     adjustedPosition -= itemSpacing;
 
     // Add a slight extra offset after two items for better spacing
-    if (i >= 2) {
+    if (i == 2) {
       adjustedPosition -= 18; // Increase spacing upward
     }
 

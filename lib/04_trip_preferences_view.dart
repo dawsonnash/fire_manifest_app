@@ -125,6 +125,7 @@ class _TripPreferencesState extends State<TripPreferences> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min, // Ensures the column only takes required space
                   children: [
                     Flexible(

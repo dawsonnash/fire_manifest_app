@@ -30,49 +30,91 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
   }
 
   // Function to edit title
-  void editTitle() {
+  void _editTitle() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        TextEditingController titleController = TextEditingController(text: widget.tripPreference.tripPreferenceName);
+        TextEditingController titleController =
+        TextEditingController(text: widget.tripPreference.tripPreferenceName);
+        String? errorMessage; // Variable to hold error message
 
-        return AlertDialog(
-          backgroundColor: AppColors.textFieldColor2,
-          title: Text(
-            "Edit Trip Preference Name",
-            style: TextStyle(color: AppColors.textColorPrimary),
-          ),
-          content: TextField(
-            controller: titleController,
-            textCapitalization: TextCapitalization.words,
-            decoration: InputDecoration(labelText: "Trip Preference Name", labelStyle: TextStyle(color: AppColors.textColorPrimary)),
-            style: TextStyle(color: AppColors.textColorPrimary),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Dismiss  dialog
-              },
-              child: Text(
-                "Cancel",
-                style: TextStyle(color: AppColors.cancelButton),
+        return StatefulBuilder( // Enables state updates inside the dialog
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: AppColors.textFieldColor2,
+              title: Text(
+                "Edit Trip Preference Name",
+                style: TextStyle(color: AppColors.textColorPrimary),
               ),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  widget.tripPreference.tripPreferenceName = titleController.text;
-                  widget.tripPreference.save(); // Save changes to Hive
-                });
-                Navigator.of(context).pop(); // Dismiss dialog
-                //widget.onUpdate();
-              },
-              child: Text(
-                "Save",
-                style: TextStyle(color: AppColors.saveButtonAllowableWeight),
+              content: TextField(
+                controller: titleController,
+                maxLength: 20,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  labelText: "Trip Preference Name",
+                  labelStyle: TextStyle(color: AppColors.textColorPrimary),
+                  errorText: errorMessage, // Display error if exists
+                ),
+                style: TextStyle(color: AppColors.textColorPrimary),
               ),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Dismiss dialog
+                  },
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(color: AppColors.cancelButton),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    bool tripNameExists = savedPreferences.tripPreferences.any(
+                          (preference) =>
+                      preference.tripPreferenceName == titleController.text &&
+                          preference != widget.tripPreference, // Exclude current name if editing the same trip
+                    );
+
+                    if (tripNameExists) {
+                      setState(() {
+                        errorMessage = "Trip Preference name already exists";
+                      });
+
+                      // Clear the error message after 2 seconds
+                      Future.delayed(Duration(seconds: 2), () {
+                        setState(() {
+                          errorMessage = null;
+                        });
+                      });
+
+                    } else if (titleController.text.trim().isEmpty) {
+                      setState(() {
+                        errorMessage = "Trip Preference name cannot be empty";
+                      });
+
+                      // Clear the error message after 2 seconds
+                      Future.delayed(Duration(seconds: 2), () {
+                        setState(() {
+                          errorMessage = null;
+                        });
+                      });
+
+                    } else {
+                      setState(() {
+                        widget.tripPreference.tripPreferenceName = titleController.text.trim();
+                        widget.tripPreference.save(); // Save changes to Hive
+                      });
+                      Navigator.of(context).pop(); // Dismiss dialog
+                    }
+                  },
+                  child: Text(
+                    "Save",
+                    style: TextStyle(color: AppColors.saveButtonAllowableWeight),
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -132,9 +174,12 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
             Navigator.of(context).pop(); // Navigate back when pressed
           },
         ),
-        title: Text(
-          widget.tripPreference.tripPreferenceName,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+        title: GestureDetector(
+          onDoubleTap: _editTitle,
+          child: Text(
+            widget.tripPreference.tripPreferenceName,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          ),
         ),
         actions: [
           IconButton(
@@ -142,7 +187,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
               Icons.edit,
               color: AppColors.textColorPrimary,
             ),
-            onPressed: editTitle,
+            onPressed: _editTitle,
           ),
         ],
 
@@ -258,7 +303,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                           }
                                           return '';
                                         }).join(', '),
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22, color: AppColors.textColorPrimary),
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: AppColors.textColorPrimary),
                                       ),
                                       subtitle: Text("Load Preference: ${loadPreferenceMap[posPref.loadPreference]}", style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary)),
                                       trailing: IconButton(
@@ -288,7 +333,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                   child: ListTile(
                                     title: Text(
                                       gearPref.gear.map((item) => '${item.name} (x${item.quantity})').join(', '),
-                                      style:  TextStyle(fontWeight: FontWeight.bold, fontSize: 22, color: AppColors.textColorPrimary),
+                                      style:  TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: AppColors.textColorPrimary),
                                     ),
                                     subtitle: Text("Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}", style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary)),
                                     trailing: IconButton(

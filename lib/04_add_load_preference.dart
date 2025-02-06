@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
+import 'CodeShare/colors.dart';
 import 'Data/crew.dart';
 import 'Data/gear.dart';
 import 'Data/saved_preferences.dart';
@@ -188,10 +189,11 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
             }
 
             return AlertDialog(
-              title: const Text(
+              backgroundColor: AppColors.textFieldColor2,
+              title:  Text(
                 'Select Crew Members',
                 style: TextStyle(
-                  color: Colors.black,
+                  color: AppColors.textColorPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -204,7 +206,14 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                         bool isSelected = selectedCrewMembers.any((item) =>
                             item is Map && item['name'] == option['name']);
                         return CheckboxListTile(
-                          title: Text(option['name']),
+                          activeColor: AppColors.textColorPrimary,
+                          // Checkbox outline color when active
+                          checkColor: AppColors.textColorSecondary,
+                          side: BorderSide(
+                            color: AppColors.textColorPrimary, // Outline color
+                            width: 2.0, // Outline width
+                          ),
+                          title: Text(option['name'], style: TextStyle(color: AppColors.textColorPrimary),),
                           value: isSelected,
                           onChanged: (bool? isChecked) {
                             setState(() {
@@ -225,23 +234,30 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                       }).toList(),
                       if (sawTeamOptions.isNotEmpty &&
                           individualOptions.isNotEmpty)
-                        const Divider(color: Colors.black, thickness: 1),
+                         Divider(color: AppColors.textColorPrimary, thickness: 1),
                       ...individualOptions.map((option) {
                         bool isSelected = option['isSelected'] ?? false;
                         CrewMember member = option['members'].first;
 
                         return CheckboxListTile(
+                          activeColor: AppColors.textColorPrimary,
+                          // Checkbox outline color when active
+                          checkColor: AppColors.textColorSecondary,
+                          side: BorderSide(
+                            color: AppColors.textColorPrimary, // Outline color
+                            width: 2.0, // Outline width
+                          ),
                           title: Text(
                             member.name,
                             style: TextStyle(
-                              color: Colors.black,
+                              color: AppColors.textColorPrimary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           subtitle: Text(
                             member.getPositionTitle(member.position),
                             style: TextStyle(
-                              color: Colors.black,
+                              color: AppColors.textColorPrimary,
                             ),
                           ),
                           value: isSelected,
@@ -266,7 +282,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Save'),
+                  child: Text('Save', style: TextStyle(color: AppColors.saveButtonAllowableWeight),),
                 ),
               ],
             );
@@ -334,10 +350,11 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text(
+              backgroundColor: AppColors.textFieldColor2,
+              title:  Text(
                 'Select Gear',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
               ),
               content: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.8, // 80% of the screen width
@@ -360,7 +377,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                     gear.name,
                                     style: TextStyle(
                                       fontSize: 16,
-                                      color: Colors.black,
+                                      color: AppColors.textColorPrimary,
                                     ),
                                     overflow: TextOverflow
                                         .ellipsis, // Use ellipsis if text is too long
@@ -385,8 +402,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                     context: context,
                                     builder: (BuildContext context) {
                                       return AlertDialog(
+                                        backgroundColor: AppColors.textFieldColor2,
                                         title: Text(
-                                            'Select Quantity for ${gear.name}'),
+                                            'Select Quantity for ${gear.name}',
+                                        style: TextStyle(color: AppColors.textColorPrimary),),
                                         content: Container(
                                           height: 150,
                                           child: CupertinoPicker(
@@ -410,7 +429,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                               return Center(
                                                 child: Text(
                                                   '${index + 1}',
-                                                  style: TextStyle(fontSize: 20),
+                                                  style: TextStyle(fontSize: 20, color: AppColors.textColorPrimary),
                                                 ),
                                               );
                                             }),
@@ -421,7 +440,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                             onPressed: () {
                                               Navigator.of(context).pop();
                                             },
-                                            child: const Text('Close'),
+                                            child:  Text('Select', style: TextStyle(color: AppColors.textColorPrimary),),
                                           ),
                                         ],
                                       );
@@ -434,17 +453,24 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                       'Qty: ${selectedGearQuantities[gear] ?? 1}',
                                       style: TextStyle(
                                         fontSize: 16,
-                                        color: Colors.black,
+                                        color: AppColors.textColorPrimary,
                                       ),
                                     ),
                                     Icon(
                                       Icons.arrow_drop_down,
-                                      color: Colors.black,
+                                      color: AppColors.textColorPrimary
                                     ),
                                   ],
                                 ),
                               ),
                           Checkbox(
+                            activeColor: AppColors.textColorPrimary,
+                            // Checkbox outline color when active
+                            checkColor: AppColors.textColorSecondary,
+                            side: BorderSide(
+                              color: AppColors.textColorPrimary, // Outline color
+                              width: 2.0, // Outline width
+                            ),
                             value: tempSelectedGear.contains(gear),
                             onChanged: (bool? isChecked) {
                               setState(() {
@@ -473,7 +499,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                     });
                     Navigator.of(context).pop(tempSelectedGear);
                   },
-                  child: const Text('Save'),
+                  child:  Text('Save', style: TextStyle(color: AppColors.saveButtonAllowableWeight),),
                 ),
               ],
             );
@@ -613,7 +639,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
         textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        backgroundColor: Colors.deepOrangeAccent,
+        backgroundColor: AppColors.fireColor,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         //surfaceTintColor: Colors.grey,
         elevation: 15,
@@ -628,15 +654,26 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
       resizeToAvoidBottomInset: false,
       // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
       appBar: AppBar(
-        backgroundColor: Colors.deepOrangeAccent,
-        title: const Text(
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back, // The back arrow icon
+            color: AppColors.textColorPrimary, // Set the desired color
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(); // Navigate back when pressed
+          },
+        ),
+        backgroundColor: AppColors.appBarColor,
+        title:  Text(
           'Add Load Preference',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         bottom: TabBar(
-          labelColor: Colors.black,
-          dividerColor: Colors.black,
-          indicatorColor: Colors.black,
+          unselectedLabelColor: AppColors.tabIconColor,
+          labelColor: AppColors.primaryColor,
+          dividerColor: AppColors.appBarColor,
+          indicatorColor: AppColors.primaryColor,
           controller: _tabController,
           tabs: const <Widget>[
             Tab(
@@ -650,33 +687,53 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
       body: Stack(
         children: [
           Container(
-            child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                // Blur effect
-                child: Image.asset(
-                  'assets/images/logo1.png',
-                  fit: BoxFit.cover, // Cover  entire background
+            color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
+            child: AppColors.isDarkMode
+                ? (AppColors.enableBackgroundImage
+                ? Stack(
+              children: [
+                ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                  child: Image.asset(
+                    'assets/images/logo1.png',
+                    fit: BoxFit.cover, // Cover the entire background
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                ),
+                Container(
+                  color: AppColors.logoImageOverlay, // Semi-transparent overlay
                   width: double.infinity,
                   height: double.infinity,
-                )),
+                ),
+              ],
+            )
+                : null) // No image if background is disabled
+                : ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+              child: Image.asset(
+                'assets/images/logo1.png',
+                fit: BoxFit.cover, // Cover the entire background
+                width: double.infinity,
+                height: double.infinity,
+              ),
+            ),
           ),
-          TabBarView(
-            controller: _tabController,
-            children: <Widget>[
-              // Positional Preference
-              Center(
-                child: Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.white.withValues(alpha: 0.1),
+
+          Container(
+            color: Colors.white.withValues(alpha: 0.05),
+            child: TabBarView(
+              controller: _tabController,
+              children: <Widget>[
+                // Positional Preference
+                Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      const Spacer(flex: 1),
-
                       // Choose Crew Member(s)
+                      SizedBox(height: 16),
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: GestureDetector(
                           onTap: _showCrewMemberSelectionDialog,
                           // Trigger dialog on tap
@@ -685,10 +742,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 16),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.textFieldColor,
                               borderRadius: BorderRadius.circular(12.0),
                               border:
-                                  Border.all(color: Colors.black, width: 2.0),
+                                  Border.all(color: AppColors.borderPrimary, width: 2.0),
                             ),
                             child: Text(
                               selectedCrewMembers.isEmpty
@@ -705,8 +762,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                       }
                                       return '';
                                     }).join(', '),
-                              style: const TextStyle(
-                                color: Colors.black,
+                              style:  TextStyle(
+                                color: AppColors.textColorPrimary,
                                 fontSize: 22,
                               ),
                             ),
@@ -714,33 +771,34 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                         ),
                       ),
 
+                      SizedBox(height: 16.0),
                       // Choose Load Preference
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.textFieldColor,
                             borderRadius: BorderRadius.circular(12.0),
-                            border: Border.all(color: Colors.black, width: 2.0),
+                            border: Border.all(color: AppColors.borderPrimary, width: 2.0),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<int>(
                               value: selectedPositionalLoadPreference,
-                              hint: const Text(
+                              hint: Text(
                                 'Choose load preference',
                                 style: TextStyle(
-                                  color: Colors.black,
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 22,
                                 ),
                               ),
-                              dropdownColor: Colors.white,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              dropdownColor: AppColors.textFieldColor2,
+                              style: TextStyle(
+                                color: AppColors.textColorPrimary,
                                 fontSize: 22,
                               ),
-                              iconEnabledColor: Colors.black,
+                              iconEnabledColor: AppColors.textColorPrimary,
                               items: loadPreferenceMap.entries.map((entry) {
                                 return DropdownMenuItem<int>(
                                   value: entry.key,
@@ -748,11 +806,11 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(entry.value, style: TextStyle(color: Colors.black),),
+                                      Text(entry.value, style: TextStyle(color: AppColors.textColorPrimary),),
                                       IconButton(
-                                        icon: const Icon(
+                                        icon: Icon(
                                           Icons.info_outline,
-                                          color: Colors.black,
+                                          color: AppColors.textColorPrimary,
                                           size: 24,
                                         ),
                                         onPressed: () {
@@ -761,15 +819,18 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                             context: context,
                                             builder: (BuildContext context) {
                                               return AlertDialog(
+                                                backgroundColor: AppColors.textFieldColor2,
                                                 title: Text(
                                                     '${entry.value} Load Preference',
                                                     style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
+                                                      color: AppColors.textColorPrimary
                                                     )),
                                                 content: Text(
                                                   getPreferenceInfo(entry
                                                       .key), //Load Preference explanation
+                                                  style: TextStyle(color: AppColors.textColorPrimary),
                                                 ),
                                                 actions: [
                                                   TextButton(
@@ -777,7 +838,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                                       Navigator.of(context)
                                                           .pop();
                                                     },
-                                                    child: const Text('Close'),
+                                                    child:  Text('Close', style: TextStyle(color: AppColors.cancelButton),),
                                                   ),
                                                 ],
                                               );
@@ -813,28 +874,23 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                   widget.tripPreference)
                               : null,
                           style: style, // Main button theme
-                          child: const Text('Save'),
+                          child:  Text('Save'),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
 
-              // Gear Preference
-              Center(
-                child: Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.white.withValues(alpha: 0.1),
+                // Gear Preference
+                Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      const Spacer(flex: 1),
 
+                      SizedBox(height: 16),
                       // Choose Gear
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: GestureDetector(
                           onTap: _showGearSelectionDialog,
                           // Trigger dialog on tap
@@ -843,10 +899,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 16),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.textFieldColor,
                               borderRadius: BorderRadius.circular(12.0),
                               border:
-                                  Border.all(color: Colors.black, width: 2.0),
+                                  Border.all(color: AppColors.borderPrimary, width: 2.0),
                             ),
                             child: Text(
                               selectedGear.isEmpty
@@ -857,8 +913,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                               1; // Use selected quantity
                                       return '${e.name} (x$quantity)';
                                     }).join(', '),
-                              style: const TextStyle(
-                                color: Colors.black,
+                              style: TextStyle(
+                                color: AppColors.textColorPrimary,
                                 fontSize: 22,
                               ),
                             ),
@@ -866,33 +922,35 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                         ),
                       ),
 
+                      SizedBox(height: 16),
+
                       // Enter Load Preference
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.textFieldColor,
                             borderRadius: BorderRadius.circular(12.0),
-                            border: Border.all(color: Colors.black, width: 2.0),
+                            border: Border.all(color: AppColors.borderPrimary, width: 2.0),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<int>(
                               value: selectedGearLoadPreference,
-                              hint: const Text(
+                              hint: Text(
                                 'Choose load preference',
                                 style: TextStyle(
-                                  color: Colors.black,
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 22,
                                 ),
                               ),
-                              dropdownColor: Colors.white,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 24,
+                              dropdownColor: AppColors.textFieldColor2,
+                              style: TextStyle(
+                                color: AppColors.textColorPrimary,
+                                fontSize: 22,
                               ),
-                              iconEnabledColor: Colors.white,
+                              iconEnabledColor: AppColors.textColorPrimary,
                               items: loadPreferenceMap.entries.map((entry) {
                                 return DropdownMenuItem<int>(
                                   value: entry.key,
@@ -902,9 +960,9 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                     children: [
                                       Text(entry.value),
                                       IconButton(
-                                        icon: const Icon(
+                                        icon: Icon(
                                           Icons.info_outline,
-                                          color: Colors.black,
+                                          color: AppColors.textColorPrimary,
                                           size: 24,
                                         ),
                                         onPressed: () {
@@ -913,15 +971,18 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                             context: context,
                                             builder: (BuildContext context) {
                                               return AlertDialog(
+                                                backgroundColor: AppColors.textFieldColor2,
                                                 title: Text(
                                                     '${entry.value} Load Preference',
                                                     style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
+                                                      color: AppColors.textColorPrimary
                                                     )),
                                                 content: Text(
                                                   getPreferenceInfo(entry
                                                       .key), //Load Preference explanation
+                                                  style: TextStyle(color: AppColors.textColorPrimary),
                                                 ),
                                                 actions: [
                                                   TextButton(
@@ -929,7 +990,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                                       Navigator.of(context)
                                                           .pop();
                                                     },
-                                                    child: const Text('Close'),
+                                                    child:  Text('Close', style: TextStyle(color: AppColors.cancelButton),),
                                                   ),
                                                 ],
                                               );
@@ -971,8 +1032,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

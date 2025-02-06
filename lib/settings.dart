@@ -871,7 +871,7 @@ class _SettingsState extends State<SettingsView> {
                       IconButton(onPressed: importExportDialog, icon: Icon(Icons.sync, color: Colors.white, size: 28,)),
                       TextButton(
                         onPressed: importExportDialog,
-                        child: const Text('Share Crew', style: TextStyle(color: Colors.white, fontSize: 18)),
+                        child: const Text('Crew Sharing', style: TextStyle(color: Colors.white, fontSize: 18)),
                       ),
                     ],
                   ),
