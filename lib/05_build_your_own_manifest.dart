@@ -84,9 +84,12 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
           builder: (context, dialogSetState) {
             return AlertDialog(
               backgroundColor: AppColors.textFieldColor2,
-              title:  Text(
+              title: Text(
                 'Add Crew Members and Gear',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textColorPrimary),
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: AppColors.textColorPrimary),
               ),
               contentPadding: const EdgeInsets.all(16),
               content: ConstrainedBox(
@@ -117,7 +120,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                   child: ListTile(
                                     title: const Text(
                                       'Crew Members',
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 );
@@ -135,25 +139,32 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                           color: Colors.grey.withOpacity(0.8),
                                           spreadRadius: 1,
                                           blurRadius: 5,
-                                          offset: Offset(0, 3), // Shadow position
+                                          offset:
+                                              Offset(0, 3), // Shadow position
                                         ),
                                       ],
                                     ),
                                     child: CheckboxListTile(
-                                      activeColor: AppColors.textColorPrimary, // Checkbox outline color when active
+                                      activeColor: AppColors.textColorPrimary,
+                                      // Checkbox outline color when active
                                       checkColor: AppColors.textColorSecondary,
                                       side: BorderSide(
-                                        color: AppColors.textColorPrimary, // Outline color
+                                        color: AppColors.textColorPrimary,
+                                        // Outline color
                                         width: 2.0, // Outline width
-                                      ),//
+                                      ),
+                                      //
                                       title: Text(
                                         '${crew.name}, ${crew.flightWeight} lbs',
-                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.textColorPrimary),
                                         textAlign: TextAlign.start,
                                       ),
                                       subtitle: Text(
                                         crew.getPositionTitle(crew.position),
-                                        style: TextStyle(color: AppColors.textColorPrimary),
+                                        style: TextStyle(
+                                            color: AppColors.textColorPrimary),
                                       ),
                                       value: selectedItems.contains(crew),
                                       onChanged: (bool? isChecked) {
@@ -194,20 +205,23 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                   child: ListTile(
                                     title: const Text(
                                       'Gear',
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 );
                               },
                               body: Column(
                                 children: sortedGearList.map((gear) {
-                                  int remainingQuantity = gear.quantity - (selectedGearQuantities[gear] ?? 0);
+                                  int remainingQuantity = gear.quantity -
+                                      (selectedGearQuantities[gear] ?? 0);
 
                                   return Container(
                                     //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
                                     decoration: BoxDecoration(
                                       color: gear.isPersonalTool
-                                          ? AppColors.toolBlue // Color for personal tools
+                                          ? AppColors
+                                              .toolBlue // Color for personal tools
                                           : AppColors.gearYellow,
                                       borderRadius: BorderRadius.circular(0.0),
                                       // Rounded corners
@@ -216,13 +230,15 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                           color: Colors.grey.withOpacity(0.8),
                                           spreadRadius: 1,
                                           blurRadius: 5,
-                                          offset: Offset(0, 3), // Shadow position
+                                          offset:
+                                              Offset(0, 3), // Shadow position
                                         ),
                                       ],
                                     ),
                                     child: CheckboxListTile(
                                       title: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             child: Row(
@@ -232,9 +248,11 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                     gear.name,
                                                     style: const TextStyle(
                                                       fontSize: 16,
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     ),
-                                                    overflow: TextOverflow.ellipsis,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
                                                 ),
                                                 Text(
@@ -252,32 +270,55 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                             if (selectedItems.contains(gear))
                                               GestureDetector(
                                                 onTap: () {
-                                                  final int gearQuantity = gear.quantity;
+                                                  final int gearQuantity =
+                                                      gear.quantity;
                                                   if (gearQuantity > 1) {
                                                     showDialog(
                                                       context: context,
-                                                      builder: (BuildContext context) {
+                                                      builder: (BuildContext
+                                                          context) {
                                                         return AlertDialog(
-                                                          backgroundColor: AppColors.textFieldColor2,
-                                                          title: Text('Select Quantity for ${gear.name}', style: TextStyle(color: AppColors.textColorPrimary),),
+                                                          backgroundColor:
+                                                              AppColors
+                                                                  .textFieldColor2,
+                                                          title: Text(
+                                                            'Select Quantity for ${gear.name}',
+                                                            style: TextStyle(
+                                                                color: AppColors
+                                                                    .textColorPrimary),
+                                                          ),
                                                           content: SizedBox(
                                                             height: 150,
-                                                            child: CupertinoPicker(
-                                                              scrollController: FixedExtentScrollController(
-                                                                initialItem: (selectedGearQuantities[gear] ?? 1) - 1,
+                                                            child:
+                                                                CupertinoPicker(
+                                                              scrollController:
+                                                                  FixedExtentScrollController(
+                                                                initialItem:
+                                                                    (selectedGearQuantities[gear] ??
+                                                                            1) -
+                                                                        1,
                                                               ),
                                                               itemExtent: 32.0,
-                                                              onSelectedItemChanged: (int value) {
-                                                                dialogSetState(() {
-                                                                  selectedGearQuantities[gear] = value + 1;
+                                                              onSelectedItemChanged:
+                                                                  (int value) {
+                                                                dialogSetState(
+                                                                    () {
+                                                                  selectedGearQuantities[
+                                                                          gear] =
+                                                                      value + 1;
                                                                 });
                                                               },
-                                                              children: List<Widget>.generate(
+                                                              children: List<
+                                                                  Widget>.generate(
                                                                 gear.quantity,
                                                                 // Use the full quantity for selection
                                                                 (int index) {
                                                                   return Center(
-                                                                    child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                    child: Text(
+                                                                        '${index + 1}',
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                AppColors.textColorPrimary)),
                                                                   );
                                                                 },
                                                               ),
@@ -286,22 +327,39 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                           actions: [
                                                             TextButton(
                                                               onPressed: () {
-                                                                Navigator.of(context).pop();
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
                                                               },
-                                                              child:  Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                                              child: Text(
+                                                                  'Cancel',
+                                                                  style: TextStyle(
+                                                                      color: AppColors
+                                                                          .cancelButton)),
                                                             ),
                                                             TextButton(
                                                               onPressed: () {
                                                                 // Finalize the selection
-                                                                dialogSetState(() {
-                                                                  int selectedQuantity = selectedGearQuantities[gear] ?? 1;
-                                                                  remainingQuantity = gear.quantity - selectedQuantity;
+                                                                dialogSetState(
+                                                                    () {
+                                                                  int selectedQuantity =
+                                                                      selectedGearQuantities[
+                                                                              gear] ??
+                                                                          1;
+                                                                  remainingQuantity =
+                                                                      gear.quantity -
+                                                                          selectedQuantity;
                                                                 });
-                                                                Navigator.of(context).pop();
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
                                                               },
-                                                              child: Text('Confirm', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
+                                                              child: Text(
+                                                                  'Confirm',
+                                                                  style: TextStyle(
+                                                                      color: AppColors
+                                                                          .saveButtonAllowableWeight)),
                                                             ),
-
                                                           ],
                                                         );
                                                       },
@@ -314,12 +372,18 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                       Text(
                                                         'Qty: ${selectedGearQuantities[gear] ?? 1}',
                                                         style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
+                                                          fontWeight:
+                                                              FontWeight.bold,
                                                           fontSize: 14,
-                                                          color: AppColors.textColorSecondary,
+                                                          color: AppColors
+                                                              .textColorSecondary,
                                                         ),
                                                       ),
-                                                    if (gear.quantity > 1)  Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
+                                                    if (gear.quantity > 1)
+                                                      Icon(
+                                                          Icons.arrow_drop_down,
+                                                          color: AppColors
+                                                              .textColorSecondary),
                                                   ],
                                                 ),
                                               ),
@@ -330,7 +394,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         dialogSetState(() {
                                           if (isChecked == true) {
                                             selectedItems.add(gear);
-                                            selectedGearQuantities[gear] = 1; // Default quantity
+                                            selectedGearQuantities[gear] =
+                                                1; // Default quantity
                                           } else {
                                             selectedItems.remove(gear);
                                             selectedGearQuantities.remove(gear);
@@ -357,21 +422,27 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                             ExpansionPanel(
                               isExpanded: isCustomItemExpanded,
                               backgroundColor: AppColors.fireColor,
-                              headerBuilder: (context, isExpanded) => GestureDetector(
+                              headerBuilder: (context, isExpanded) =>
+                                  GestureDetector(
                                 onLongPress: () {
                                   showModalBottomSheet(
                                     backgroundColor: AppColors.textFieldColor2,
                                     context: context,
                                     isScrollControlled: true,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(16)),
                                     ),
                                     builder: (BuildContext context) {
                                       return Container(
                                         padding: EdgeInsets.all(16.0),
-                                        height: MediaQuery.of(context).size.height * 0.7, // 70% of the screen height
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.7,
+                                        // 70% of the screen height
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             // Modal Title
                                             Text(
@@ -379,7 +450,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 20,
-                                                color: AppColors.textColorPrimary,
+                                                color:
+                                                    AppColors.textColorPrimary,
                                               ),
                                             ),
                                             const SizedBox(height: 16),
@@ -391,24 +463,33 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                 itemBuilder: (context, index) {
                                                   final item = irpgItems[index];
                                                   return Container(
-                                                    margin: EdgeInsets.symmetric(vertical: 4.0),
+                                                    margin:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 4.0),
                                                     child: ListTile(
-                                                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0.0),
+                                                      contentPadding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 8.0,
+                                                              vertical: 0.0),
                                                       title: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
                                                         children: [
                                                           Text(
                                                             item['name'],
                                                             style: TextStyle(
                                                               fontSize: 16,
-                                                              color: AppColors.textColorPrimary,
+                                                              color: AppColors
+                                                                  .textColorPrimary,
                                                             ),
                                                           ),
                                                           Text(
                                                             '${item['weight']} lbs',
                                                             style: TextStyle(
                                                               fontSize: 16,
-                                                              color: AppColors.textColorPrimary,
+                                                              color: AppColors
+                                                                  .textColorPrimary,
                                                             ),
                                                           ),
                                                         ],
@@ -424,12 +505,14 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                               alignment: Alignment.bottomRight,
                                               child: TextButton(
                                                 onPressed: () {
-                                                  Navigator.of(context).pop(); // Close the modal
+                                                  Navigator.of(context)
+                                                      .pop(); // Close the modal
                                                 },
                                                 child: Text(
                                                   'Cancel',
                                                   style: TextStyle(
-                                                    color: AppColors.cancelButton,
+                                                    color:
+                                                        AppColors.cancelButton,
                                                   ),
                                                 ),
                                               ),
@@ -455,17 +538,22 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                   children: [
                                     // Custom Item Name Field
                                     TextField(
-                                      decoration: InputDecoration(labelText: 'Item Name',
-                                        labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
+                                      decoration: InputDecoration(
+                                        labelText: 'Item Name',
+                                        labelStyle: TextStyle(
+                                            color: AppColors
+                                                .textColorPrimary), // Label color
                                       ),
-                                      textCapitalization: TextCapitalization.words,
+                                      textCapitalization:
+                                          TextCapitalization.words,
                                       focusNode: customItemNameFocus,
                                       // Attach focus node
                                       textInputAction: TextInputAction.next,
                                       // Specify the action
                                       onSubmitted: (_) {
                                         // Move focus to the next field
-                                        FocusScope.of(context).requestFocus(customItemWeightFocus);
+                                        FocusScope.of(context).requestFocus(
+                                            customItemWeightFocus);
                                       },
                                       onChanged: (value) {
                                         customItemName = value;
@@ -475,8 +563,11 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
                                     // Custom Item Weight Field
                                     TextField(
-                                      decoration: InputDecoration(labelText: 'Weight (lbs)',
-                                        labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
+                                      decoration: InputDecoration(
+                                        labelText: 'Weight (lbs)',
+                                        labelStyle: TextStyle(
+                                            color: AppColors
+                                                .textColorPrimary), // Label color
                                       ),
                                       keyboardType: TextInputType.number,
                                       maxLength: 3,
@@ -486,10 +577,12 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       // Specify the action
                                       onSubmitted: (_) {
                                         // Move focus to the next field
-                                        FocusScope.of(context).requestFocus(customItemQuantityFocus);
+                                        FocusScope.of(context).requestFocus(
+                                            customItemQuantityFocus);
                                       },
                                       onChanged: (value) {
-                                        customItemWeight = int.tryParse(value) ?? 0;
+                                        customItemWeight =
+                                            int.tryParse(value) ?? 0;
                                       },
                                     ),
                                   ],
@@ -508,7 +601,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child:  Text('Cancel', style: TextStyle(color: AppColors.cancelButton),),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: AppColors.cancelButton),
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
@@ -533,27 +629,33 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                       for (var item in selectedItems) {
                         if (item is Gear) {
                           // Respect the selected quantity
-                          int selectedQuantity = selectedGearQuantities[item] ?? 1;
+                          int selectedQuantity =
+                              selectedGearQuantities[item] ?? 1;
 
                           // Check if a gear with the same name already exists in the load
-                          final existingGearIndex = loads[selectedLoadIndex].indexWhere(
-                            (loadItem) => loadItem is Gear && loadItem.name == item.name,
+                          final existingGearIndex =
+                              loads[selectedLoadIndex].indexWhere(
+                            (loadItem) =>
+                                loadItem is Gear && loadItem.name == item.name,
                           );
 
                           if (existingGearIndex != -1) {
                             // If it exists, update its quantity and weight
-                            Gear existingGear = loads[selectedLoadIndex][existingGearIndex] as Gear;
+                            Gear existingGear = loads[selectedLoadIndex]
+                                [existingGearIndex] as Gear;
                             existingGear.quantity += selectedQuantity;
-                            existingGear.weight = existingGear.quantity * item.weight; // Recalculate weight
+                            existingGear.weight = existingGear.quantity *
+                                item.weight; // Recalculate weight
                           } else {
                             // If it doesn't exist, add the new gear item to the load
                             loads[selectedLoadIndex].add(
                               Gear(
-                                name: item.name,
-                                quantity: selectedQuantity,
-                                weight: item.weight * selectedQuantity, // Calculate total weight
-                                isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat
-                              ),
+                                  name: item.name,
+                                  quantity: selectedQuantity,
+                                  weight: item.weight * selectedQuantity,
+                                  // Calculate total weight
+                                  isPersonalTool: item.isPersonalTool,
+                                  isHazmat: item.isHazmat),
                             );
                           }
 
@@ -569,24 +671,29 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                           // Loop through and add all personal tools
                           if (item.personalTools != null) {
                             for (var tool in item.personalTools!) {
-                              final existingToolIndex = loads[selectedLoadIndex].indexWhere(
-                                (loadItem) => loadItem is Gear && loadItem.name == tool.name,
+                              final existingToolIndex =
+                                  loads[selectedLoadIndex].indexWhere(
+                                (loadItem) =>
+                                    loadItem is Gear &&
+                                    loadItem.name == tool.name,
                               );
 
                               if (existingToolIndex != -1) {
                                 // Update the existing tool's quantity and weight
-                                Gear existingTool = loads[selectedLoadIndex][existingToolIndex] as Gear;
+                                Gear existingTool = loads[selectedLoadIndex]
+                                    [existingToolIndex] as Gear;
                                 existingTool.quantity += tool.quantity;
-                                existingTool.weight = existingTool.quantity * tool.weight;
+                                existingTool.weight =
+                                    existingTool.quantity * tool.weight;
                               } else {
                                 // Add the tool as a new gear item
                                 loads[selectedLoadIndex].add(
                                   Gear(
-                                    name: tool.name,
-                                    quantity: tool.quantity,
-                                    weight: tool.weight * tool.quantity,
-                                    isPersonalTool: tool.isPersonalTool, isHazmat: tool.isHazmat
-                                  ),
+                                      name: tool.name,
+                                      quantity: tool.quantity,
+                                      weight: tool.weight * tool.quantity,
+                                      isPersonalTool: tool.isPersonalTool,
+                                      isHazmat: tool.isHazmat),
                                 );
                               }
                             }
@@ -599,7 +706,11 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                     });
                     sortLoadItems(loads[selectedLoadIndex]);
                   },
-                  child:  Text('Add', style: TextStyle(color: AppColors.saveButtonAllowableWeight),),
+                  child: Text(
+                    'Add',
+                    style:
+                        TextStyle(color: AppColors.saveButtonAllowableWeight),
+                  ),
                 ),
               ],
             );
@@ -615,11 +726,11 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
       // Create deep copies of the gear and crew member data
       gearList = gearBox.values.map((gear) {
         return Gear(
-          name: gear.name,
-          quantity: gear.quantity,
-          weight: gear.weight,
-          isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat
-        );
+            name: gear.name,
+            quantity: gear.quantity,
+            weight: gear.weight,
+            isPersonalTool: gear.isPersonalTool,
+            isHazmat: gear.isHazmat);
       }).toList();
 
       crewList = crewmemberBox.values.map((crew) {
@@ -648,14 +759,16 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
       // Because i made mistake with gear quantitys/weights. This is a fix before saving trip
       loadItems.whereType<Gear>().forEach((gear) {
         if (gear.quantity > 0) {
-          gear.weight = gear.weight ~/ gear.quantity; // Adjust to per-item weight
+          gear.weight =
+              gear.weight ~/ gear.quantity; // Adjust to per-item weight
         }
       });
 
       // Calculate total weight for the load
       int loadWeight = loadItems.fold(0, (sum, item) {
         if (item is Gear) {
-          return sum + (item.weight * item.quantity); // Use adjusted per-item weight
+          return sum +
+              (item.weight * item.quantity); // Use adjusted per-item weight
         } else if (item is CrewMember) {
           return sum + item.flightWeight;
         } else if (item is CustomItem) {
@@ -670,7 +783,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         weight: loadWeight,
         loadPersonnel: loadItems.whereType<CrewMember>().toList(),
         loadGear: loadItems.whereType<Gear>().toList(),
-        customItems: loadItems.whereType<CustomItem>().toList(), // Save CustomItems
+        customItems:
+            loadItems.whereType<CustomItem>().toList(), // Save CustomItems
       );
     }).toList();
 
@@ -766,27 +880,35 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
           children: [
             Text(
               widget.trip.tripName,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textColorPrimary),
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lbs',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textColorPrimary),
             ),
           ],
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
             child: ElevatedButton(
               onPressed: _saveTrip,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.buttonStyle1,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               ),
               child: Text(
                 'Save',
                 style: TextStyle(
-                  color:  AppColors.textColorSecondary,
+                  color: AppColors.textColorSecondary,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -799,694 +921,1004 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         children: [
           // Background Image
           Container(
-            color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
+            color: AppColors.isDarkMode ? Colors.black : Colors.transparent,
+            // Background color for dark mode
             child: AppColors.isDarkMode
                 ? (AppColors.enableBackgroundImage
-                ? Stack(
-              children: [
-                ImageFiltered(
-                  imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                  child: Image.asset(
-                    'assets/images/logo1.png',
-                    fit: BoxFit.cover, // Cover the entire background
-                    width: double.infinity,
-                    height: double.infinity,
-                  ),
-                ),
-                Container(
-                  color: AppColors.logoImageOverlay, // Semi-transparent overlay
-                  width: double.infinity,
-                  height: double.infinity,
-                ),
-              ],
-            )
-                : null) // No image if background is disabled
+                    ? Stack(
+                        children: [
+                          ImageFiltered(
+                            imageFilter:
+                                ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                            // Blur effect
+                            child: Image.asset(
+                              'assets/images/logo1.png',
+                              fit: BoxFit.cover, // Cover the entire background
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                          Container(
+                            color: AppColors
+                                .logoImageOverlay, // Semi-transparent overlay
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ],
+                      )
+                    : null) // No image if background is disabled
                 : ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
-              child: Image.asset(
-                'assets/images/logo1.png',
-                fit: BoxFit.cover, // Cover the entire background
-                width: double.infinity,
-                height: double.infinity,
-              ),
-            ),
+                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                    // Always display in light mode
+                    child: Image.asset(
+                      'assets/images/logo1.png',
+                      fit: BoxFit.cover, // Cover the entire background
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
           ),
-
-
 
           Container(
             color: Colors.white.withValues(alpha: 0.05),
-
             child: Scrollbar(
-              child: ListView(
-                padding: const EdgeInsets.all(8.0),
+              child: Column(
                 children: [
-                  ...List.generate(loads.length, (index) {
-                    // Track expanded state for each load
-                    bool isExpanded = _isExpanded[index];
-
-                    // Sort the load dynamically by CrewMember first, then Gear
-                    loads[index].sort((a, b) {
-                      if (a is CrewMember && b is Gear) {
-                        return -1; // CrewMember comes before Gear
-                      } else if (a is Gear && b is CrewMember) {
-                        return 1; // Gear comes after CrewMember
-                      } else {
-                        return 0; // Keep original order if they are the same type
-                      }
-                    });
-
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Header Section
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _isExpanded[index] = !_isExpanded[index];
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                    ? Colors.black // Warning color
-                                    : AppColors.fireColor, // Normal color
-                                borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(10),
-                                  bottom: Radius.circular(10),
-                                ),
+                  Flexible(
+                    child: ReorderableListView.builder(
+                      proxyDecorator: (Widget child, int index, Animation<double> animation) {
+                        return AnimatedBuilder(
+                          animation: animation,
+                          builder: (context, child) {
+                            return Transform.scale(
+                              scale: 1.0 + (0.05 * animation.value),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: child,
                               ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'LOAD #${index + 1}',
-                                        style: TextStyle(
-                                          color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                              ? Colors.white // Warning color
-                                              : Colors.black,
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.only(left: 4.0, right: 4.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.transparent,
-                                          // Background color
-                                          borderRadius: BorderRadius.circular(10), // Rounded corners
-                                        ),
-                                        height: 30,
-                                        child: Row(
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  '${calculateAvailableWeight(loads[index])} lbs',
-                                                  style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                        ? Colors.white // Warning color
-                                                        : Colors.black,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            VerticalDivider(
-                                              width: 20,
-                                              // Space between text and divider
-                                              thickness: 1,
-                                              // Thickness of the divider
-                                              color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                  ? Colors.white // Warning color
-                                                  : Colors.black, // Divider color
-                                            ),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  '${calculateAvailableSeats(loads[index])}',
-                                                  style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                        ? Colors.white // Warning color
-                                                        : Colors.black,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  '/${widget.trip.availableSeats} seats',
-                                                  style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                        ? Colors.white // Warning color
-                                                        : Colors.black,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  // Expansion Icon
-                                  Icon(
-                                    isExpanded ? Icons.expand_less : Icons.expand_more,
-                                    color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                        ? Colors.white // Warning color
-                                        : Colors.black,
-                                    size: 36,
-                                  ),
-                                ],
+                            );
+                          },
+                          child: child,
+                        );
+                      },
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.all(8.0),
+                      itemCount: loads.length,
+                      onReorder: (oldIndex, newIndex) {
+                        setState(() {
+                          if (newIndex > oldIndex) {
+                            newIndex -= 1;
+                          }
+                          final item = loads.removeAt(oldIndex);
+                          loads.insert(newIndex, item);
+
+                          // Also update expanded state to match the reordered loads
+                          final expandedState = _isExpanded.removeAt(oldIndex);
+                          _isExpanded.insert(newIndex, expandedState);
+                        });
+                      },
+                      itemBuilder: (context, index) {
+                        bool isExpanded = _isExpanded[index];
+
+                        return Container(
+                          key: ValueKey(index),
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 5,
+                                offset: const Offset(0, 3),
                               ),
-                            ),
+                            ],
                           ),
-
-                          // Body Section with Add Item Button
-                          if (isExpanded)
-                            Padding(
-                              padding: const EdgeInsets.all(0.0),
-                              child: Column(
-                                children: [
-                                  // If overweight
-                                  if (calculateAvailableWeight(loads[index]) > widget.trip.allowable)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 1.0),
-                                      child: Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.symmetric(vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          // Background color
-                                          borderRadius: BorderRadius.circular(8),
-                                          // Rounded corners
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: const Text(
-                                          'OVERWEIGHT',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-
-                                  // If overseats
-                                  if (calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 1.0), // Adjust padding as needed
-                                      child: Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.symmetric(vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          // Background color
-                                          borderRadius: BorderRadius.circular(8),
-                                          // Rounded corners
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: const Text(
-                                          'NOT ENOUGH SEATS',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-
-                                  for (var item in loads[index]
-                                    ..sort((a, b) {
-                                      if (a is CustomItem && (b is Gear || b is CrewMember)) {
-                                        return 1; // CustomItem comes after Gear or CrewMember
-                                      } else if ((a is Gear || a is CrewMember) && b is CustomItem) {
-                                        return -1; // Gear or CrewMember comes before CustomItem
-                                      }
-                                      return 0; // Keep relative order for same types
-                                    }))
-                                    // Swipe Deletion
-                                    Dismissible(
-                                      key: ValueKey(item),
-                                      // Unique key for each item
-                                      direction: DismissDirection.endToStart,
-                                      // Allow swipe from right to left
-                                      background: Container(
-                                        color: Colors.red,
-                                        // Red background for delete action
-                                        alignment: Alignment.centerRight,
-                                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                                        child: Icon(Icons.delete, color: AppColors.textColorSecondary), // Trash icon
-                                      ),
-                                      onDismissed: (direction) {
-                                        setState(() {
-                                          if (loads[index].contains(item)) {
-                                            loads[index].remove(item);
-
-                                            if (item is Gear) {
-                                              var existingGear = gearList.firstWhere(
-                                                (gear) => gear.name == item.name,
-                                                orElse: () => Gear(
-                                                  name: item.name,
-                                                  quantity: 0,
-                                                  weight: item.weight ~/ item.quantity, // Correct per-unit weight
-                                                  isPersonalTool: item.isPersonalTool,
-                                                    isHazmat: item.isHazmat
-                                                ),
-                                              );
-
-                                              // Update the quantity and total weight
-                                              existingGear.quantity += item.quantity;
-
-                                              if (!gearList.contains(existingGear)) {
-                                                gearList.add(existingGear);
-                                              }
-                                            } else if (item is CrewMember) {
-                                              // Handle personal tools
-                                              if (item.personalTools != null) {
-                                                for (var tool in item.personalTools!) {
-                                                  // Check if the tool exists in the gearList first
-                                                  final gearListIndex = gearList.indexWhere(
-                                                    (gear) => gear.name == tool.name,
-                                                  );
-
-                                                  if (gearListIndex != -1) {
-                                                    // Decrement the quantity of the tool in the gearList
-                                                    Gear gearTool = gearList[gearListIndex];
-                                                    gearTool.quantity -= tool.quantity;
-                                                    gearTool.weight -= tool.weight * tool.quantity; // Adjust weight
-
-                                                    // If the quantity reaches zero, remove the tool from the gearList
-                                                    if (gearTool.quantity <= 0) {
-                                                      gearList.removeAt(gearListIndex);
-                                                    }
-                                                  } else {
-                                                    // Check if the tool exists in the current load
-                                                    final toolIndex = loads[index].indexWhere(
-                                                      (loadItem) => loadItem is Gear && loadItem.name == tool.name,
-                                                    );
-
-                                                    if (toolIndex != -1) {
-                                                      // Decrement the quantity of the tool in the load
-                                                      Gear loadTool = loads[index][toolIndex];
-                                                      loadTool.quantity -= tool.quantity;
-                                                      loadTool.weight -= tool.weight * tool.quantity; // Adjust weight
-
-                                                      // If the quantity reaches zero, remove the tool from the load
-                                                      if (loadTool.quantity <= 0) {
-                                                        loads[index].removeAt(toolIndex);
-                                                      }
-                                                    }
-                                                  }
-                                                }
-                                              }
-
-                                              // Add the crew member back to the crew list if necessary
-                                              if (!crewList.contains(item)) {
-                                                crewList.add(item);
-                                              }
-                                            }
-                                          }
-                                        });
-                                      },
-                                      child: Card(
-                                        elevation: 2,
-                                        color: item is CrewMember
-                                            ? AppColors.textFieldColor2 // Color for CrewMembers
-                                            : item is Gear && item.isPersonalTool == true
-                                            ? AppColors.toolBlue // Color for personal tools
-                                            : AppColors.gearYellow,
-                                        // Color for regular Gear
-                                        // Different colors for CrewMember and Gear
-                                        margin: const EdgeInsets.symmetric(vertical: 1.0),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8.0), // Rounded corners
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    itemDisplay(item),
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    item is Gear
-                                                        ? 'Quantity: ${item.quantity}'
-                                                        : item is CrewMember
-                                                            ? item.getPositionTitle(item.position)
-                                                            : '',
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
-
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-
-                                              // Single Item Deletion
-                                              IconButton(
-                                                icon: const Icon(Icons.delete, color: Colors.red),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    if (loads[index].contains(item)) {
-                                                      if (item is Gear) {
-                                                        if (item.quantity > 1) {
-                                                          showDialog(
-                                                            context: context,
-                                                            builder: (BuildContext context) {
-                                                              int quantityToRemove = 1; // Default to 1 for selection
-                                                              return StatefulBuilder(builder: (BuildContext context, StateSetter setDialogState) {
-                                                                return AlertDialog(
-                                                                  backgroundColor: AppColors.textFieldColor2,
-                                                                  title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary)),
-                                                                  content: Column(
-                                                                    mainAxisSize: MainAxisSize.min,
-                                                                    children: [
-                                                                      Text('Select the quantity to remove:', style: TextStyle(color: AppColors.textColorPrimary)),
-                                                                      SizedBox(height: 8),
-                                                                      DropdownButton<int>(
-                                                                        dropdownColor: AppColors.textFieldColor2,
-                                                                        value: quantityToRemove,
-                                                                        items: List.generate(
-                                                                          item.quantity,
-                                                                          (index) => DropdownMenuItem(
-                                                                            value: index + 1,
-                                                                            child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
-                                                                          ),
-                                                                        ),
-                                                                        onChanged: (value) {
-                                                                          setDialogState(() {
-                                                                            quantityToRemove = value ?? 1; // Update dialog state
-                                                                          });
-                                                                        },
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                  actions: [
-                                                                    TextButton(
-                                                                      onPressed: () {
-                                                                        Navigator.of(context).pop(); // Cancel action
-                                                                      },
-                                                                      child:  Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
-                                                                    ),
-                                                                    TextButton(
-                                                                      onPressed: () {
-                                                                        setState(() {
-                                                                          // Deduct the selected quantity from the load item
-                                                                          // item is in load. existingGear is in inventory
-                                                                          var originalWeight = item.weight ~/ item.quantity;
-                                                                          item.quantity -= quantityToRemove;
-                                                                          item.weight -= (item.weight ~/ (item.quantity + quantityToRemove)) * quantityToRemove;
-
-                                                                          // Handle returning the removed item to the inventory
-                                                                          var existingGear = gearList.firstWhere(
-                                                                            (gear) => gear.name == item.name,
-                                                                            orElse: () => Gear(
-                                                                              name: item.name,
-                                                                              quantity: 0,
-                                                                              weight: 0,
-                                                                              isPersonalTool: item.isPersonalTool,
-                                                                                isHazmat: item.isHazmat
-                                                                            ),
-                                                                          );
-
-                                                                          // Update the quantity
-                                                                          existingGear.quantity += quantityToRemove;
-                                                                          existingGear.weight = originalWeight;
-
-                                                                          if (!gearList.contains(existingGear)) {
-                                                                            gearList.add(existingGear);
-                                                                          }
-
-                                                                          // Remove the item from the load if its quantity reaches zero
-                                                                          if (item.quantity <= 0) {
-                                                                            loads[index].remove(item);
-                                                                          }
-                                                                        });
-
-                                                                        Navigator.of(context).pop(); // Close the dialog
-                                                                      },
-                                                                      child: const Text('Remove', style: TextStyle(color: Colors.red)),
-                                                                    ),
-                                                                  ],
-                                                                );
-                                                              });
-                                                            },
-                                                          );
-                                                        } else {
-                                                          loads[index].remove(item);
-                                                          var existingGear = gearList.firstWhere(
-                                                            (gear) => gear.name == item.name,
-                                                            orElse: () => Gear(
-                                                              name: item.name,
-                                                              quantity: 0,
-                                                              weight: item.weight ~/ item.quantity, // Correct per-unit weight
-                                                              isPersonalTool: item.isPersonalTool,
-                                                                isHazmat: item.isHazmat
-                                                            ),
-                                                          );
-
-                                                          // Update the quantity
-                                                          existingGear.quantity += item.quantity;
-
-                                                          if (!gearList.contains(existingGear)) {
-                                                            gearList.add(existingGear);
-                                                          }
-                                                        }
-                                                      } else if (item is CrewMember) {
-                                                        // Handle personal tools
-                                                        if (item.personalTools != null) {
-                                                          for (var tool in item.personalTools!) {
-                                                            // Check if the tool exists in the gearList first
-                                                            final gearListIndex = gearList.indexWhere(
-                                                              (gear) => gear.name == tool.name,
-                                                            );
-
-                                                            if (gearListIndex != -1) {
-                                                              // Decrement the quantity of the tool in the gearList
-                                                              Gear gearTool = gearList[gearListIndex];
-                                                              gearTool.quantity -= tool.quantity;
-                                                              gearTool.weight -= tool.weight * tool.quantity; // Adjust weight
-
-                                                              // If the quantity reaches zero, remove the tool from the gearList
-                                                              if (gearTool.quantity <= 0) {
-                                                                gearList.removeAt(gearListIndex);
-                                                              }
-                                                            } else {
-                                                              // Check if the tool exists in the current load
-                                                              final toolIndex = loads[index].indexWhere(
-                                                                (loadItem) => loadItem is Gear && loadItem.name == tool.name,
-                                                              );
-
-                                                              if (toolIndex != -1) {
-                                                                // Decrement the quantity of the tool in the load
-                                                                Gear loadTool = loads[index][toolIndex];
-                                                                loadTool.quantity -= tool.quantity;
-                                                                loadTool.weight -= tool.weight * tool.quantity; // Adjust weight
-
-                                                                // If the quantity reaches zero, remove the tool from the load
-                                                                if (loadTool.quantity <= 0) {
-                                                                  loads[index].removeAt(toolIndex);
-                                                                }
-                                                              }
-                                                            }
-                                                          }
-                                                        }
-
-                                                        // Add the crew member back to the crew list if necessary
-                                                        if (!crewList.contains(item)) {
-                                                          crewList.add(item);
-                                                        }
-                                                        loads[index].remove(item);
-                                                      } else if (item is CustomItem) {
-                                                        loads[index].remove(item);
-                                                      }
-                                                    }
-                                                  });
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  //const SizedBox(height: 4),
-
-                                  SizedBox(height: 2),
-
-                                  // Add item
-                                  GestureDetector(
-                                    onTap: () => _showSelectionDialog(index),
-                                    child: Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(vertical: 8),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.textFieldColor2,
-                                        // Background color
-                                        borderRadius: BorderRadius.circular(8),
-                                        // Rounded corners
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        '+ Add Item',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.textColorPrimary,
-                                        ),
-                                      ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Header Section
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _isExpanded[index] = !_isExpanded[index];
+                                  });
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: calculateAvailableWeight(
+                                                    loads[index]) >
+                                                widget.trip.allowable ||
+                                            calculateAvailableSeats(
+                                                    loads[index]) >
+                                                widget.trip.availableSeats
+                                        ? Colors.black // Warning color
+                                        : AppColors.fireColor, // Normal color
+                                    borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(10),
+                                      bottom: Radius.circular(10),
                                     ),
                                   ),
-
-                                  SizedBox(height: 2),
-
-                                  // Delete load
-                                  GestureDetector(
-                                    onTap: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            backgroundColor: AppColors.textFieldColor2,
-                                            title:  Text(
-                                              'Confirm Deletion',
-                                              style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                            ),
-                                            content: Text(
-                                              'Are you sure you want to delete this load?',
-                                              style: TextStyle(fontSize: 16,color: AppColors.textColorPrimary),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop(); // Close the dialog without deleting
-                                                },
-                                                child:  Text(
-                                                  'Cancel',
-                                                  style: TextStyle(color: AppColors.cancelButton),
-                                                ),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-                                                  // Execute deletion logic
-                                                  setState(() {
-                                                    // Iterate through all items in the load
-                                                    for (var item in loads[index]) {
-                                                      if (item is CrewMember) {
-                                                        // Add crew member back to the crew list
-                                                        if (!crewList.contains(item)) {
-                                                          crewList.add(item);
-                                                        }
-                                                      } else if (item is Gear) {
-                                                        if (item.isPersonalTool) {
-                                                          gearList.removeWhere((gear) => gear.name == item.name && gear.isPersonalTool);
-                                                        } else {
-                                                          // General gear: update or add back to gearList
-                                                          final existingGear = gearList.firstWhere(
-                                                            (gear) => gear.name == item.name && !gear.isPersonalTool,
-                                                            orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight ~/ item.quantity, isHazmat: item.isHazmat),
-                                                          );
-
-                                                          existingGear.quantity += item.quantity;
-
-                                                          // Add to gearList if it's not already present
-                                                          if (!gearList.contains(existingGear)) {
-                                                            gearList.add(existingGear);
-                                                          }
-                                                        }
-                                                      }
-                                                    }
-                                                    // Remove all personal tools from the gearList
-                                                    gearList.removeWhere((gear) => gear.isPersonalTool);
-
-                                                    // Remove the load from the list
-                                                    loads.removeAt(index);
-                                                    _isExpanded.removeAt(index); // Ensure the lists stay in sync
-                                                  });
-
-                                                  Navigator.of(context).pop(); // Close the dialog after deletion
-                                                },
-                                                child: const Text(
-                                                  'Delete',
-                                                  style: TextStyle(color: Colors.red),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    },
-                                    child: Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(vertical: 8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        // Background color
-                                        borderRadius: BorderRadius.circular(8),
-                                        // Rounded corners
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: [
-                                          Icon(Icons.delete, color: Colors.black, size: 24),
                                           Text(
-                                            ' Delete Load',
+                                            'LOAD #${index + 1}',
                                             style: TextStyle(
-                                              fontSize: 18,
+                                              color: calculateAvailableWeight(
+                                                              loads[index]) >
+                                                          widget
+                                                              .trip.allowable ||
+                                                      calculateAvailableSeats(
+                                                              loads[index]) >
+                                                          widget.trip
+                                                              .availableSeats
+                                                  ? Colors
+                                                      .white // Warning color
+                                                  : Colors.black,
+                                              fontSize: 22,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.black,
                                             ),
                                           ),
                                         ],
                                       ),
-                                    ),
+                                      Column(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.only(
+                                                left: 4.0, right: 4.0),
+                                            decoration: BoxDecoration(
+                                              color: Colors.transparent,
+                                              // Background color
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      10), // Rounded corners
+                                            ),
+                                            height: 30,
+                                            child: Row(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      '${calculateAvailableWeight(loads[index])} lbs',
+                                                      style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: calculateAvailableWeight(
+                                                                        loads[
+                                                                            index]) >
+                                                                    widget.trip
+                                                                        .allowable ||
+                                                                calculateAvailableSeats(
+                                                                        loads[
+                                                                            index]) >
+                                                                    widget.trip
+                                                                        .availableSeats
+                                                            ? Colors
+                                                                .white // Warning color
+                                                            : Colors.black,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                VerticalDivider(
+                                                  width: 20,
+                                                  // Space between text and divider
+                                                  thickness: 1,
+                                                  // Thickness of the divider
+                                                  color: calculateAvailableWeight(
+                                                                  loads[
+                                                                      index]) >
+                                                              widget.trip
+                                                                  .allowable ||
+                                                          calculateAvailableSeats(
+                                                                  loads[
+                                                                      index]) >
+                                                              widget.trip
+                                                                  .availableSeats
+                                                      ? Colors
+                                                          .white // Warning color
+                                                      : Colors
+                                                          .black, // Divider color
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      '${calculateAvailableSeats(loads[index])}',
+                                                      style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: calculateAvailableWeight(
+                                                                        loads[
+                                                                            index]) >
+                                                                    widget.trip
+                                                                        .allowable ||
+                                                                calculateAvailableSeats(
+                                                                        loads[
+                                                                            index]) >
+                                                                    widget.trip
+                                                                        .availableSeats
+                                                            ? Colors
+                                                                .white // Warning color
+                                                            : Colors.black,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '/${widget.trip.availableSeats} seats',
+                                                      style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: calculateAvailableWeight(
+                                                                        loads[
+                                                                            index]) >
+                                                                    widget.trip
+                                                                        .allowable ||
+                                                                calculateAvailableSeats(
+                                                                        loads[
+                                                                            index]) >
+                                                                    widget.trip
+                                                                        .availableSeats
+                                                            ? Colors
+                                                                .white // Warning color
+                                                            : Colors.black,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      // Expansion Icon
+                                      Icon(
+                                        isExpanded
+                                            ? Icons.expand_less
+                                            : Icons.expand_more,
+                                        color: calculateAvailableWeight(
+                                                        loads[index]) >
+                                                    widget.trip.allowable ||
+                                                calculateAvailableSeats(
+                                                        loads[index]) >
+                                                    widget.trip.availableSeats
+                                            ? Colors.white // Warning color
+                                            : Colors.black,
+                                        size: 36,
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                        ],
-                      ),
-                    );
-                  }),
 
-                  // Add Load Button
+                              // Body Section with Add Item Button
+                              if (isExpanded)
+                                Padding(
+                                  padding: const EdgeInsets.all(0.0),
+                                  child: Column(
+                                    children: [
+                                      // If overweight
+                                      if (calculateAvailableWeight(
+                                              loads[index]) >
+                                          widget.trip.allowable)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 1.0),
+                                          child: Container(
+                                            width: double.infinity,
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              // Background color
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              // Rounded corners
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: const Text(
+                                              'OVERWEIGHT',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+
+                                      // If overseats
+                                      if (calculateAvailableSeats(
+                                              loads[index]) >
+                                          widget.trip.availableSeats)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 1.0),
+                                          // Adjust padding as needed
+                                          child: Container(
+                                            width: double.infinity,
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              // Background color
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              // Rounded corners
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: const Text(
+                                              'NOT ENOUGH SEATS',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+
+                                      for (var item in loads[index]
+                                        ..sort((a, b) {
+                                          if (a is CustomItem &&
+                                              (b is Gear || b is CrewMember)) {
+                                            return 1; // CustomItem comes after Gear or CrewMember
+                                          } else if ((a is Gear ||
+                                                  a is CrewMember) &&
+                                              b is CustomItem) {
+                                            return -1; // Gear or CrewMember comes before CustomItem
+                                          }
+                                          return 0; // Keep relative order for same types
+                                        }))
+                                        // Swipe Deletion
+                                        Dismissible(
+                                          key: ValueKey(item),
+                                          // Unique key for each item
+                                          direction:
+                                              DismissDirection.endToStart,
+                                          // Allow swipe from right to left
+                                          background: Container(
+                                            color: Colors.red,
+                                            // Red background for delete action
+                                            alignment: Alignment.centerRight,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            child: Icon(Icons.delete,
+                                                color: AppColors
+                                                    .textColorSecondary), // Trash icon
+                                          ),
+                                          onDismissed: (direction) {
+                                            setState(() {
+                                              if (loads[index].contains(item)) {
+                                                loads[index].remove(item);
+
+                                                if (item is Gear) {
+                                                  var existingGear =
+                                                      gearList.firstWhere(
+                                                    (gear) =>
+                                                        gear.name == item.name,
+                                                    orElse: () => Gear(
+                                                        name: item.name,
+                                                        quantity: 0,
+                                                        weight: item.weight ~/
+                                                            item.quantity,
+                                                        // Correct per-unit weight
+                                                        isPersonalTool:
+                                                            item.isPersonalTool,
+                                                        isHazmat:
+                                                            item.isHazmat),
+                                                  );
+
+                                                  // Update the quantity and total weight
+                                                  existingGear.quantity +=
+                                                      item.quantity;
+
+                                                  if (!gearList
+                                                      .contains(existingGear)) {
+                                                    gearList.add(existingGear);
+                                                  }
+                                                } else if (item is CrewMember) {
+                                                  // Handle personal tools
+                                                  if (item.personalTools !=
+                                                      null) {
+                                                    for (var tool in item
+                                                        .personalTools!) {
+                                                      // Check if the tool exists in the gearList first
+                                                      final gearListIndex =
+                                                          gearList.indexWhere(
+                                                        (gear) =>
+                                                            gear.name ==
+                                                            tool.name,
+                                                      );
+
+                                                      if (gearListIndex != -1) {
+                                                        // Decrement the quantity of the tool in the gearList
+                                                        Gear gearTool =
+                                                            gearList[
+                                                                gearListIndex];
+                                                        gearTool.quantity -=
+                                                            tool.quantity;
+                                                        gearTool.weight -= tool
+                                                                .weight *
+                                                            tool.quantity; // Adjust weight
+
+                                                        // If the quantity reaches zero, remove the tool from the gearList
+                                                        if (gearTool.quantity <=
+                                                            0) {
+                                                          gearList.removeAt(
+                                                              gearListIndex);
+                                                        }
+                                                      } else {
+                                                        // Check if the tool exists in the current load
+                                                        final toolIndex =
+                                                            loads[index]
+                                                                .indexWhere(
+                                                          (loadItem) =>
+                                                              loadItem
+                                                                  is Gear &&
+                                                              loadItem.name ==
+                                                                  tool.name,
+                                                        );
+
+                                                        if (toolIndex != -1) {
+                                                          // Decrement the quantity of the tool in the load
+                                                          Gear loadTool =
+                                                              loads[index]
+                                                                  [toolIndex];
+                                                          loadTool.quantity -=
+                                                              tool.quantity;
+                                                          loadTool
+                                                              .weight -= tool
+                                                                  .weight *
+                                                              tool.quantity; // Adjust weight
+
+                                                          // If the quantity reaches zero, remove the tool from the load
+                                                          if (loadTool
+                                                                  .quantity <=
+                                                              0) {
+                                                            loads[index]
+                                                                .removeAt(
+                                                                    toolIndex);
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+
+                                                  // Add the crew member back to the crew list if necessary
+                                                  if (!crewList
+                                                      .contains(item)) {
+                                                    crewList.add(item);
+                                                  }
+                                                }
+                                              }
+                                            });
+                                          },
+                                          child: Card(
+                                            elevation: 2,
+                                            color: item is CrewMember
+                                                ? AppColors
+                                                    .textFieldColor2 // Color for CrewMembers
+                                                : item is Gear &&
+                                                        item.isPersonalTool ==
+                                                            true
+                                                    ? AppColors
+                                                        .toolBlue // Color for personal tools
+                                                    : AppColors.gearYellow,
+                                            // Color for regular Gear
+                                            // Different colors for CrewMember and Gear
+                                            margin: const EdgeInsets.symmetric(
+                                                vertical: 1.0),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      8.0), // Rounded corners
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        itemDisplay(item),
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: item
+                                                                  is CrewMember
+                                                              ? AppColors
+                                                                  .textColorPrimary
+                                                              : Colors.black,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        item is Gear
+                                                            ? 'Quantity: ${item.quantity}'
+                                                            : item is CrewMember
+                                                                ? item.getPositionTitle(
+                                                                    item.position)
+                                                                : '',
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          color: item
+                                                                  is CrewMember
+                                                              ? AppColors
+                                                                  .textColorPrimary
+                                                              : Colors.black,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+
+                                                  // Single Item Deletion
+                                                  IconButton(
+                                                    icon: const Icon(
+                                                        Icons.delete,
+                                                        color: Colors.red),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        if (loads[index]
+                                                            .contains(item)) {
+                                                          if (item is Gear) {
+                                                            if (item.quantity >
+                                                                1) {
+                                                              showDialog(
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  int quantityToRemove =
+                                                                      1; // Default to 1 for selection
+                                                                  return StatefulBuilder(builder: (BuildContext
+                                                                          context,
+                                                                      StateSetter
+                                                                          setDialogState) {
+                                                                    return AlertDialog(
+                                                                      backgroundColor:
+                                                                          AppColors
+                                                                              .textFieldColor2,
+                                                                      title: Text(
+                                                                          'Remove ${item.name}',
+                                                                          style:
+                                                                              TextStyle(color: AppColors.textColorPrimary)),
+                                                                      content:
+                                                                          Column(
+                                                                        mainAxisSize:
+                                                                            MainAxisSize.min,
+                                                                        children: [
+                                                                          Text(
+                                                                              'Select the quantity to remove:',
+                                                                              style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                          SizedBox(
+                                                                              height: 8),
+                                                                          DropdownButton<
+                                                                              int>(
+                                                                            dropdownColor:
+                                                                                AppColors.textFieldColor2,
+                                                                            value:
+                                                                                quantityToRemove,
+                                                                            items:
+                                                                                List.generate(
+                                                                              item.quantity,
+                                                                              (index) => DropdownMenuItem(
+                                                                                value: index + 1,
+                                                                                child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                              ),
+                                                                            ),
+                                                                            onChanged:
+                                                                                (value) {
+                                                                              setDialogState(() {
+                                                                                quantityToRemove = value ?? 1; // Update dialog state
+                                                                              });
+                                                                            },
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      actions: [
+                                                                        TextButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            Navigator.of(context).pop(); // Cancel action
+                                                                          },
+                                                                          child: Text(
+                                                                              'Cancel',
+                                                                              style: TextStyle(color: AppColors.cancelButton)),
+                                                                        ),
+                                                                        TextButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            setState(() {
+                                                                              // Deduct the selected quantity from the load item
+                                                                              // item is in load. existingGear is in inventory
+                                                                              var originalWeight = item.weight ~/ item.quantity;
+                                                                              item.quantity -= quantityToRemove;
+                                                                              item.weight -= (item.weight ~/ (item.quantity + quantityToRemove)) * quantityToRemove;
+
+                                                                              // Handle returning the removed item to the inventory
+                                                                              var existingGear = gearList.firstWhere(
+                                                                                (gear) => gear.name == item.name,
+                                                                                orElse: () => Gear(name: item.name, quantity: 0, weight: 0, isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat),
+                                                                              );
+
+                                                                              // Update the quantity
+                                                                              existingGear.quantity += quantityToRemove;
+                                                                              existingGear.weight = originalWeight;
+
+                                                                              if (!gearList.contains(existingGear)) {
+                                                                                gearList.add(existingGear);
+                                                                              }
+
+                                                                              // Remove the item from the load if its quantity reaches zero
+                                                                              if (item.quantity <= 0) {
+                                                                                loads[index].remove(item);
+                                                                              }
+                                                                            });
+
+                                                                            Navigator.of(context).pop(); // Close the dialog
+                                                                          },
+                                                                          child: const Text(
+                                                                              'Remove',
+                                                                              style: TextStyle(color: Colors.red)),
+                                                                        ),
+                                                                      ],
+                                                                    );
+                                                                  });
+                                                                },
+                                                              );
+                                                            } else {
+                                                              loads[index]
+                                                                  .remove(item);
+                                                              var existingGear =
+                                                                  gearList
+                                                                      .firstWhere(
+                                                                (gear) =>
+                                                                    gear.name ==
+                                                                    item.name,
+                                                                orElse: () =>
+                                                                    Gear(
+                                                                        name: item
+                                                                            .name,
+                                                                        quantity:
+                                                                            0,
+                                                                        weight: item.weight ~/
+                                                                            item
+                                                                                .quantity,
+                                                                        // Correct per-unit weight
+                                                                        isPersonalTool:
+                                                                            item
+                                                                                .isPersonalTool,
+                                                                        isHazmat:
+                                                                            item.isHazmat),
+                                                              );
+
+                                                              // Update the quantity
+                                                              existingGear
+                                                                      .quantity +=
+                                                                  item.quantity;
+
+                                                              if (!gearList
+                                                                  .contains(
+                                                                      existingGear)) {
+                                                                gearList.add(
+                                                                    existingGear);
+                                                              }
+                                                            }
+                                                          } else if (item
+                                                              is CrewMember) {
+                                                            // Handle personal tools
+                                                            if (item.personalTools !=
+                                                                null) {
+                                                              for (var tool in item
+                                                                  .personalTools!) {
+                                                                // Check if the tool exists in the gearList first
+                                                                final gearListIndex =
+                                                                    gearList
+                                                                        .indexWhere(
+                                                                  (gear) =>
+                                                                      gear.name ==
+                                                                      tool.name,
+                                                                );
+
+                                                                if (gearListIndex !=
+                                                                    -1) {
+                                                                  // Decrement the quantity of the tool in the gearList
+                                                                  Gear
+                                                                      gearTool =
+                                                                      gearList[
+                                                                          gearListIndex];
+                                                                  gearTool.quantity -=
+                                                                      tool.quantity;
+                                                                  gearTool
+                                                                      .weight -= tool
+                                                                          .weight *
+                                                                      tool.quantity; // Adjust weight
+
+                                                                  // If the quantity reaches zero, remove the tool from the gearList
+                                                                  if (gearTool
+                                                                          .quantity <=
+                                                                      0) {
+                                                                    gearList.removeAt(
+                                                                        gearListIndex);
+                                                                  }
+                                                                } else {
+                                                                  // Check if the tool exists in the current load
+                                                                  final toolIndex =
+                                                                      loads[index]
+                                                                          .indexWhere(
+                                                                    (loadItem) =>
+                                                                        loadItem
+                                                                            is Gear &&
+                                                                        loadItem.name ==
+                                                                            tool.name,
+                                                                  );
+
+                                                                  if (toolIndex !=
+                                                                      -1) {
+                                                                    // Decrement the quantity of the tool in the load
+                                                                    Gear
+                                                                        loadTool =
+                                                                        loads[index]
+                                                                            [
+                                                                            toolIndex];
+                                                                    loadTool.quantity -=
+                                                                        tool.quantity;
+                                                                    loadTool
+                                                                        .weight -= tool
+                                                                            .weight *
+                                                                        tool.quantity; // Adjust weight
+
+                                                                    // If the quantity reaches zero, remove the tool from the load
+                                                                    if (loadTool
+                                                                            .quantity <=
+                                                                        0) {
+                                                                      loads[index]
+                                                                          .removeAt(
+                                                                              toolIndex);
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+
+                                                            // Add the crew member back to the crew list if necessary
+                                                            if (!crewList
+                                                                .contains(
+                                                                    item)) {
+                                                              crewList
+                                                                  .add(item);
+                                                            }
+                                                            loads[index]
+                                                                .remove(item);
+                                                          } else if (item
+                                                              is CustomItem) {
+                                                            loads[index]
+                                                                .remove(item);
+                                                          }
+                                                        }
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      //const SizedBox(height: 4),
+
+                                      SizedBox(height: 2),
+
+                                      // Add item
+                                      GestureDetector(
+                                        onTap: () =>
+                                            _showSelectionDialog(index),
+                                        child: Container(
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.textFieldColor2,
+                                            // Background color
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            // Rounded corners
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            '+ Add Item',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.textColorPrimary,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      SizedBox(height: 2),
+
+                                      // Delete load
+                                      GestureDetector(
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                backgroundColor:
+                                                    AppColors.textFieldColor2,
+                                                title: Text(
+                                                  'Confirm Deletion',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: AppColors
+                                                          .textColorPrimary),
+                                                ),
+                                                content: Text(
+                                                  'Are you sure you want to delete this load?',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: AppColors
+                                                          .textColorPrimary),
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop(); // Close the dialog without deleting
+                                                    },
+                                                    child: Text(
+                                                      'Cancel',
+                                                      style: TextStyle(
+                                                          color: AppColors
+                                                              .cancelButton),
+                                                    ),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      // Execute deletion logic
+                                                      setState(() {
+                                                        // Iterate through all items in the load
+                                                        for (var item
+                                                            in loads[index]) {
+                                                          if (item
+                                                              is CrewMember) {
+                                                            // Add crew member back to the crew list
+                                                            if (!crewList
+                                                                .contains(
+                                                                    item)) {
+                                                              crewList
+                                                                  .add(item);
+                                                            }
+                                                          } else if (item
+                                                              is Gear) {
+                                                            if (item
+                                                                .isPersonalTool) {
+                                                              gearList.removeWhere((gear) =>
+                                                                  gear.name ==
+                                                                      item.name &&
+                                                                  gear.isPersonalTool);
+                                                            } else {
+                                                              // General gear: update or add back to gearList
+                                                              final existingGear =
+                                                                  gearList
+                                                                      .firstWhere(
+                                                                (gear) =>
+                                                                    gear.name ==
+                                                                        item
+                                                                            .name &&
+                                                                    !gear
+                                                                        .isPersonalTool,
+                                                                orElse: () => Gear(
+                                                                    name: item
+                                                                        .name,
+                                                                    quantity: 0,
+                                                                    weight: item
+                                                                            .weight ~/
+                                                                        item
+                                                                            .quantity,
+                                                                    isHazmat: item
+                                                                        .isHazmat),
+                                                              );
+
+                                                              existingGear
+                                                                      .quantity +=
+                                                                  item.quantity;
+
+                                                              // Add to gearList if it's not already present
+                                                              if (!gearList
+                                                                  .contains(
+                                                                      existingGear)) {
+                                                                gearList.add(
+                                                                    existingGear);
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                        // Remove all personal tools from the gearList
+                                                        gearList.removeWhere(
+                                                            (gear) => gear
+                                                                .isPersonalTool);
+
+                                                        // Remove the load from the list
+                                                        loads.removeAt(index);
+                                                        _isExpanded.removeAt(
+                                                            index); // Ensure the lists stay in sync
+                                                      });
+
+                                                      Navigator.of(context)
+                                                          .pop(); // Close the dialog after deletion
+                                                    },
+                                                    child: const Text(
+                                                      'Delete',
+                                                      style: TextStyle(
+                                                          color: Colors.red),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: Container(
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            // Background color
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            // Rounded corners
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.delete,
+                                                  color: Colors.black,
+                                                  size: 24),
+                                              Text(
+                                                ' Delete Load',
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
@@ -1500,9 +1932,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.buttonStyle1,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
                       ),
-                      child:  Text(
+                      child: Text(
                         '+ Add Load',
                         style: TextStyle(
                           fontSize: 16,
@@ -1514,6 +1947,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                   ),
                 ],
               ),
+              // Add Load Button
             ),
           ),
         ],
