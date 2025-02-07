@@ -227,15 +227,13 @@ class _EditCrewmemberState extends State<EditCrewmember> {
       return;
     }
 
-    // ✅ Update crew member details
     widget.crewMember.name = nameController.text;
     widget.crewMember.flightWeight = int.parse(flightWeightController.text);
     widget.crewMember.position = selectedPosition ?? widget.crewMember.position; // Keep old position if not changed
 
-    // ✅ Directly update `personalTools` with `addedTools`
     widget.crewMember.personalTools = List.from(addedTools ?? []);
 
-    // ✅ Update Hive with the new list of tools
+
     final key = crewmemberBox.keys.firstWhere(
           (key) => crewmemberBox.get(key) == widget.crewMember,
       orElse: () => null,
@@ -247,7 +245,6 @@ class _EditCrewmemberState extends State<EditCrewmember> {
       crewmemberBox.add(widget.crewMember);
     }
 
-    // ✅ Ensure the total crew weight is updated
     crew.updateTotalCrewWeight();
 
     // Callback to update UI
@@ -271,7 +268,6 @@ class _EditCrewmemberState extends State<EditCrewmember> {
       ),
     );
 
-    // ✅ Navigate back to previous screen
     Navigator.of(context).pop();
   }
 

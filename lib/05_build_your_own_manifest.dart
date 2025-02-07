@@ -673,7 +673,18 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
       return Load(
         loadNumber: index + 1,
         weight: loadWeight,
-        loadPersonnel: loadItems.whereType<CrewMember>().toList(),
+        loadPersonnel: loadItems.whereType<CrewMember>().map((crew) => CrewMember(
+          name: crew.name,
+          flightWeight: crew.flightWeight,
+          position: crew.position,
+          personalTools: crew.personalTools?.map((tool) => Gear(
+            name: tool.name,
+            quantity: tool.quantity,
+            weight: tool.weight,
+            isPersonalTool: tool.isPersonalTool,
+            isHazmat: tool.isHazmat,
+          )).toList(), // Deep copy personalTools list
+        )).toList(),
         loadGear: loadItems.whereType<Gear>().toList(),
         customItems: loadItems.whereType<CustomItem>().toList(), // Save CustomItems
       );
