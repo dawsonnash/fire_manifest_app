@@ -90,10 +90,7 @@ class _EditTripState extends State<EditTrip> {
               backgroundColor: AppColors.textFieldColor2,
               title: Text(
                 'Add Crew Members and Gear',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: AppColors.textColorPrimary),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textColorPrimary),
               ),
               contentPadding: const EdgeInsets.all(16),
               content: ConstrainedBox(
@@ -124,8 +121,7 @@ class _EditTripState extends State<EditTrip> {
                                   child: ListTile(
                                     title: const Text(
                                       'Crew Members',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 );
@@ -143,8 +139,7 @@ class _EditTripState extends State<EditTrip> {
                                           color: Colors.grey.withOpacity(0.8),
                                           spreadRadius: 1,
                                           blurRadius: 5,
-                                          offset:
-                                              Offset(0, 3), // Shadow position
+                                          offset: Offset(0, 3), // Shadow position
                                         ),
                                       ],
                                     ),
@@ -160,16 +155,12 @@ class _EditTripState extends State<EditTrip> {
                                       //
                                       title: Text(
                                         '${crew.name}, ${crew.flightWeight} lbs',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.textColorPrimary),
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                         textAlign: TextAlign.start,
                                       ),
                                       subtitle: Text(
                                         crew.getPositionTitle(crew.position),
-                                        style: TextStyle(
-                                            fontStyle: FontStyle.italic,
-                                            color: AppColors.textColorPrimary),
+                                        style: TextStyle(fontStyle: FontStyle.italic, color: AppColors.textColorPrimary),
                                       ),
                                       value: selectedItems.contains(crew),
                                       onChanged: (bool? isChecked) {
@@ -210,23 +201,20 @@ class _EditTripState extends State<EditTrip> {
                                   child: ListTile(
                                     title: const Text(
                                       'Gear',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 );
                               },
                               body: Column(
                                 children: sortedGearList.map((gear) {
-                                  int remainingQuantity = gear.quantity -
-                                      (selectedGearQuantities[gear] ?? 0);
+                                  int remainingQuantity = gear.quantity - (selectedGearQuantities[gear] ?? 0);
 
                                   return Container(
                                     //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
                                     decoration: BoxDecoration(
                                       color: gear.isPersonalTool
-                                          ? AppColors
-                                              .toolBlue // Color for personal tools
+                                          ? AppColors.toolBlue // Color for personal tools
                                           : AppColors.gearYellow,
                                       borderRadius: BorderRadius.circular(0.0),
                                       // Rounded corners
@@ -235,15 +223,13 @@ class _EditTripState extends State<EditTrip> {
                                           color: Colors.grey.withOpacity(0.8),
                                           spreadRadius: 1,
                                           blurRadius: 5,
-                                          offset:
-                                              Offset(0, 3), // Shadow position
+                                          offset: Offset(0, 3), // Shadow position
                                         ),
                                       ],
                                     ),
                                     child: CheckboxListTile(
                                       title: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             child: Row(
@@ -253,11 +239,9 @@ class _EditTripState extends State<EditTrip> {
                                                     gear.name,
                                                     style: const TextStyle(
                                                       fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                      fontWeight: FontWeight.bold,
                                                     ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                    overflow: TextOverflow.ellipsis,
                                                   ),
                                                 ),
                                                 Text(
@@ -275,55 +259,35 @@ class _EditTripState extends State<EditTrip> {
                                             if (selectedItems.contains(gear))
                                               GestureDetector(
                                                 onTap: () {
-                                                  final int gearQuantity =
-                                                      gear.quantity;
+                                                  final int gearQuantity = gear.quantity;
                                                   if (gearQuantity > 1) {
                                                     showDialog(
                                                       context: context,
-                                                      builder: (BuildContext
-                                                          context) {
+                                                      builder: (BuildContext context) {
                                                         return AlertDialog(
-                                                          backgroundColor:
-                                                              AppColors
-                                                                  .textFieldColor,
+                                                          backgroundColor: AppColors.textFieldColor2,
                                                           title: Text(
                                                             'Select Quantity for ${gear.name}',
-                                                            style: TextStyle(
-                                                                color: AppColors
-                                                                    .textColorPrimary),
+                                                            style: TextStyle(color: AppColors.textColorPrimary),
                                                           ),
                                                           content: SizedBox(
                                                             height: 150,
-                                                            child:
-                                                                CupertinoPicker(
-                                                              scrollController:
-                                                                  FixedExtentScrollController(
-                                                                initialItem:
-                                                                    (selectedGearQuantities[gear] ??
-                                                                            1) -
-                                                                        1,
+                                                            child: CupertinoPicker(
+                                                              scrollController: FixedExtentScrollController(
+                                                                initialItem: (selectedGearQuantities[gear] ?? 1) - 1,
                                                               ),
                                                               itemExtent: 32.0,
-                                                              onSelectedItemChanged:
-                                                                  (int value) {
-                                                                dialogSetState(
-                                                                    () {
-                                                                  selectedGearQuantities[
-                                                                          gear] =
-                                                                      value + 1;
+                                                              onSelectedItemChanged: (int value) {
+                                                                dialogSetState(() {
+                                                                  selectedGearQuantities[gear] = value + 1;
                                                                 });
                                                               },
-                                                              children: List<
-                                                                  Widget>.generate(
+                                                              children: List<Widget>.generate(
                                                                 gear.quantity,
                                                                 // Use the full quantity for selection
                                                                 (int index) {
                                                                   return Center(
-                                                                    child: Text(
-                                                                        '${index + 1}',
-                                                                        style: TextStyle(
-                                                                            color:
-                                                                                AppColors.textColorPrimary)),
+                                                                    child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                   );
                                                                 },
                                                               ),
@@ -332,38 +296,20 @@ class _EditTripState extends State<EditTrip> {
                                                           actions: [
                                                             TextButton(
                                                               onPressed: () {
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop();
+                                                                Navigator.of(context).pop();
                                                               },
-                                                              child: Text(
-                                                                  'Cancel',
-                                                                  style: TextStyle(
-                                                                      color: AppColors
-                                                                          .cancelButton)),
+                                                              child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
                                                             ),
                                                             TextButton(
                                                               onPressed: () {
                                                                 // Finalize the selection
-                                                                dialogSetState(
-                                                                    () {
-                                                                  int selectedQuantity =
-                                                                      selectedGearQuantities[
-                                                                              gear] ??
-                                                                          1;
-                                                                  remainingQuantity =
-                                                                      gear.quantity -
-                                                                          selectedQuantity;
+                                                                dialogSetState(() {
+                                                                  int selectedQuantity = selectedGearQuantities[gear] ?? 1;
+                                                                  remainingQuantity = gear.quantity - selectedQuantity;
                                                                 });
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop();
+                                                                Navigator.of(context).pop();
                                                               },
-                                                              child: Text(
-                                                                  'Confirm',
-                                                                  style: TextStyle(
-                                                                      color: AppColors
-                                                                          .saveButtonAllowableWeight)),
+                                                              child: Text('Confirm', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
                                                             ),
                                                           ],
                                                         );
@@ -376,18 +322,9 @@ class _EditTripState extends State<EditTrip> {
                                                     if (gear.quantity > 1)
                                                       Text(
                                                         'Qty: ${selectedGearQuantities[gear] ?? 1}',
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 14,
-                                                            color: AppColors
-                                                                .textColorSecondary),
+                                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textColorSecondary),
                                                       ),
-                                                    if (gear.quantity > 1)
-                                                      Icon(
-                                                          Icons.arrow_drop_down,
-                                                          color: AppColors
-                                                              .textColorSecondary),
+                                                    if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
                                                   ],
                                                 ),
                                               ),
@@ -398,8 +335,7 @@ class _EditTripState extends State<EditTrip> {
                                         dialogSetState(() {
                                           if (isChecked == true) {
                                             selectedItems.add(gear);
-                                            selectedGearQuantities[gear] =
-                                                1; // Default quantity
+                                            selectedGearQuantities[gear] = 1; // Default quantity
                                           } else {
                                             selectedItems.remove(gear);
                                             selectedGearQuantities.remove(gear);
@@ -426,27 +362,22 @@ class _EditTripState extends State<EditTrip> {
                             ExpansionPanel(
                               isExpanded: isCustomItemExpanded,
                               backgroundColor: AppColors.fireColor,
-                              headerBuilder: (context, isExpanded) =>
-                                  GestureDetector(
+                              headerBuilder: (context, isExpanded) => GestureDetector(
                                 onLongPress: () {
                                   showModalBottomSheet(
                                     backgroundColor: AppColors.textFieldColor2,
                                     context: context,
                                     isScrollControlled: true,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(16)),
+                                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                                     ),
                                     builder: (BuildContext context) {
                                       return Container(
                                         padding: EdgeInsets.all(16.0),
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.7,
+                                        height: MediaQuery.of(context).size.height * 0.7,
                                         // 70% of the screen height
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             // Modal Title
                                             Text(
@@ -454,8 +385,7 @@ class _EditTripState extends State<EditTrip> {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 20,
-                                                color:
-                                                    AppColors.textColorPrimary,
+                                                color: AppColors.textColorPrimary,
                                               ),
                                             ),
                                             const SizedBox(height: 16),
@@ -467,33 +397,24 @@ class _EditTripState extends State<EditTrip> {
                                                 itemBuilder: (context, index) {
                                                   final item = irpgItems[index];
                                                   return Container(
-                                                    margin:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 4.0),
+                                                    margin: EdgeInsets.symmetric(vertical: 4.0),
                                                     child: ListTile(
-                                                      contentPadding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 8.0,
-                                                              vertical: 0.0),
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0.0),
                                                       title: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children: [
                                                           Text(
                                                             item['name'],
                                                             style: TextStyle(
                                                               fontSize: 16,
-                                                              color: AppColors
-                                                                  .textColorPrimary,
+                                                              color: AppColors.textColorPrimary,
                                                             ),
                                                           ),
                                                           Text(
                                                             '${item['weight']} lbs',
                                                             style: TextStyle(
                                                               fontSize: 16,
-                                                              color: AppColors
-                                                                  .textColorPrimary,
+                                                              color: AppColors.textColorPrimary,
                                                             ),
                                                           ),
                                                         ],
@@ -509,14 +430,12 @@ class _EditTripState extends State<EditTrip> {
                                               alignment: Alignment.bottomRight,
                                               child: TextButton(
                                                 onPressed: () {
-                                                  Navigator.of(context)
-                                                      .pop(); // Close the modal
+                                                  Navigator.of(context).pop(); // Close the modal
                                                 },
                                                 child: Text(
                                                   'Cancel',
                                                   style: TextStyle(
-                                                    color:
-                                                        AppColors.cancelButton,
+                                                    color: AppColors.cancelButton,
                                                   ),
                                                 ),
                                               ),
@@ -544,26 +463,21 @@ class _EditTripState extends State<EditTrip> {
                                     TextField(
                                       decoration: InputDecoration(
                                         labelText: 'Item Name',
-                                        labelStyle: TextStyle(
-                                            color: AppColors
-                                                .textColorPrimary), // Label color
+                                        labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
                                       ),
-                                      textCapitalization:
-                                          TextCapitalization.words,
+                                      textCapitalization: TextCapitalization.words,
                                       focusNode: customItemNameFocus,
                                       // Attach focus node
                                       textInputAction: TextInputAction.next,
                                       // Specify the action
                                       onSubmitted: (_) {
                                         // Move focus to the next field
-                                        FocusScope.of(context).requestFocus(
-                                            customItemWeightFocus);
+                                        FocusScope.of(context).requestFocus(customItemWeightFocus);
                                       },
                                       onChanged: (value) {
                                         customItemName = value;
                                       },
-                                      style: TextStyle(
-                                          color: AppColors.textColorPrimary),
+                                      style: TextStyle(color: AppColors.textColorPrimary),
                                     ),
                                     const SizedBox(height: 8),
 
@@ -571,9 +485,7 @@ class _EditTripState extends State<EditTrip> {
                                     TextField(
                                         decoration: InputDecoration(
                                           labelText: 'Weight (lbs)',
-                                          labelStyle: TextStyle(
-                                              color: AppColors
-                                                  .textColorPrimary), // Label color
+                                          labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
                                         ),
                                         keyboardType: TextInputType.number,
                                         maxLength: 3,
@@ -583,15 +495,12 @@ class _EditTripState extends State<EditTrip> {
                                         // Specify the action
                                         onSubmitted: (_) {
                                           // Move focus to the next field
-                                          FocusScope.of(context).requestFocus(
-                                              customItemQuantityFocus);
+                                          FocusScope.of(context).requestFocus(customItemQuantityFocus);
                                         },
                                         onChanged: (value) {
-                                          customItemWeight =
-                                              int.tryParse(value) ?? 0;
+                                          customItemWeight = int.tryParse(value) ?? 0;
                                         },
-                                        style: TextStyle(
-                                            color: AppColors.textColorPrimary)),
+                                        style: TextStyle(color: AppColors.textColorPrimary)),
                                   ],
                                 ),
                               ),
@@ -636,20 +545,16 @@ class _EditTripState extends State<EditTrip> {
                       for (var item in selectedItems) {
                         if (item is Gear) {
                           // Respect the selected quantity
-                          int selectedQuantity =
-                              selectedGearQuantities[item] ?? 1;
+                          int selectedQuantity = selectedGearQuantities[item] ?? 1;
 
                           // Check if a gear with the same name already exists in the load
-                          final existingGearIndex =
-                              loads[selectedLoadIndex].indexWhere(
-                            (loadItem) =>
-                                loadItem is Gear && loadItem.name == item.name,
+                          final existingGearIndex = loads[selectedLoadIndex].indexWhere(
+                            (loadItem) => loadItem is Gear && loadItem.name == item.name,
                           );
 
                           if (existingGearIndex != -1) {
                             // If it exists, update its quantity
-                            Gear existingGear = loads[selectedLoadIndex]
-                                [existingGearIndex] as Gear;
+                            Gear existingGear = loads[selectedLoadIndex][existingGearIndex] as Gear;
                             existingGear.quantity += selectedQuantity;
                             // Weight is dynamically calculated elsewhere based on quantity
                           } else {
@@ -677,17 +582,13 @@ class _EditTripState extends State<EditTrip> {
                           // Loop through and add all personal tools
                           if (item.personalTools != null) {
                             for (var tool in item.personalTools!) {
-                              final existingToolIndex =
-                                  loads[selectedLoadIndex].indexWhere(
-                                (loadItem) =>
-                                    loadItem is Gear &&
-                                    loadItem.name == tool.name,
+                              final existingToolIndex = loads[selectedLoadIndex].indexWhere(
+                                (loadItem) => loadItem is Gear && loadItem.name == tool.name,
                               );
 
                               if (existingToolIndex != -1) {
                                 // Update the existing tool's quantity
-                                Gear existingTool = loads[selectedLoadIndex]
-                                    [existingToolIndex] as Gear;
+                                Gear existingTool = loads[selectedLoadIndex][existingToolIndex] as Gear;
                                 existingTool.quantity += tool.quantity;
                                 // Weight is dynamically calculated elsewhere based on quantity
                               } else {
@@ -712,9 +613,7 @@ class _EditTripState extends State<EditTrip> {
                     });
                     sortLoadItems(loads[selectedLoadIndex]);
                   },
-                  child: Text('Add',
-                      style: TextStyle(
-                          color: AppColors.saveButtonAllowableWeight)),
+                  child: Text('Add', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
                 ),
               ],
             );
@@ -734,8 +633,7 @@ class _EditTripState extends State<EditTrip> {
       for (var load in loads) {
         for (var item in load) {
           if (item is Gear) {
-            usedGearQuantities[item.name] =
-                (usedGearQuantities[item.name] ?? 0) + item.quantity;
+            usedGearQuantities[item.name] = (usedGearQuantities[item.name] ?? 0) + item.quantity;
           }
         }
       }
@@ -747,20 +645,14 @@ class _EditTripState extends State<EditTrip> {
             int remainingQuantity = gear.quantity - usedQuantity;
 
             // Only include gear with remaining quantities
-            return Gear(
-                name: gear.name,
-                quantity: remainingQuantity > 0 ? remainingQuantity : 0,
-                weight: gear.weight,
-                isPersonalTool: gear.isPersonalTool,
-                isHazmat: gear.isHazmat);
+            return Gear(name: gear.name, quantity: remainingQuantity > 0 ? remainingQuantity : 0, weight: gear.weight, isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat);
           })
           .where((gear) => gear.quantity > 0)
           .toList();
 
       // Load crew members
       crewList = widget.trip.crewMembers
-          .where((crew) => !loads.any((load) =>
-              load.any((item) => item is CrewMember && item.name == crew.name)))
+          .where((crew) => !loads.any((load) => load.any((item) => item is CrewMember && item.name == crew.name)))
           .map((crew) => CrewMember(
                 name: crew.name,
                 flightWeight: crew.flightWeight,
@@ -775,12 +667,7 @@ class _EditTripState extends State<EditTrip> {
   List<dynamic> loadToDynamicList(Load load) {
     return [
       ...load.loadPersonnel,
-      ...load.loadGear.map((gear) => Gear(
-          name: gear.name,
-          quantity: gear.quantity,
-          weight: gear.weight,
-          isPersonalTool: gear.isPersonalTool,
-          isHazmat: gear.isHazmat)),
+      ...load.loadGear.map((gear) => Gear(name: gear.name, quantity: gear.quantity, weight: gear.weight, isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat)),
       ...load.customItems.map((customItem) => CustomItem(
             name: customItem.name,
             weight: customItem.weight,
@@ -915,30 +802,22 @@ class _EditTripState extends State<EditTrip> {
           children: [
             Text(
               widget.trip.tripName,
-              style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lbs',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
           ],
         ),
         actions: [
           Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
             child: ElevatedButton(
               onPressed: _saveTrip,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.buttonStyle1,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               ),
               child: Text(
                 'Save',
@@ -963,8 +842,7 @@ class _EditTripState extends State<EditTrip> {
                     ? Stack(
                         children: [
                           ImageFiltered(
-                            imageFilter:
-                                ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                             // Blur effect
                             child: Image.asset(
                               'assets/images/logo1.png',
@@ -974,8 +852,7 @@ class _EditTripState extends State<EditTrip> {
                             ),
                           ),
                           Container(
-                            color: AppColors
-                                .logoImageOverlay, // Semi-transparent overlay
+                            color: AppColors.logoImageOverlay, // Semi-transparent overlay
                             width: double.infinity,
                             height: double.infinity,
                           ),
@@ -1001,8 +878,7 @@ class _EditTripState extends State<EditTrip> {
                 children: [
                   Flexible(
                     child: ReorderableListView.builder(
-                      proxyDecorator: (Widget child, int index,
-                          Animation<double> animation) {
+                      proxyDecorator: (Widget child, int index, Animation<double> animation) {
                         return AnimatedBuilder(
                           animation: animation,
                           builder: (context, child) {
@@ -1063,12 +939,7 @@ class _EditTripState extends State<EditTrip> {
                                 child: Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: calculateAvailableWeight(
-                                                    loads[index]) >
-                                                widget.trip.allowable ||
-                                            calculateAvailableSeats(
-                                                    loads[index]) >
-                                                widget.trip.availableSeats
+                                    color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                         ? Colors.black // Warning color
                                         : AppColors.fireColor, // Normal color
                                     borderRadius: const BorderRadius.vertical(
@@ -1077,26 +948,16 @@ class _EditTripState extends State<EditTrip> {
                                     ),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
                                           Text(
                                             'LOAD #${index + 1}',
                                             style: TextStyle(
-                                              color: calculateAvailableWeight(
-                                                              loads[index]) >
-                                                          widget
-                                                              .trip.allowable ||
-                                                      calculateAvailableSeats(
-                                                              loads[index]) >
-                                                          widget.trip
-                                                              .availableSeats
-                                                  ? Colors
-                                                      .white // Warning color
+                                              color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
+                                                  ? Colors.white // Warning color
                                                   : Colors.black,
                                               fontSize: 22,
                                               fontWeight: FontWeight.bold,
@@ -1107,14 +968,11 @@ class _EditTripState extends State<EditTrip> {
                                       Column(
                                         children: [
                                           Container(
-                                            padding: const EdgeInsets.only(
-                                                left: 4.0, right: 4.0),
+                                            padding: const EdgeInsets.only(left: 4.0, right: 4.0),
                                             decoration: BoxDecoration(
                                               color: Colors.transparent,
                                               // Background color
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      10), // Rounded corners
+                                              borderRadius: BorderRadius.circular(10), // Rounded corners
                                             ),
                                             height: 30,
                                             child: Row(
@@ -1125,20 +983,9 @@ class _EditTripState extends State<EditTrip> {
                                                       '${calculateAvailableWeight(loads[index])} lbs',
                                                       style: TextStyle(
                                                         fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: calculateAvailableWeight(
-                                                                        loads[
-                                                                            index]) >
-                                                                    widget.trip
-                                                                        .allowable ||
-                                                                calculateAvailableSeats(
-                                                                        loads[
-                                                                            index]) >
-                                                                    widget.trip
-                                                                        .availableSeats
-                                                            ? Colors
-                                                                .white // Warning color
+                                                        fontWeight: FontWeight.bold,
+                                                        color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
+                                                            ? Colors.white // Warning color
                                                             : Colors.black,
                                                       ),
                                                     ),
@@ -1149,20 +996,9 @@ class _EditTripState extends State<EditTrip> {
                                                   // Space between text and divider
                                                   thickness: 1,
                                                   // Thickness of the divider
-                                                  color: calculateAvailableWeight(
-                                                                  loads[
-                                                                      index]) >
-                                                              widget.trip
-                                                                  .allowable ||
-                                                          calculateAvailableSeats(
-                                                                  loads[
-                                                                      index]) >
-                                                              widget.trip
-                                                                  .availableSeats
-                                                      ? Colors
-                                                          .white // Warning color
-                                                      : Colors
-                                                          .black, // Divider color
+                                                  color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
+                                                      ? Colors.white // Warning color
+                                                      : Colors.black, // Divider color
                                                 ),
                                                 Row(
                                                   children: [
@@ -1170,20 +1006,9 @@ class _EditTripState extends State<EditTrip> {
                                                       '${calculateAvailableSeats(loads[index])}',
                                                       style: TextStyle(
                                                         fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: calculateAvailableWeight(
-                                                                        loads[
-                                                                            index]) >
-                                                                    widget.trip
-                                                                        .allowable ||
-                                                                calculateAvailableSeats(
-                                                                        loads[
-                                                                            index]) >
-                                                                    widget.trip
-                                                                        .availableSeats
-                                                            ? Colors
-                                                                .white // Warning color
+                                                        fontWeight: FontWeight.bold,
+                                                        color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
+                                                            ? Colors.white // Warning color
                                                             : Colors.black,
                                                       ),
                                                     ),
@@ -1191,20 +1016,9 @@ class _EditTripState extends State<EditTrip> {
                                                       '/${widget.trip.availableSeats} seats',
                                                       style: TextStyle(
                                                         fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: calculateAvailableWeight(
-                                                                        loads[
-                                                                            index]) >
-                                                                    widget.trip
-                                                                        .allowable ||
-                                                                calculateAvailableSeats(
-                                                                        loads[
-                                                                            index]) >
-                                                                    widget.trip
-                                                                        .availableSeats
-                                                            ? Colors
-                                                                .white // Warning color
+                                                        fontWeight: FontWeight.bold,
+                                                        color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
+                                                            ? Colors.white // Warning color
                                                             : Colors.black,
                                                       ),
                                                     ),
@@ -1217,15 +1031,8 @@ class _EditTripState extends State<EditTrip> {
                                       ),
                                       // Expansion Icon
                                       Icon(
-                                        isExpanded
-                                            ? Icons.expand_less
-                                            : Icons.expand_more,
-                                        color: calculateAvailableWeight(
-                                                        loads[index]) >
-                                                    widget.trip.allowable ||
-                                                calculateAvailableSeats(
-                                                        loads[index]) >
-                                                    widget.trip.availableSeats
+                                        isExpanded ? Icons.expand_less : Icons.expand_more,
+                                        color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                             ? Colors.white // Warning color
                                             : Colors.black,
                                         size: 36,
@@ -1242,21 +1049,16 @@ class _EditTripState extends State<EditTrip> {
                                   child: Column(
                                     children: [
                                       // If overweight
-                                      if (calculateAvailableWeight(
-                                              loads[index]) >
-                                          widget.trip.allowable)
+                                      if (calculateAvailableWeight(loads[index]) > widget.trip.allowable)
                                         Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 1.0),
+                                          padding: const EdgeInsets.symmetric(vertical: 1.0),
                                           child: Container(
                                             width: double.infinity,
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 4),
+                                            padding: const EdgeInsets.symmetric(vertical: 4),
                                             decoration: BoxDecoration(
                                               color: Colors.red,
                                               // Background color
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
+                                              borderRadius: BorderRadius.circular(8),
                                               // Rounded corners
                                             ),
                                             alignment: Alignment.center,
@@ -1271,22 +1073,17 @@ class _EditTripState extends State<EditTrip> {
                                           ),
                                         ),
                                       // If over seats
-                                      if (calculateAvailableSeats(
-                                              loads[index]) >
-                                          widget.trip.availableSeats)
+                                      if (calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
                                         Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 1.0),
+                                          padding: const EdgeInsets.symmetric(vertical: 1.0),
                                           // Adjust padding as needed
                                           child: Container(
                                             width: double.infinity,
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 4),
+                                            padding: const EdgeInsets.symmetric(vertical: 4),
                                             decoration: BoxDecoration(
                                               color: Colors.red,
                                               // Background color
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
+                                              borderRadius: BorderRadius.circular(8),
                                               // Rounded corners
                                             ),
                                             alignment: Alignment.center,
@@ -1303,12 +1100,9 @@ class _EditTripState extends State<EditTrip> {
 
                                       for (var item in loads[index]
                                         ..sort((a, b) {
-                                          if (a is CustomItem &&
-                                              (b is Gear || b is CrewMember)) {
+                                          if (a is CustomItem && (b is Gear || b is CrewMember)) {
                                             return 1; // CustomItem comes after Gear or CrewMember
-                                          } else if ((a is Gear ||
-                                                  a is CrewMember) &&
-                                              b is CustomItem) {
+                                          } else if ((a is Gear || a is CrewMember) && b is CustomItem) {
                                             return -1; // Gear or CrewMember comes before CustomItem
                                           }
                                           return 0; // Keep relative order for same types
@@ -1317,18 +1111,14 @@ class _EditTripState extends State<EditTrip> {
                                         Dismissible(
                                           key: ValueKey(item),
                                           // Unique key for each item
-                                          direction:
-                                              DismissDirection.endToStart,
+                                          direction: DismissDirection.endToStart,
                                           // Allow swipe from right to left
                                           background: Container(
                                             color: Colors.red,
                                             // Red background for delete action
                                             alignment: Alignment.centerRight,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 20),
-                                            child: Icon(Icons.delete,
-                                                color: AppColors
-                                                    .textColorSecondary), // Trash icon
+                                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                                            child: Icon(Icons.delete, color: AppColors.textColorSecondary), // Trash icon
                                           ),
                                           onDismissed: (direction) {
                                             setState(() {
@@ -1337,82 +1127,53 @@ class _EditTripState extends State<EditTrip> {
 
                                                 if (item is Gear) {
                                                   // No changes needed for Gear removal
-                                                  var existingGear =
-                                                      gearList.firstWhere(
-                                                    (gear) =>
-                                                        gear.name == item.name,
+                                                  var existingGear = gearList.firstWhere(
+                                                    (gear) => gear.name == item.name,
                                                     orElse: () => Gear(
                                                         name: item.name,
                                                         quantity: 0,
                                                         weight: item.weight,
                                                         // Per-item weight
-                                                        isPersonalTool:
-                                                            item.isPersonalTool,
-                                                        isHazmat:
-                                                            item.isHazmat),
+                                                        isPersonalTool: item.isPersonalTool,
+                                                        isHazmat: item.isHazmat),
                                                   );
 
                                                   // Update the quantity in the existing inventory
-                                                  existingGear.quantity +=
-                                                      item.quantity;
+                                                  existingGear.quantity += item.quantity;
 
-                                                  if (!gearList
-                                                      .contains(existingGear)) {
+                                                  if (!gearList.contains(existingGear)) {
                                                     gearList.add(existingGear);
                                                   }
                                                 } else if (item is CrewMember) {
                                                   // Handle personal tools for CrewMembers
-                                                  if (item.personalTools !=
-                                                      null) {
-                                                    for (var tool in item
-                                                        .personalTools!) {
+                                                  if (item.personalTools != null) {
+                                                    for (var tool in item.personalTools!) {
                                                       // Check and update in the gearList
-                                                      final gearListIndex =
-                                                          gearList.indexWhere(
-                                                        (gear) =>
-                                                            gear.name ==
-                                                            tool.name,
+                                                      final gearListIndex = gearList.indexWhere(
+                                                        (gear) => gear.name == tool.name,
                                                       );
 
                                                       if (gearListIndex != -1) {
-                                                        Gear gearTool =
-                                                            gearList[
-                                                                gearListIndex];
-                                                        gearTool.quantity -=
-                                                            tool.quantity;
+                                                        Gear gearTool = gearList[gearListIndex];
+                                                        gearTool.quantity -= tool.quantity;
 
                                                         // If quantity reaches zero, remove the tool from the gearList
-                                                        if (gearTool.quantity <=
-                                                            0) {
-                                                          gearList.removeAt(
-                                                              gearListIndex);
+                                                        if (gearTool.quantity <= 0) {
+                                                          gearList.removeAt(gearListIndex);
                                                         }
                                                       } else {
                                                         // Check and update in the load
-                                                        final toolIndex =
-                                                            loads[index]
-                                                                .indexWhere(
-                                                          (loadItem) =>
-                                                              loadItem
-                                                                  is Gear &&
-                                                              loadItem.name ==
-                                                                  tool.name,
+                                                        final toolIndex = loads[index].indexWhere(
+                                                          (loadItem) => loadItem is Gear && loadItem.name == tool.name,
                                                         );
 
                                                         if (toolIndex != -1) {
-                                                          Gear loadTool =
-                                                              loads[index]
-                                                                  [toolIndex];
-                                                          loadTool.quantity -=
-                                                              tool.quantity;
+                                                          Gear loadTool = loads[index][toolIndex];
+                                                          loadTool.quantity -= tool.quantity;
 
                                                           // If quantity reaches zero, remove the tool from the load
-                                                          if (loadTool
-                                                                  .quantity <=
-                                                              0) {
-                                                            loads[index]
-                                                                .removeAt(
-                                                                    toolIndex);
+                                                          if (loadTool.quantity <= 0) {
+                                                            loads[index].removeAt(toolIndex);
                                                           }
                                                         }
                                                       }
@@ -1420,8 +1181,7 @@ class _EditTripState extends State<EditTrip> {
                                                   }
 
                                                   // Add the CrewMember back to the available list
-                                                  if (!crewList
-                                                      .contains(item)) {
+                                                  if (!crewList.contains(item)) {
                                                     crewList.add(item);
                                                   }
                                                 }
@@ -1431,64 +1191,41 @@ class _EditTripState extends State<EditTrip> {
                                           child: Card(
                                             elevation: 2,
                                             color: item is CrewMember
-                                                ? AppColors
-                                                    .textFieldColor2 // Color for CrewMembers
-                                                : item is Gear &&
-                                                        item.isPersonalTool ==
-                                                            true
-                                                    ? AppColors
-                                                        .toolBlue // Color for personal tools
+                                                ? AppColors.textFieldColor2 // Color for CrewMembers
+                                                : item is Gear && item.isPersonalTool == true
+                                                    ? AppColors.toolBlue // Color for personal tools
                                                     : AppColors.gearYellow,
                                             // Color for regular Gear
                                             // Different colors for CrewMember and Gear
-                                            margin: const EdgeInsets.symmetric(
-                                                vertical: 1.0),
+                                            margin: const EdgeInsets.symmetric(vertical: 1.0),
                                             shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      8.0), // Rounded corners
+                                              borderRadius: BorderRadius.circular(8.0), // Rounded corners
                                             ),
                                             child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
+                                              padding: const EdgeInsets.all(8.0),
                                               child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Text(
-                                                        itemDisplayEditTrip(
-                                                            item),
+                                                        itemDisplayEditTrip(item),
                                                         style: TextStyle(
                                                           fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: item
-                                                                  is CrewMember
-                                                              ? AppColors
-                                                                  .textColorPrimary
-                                                              : Colors.black,
+                                                          fontWeight: FontWeight.bold,
+                                                          color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
                                                         ),
                                                       ),
                                                       Text(
                                                         item is Gear
                                                             ? 'Quantity: ${item.quantity}'
                                                             : item is CrewMember
-                                                                ? item.getPositionTitle(
-                                                                    item.position)
+                                                                ? item.getPositionTitle(item.position)
                                                                 : '',
                                                         style: TextStyle(
                                                           fontSize: 14,
-                                                          color: item
-                                                                  is CrewMember
-                                                              ? AppColors
-                                                                  .textColorPrimary
-                                                              : Colors.black,
+                                                          color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
                                                         ),
                                                       ),
                                                     ],
@@ -1496,40 +1233,23 @@ class _EditTripState extends State<EditTrip> {
 
                                                   // Single Item Deletion
                                                   IconButton(
-                                                    icon: const Icon(
-                                                        Icons.delete,
-                                                        color: Colors.red),
+                                                    icon: const Icon(Icons.delete, color: Colors.red),
                                                     onPressed: () {
                                                       setState(() {
-                                                        if (loads[index]
-                                                            .contains(item)) {
+                                                        if (loads[index].contains(item)) {
                                                           if (item is Gear) {
-                                                            if (item.quantity >
-                                                                1) {
+                                                            if (item.quantity > 1) {
                                                               showDialog(
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    (BuildContext
-                                                                        context) {
-                                                                  int quantityToRemove =
-                                                                      1; // Default to 1 for selection
+                                                                context: context,
+                                                                builder: (BuildContext context) {
+                                                                  int quantityToRemove = 1; // Default to 1 for selection
                                                                   return StatefulBuilder(
-                                                                    builder: (BuildContext
-                                                                            context,
-                                                                        StateSetter
-                                                                            setDialogState) {
+                                                                    builder: (BuildContext context, StateSetter setDialogState) {
                                                                       return AlertDialog(
-                                                                        backgroundColor:
-                                                                            AppColors.textFieldColor2,
-                                                                        title: Text(
-                                                                            'Remove ${item.name}',
-                                                                            style:
-                                                                                TextStyle(color: AppColors.textColorPrimary)),
-                                                                        content:
-                                                                            Column(
-                                                                          mainAxisSize:
-                                                                              MainAxisSize.min,
+                                                                        backgroundColor: AppColors.textFieldColor2,
+                                                                        title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                        content: Column(
+                                                                          mainAxisSize: MainAxisSize.min,
                                                                           children: [
                                                                             Text(
                                                                               'Select the quantity to remove:',
@@ -1557,16 +1277,13 @@ class _EditTripState extends State<EditTrip> {
                                                                         ),
                                                                         actions: [
                                                                           TextButton(
-                                                                            onPressed:
-                                                                                () {
+                                                                            onPressed: () {
                                                                               Navigator.of(context).pop(); // Cancel action
                                                                             },
-                                                                            child:
-                                                                                Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                                                            child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
                                                                           ),
                                                                           TextButton(
-                                                                            onPressed:
-                                                                                () {
+                                                                            onPressed: () {
                                                                               setState(() {
                                                                                 // Deduct the selected quantity
                                                                                 item.quantity -= quantityToRemove;
@@ -1598,8 +1315,7 @@ class _EditTripState extends State<EditTrip> {
 
                                                                               Navigator.of(context).pop(); // Close the dialog
                                                                             },
-                                                                            child:
-                                                                                Text(
+                                                                            child: Text(
                                                                               'Remove',
                                                                               style: TextStyle(color: Colors.red),
                                                                             ),
@@ -1612,14 +1328,9 @@ class _EditTripState extends State<EditTrip> {
                                                               );
                                                             } else {
                                                               // Remove single gear item
-                                                              loads[index]
-                                                                  .remove(item);
-                                                              var existingGear =
-                                                                  gearList
-                                                                      .firstWhere(
-                                                                (gear) =>
-                                                                    gear.name ==
-                                                                    item.name,
+                                                              loads[index].remove(item);
+                                                              var existingGear = gearList.firstWhere(
+                                                                (gear) => gear.name == item.name,
                                                                 orElse: () => Gear(
                                                                     name: item.name,
                                                                     quantity: 0,
@@ -1630,90 +1341,49 @@ class _EditTripState extends State<EditTrip> {
                                                               );
 
                                                               // Update inventory quantity
-                                                              existingGear
-                                                                  .quantity += 1;
+                                                              existingGear.quantity += 1;
 
-                                                              if (!gearList
-                                                                  .contains(
-                                                                      existingGear)) {
-                                                                gearList.add(
-                                                                    existingGear);
+                                                              if (!gearList.contains(existingGear)) {
+                                                                gearList.add(existingGear);
                                                               }
                                                             }
-                                                          } else if (item
-                                                              is CrewMember) {
+                                                          } else if (item is CrewMember) {
                                                             // Handle CrewMember logic
-                                                            if (item.personalTools !=
-                                                                null) {
-                                                              for (var tool in item
-                                                                  .personalTools!) {
-                                                                final gearListIndex =
-                                                                    gearList
-                                                                        .indexWhere(
-                                                                  (gear) =>
-                                                                      gear.name ==
-                                                                      tool.name,
+                                                            if (item.personalTools != null) {
+                                                              for (var tool in item.personalTools!) {
+                                                                final gearListIndex = gearList.indexWhere(
+                                                                  (gear) => gear.name == tool.name,
                                                                 );
 
-                                                                if (gearListIndex !=
-                                                                    -1) {
+                                                                if (gearListIndex != -1) {
                                                                   // Update gear list quantities
-                                                                  Gear
-                                                                      gearTool =
-                                                                      gearList[
-                                                                          gearListIndex];
-                                                                  gearTool.quantity -=
-                                                                      tool.quantity;
-                                                                  if (gearTool
-                                                                          .quantity <=
-                                                                      0) {
-                                                                    gearList.removeAt(
-                                                                        gearListIndex);
+                                                                  Gear gearTool = gearList[gearListIndex];
+                                                                  gearTool.quantity -= tool.quantity;
+                                                                  if (gearTool.quantity <= 0) {
+                                                                    gearList.removeAt(gearListIndex);
                                                                   }
                                                                 } else {
                                                                   // Update load quantities
-                                                                  final toolIndex =
-                                                                      loads[index]
-                                                                          .indexWhere(
-                                                                    (loadItem) =>
-                                                                        loadItem
-                                                                            is Gear &&
-                                                                        loadItem.name ==
-                                                                            tool.name,
+                                                                  final toolIndex = loads[index].indexWhere(
+                                                                    (loadItem) => loadItem is Gear && loadItem.name == tool.name,
                                                                   );
 
-                                                                  if (toolIndex !=
-                                                                      -1) {
-                                                                    Gear
-                                                                        loadTool =
-                                                                        loads[index]
-                                                                            [
-                                                                            toolIndex];
-                                                                    loadTool.quantity -=
-                                                                        tool.quantity;
-                                                                    if (loadTool
-                                                                            .quantity <=
-                                                                        0) {
-                                                                      loads[index]
-                                                                          .removeAt(
-                                                                              toolIndex);
+                                                                  if (toolIndex != -1) {
+                                                                    Gear loadTool = loads[index][toolIndex];
+                                                                    loadTool.quantity -= tool.quantity;
+                                                                    if (loadTool.quantity <= 0) {
+                                                                      loads[index].removeAt(toolIndex);
                                                                     }
                                                                   }
                                                                 }
                                                               }
                                                             }
-                                                            if (!crewList
-                                                                .contains(
-                                                                    item)) {
-                                                              crewList
-                                                                  .add(item);
+                                                            if (!crewList.contains(item)) {
+                                                              crewList.add(item);
                                                             }
-                                                            loads[index]
-                                                                .remove(item);
-                                                          } else if (item
-                                                              is CustomItem) {
-                                                            loads[index]
-                                                                .remove(item);
+                                                            loads[index].remove(item);
+                                                          } else if (item is CustomItem) {
+                                                            loads[index].remove(item);
                                                           }
                                                         }
                                                       });
@@ -1730,68 +1400,50 @@ class _EditTripState extends State<EditTrip> {
 
                                       // Add Item
                                       GestureDetector(
-                                        onTap: () =>
-                                            _showSelectionDialog(index),
+                                        onTap: () => _showSelectionDialog(index),
                                         child: Container(
                                           width: double.infinity,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8),
+                                          padding: const EdgeInsets.symmetric(vertical: 8),
                                           decoration: BoxDecoration(
                                             color: AppColors.textFieldColor2,
                                             // Background color
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(8),
                                             // Rounded corners
                                           ),
                                           alignment: Alignment.center,
                                           child: Text(
                                             '+ Add Item',
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color:
-                                                    AppColors.textColorPrimary),
+                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                           ),
                                         ),
                                       ),
 
                                       SizedBox(height: 2),
 
-                                      // Delete load
+                                      // Load Deletion
                                       GestureDetector(
                                         onTap: () {
                                           showDialog(
                                             context: context,
                                             builder: (BuildContext context) {
                                               return AlertDialog(
-                                                backgroundColor:
-                                                    AppColors.textFieldColor2,
+                                                backgroundColor: AppColors.textFieldColor2,
                                                 title: Text(
                                                   'Confirm Deletion',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: AppColors
-                                                          .textColorPrimary),
+                                                  style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                                 ),
                                                 content: Text(
                                                   'Are you sure you want to delete this load?',
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: AppColors
-                                                          .textColorPrimary),
+                                                  style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
                                                 ),
                                                 actions: [
                                                   TextButton(
                                                     onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop(); // Close the dialog without deleting
+                                                      Navigator.of(context).pop(); // Close the dialog without deleting
                                                     },
                                                     child: Text(
                                                       'Cancel',
-                                                      style: TextStyle(
-                                                          color: AppColors
-                                                              .cancelButton),
+                                                      style: TextStyle(color: AppColors.cancelButton),
                                                     ),
                                                   ),
                                                   TextButton(
@@ -1799,80 +1451,44 @@ class _EditTripState extends State<EditTrip> {
                                                       // Execute deletion logic
                                                       setState(() {
                                                         // Iterate through all items in the load
-                                                        for (var item
-                                                            in loads[index]) {
-                                                          if (item
-                                                              is CrewMember) {
+                                                        for (var item in loads[index]) {
+                                                          if (item is CrewMember) {
                                                             // Add crew member back to the crew list
-                                                            if (!crewList
-                                                                .contains(
-                                                                    item)) {
-                                                              crewList
-                                                                  .add(item);
+                                                            if (!crewList.contains(item)) {
+                                                              crewList.add(item);
                                                             }
-                                                          } else if (item
-                                                              is Gear) {
-                                                            if (item
-                                                                .isPersonalTool) {
-                                                              gearList.removeWhere((gear) =>
-                                                                  gear.name ==
-                                                                      item.name &&
-                                                                  gear.isPersonalTool);
+                                                          } else if (item is Gear) {
+                                                            if (item.isPersonalTool) {
+                                                              gearList.removeWhere((gear) => gear.name == item.name && gear.isPersonalTool);
                                                             } else {
                                                               // General gear: update or add back to gearList
-                                                              final existingGear =
-                                                                  gearList
-                                                                      .firstWhere(
-                                                                (gear) =>
-                                                                    gear.name ==
-                                                                        item
-                                                                            .name &&
-                                                                    !gear
-                                                                        .isPersonalTool,
-                                                                orElse: () => Gear(
-                                                                    name: item
-                                                                        .name,
-                                                                    quantity: 0,
-                                                                    weight: item
-                                                                            .weight ~/
-                                                                        item
-                                                                            .quantity,
-                                                                    isHazmat: item
-                                                                        .isHazmat),
+                                                              final existingGear = gearList.firstWhere(
+                                                                (gear) => gear.name == item.name && !gear.isPersonalTool,
+                                                                orElse: () => Gear(name: item.name, quantity: 0, weight: item.totalGearWeight ~/ item.quantity, isHazmat: item.isHazmat),
                                                               );
 
-                                                              existingGear
-                                                                      .quantity +=
-                                                                  item.quantity;
+                                                              existingGear.quantity += item.quantity;
 
                                                               // Add to gearList if it's not already present
-                                                              if (!gearList
-                                                                  .contains(
-                                                                      existingGear)) {
-                                                                gearList.add(
-                                                                    existingGear);
+                                                              if (!gearList.contains(existingGear)) {
+                                                                gearList.add(existingGear);
                                                               }
                                                             }
                                                           }
                                                         }
                                                         // Remove all personal tools from the gearList
-                                                        gearList.removeWhere(
-                                                            (gear) => gear
-                                                                .isPersonalTool);
+                                                        gearList.removeWhere((gear) => gear.isPersonalTool);
 
                                                         // Remove the load from the list
                                                         loads.removeAt(index);
-                                                        _isExpanded.removeAt(
-                                                            index); // Ensure the lists stay in sync
+                                                        _isExpanded.removeAt(index); // Ensure the lists stay in sync
                                                       });
 
-                                                      Navigator.of(context)
-                                                          .pop(); // Close the dialog after deletion
+                                                      Navigator.of(context).pop(); // Close the dialog after deletion
                                                     },
                                                     child: const Text(
                                                       'Delete',
-                                                      style: TextStyle(
-                                                          color: Colors.red),
+                                                      style: TextStyle(color: Colors.red),
                                                     ),
                                                   ),
                                                 ],
@@ -1882,25 +1498,19 @@ class _EditTripState extends State<EditTrip> {
                                         },
                                         child: Container(
                                           width: double.infinity,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8),
+                                          padding: const EdgeInsets.symmetric(vertical: 8),
                                           decoration: BoxDecoration(
                                             color: Colors.red,
                                             // Background color
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(8),
                                             // Rounded corners
                                           ),
                                           alignment: Alignment.center,
                                           child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              Icon(Icons.delete,
-                                                  color: Colors.black,
-                                                  size: 24),
+                                              Icon(Icons.delete, color: Colors.black, size: 24),
                                               Text(
                                                 ' Delete Load',
                                                 style: TextStyle(
@@ -1927,20 +1537,17 @@ class _EditTripState extends State<EditTrip> {
                     child: ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          print(
-                              'Before adding: loads.length = ${loads.length}, _isExpanded.length = ${_isExpanded.length}');
+                          print('Before adding: loads.length = ${loads.length}, _isExpanded.length = ${_isExpanded.length}');
 
 // Add load here bruh
                           loads.add([]);
                           _isExpanded.add(true);
-                          print(
-                              'After adding: loads.length = ${loads.length}, _isExpanded.length = ${_isExpanded.length}');
+                          print('After adding: loads.length = ${loads.length}, _isExpanded.length = ${_isExpanded.length}');
                         });
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.buttonStyle1,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       ),
                       child: Text(
                         ' + Add Load',

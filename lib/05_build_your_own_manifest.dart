@@ -86,10 +86,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
               backgroundColor: AppColors.textFieldColor2,
               title: Text(
                 'Add Crew Members and Gear',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: AppColors.textColorPrimary),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textColorPrimary),
               ),
               contentPadding: const EdgeInsets.all(16),
               content: ConstrainedBox(
@@ -120,8 +117,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                   child: ListTile(
                                     title: const Text(
                                       'Crew Members',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 );
@@ -139,8 +135,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                           color: Colors.grey.withOpacity(0.8),
                                           spreadRadius: 1,
                                           blurRadius: 5,
-                                          offset:
-                                              Offset(0, 3), // Shadow position
+                                          offset: Offset(0, 3), // Shadow position
                                         ),
                                       ],
                                     ),
@@ -156,15 +151,12 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       //
                                       title: Text(
                                         '${crew.name}, ${crew.flightWeight} lbs',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.textColorPrimary),
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                         textAlign: TextAlign.start,
                                       ),
                                       subtitle: Text(
                                         crew.getPositionTitle(crew.position),
-                                        style: TextStyle(
-                                            color: AppColors.textColorPrimary),
+                                        style: TextStyle(color: AppColors.textColorPrimary),
                                       ),
                                       value: selectedItems.contains(crew),
                                       onChanged: (bool? isChecked) {
@@ -205,23 +197,20 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                   child: ListTile(
                                     title: const Text(
                                       'Gear',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 );
                               },
                               body: Column(
                                 children: sortedGearList.map((gear) {
-                                  int remainingQuantity = gear.quantity -
-                                      (selectedGearQuantities[gear] ?? 0);
+                                  int remainingQuantity = gear.quantity - (selectedGearQuantities[gear] ?? 0);
 
                                   return Container(
                                     //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
                                     decoration: BoxDecoration(
                                       color: gear.isPersonalTool
-                                          ? AppColors
-                                              .toolBlue // Color for personal tools
+                                          ? AppColors.toolBlue // Color for personal tools
                                           : AppColors.gearYellow,
                                       borderRadius: BorderRadius.circular(0.0),
                                       // Rounded corners
@@ -230,15 +219,13 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                           color: Colors.grey.withOpacity(0.8),
                                           spreadRadius: 1,
                                           blurRadius: 5,
-                                          offset:
-                                              Offset(0, 3), // Shadow position
+                                          offset: Offset(0, 3), // Shadow position
                                         ),
                                       ],
                                     ),
                                     child: CheckboxListTile(
                                       title: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             child: Row(
@@ -248,11 +235,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                     gear.name,
                                                     style: const TextStyle(
                                                       fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                      fontWeight: FontWeight.bold,
                                                     ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                    overflow: TextOverflow.ellipsis,
                                                   ),
                                                 ),
                                                 Text(
@@ -270,55 +255,35 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                             if (selectedItems.contains(gear))
                                               GestureDetector(
                                                 onTap: () {
-                                                  final int gearQuantity =
-                                                      gear.quantity;
+                                                  final int gearQuantity = gear.quantity;
                                                   if (gearQuantity > 1) {
                                                     showDialog(
                                                       context: context,
-                                                      builder: (BuildContext
-                                                          context) {
+                                                      builder: (BuildContext context) {
                                                         return AlertDialog(
-                                                          backgroundColor:
-                                                              AppColors
-                                                                  .textFieldColor2,
+                                                          backgroundColor: AppColors.textFieldColor2,
                                                           title: Text(
                                                             'Select Quantity for ${gear.name}',
-                                                            style: TextStyle(
-                                                                color: AppColors
-                                                                    .textColorPrimary),
+                                                            style: TextStyle(color: AppColors.textColorPrimary),
                                                           ),
                                                           content: SizedBox(
                                                             height: 150,
-                                                            child:
-                                                                CupertinoPicker(
-                                                              scrollController:
-                                                                  FixedExtentScrollController(
-                                                                initialItem:
-                                                                    (selectedGearQuantities[gear] ??
-                                                                            1) -
-                                                                        1,
+                                                            child: CupertinoPicker(
+                                                              scrollController: FixedExtentScrollController(
+                                                                initialItem: (selectedGearQuantities[gear] ?? 1) - 1,
                                                               ),
                                                               itemExtent: 32.0,
-                                                              onSelectedItemChanged:
-                                                                  (int value) {
-                                                                dialogSetState(
-                                                                    () {
-                                                                  selectedGearQuantities[
-                                                                          gear] =
-                                                                      value + 1;
+                                                              onSelectedItemChanged: (int value) {
+                                                                dialogSetState(() {
+                                                                  selectedGearQuantities[gear] = value + 1;
                                                                 });
                                                               },
-                                                              children: List<
-                                                                  Widget>.generate(
+                                                              children: List<Widget>.generate(
                                                                 gear.quantity,
                                                                 // Use the full quantity for selection
                                                                 (int index) {
                                                                   return Center(
-                                                                    child: Text(
-                                                                        '${index + 1}',
-                                                                        style: TextStyle(
-                                                                            color:
-                                                                                AppColors.textColorPrimary)),
+                                                                    child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                   );
                                                                 },
                                                               ),
@@ -327,38 +292,20 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                           actions: [
                                                             TextButton(
                                                               onPressed: () {
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop();
+                                                                Navigator.of(context).pop();
                                                               },
-                                                              child: Text(
-                                                                  'Cancel',
-                                                                  style: TextStyle(
-                                                                      color: AppColors
-                                                                          .cancelButton)),
+                                                              child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
                                                             ),
                                                             TextButton(
                                                               onPressed: () {
                                                                 // Finalize the selection
-                                                                dialogSetState(
-                                                                    () {
-                                                                  int selectedQuantity =
-                                                                      selectedGearQuantities[
-                                                                              gear] ??
-                                                                          1;
-                                                                  remainingQuantity =
-                                                                      gear.quantity -
-                                                                          selectedQuantity;
+                                                                dialogSetState(() {
+                                                                  int selectedQuantity = selectedGearQuantities[gear] ?? 1;
+                                                                  remainingQuantity = gear.quantity - selectedQuantity;
                                                                 });
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop();
+                                                                Navigator.of(context).pop();
                                                               },
-                                                              child: Text(
-                                                                  'Confirm',
-                                                                  style: TextStyle(
-                                                                      color: AppColors
-                                                                          .saveButtonAllowableWeight)),
+                                                              child: Text('Confirm', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
                                                             ),
                                                           ],
                                                         );
@@ -372,18 +319,12 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                       Text(
                                                         'Qty: ${selectedGearQuantities[gear] ?? 1}',
                                                         style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
+                                                          fontWeight: FontWeight.bold,
                                                           fontSize: 14,
-                                                          color: AppColors
-                                                              .textColorSecondary,
+                                                          color: AppColors.textColorSecondary,
                                                         ),
                                                       ),
-                                                    if (gear.quantity > 1)
-                                                      Icon(
-                                                          Icons.arrow_drop_down,
-                                                          color: AppColors
-                                                              .textColorSecondary),
+                                                    if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
                                                   ],
                                                 ),
                                               ),
@@ -394,8 +335,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         dialogSetState(() {
                                           if (isChecked == true) {
                                             selectedItems.add(gear);
-                                            selectedGearQuantities[gear] =
-                                                1; // Default quantity
+                                            selectedGearQuantities[gear] = 1; // Default quantity
                                           } else {
                                             selectedItems.remove(gear);
                                             selectedGearQuantities.remove(gear);
@@ -422,27 +362,22 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                             ExpansionPanel(
                               isExpanded: isCustomItemExpanded,
                               backgroundColor: AppColors.fireColor,
-                              headerBuilder: (context, isExpanded) =>
-                                  GestureDetector(
+                              headerBuilder: (context, isExpanded) => GestureDetector(
                                 onLongPress: () {
                                   showModalBottomSheet(
                                     backgroundColor: AppColors.textFieldColor2,
                                     context: context,
                                     isScrollControlled: true,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(16)),
+                                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                                     ),
                                     builder: (BuildContext context) {
                                       return Container(
                                         padding: EdgeInsets.all(16.0),
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.7,
+                                        height: MediaQuery.of(context).size.height * 0.7,
                                         // 70% of the screen height
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             // Modal Title
                                             Text(
@@ -450,8 +385,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 20,
-                                                color:
-                                                    AppColors.textColorPrimary,
+                                                color: AppColors.textColorPrimary,
                                               ),
                                             ),
                                             const SizedBox(height: 16),
@@ -463,33 +397,24 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                 itemBuilder: (context, index) {
                                                   final item = irpgItems[index];
                                                   return Container(
-                                                    margin:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 4.0),
+                                                    margin: EdgeInsets.symmetric(vertical: 4.0),
                                                     child: ListTile(
-                                                      contentPadding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 8.0,
-                                                              vertical: 0.0),
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0.0),
                                                       title: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children: [
                                                           Text(
                                                             item['name'],
                                                             style: TextStyle(
                                                               fontSize: 16,
-                                                              color: AppColors
-                                                                  .textColorPrimary,
+                                                              color: AppColors.textColorPrimary,
                                                             ),
                                                           ),
                                                           Text(
                                                             '${item['weight']} lbs',
                                                             style: TextStyle(
                                                               fontSize: 16,
-                                                              color: AppColors
-                                                                  .textColorPrimary,
+                                                              color: AppColors.textColorPrimary,
                                                             ),
                                                           ),
                                                         ],
@@ -505,14 +430,12 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                               alignment: Alignment.bottomRight,
                                               child: TextButton(
                                                 onPressed: () {
-                                                  Navigator.of(context)
-                                                      .pop(); // Close the modal
+                                                  Navigator.of(context).pop(); // Close the modal
                                                 },
                                                 child: Text(
                                                   'Cancel',
                                                   style: TextStyle(
-                                                    color:
-                                                        AppColors.cancelButton,
+                                                    color: AppColors.cancelButton,
                                                   ),
                                                 ),
                                               ),
@@ -540,20 +463,16 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                     TextField(
                                       decoration: InputDecoration(
                                         labelText: 'Item Name',
-                                        labelStyle: TextStyle(
-                                            color: AppColors
-                                                .textColorPrimary), // Label color
+                                        labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
                                       ),
-                                      textCapitalization:
-                                          TextCapitalization.words,
+                                      textCapitalization: TextCapitalization.words,
                                       focusNode: customItemNameFocus,
                                       // Attach focus node
                                       textInputAction: TextInputAction.next,
                                       // Specify the action
                                       onSubmitted: (_) {
                                         // Move focus to the next field
-                                        FocusScope.of(context).requestFocus(
-                                            customItemWeightFocus);
+                                        FocusScope.of(context).requestFocus(customItemWeightFocus);
                                       },
                                       onChanged: (value) {
                                         customItemName = value;
@@ -565,9 +484,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                     TextField(
                                       decoration: InputDecoration(
                                         labelText: 'Weight (lbs)',
-                                        labelStyle: TextStyle(
-                                            color: AppColors
-                                                .textColorPrimary), // Label color
+                                        labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
                                       ),
                                       keyboardType: TextInputType.number,
                                       maxLength: 3,
@@ -577,12 +494,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       // Specify the action
                                       onSubmitted: (_) {
                                         // Move focus to the next field
-                                        FocusScope.of(context).requestFocus(
-                                            customItemQuantityFocus);
+                                        FocusScope.of(context).requestFocus(customItemQuantityFocus);
                                       },
                                       onChanged: (value) {
-                                        customItemWeight =
-                                            int.tryParse(value) ?? 0;
+                                        customItemWeight = int.tryParse(value) ?? 0;
                                       },
                                     ),
                                   ],
@@ -629,23 +544,18 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                       for (var item in selectedItems) {
                         if (item is Gear) {
                           // Respect the selected quantity
-                          int selectedQuantity =
-                              selectedGearQuantities[item] ?? 1;
+                          int selectedQuantity = selectedGearQuantities[item] ?? 1;
 
                           // Check if a gear with the same name already exists in the load
-                          final existingGearIndex =
-                              loads[selectedLoadIndex].indexWhere(
-                            (loadItem) =>
-                                loadItem is Gear && loadItem.name == item.name,
+                          final existingGearIndex = loads[selectedLoadIndex].indexWhere(
+                            (loadItem) => loadItem is Gear && loadItem.name == item.name,
                           );
 
                           if (existingGearIndex != -1) {
                             // If it exists, update its quantity and weight
-                            Gear existingGear = loads[selectedLoadIndex]
-                                [existingGearIndex] as Gear;
+                            Gear existingGear = loads[selectedLoadIndex][existingGearIndex] as Gear;
                             existingGear.quantity += selectedQuantity;
-                            existingGear.weight = existingGear.quantity *
-                                item.weight; // Recalculate weight
+                            existingGear.weight = existingGear.quantity * item.weight; // Recalculate weight
                           } else {
                             // If it doesn't exist, add the new gear item to the load
                             loads[selectedLoadIndex].add(
@@ -671,29 +581,19 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                           // Loop through and add all personal tools
                           if (item.personalTools != null) {
                             for (var tool in item.personalTools!) {
-                              final existingToolIndex =
-                                  loads[selectedLoadIndex].indexWhere(
-                                (loadItem) =>
-                                    loadItem is Gear &&
-                                    loadItem.name == tool.name,
+                              final existingToolIndex = loads[selectedLoadIndex].indexWhere(
+                                (loadItem) => loadItem is Gear && loadItem.name == tool.name,
                               );
 
                               if (existingToolIndex != -1) {
                                 // Update the existing tool's quantity and weight
-                                Gear existingTool = loads[selectedLoadIndex]
-                                    [existingToolIndex] as Gear;
+                                Gear existingTool = loads[selectedLoadIndex][existingToolIndex] as Gear;
                                 existingTool.quantity += tool.quantity;
-                                existingTool.weight =
-                                    existingTool.quantity * tool.weight;
+                                existingTool.weight = existingTool.quantity * tool.weight;
                               } else {
                                 // Add the tool as a new gear item
                                 loads[selectedLoadIndex].add(
-                                  Gear(
-                                      name: tool.name,
-                                      quantity: tool.quantity,
-                                      weight: tool.weight * tool.quantity,
-                                      isPersonalTool: tool.isPersonalTool,
-                                      isHazmat: tool.isHazmat),
+                                  Gear(name: tool.name, quantity: tool.quantity, weight: tool.weight * tool.quantity, isPersonalTool: tool.isPersonalTool, isHazmat: tool.isHazmat),
                                 );
                               }
                             }
@@ -708,8 +608,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                   },
                   child: Text(
                     'Add',
-                    style:
-                        TextStyle(color: AppColors.saveButtonAllowableWeight),
+                    style: TextStyle(color: AppColors.saveButtonAllowableWeight),
                   ),
                 ),
               ],
@@ -725,12 +624,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
     setState(() {
       // Create deep copies of the gear and crew member data
       gearList = gearBox.values.map((gear) {
-        return Gear(
-            name: gear.name,
-            quantity: gear.quantity,
-            weight: gear.weight,
-            isPersonalTool: gear.isPersonalTool,
-            isHazmat: gear.isHazmat);
+        return Gear(name: gear.name, quantity: gear.quantity, weight: gear.weight, isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat);
       }).toList();
 
       crewList = crewmemberBox.values.map((crew) {
@@ -759,16 +653,14 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
       // Because i made mistake with gear quantitys/weights. This is a fix before saving trip
       loadItems.whereType<Gear>().forEach((gear) {
         if (gear.quantity > 0) {
-          gear.weight =
-              gear.weight ~/ gear.quantity; // Adjust to per-item weight
+          gear.weight = gear.weight ~/ gear.quantity; // Adjust to per-item weight
         }
       });
 
       // Calculate total weight for the load
       int loadWeight = loadItems.fold(0, (sum, item) {
         if (item is Gear) {
-          return sum +
-              (item.weight * item.quantity); // Use adjusted per-item weight
+          return sum + (item.weight * item.quantity); // Use adjusted per-item weight
         } else if (item is CrewMember) {
           return sum + item.flightWeight;
         } else if (item is CustomItem) {
@@ -783,8 +675,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
         weight: loadWeight,
         loadPersonnel: loadItems.whereType<CrewMember>().toList(),
         loadGear: loadItems.whereType<Gear>().toList(),
-        customItems:
-            loadItems.whereType<CustomItem>().toList(), // Save CustomItems
+        customItems: loadItems.whereType<CustomItem>().toList(), // Save CustomItems
       );
     }).toList();
 
@@ -880,30 +771,22 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
           children: [
             Text(
               widget.trip.tripName,
-              style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lbs',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
           ],
         ),
         actions: [
           Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
             child: ElevatedButton(
               onPressed: _saveTrip,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.buttonStyle1,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               ),
               child: Text(
                 'Save',
@@ -928,8 +811,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                     ? Stack(
                         children: [
                           ImageFiltered(
-                            imageFilter:
-                                ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                             // Blur effect
                             child: Image.asset(
                               'assets/images/logo1.png',
@@ -939,8 +821,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                             ),
                           ),
                           Container(
-                            color: AppColors
-                                .logoImageOverlay, // Semi-transparent overlay
+                            color: AppColors.logoImageOverlay, // Semi-transparent overlay
                             width: double.infinity,
                             height: double.infinity,
                           ),
@@ -1027,12 +908,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                 child: Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: calculateAvailableWeight(
-                                                    loads[index]) >
-                                                widget.trip.allowable ||
-                                            calculateAvailableSeats(
-                                                    loads[index]) >
-                                                widget.trip.availableSeats
+                                    color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                         ? Colors.black // Warning color
                                         : AppColors.fireColor, // Normal color
                                     borderRadius: const BorderRadius.vertical(
@@ -1041,26 +917,16 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                     ),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
                                           Text(
                                             'LOAD #${index + 1}',
                                             style: TextStyle(
-                                              color: calculateAvailableWeight(
-                                                              loads[index]) >
-                                                          widget
-                                                              .trip.allowable ||
-                                                      calculateAvailableSeats(
-                                                              loads[index]) >
-                                                          widget.trip
-                                                              .availableSeats
-                                                  ? Colors
-                                                      .white // Warning color
+                                              color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
+                                                  ? Colors.white // Warning color
                                                   : Colors.black,
                                               fontSize: 22,
                                               fontWeight: FontWeight.bold,
@@ -1071,14 +937,11 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       Column(
                                         children: [
                                           Container(
-                                            padding: const EdgeInsets.only(
-                                                left: 4.0, right: 4.0),
+                                            padding: const EdgeInsets.only(left: 4.0, right: 4.0),
                                             decoration: BoxDecoration(
                                               color: Colors.transparent,
                                               // Background color
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      10), // Rounded corners
+                                              borderRadius: BorderRadius.circular(10), // Rounded corners
                                             ),
                                             height: 30,
                                             child: Row(
@@ -1089,20 +952,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                       '${calculateAvailableWeight(loads[index])} lbs',
                                                       style: TextStyle(
                                                         fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: calculateAvailableWeight(
-                                                                        loads[
-                                                                            index]) >
-                                                                    widget.trip
-                                                                        .allowable ||
-                                                                calculateAvailableSeats(
-                                                                        loads[
-                                                                            index]) >
-                                                                    widget.trip
-                                                                        .availableSeats
-                                                            ? Colors
-                                                                .white // Warning color
+                                                        fontWeight: FontWeight.bold,
+                                                        color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
+                                                            ? Colors.white // Warning color
                                                             : Colors.black,
                                                       ),
                                                     ),
@@ -1113,20 +965,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                   // Space between text and divider
                                                   thickness: 1,
                                                   // Thickness of the divider
-                                                  color: calculateAvailableWeight(
-                                                                  loads[
-                                                                      index]) >
-                                                              widget.trip
-                                                                  .allowable ||
-                                                          calculateAvailableSeats(
-                                                                  loads[
-                                                                      index]) >
-                                                              widget.trip
-                                                                  .availableSeats
-                                                      ? Colors
-                                                          .white // Warning color
-                                                      : Colors
-                                                          .black, // Divider color
+                                                  color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
+                                                      ? Colors.white // Warning color
+                                                      : Colors.black, // Divider color
                                                 ),
                                                 Row(
                                                   children: [
@@ -1134,20 +975,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                       '${calculateAvailableSeats(loads[index])}',
                                                       style: TextStyle(
                                                         fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: calculateAvailableWeight(
-                                                                        loads[
-                                                                            index]) >
-                                                                    widget.trip
-                                                                        .allowable ||
-                                                                calculateAvailableSeats(
-                                                                        loads[
-                                                                            index]) >
-                                                                    widget.trip
-                                                                        .availableSeats
-                                                            ? Colors
-                                                                .white // Warning color
+                                                        fontWeight: FontWeight.bold,
+                                                        color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
+                                                            ? Colors.white // Warning color
                                                             : Colors.black,
                                                       ),
                                                     ),
@@ -1155,20 +985,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                       '/${widget.trip.availableSeats} seats',
                                                       style: TextStyle(
                                                         fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: calculateAvailableWeight(
-                                                                        loads[
-                                                                            index]) >
-                                                                    widget.trip
-                                                                        .allowable ||
-                                                                calculateAvailableSeats(
-                                                                        loads[
-                                                                            index]) >
-                                                                    widget.trip
-                                                                        .availableSeats
-                                                            ? Colors
-                                                                .white // Warning color
+                                                        fontWeight: FontWeight.bold,
+                                                        color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
+                                                            ? Colors.white // Warning color
                                                             : Colors.black,
                                                       ),
                                                     ),
@@ -1181,15 +1000,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       ),
                                       // Expansion Icon
                                       Icon(
-                                        isExpanded
-                                            ? Icons.expand_less
-                                            : Icons.expand_more,
-                                        color: calculateAvailableWeight(
-                                                        loads[index]) >
-                                                    widget.trip.allowable ||
-                                                calculateAvailableSeats(
-                                                        loads[index]) >
-                                                    widget.trip.availableSeats
+                                        isExpanded ? Icons.expand_less : Icons.expand_more,
+                                        color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                             ? Colors.white // Warning color
                                             : Colors.black,
                                         size: 36,
@@ -1206,21 +1018,16 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                   child: Column(
                                     children: [
                                       // If overweight
-                                      if (calculateAvailableWeight(
-                                              loads[index]) >
-                                          widget.trip.allowable)
+                                      if (calculateAvailableWeight(loads[index]) > widget.trip.allowable)
                                         Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 1.0),
+                                          padding: const EdgeInsets.symmetric(vertical: 1.0),
                                           child: Container(
                                             width: double.infinity,
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 4),
+                                            padding: const EdgeInsets.symmetric(vertical: 4),
                                             decoration: BoxDecoration(
                                               color: Colors.red,
                                               // Background color
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
+                                              borderRadius: BorderRadius.circular(8),
                                               // Rounded corners
                                             ),
                                             alignment: Alignment.center,
@@ -1236,22 +1043,17 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         ),
 
                                       // If overseats
-                                      if (calculateAvailableSeats(
-                                              loads[index]) >
-                                          widget.trip.availableSeats)
+                                      if (calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
                                         Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 1.0),
+                                          padding: const EdgeInsets.symmetric(vertical: 1.0),
                                           // Adjust padding as needed
                                           child: Container(
                                             width: double.infinity,
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 4),
+                                            padding: const EdgeInsets.symmetric(vertical: 4),
                                             decoration: BoxDecoration(
                                               color: Colors.red,
                                               // Background color
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
+                                              borderRadius: BorderRadius.circular(8),
                                               // Rounded corners
                                             ),
                                             alignment: Alignment.center,
@@ -1268,12 +1070,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
                                       for (var item in loads[index]
                                         ..sort((a, b) {
-                                          if (a is CustomItem &&
-                                              (b is Gear || b is CrewMember)) {
+                                          if (a is CustomItem && (b is Gear || b is CrewMember)) {
                                             return 1; // CustomItem comes after Gear or CrewMember
-                                          } else if ((a is Gear ||
-                                                  a is CrewMember) &&
-                                              b is CustomItem) {
+                                          } else if ((a is Gear || a is CrewMember) && b is CustomItem) {
                                             return -1; // Gear or CrewMember comes before CustomItem
                                           }
                                           return 0; // Keep relative order for same types
@@ -1282,18 +1081,14 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         Dismissible(
                                           key: ValueKey(item),
                                           // Unique key for each item
-                                          direction:
-                                              DismissDirection.endToStart,
+                                          direction: DismissDirection.endToStart,
                                           // Allow swipe from right to left
                                           background: Container(
                                             color: Colors.red,
                                             // Red background for delete action
                                             alignment: Alignment.centerRight,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 20),
-                                            child: Icon(Icons.delete,
-                                                color: AppColors
-                                                    .textColorSecondary), // Trash icon
+                                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                                            child: Icon(Icons.delete, color: AppColors.textColorSecondary), // Trash icon
                                           ),
                                           onDismissed: (direction) {
                                             setState(() {
@@ -1301,92 +1096,57 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                 loads[index].remove(item);
 
                                                 if (item is Gear) {
-                                                  var existingGear =
-                                                      gearList.firstWhere(
-                                                    (gear) =>
-                                                        gear.name == item.name,
+                                                  var existingGear = gearList.firstWhere(
+                                                    (gear) => gear.name == item.name,
                                                     orElse: () => Gear(
                                                         name: item.name,
                                                         quantity: 0,
-                                                        weight: item.weight ~/
-                                                            item.quantity,
+                                                        weight: item.weight ~/ item.quantity,
                                                         // Correct per-unit weight
-                                                        isPersonalTool:
-                                                            item.isPersonalTool,
-                                                        isHazmat:
-                                                            item.isHazmat),
+                                                        isPersonalTool: item.isPersonalTool,
+                                                        isHazmat: item.isHazmat),
                                                   );
 
                                                   // Update the quantity and total weight
-                                                  existingGear.quantity +=
-                                                      item.quantity;
+                                                  existingGear.quantity += item.quantity;
 
-                                                  if (!gearList
-                                                      .contains(existingGear)) {
+                                                  if (!gearList.contains(existingGear)) {
                                                     gearList.add(existingGear);
                                                   }
                                                 } else if (item is CrewMember) {
                                                   // Handle personal tools
-                                                  if (item.personalTools !=
-                                                      null) {
-                                                    for (var tool in item
-                                                        .personalTools!) {
+                                                  if (item.personalTools != null) {
+                                                    for (var tool in item.personalTools!) {
                                                       // Check if the tool exists in the gearList first
-                                                      final gearListIndex =
-                                                          gearList.indexWhere(
-                                                        (gear) =>
-                                                            gear.name ==
-                                                            tool.name,
+                                                      final gearListIndex = gearList.indexWhere(
+                                                        (gear) => gear.name == tool.name,
                                                       );
 
                                                       if (gearListIndex != -1) {
                                                         // Decrement the quantity of the tool in the gearList
-                                                        Gear gearTool =
-                                                            gearList[
-                                                                gearListIndex];
-                                                        gearTool.quantity -=
-                                                            tool.quantity;
-                                                        gearTool.weight -= tool
-                                                                .weight *
-                                                            tool.quantity; // Adjust weight
+                                                        Gear gearTool = gearList[gearListIndex];
+                                                        gearTool.quantity -= tool.quantity;
+                                                        gearTool.weight -= tool.weight * tool.quantity; // Adjust weight
 
                                                         // If the quantity reaches zero, remove the tool from the gearList
-                                                        if (gearTool.quantity <=
-                                                            0) {
-                                                          gearList.removeAt(
-                                                              gearListIndex);
+                                                        if (gearTool.quantity <= 0) {
+                                                          gearList.removeAt(gearListIndex);
                                                         }
                                                       } else {
                                                         // Check if the tool exists in the current load
-                                                        final toolIndex =
-                                                            loads[index]
-                                                                .indexWhere(
-                                                          (loadItem) =>
-                                                              loadItem
-                                                                  is Gear &&
-                                                              loadItem.name ==
-                                                                  tool.name,
+                                                        final toolIndex = loads[index].indexWhere(
+                                                          (loadItem) => loadItem is Gear && loadItem.name == tool.name,
                                                         );
 
                                                         if (toolIndex != -1) {
                                                           // Decrement the quantity of the tool in the load
-                                                          Gear loadTool =
-                                                              loads[index]
-                                                                  [toolIndex];
-                                                          loadTool.quantity -=
-                                                              tool.quantity;
-                                                          loadTool
-                                                              .weight -= tool
-                                                                  .weight *
-                                                              tool.quantity; // Adjust weight
+                                                          Gear loadTool = loads[index][toolIndex];
+                                                          loadTool.quantity -= tool.quantity;
+                                                          loadTool.weight -= tool.weight * tool.quantity; // Adjust weight
 
                                                           // If the quantity reaches zero, remove the tool from the load
-                                                          if (loadTool
-                                                                  .quantity <=
-                                                              0) {
-                                                            loads[index]
-                                                                .removeAt(
-                                                                    toolIndex);
+                                                          if (loadTool.quantity <= 0) {
+                                                            loads[index].removeAt(toolIndex);
                                                           }
                                                         }
                                                       }
@@ -1394,8 +1154,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                   }
 
                                                   // Add the crew member back to the crew list if necessary
-                                                  if (!crewList
-                                                      .contains(item)) {
+                                                  if (!crewList.contains(item)) {
                                                     crewList.add(item);
                                                   }
                                                 }
@@ -1405,63 +1164,41 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                           child: Card(
                                             elevation: 2,
                                             color: item is CrewMember
-                                                ? AppColors
-                                                    .textFieldColor2 // Color for CrewMembers
-                                                : item is Gear &&
-                                                        item.isPersonalTool ==
-                                                            true
-                                                    ? AppColors
-                                                        .toolBlue // Color for personal tools
+                                                ? AppColors.textFieldColor2 // Color for CrewMembers
+                                                : item is Gear && item.isPersonalTool == true
+                                                    ? AppColors.toolBlue // Color for personal tools
                                                     : AppColors.gearYellow,
                                             // Color for regular Gear
                                             // Different colors for CrewMember and Gear
-                                            margin: const EdgeInsets.symmetric(
-                                                vertical: 1.0),
+                                            margin: const EdgeInsets.symmetric(vertical: 1.0),
                                             shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      8.0), // Rounded corners
+                                              borderRadius: BorderRadius.circular(8.0), // Rounded corners
                                             ),
                                             child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
+                                              padding: const EdgeInsets.all(8.0),
                                               child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Text(
                                                         itemDisplay(item),
                                                         style: TextStyle(
                                                           fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: item
-                                                                  is CrewMember
-                                                              ? AppColors
-                                                                  .textColorPrimary
-                                                              : Colors.black,
+                                                          fontWeight: FontWeight.bold,
+                                                          color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
                                                         ),
                                                       ),
                                                       Text(
                                                         item is Gear
                                                             ? 'Quantity: ${item.quantity}'
                                                             : item is CrewMember
-                                                                ? item.getPositionTitle(
-                                                                    item.position)
+                                                                ? item.getPositionTitle(item.position)
                                                                 : '',
                                                         style: TextStyle(
                                                           fontSize: 14,
-                                                          color: item
-                                                                  is CrewMember
-                                                              ? AppColors
-                                                                  .textColorPrimary
-                                                              : Colors.black,
+                                                          color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
                                                         ),
                                                       ),
                                                     ],
@@ -1469,62 +1206,36 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
                                                   // Single Item Deletion
                                                   IconButton(
-                                                    icon: const Icon(
-                                                        Icons.delete,
-                                                        color: Colors.red),
+                                                    icon: const Icon(Icons.delete, color: Colors.red),
                                                     onPressed: () {
                                                       setState(() {
-                                                        if (loads[index]
-                                                            .contains(item)) {
+                                                        if (loads[index].contains(item)) {
                                                           if (item is Gear) {
-                                                            if (item.quantity >
-                                                                1) {
+                                                            if (item.quantity > 1) {
                                                               showDialog(
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    (BuildContext
-                                                                        context) {
-                                                                  int quantityToRemove =
-                                                                      1; // Default to 1 for selection
-                                                                  return StatefulBuilder(builder: (BuildContext
-                                                                          context,
-                                                                      StateSetter
-                                                                          setDialogState) {
+                                                                context: context,
+                                                                builder: (BuildContext context) {
+                                                                  int quantityToRemove = 1; // Default to 1 for selection
+                                                                  return StatefulBuilder(builder: (BuildContext context, StateSetter setDialogState) {
                                                                     return AlertDialog(
-                                                                      backgroundColor:
-                                                                          AppColors
-                                                                              .textFieldColor2,
-                                                                      title: Text(
-                                                                          'Remove ${item.name}',
-                                                                          style:
-                                                                              TextStyle(color: AppColors.textColorPrimary)),
-                                                                      content:
-                                                                          Column(
-                                                                        mainAxisSize:
-                                                                            MainAxisSize.min,
+                                                                      backgroundColor: AppColors.textFieldColor2,
+                                                                      title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                      content: Column(
+                                                                        mainAxisSize: MainAxisSize.min,
                                                                         children: [
-                                                                          Text(
-                                                                              'Select the quantity to remove:',
-                                                                              style: TextStyle(color: AppColors.textColorPrimary)),
-                                                                          SizedBox(
-                                                                              height: 8),
-                                                                          DropdownButton<
-                                                                              int>(
-                                                                            dropdownColor:
-                                                                                AppColors.textFieldColor2,
-                                                                            value:
-                                                                                quantityToRemove,
-                                                                            items:
-                                                                                List.generate(
+                                                                          Text('Select the quantity to remove:', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                          SizedBox(height: 8),
+                                                                          DropdownButton<int>(
+                                                                            dropdownColor: AppColors.textFieldColor2,
+                                                                            value: quantityToRemove,
+                                                                            items: List.generate(
                                                                               item.quantity,
                                                                               (index) => DropdownMenuItem(
                                                                                 value: index + 1,
                                                                                 child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                               ),
                                                                             ),
-                                                                            onChanged:
-                                                                                (value) {
+                                                                            onChanged: (value) {
                                                                               setDialogState(() {
                                                                                 quantityToRemove = value ?? 1; // Update dialog state
                                                                               });
@@ -1534,17 +1245,13 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                       ),
                                                                       actions: [
                                                                         TextButton(
-                                                                          onPressed:
-                                                                              () {
+                                                                          onPressed: () {
                                                                             Navigator.of(context).pop(); // Cancel action
                                                                           },
-                                                                          child: Text(
-                                                                              'Cancel',
-                                                                              style: TextStyle(color: AppColors.cancelButton)),
+                                                                          child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
                                                                         ),
                                                                         TextButton(
-                                                                          onPressed:
-                                                                              () {
+                                                                          onPressed: () {
                                                                             setState(() {
                                                                               // Deduct the selected quantity from the load item
                                                                               // item is in load. existingGear is in inventory
@@ -1555,7 +1262,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                               // Handle returning the removed item to the inventory
                                                                               var existingGear = gearList.firstWhere(
                                                                                 (gear) => gear.name == item.name,
-                                                                                orElse: () => Gear(name: item.name, quantity: 0, weight: 0, isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat),
+                                                                                orElse: () =>
+                                                                                    Gear(name: item.name, quantity: 0, weight: 0, isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat),
                                                                               );
 
                                                                               // Update the quantity
@@ -1574,9 +1282,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
                                                                             Navigator.of(context).pop(); // Close the dialog
                                                                           },
-                                                                          child: const Text(
-                                                                              'Remove',
-                                                                              style: TextStyle(color: Colors.red)),
+                                                                          child: const Text('Remove', style: TextStyle(color: Colors.red)),
                                                                         ),
                                                                       ],
                                                                     );
@@ -1584,114 +1290,59 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                 },
                                                               );
                                                             } else {
-                                                              loads[index]
-                                                                  .remove(item);
-                                                              var existingGear =
-                                                                  gearList
-                                                                      .firstWhere(
-                                                                (gear) =>
-                                                                    gear.name ==
-                                                                    item.name,
-                                                                orElse: () =>
-                                                                    Gear(
-                                                                        name: item
-                                                                            .name,
-                                                                        quantity:
-                                                                            0,
-                                                                        weight: item.weight ~/
-                                                                            item
-                                                                                .quantity,
-                                                                        // Correct per-unit weight
-                                                                        isPersonalTool:
-                                                                            item
-                                                                                .isPersonalTool,
-                                                                        isHazmat:
-                                                                            item.isHazmat),
+                                                              loads[index].remove(item);
+                                                              var existingGear = gearList.firstWhere(
+                                                                (gear) => gear.name == item.name,
+                                                                orElse: () => Gear(
+                                                                    name: item.name,
+                                                                    quantity: 0,
+                                                                    weight: item.weight ~/ item.quantity,
+                                                                    // Correct per-unit weight
+                                                                    isPersonalTool: item.isPersonalTool,
+                                                                    isHazmat: item.isHazmat),
                                                               );
 
                                                               // Update the quantity
-                                                              existingGear
-                                                                      .quantity +=
-                                                                  item.quantity;
+                                                              existingGear.quantity += item.quantity;
 
-                                                              if (!gearList
-                                                                  .contains(
-                                                                      existingGear)) {
-                                                                gearList.add(
-                                                                    existingGear);
+                                                              if (!gearList.contains(existingGear)) {
+                                                                gearList.add(existingGear);
                                                               }
                                                             }
-                                                          } else if (item
-                                                              is CrewMember) {
+                                                          } else if (item is CrewMember) {
                                                             // Handle personal tools
-                                                            if (item.personalTools !=
-                                                                null) {
-                                                              for (var tool in item
-                                                                  .personalTools!) {
+                                                            if (item.personalTools != null) {
+                                                              for (var tool in item.personalTools!) {
                                                                 // Check if the tool exists in the gearList first
-                                                                final gearListIndex =
-                                                                    gearList
-                                                                        .indexWhere(
-                                                                  (gear) =>
-                                                                      gear.name ==
-                                                                      tool.name,
+                                                                final gearListIndex = gearList.indexWhere(
+                                                                  (gear) => gear.name == tool.name,
                                                                 );
 
-                                                                if (gearListIndex !=
-                                                                    -1) {
+                                                                if (gearListIndex != -1) {
                                                                   // Decrement the quantity of the tool in the gearList
-                                                                  Gear
-                                                                      gearTool =
-                                                                      gearList[
-                                                                          gearListIndex];
-                                                                  gearTool.quantity -=
-                                                                      tool.quantity;
-                                                                  gearTool
-                                                                      .weight -= tool
-                                                                          .weight *
-                                                                      tool.quantity; // Adjust weight
+                                                                  Gear gearTool = gearList[gearListIndex];
+                                                                  gearTool.quantity -= tool.quantity;
+                                                                  gearTool.weight -= tool.weight * tool.quantity; // Adjust weight
 
                                                                   // If the quantity reaches zero, remove the tool from the gearList
-                                                                  if (gearTool
-                                                                          .quantity <=
-                                                                      0) {
-                                                                    gearList.removeAt(
-                                                                        gearListIndex);
+                                                                  if (gearTool.quantity <= 0) {
+                                                                    gearList.removeAt(gearListIndex);
                                                                   }
                                                                 } else {
                                                                   // Check if the tool exists in the current load
-                                                                  final toolIndex =
-                                                                      loads[index]
-                                                                          .indexWhere(
-                                                                    (loadItem) =>
-                                                                        loadItem
-                                                                            is Gear &&
-                                                                        loadItem.name ==
-                                                                            tool.name,
+                                                                  final toolIndex = loads[index].indexWhere(
+                                                                    (loadItem) => loadItem is Gear && loadItem.name == tool.name,
                                                                   );
 
-                                                                  if (toolIndex !=
-                                                                      -1) {
+                                                                  if (toolIndex != -1) {
                                                                     // Decrement the quantity of the tool in the load
-                                                                    Gear
-                                                                        loadTool =
-                                                                        loads[index]
-                                                                            [
-                                                                            toolIndex];
-                                                                    loadTool.quantity -=
-                                                                        tool.quantity;
-                                                                    loadTool
-                                                                        .weight -= tool
-                                                                            .weight *
-                                                                        tool.quantity; // Adjust weight
+                                                                    Gear loadTool = loads[index][toolIndex];
+                                                                    loadTool.quantity -= tool.quantity;
+                                                                    loadTool.weight -= tool.weight * tool.quantity; // Adjust weight
 
                                                                     // If the quantity reaches zero, remove the tool from the load
-                                                                    if (loadTool
-                                                                            .quantity <=
-                                                                        0) {
-                                                                      loads[index]
-                                                                          .removeAt(
-                                                                              toolIndex);
+                                                                    if (loadTool.quantity <= 0) {
+                                                                      loads[index].removeAt(toolIndex);
                                                                     }
                                                                   }
                                                                 }
@@ -1699,18 +1350,12 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                             }
 
                                                             // Add the crew member back to the crew list if necessary
-                                                            if (!crewList
-                                                                .contains(
-                                                                    item)) {
-                                                              crewList
-                                                                  .add(item);
+                                                            if (!crewList.contains(item)) {
+                                                              crewList.add(item);
                                                             }
-                                                            loads[index]
-                                                                .remove(item);
-                                                          } else if (item
-                                                              is CustomItem) {
-                                                            loads[index]
-                                                                .remove(item);
+                                                            loads[index].remove(item);
+                                                          } else if (item is CustomItem) {
+                                                            loads[index].remove(item);
                                                           }
                                                         }
                                                       });
@@ -1727,17 +1372,14 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
                                       // Add item
                                       GestureDetector(
-                                        onTap: () =>
-                                            _showSelectionDialog(index),
+                                        onTap: () => _showSelectionDialog(index),
                                         child: Container(
                                           width: double.infinity,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8),
+                                          padding: const EdgeInsets.symmetric(vertical: 8),
                                           decoration: BoxDecoration(
                                             color: AppColors.textFieldColor2,
                                             // Background color
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(8),
                                             // Rounded corners
                                           ),
                                           alignment: Alignment.center,
@@ -1754,41 +1396,30 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
                                       SizedBox(height: 2),
 
-                                      // Delete load
+                                      // Load Deletion
                                       GestureDetector(
                                         onTap: () {
                                           showDialog(
                                             context: context,
                                             builder: (BuildContext context) {
                                               return AlertDialog(
-                                                backgroundColor:
-                                                    AppColors.textFieldColor2,
+                                                backgroundColor: AppColors.textFieldColor2,
                                                 title: Text(
                                                   'Confirm Deletion',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: AppColors
-                                                          .textColorPrimary),
+                                                  style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                                 ),
                                                 content: Text(
                                                   'Are you sure you want to delete this load?',
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: AppColors
-                                                          .textColorPrimary),
+                                                  style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
                                                 ),
                                                 actions: [
                                                   TextButton(
                                                     onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop(); // Close the dialog without deleting
+                                                      Navigator.of(context).pop(); // Close the dialog without deleting
                                                     },
                                                     child: Text(
                                                       'Cancel',
-                                                      style: TextStyle(
-                                                          color: AppColors
-                                                              .cancelButton),
+                                                      style: TextStyle(color: AppColors.cancelButton),
                                                     ),
                                                   ),
                                                   TextButton(
@@ -1796,80 +1427,44 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                       // Execute deletion logic
                                                       setState(() {
                                                         // Iterate through all items in the load
-                                                        for (var item
-                                                            in loads[index]) {
-                                                          if (item
-                                                              is CrewMember) {
+                                                        for (var item in loads[index]) {
+                                                          if (item is CrewMember) {
                                                             // Add crew member back to the crew list
-                                                            if (!crewList
-                                                                .contains(
-                                                                    item)) {
-                                                              crewList
-                                                                  .add(item);
+                                                            if (!crewList.contains(item)) {
+                                                              crewList.add(item);
                                                             }
-                                                          } else if (item
-                                                              is Gear) {
-                                                            if (item
-                                                                .isPersonalTool) {
-                                                              gearList.removeWhere((gear) =>
-                                                                  gear.name ==
-                                                                      item.name &&
-                                                                  gear.isPersonalTool);
+                                                          } else if (item is Gear) {
+                                                            if (item.isPersonalTool) {
+                                                              gearList.removeWhere((gear) => gear.name == item.name && gear.isPersonalTool);
                                                             } else {
                                                               // General gear: update or add back to gearList
-                                                              final existingGear =
-                                                                  gearList
-                                                                      .firstWhere(
-                                                                (gear) =>
-                                                                    gear.name ==
-                                                                        item
-                                                                            .name &&
-                                                                    !gear
-                                                                        .isPersonalTool,
-                                                                orElse: () => Gear(
-                                                                    name: item
-                                                                        .name,
-                                                                    quantity: 0,
-                                                                    weight: item
-                                                                            .weight ~/
-                                                                        item
-                                                                            .quantity,
-                                                                    isHazmat: item
-                                                                        .isHazmat),
+                                                              final existingGear = gearList.firstWhere(
+                                                                (gear) => gear.name == item.name && !gear.isPersonalTool,
+                                                                orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight ~/ item.quantity, isHazmat: item.isHazmat),
                                                               );
 
-                                                              existingGear
-                                                                      .quantity +=
-                                                                  item.quantity;
+                                                              existingGear.quantity += item.quantity;
 
                                                               // Add to gearList if it's not already present
-                                                              if (!gearList
-                                                                  .contains(
-                                                                      existingGear)) {
-                                                                gearList.add(
-                                                                    existingGear);
+                                                              if (!gearList.contains(existingGear)) {
+                                                                gearList.add(existingGear);
                                                               }
                                                             }
                                                           }
                                                         }
                                                         // Remove all personal tools from the gearList
-                                                        gearList.removeWhere(
-                                                            (gear) => gear
-                                                                .isPersonalTool);
+                                                        gearList.removeWhere((gear) => gear.isPersonalTool);
 
                                                         // Remove the load from the list
                                                         loads.removeAt(index);
-                                                        _isExpanded.removeAt(
-                                                            index); // Ensure the lists stay in sync
+                                                        _isExpanded.removeAt(index); // Ensure the lists stay in sync
                                                       });
 
-                                                      Navigator.of(context)
-                                                          .pop(); // Close the dialog after deletion
+                                                      Navigator.of(context).pop(); // Close the dialog after deletion
                                                     },
                                                     child: const Text(
                                                       'Delete',
-                                                      style: TextStyle(
-                                                          color: Colors.red),
+                                                      style: TextStyle(color: Colors.red),
                                                     ),
                                                   ),
                                                 ],
@@ -1879,25 +1474,19 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         },
                                         child: Container(
                                           width: double.infinity,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8),
+                                          padding: const EdgeInsets.symmetric(vertical: 8),
                                           decoration: BoxDecoration(
                                             color: Colors.red,
                                             // Background color
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(8),
                                             // Rounded corners
                                           ),
                                           alignment: Alignment.center,
                                           child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              Icon(Icons.delete,
-                                                  color: Colors.black,
-                                                  size: 24),
+                                              Icon(Icons.delete, color: Colors.black, size: 24),
                                               Text(
                                                 ' Delete Load',
                                                 style: TextStyle(
@@ -1932,8 +1521,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.buttonStyle1,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       ),
                       child: Text(
                         '+ Add Load',
