@@ -589,24 +589,23 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
   }
 
   void saveGearLoadPreference(TripPreference newTripPreference) {
-    // Use original Gear objects but update their quantities in place
-    List<Gear> referencedSelectedGear = selectedGear.map((gear) {
-      gear.quantity = selectedGearQuantities[gear] ?? 1;
-      return gear; // Use the same reference
+    // Create deep copies of Gear objects with updated quantities
+    List<Gear> deepCopiedSelectedGear = selectedGear.map((gear) {
+      return Gear(
+        name: gear.name,
+        weight: gear.weight,
+        quantity: selectedGearQuantities[gear] ?? 1, // Copy new quantity
+        isPersonalTool: gear.isPersonalTool,
+        isHazmat: gear.isHazmat,
+      );
     }).toList();
 
-    // New GearPreference object with copied Gear objects
+    // New GearPreference object with deep-copied Gear objects
     final newGearPreference = GearPreference(
       priority: 1, // To be updated through UI
       loadPreference: selectedGearLoadPreference!,
-      gear: referencedSelectedGear, // Use copied list with updated quantities
+      gear: deepCopiedSelectedGear, // Now using deep copies
     );
-
-    // Print statement to display the gear items and their selected quantities
-    // print("Saving...");
-    // for (var gear in newGearPreference.gear) {
-    //   print("Gear: ${gear.name}, Quantity: ${gear.quantity}");
-    // }
 
     // Add to TripPreference object
     savedPreferences.addGearPreference(newTripPreference, newGearPreference);
