@@ -223,17 +223,18 @@ class Crew {
 
     // Iterate through all trip preferences
     for (var tripPreference in tripPreferenceBox.values.toList()) {
+      // First, remove the specific gear item from each gear preference
+      for (var gearPreference in tripPreference.gearPreferences) {
+        gearPreference.gear.removeWhere((g) => g.name == gearItem.name);
+      }
 
-      // Remove gear preferences containing gear with the same name
-      tripPreference.gearPreferences.removeWhere((gearPreference) {
+      // Then, remove any gear preference that is now empty
+      tripPreference.gearPreferences.removeWhere((gearPreference) => gearPreference.gear.isEmpty);
 
-        // Remove the gearPreference if it contains a gear with the same name
-        return gearPreference.gear.any((g) => g.name == gearItem.name);
-      });
-
-      // Check if the trip preference is empty after removing the gear preferences
+      // Check if the entire trip preference is empty after removing gear preferences
       if (tripPreference.positionalPreferences.isEmpty && tripPreference.gearPreferences.isEmpty) {
         savedPreferences.removeTripPreference(tripPreference);
+        tripPreferenceBox.delete(tripPreference); // Ensure it's removed from Hive
       } else {
         tripPreference.save(); // Save the updated trip preference
       }

@@ -87,7 +87,7 @@ class _GearViewState extends State<GearView> {
                                     style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                   ),
                                   content:  Text(
-                                    'Are you sure you want to delete all gear?',
+                                    'Are you sure you want to delete all gear? All gear and gear preference data will be erased.',
                                     style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
                                   ),
                                   actions: [

@@ -100,6 +100,7 @@ class SavedPreferences {
   }
 
   bool updateGearInPreferences(String oldGearName, String newGearQuantity, Gear updatedGear) {
+    final tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
     bool quantityIssueFound = false;
 
     // Loop through all saved TripPreferences
@@ -120,6 +121,13 @@ class SavedPreferences {
           }
         }
       }
+    }
+    // Loop through all TripPreferences and save them to Hive
+    for (var key in tripPreferenceBox.keys) {
+      tripPreferenceBox.put(key, savedPreferences.tripPreferences.firstWhere(
+            (tripPref) => tripPref.tripPreferenceName == tripPreferenceBox.get(key)!.tripPreferenceName,
+        orElse: () => tripPreferenceBox.get(key)!, // Fallback to existing preference
+      ));
     }
 
     return quantityIssueFound; // Return true if quantity issue was found
