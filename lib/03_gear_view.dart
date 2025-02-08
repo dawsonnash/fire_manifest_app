@@ -256,15 +256,30 @@ class _GearViewState extends State<GearView> {
                                           children: [
                                             // Gear name with ellipsis
                                             Flexible(
-                                              child: Text(
-                                                gear.name,
-                                                style: TextStyle(
-                                                  fontSize: 22,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.textColorPrimary,
-                                                ),
-                                                maxLines: 1, // Limit to one line
-                                                overflow: TextOverflow.ellipsis, // Show ellipsis if text overflows
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    '${gear.name} ',
+                                                    style: TextStyle(
+                                                      fontSize: 22,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: AppColors.textColorPrimary,
+                                                    ),
+                                                    maxLines: 1, // Limit to one line
+                                                    overflow: TextOverflow.ellipsis, // Show ellipsis if text overflows
+                                                  ),
+                                                  if (gear.isHazmat)
+                                                    Tooltip(
+                                                      message: 'HAZMAT', // The hint displayed on long-press
+                                                      waitDuration: const Duration(milliseconds: 500), // Time before the tooltip shows
+                                                      child: Icon(
+                                                        FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                        color: Colors.red, // Red color for hazard
+                                                        size: 18, // Icon size
+                                                      ),
+                                                    ),
+                                                ],
+
                                               ),
                                             ),
                                             // Hazard icon (conditionally rendered)
@@ -272,31 +287,14 @@ class _GearViewState extends State<GearView> {
 
                                           ],
                                         ),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              '${gear.weight} lbs x ${gear.quantity}',
-                                              style:  TextStyle(
-                                                fontSize: 16,
-                                                  color: AppColors.textColorPrimary
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            if (gear.isHazmat)
-                                              Padding(
-                                                padding: const EdgeInsets.only(left: 8.0), // Add spacing between text and icon
-                                                child: Tooltip(
-                                                  message: 'HAZMAT', // The hint displayed on long-press
-                                                  waitDuration: const Duration(milliseconds: 500), // Time before the tooltip shows
-                                                  child: Icon(
-                                                    FontAwesomeIcons.triangleExclamation, // Hazard icon
-                                                    color: Colors.red, // Red color for hazard
-                                                    size: 18, // Icon size
-                                                  ),
-                                                ),
-                                              ),
-                                          ],
+                                        Text(
+                                          '${gear.weight} lbs x ${gear.quantity}',
+                                          style:  TextStyle(
+                                            fontSize: 16,
+                                              color: AppColors.textColorPrimary
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
                                     ),

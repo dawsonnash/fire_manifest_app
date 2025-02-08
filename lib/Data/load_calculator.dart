@@ -511,6 +511,17 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
     load.loadGear = consolidatedGear;
   }
 
+  // Sort load contents: crew first, then personal tools, then general gear
+  for (var load in loads) {
+    // Sort the loadGear list
+    load.loadGear.sort((a, b) {
+      if (a.isPersonalTool && !b.isPersonalTool) return -1; // Personal tools come first
+      if (!a.isPersonalTool && b.isPersonalTool) return 1;  // General gear comes after personal tools
+      return a.name.compareTo(b.name); // Otherwise, sort alphabetically by name
+    });
+  }
+
+
   loads.removeWhere((load) => load.weight == 0); // Remove loads with zero weight
   // Re-consolidate load numbers
   for (int i = 0; i < loads.length; i++) {

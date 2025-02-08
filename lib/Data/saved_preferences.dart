@@ -63,7 +63,7 @@ class SavedPreferences {
   // Load all preferences from Hive to in-memory lists
   Future<void> loadPreferencesFromHive() async {
     var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
-    tripPreferences = tripPreferenceBox.values.toList(); // Load into memory
+    savedPreferences.tripPreferences = tripPreferenceBox.values.toList(); // Load into memory
   }
 
   void printTripPreferencesFromHive() {

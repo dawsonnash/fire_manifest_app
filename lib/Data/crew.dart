@@ -70,6 +70,7 @@ class Crew {
       default: return [];
     }
   }
+
   void updateTotalCrewWeight() {
 
     // Get all flight weight
@@ -110,6 +111,7 @@ class Crew {
     personalTools.add(tool);
     personalToolsBox.add(tool);
   }
+
   void removePersonalTool(String toolName) {
     var personalToolsBox = Hive.box<Gear>('personalToolsBox');
 
@@ -129,7 +131,6 @@ class Crew {
     // Remove the tool from the in-memory list
     personalTools.removeWhere((tool) => tool.name == toolName);
   }
-
 
   void removeCrewMember(CrewMember member) {
     var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
