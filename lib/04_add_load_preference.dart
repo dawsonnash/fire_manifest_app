@@ -1,9 +1,11 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 
 import 'CodeShare/colors.dart';
 import 'Data/crew.dart';
+import 'Data/crewMemberList.dart';
 import 'Data/gear.dart';
 import 'Data/saved_preferences.dart';
 import 'Data/gear_preferences.dart';
@@ -534,17 +536,31 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     // Create a new list to store crew members dynamically
     List<dynamic> crewMembersToSave = [];
 
-    // Loop through selectedCrewMembers and add either individual members or entire Saw Teams
     for (var member in selectedCrewMembers) {
       if (member is Map && member.containsKey('members')) {
-        // Add the Saw Team as a List<CrewMember>
-        crewMembersToSave.add(member['members']);
+        // Fully detach CrewMembers from Hive before saving
+        List<CrewMember> copiedSawTeam = (member['members'] as List<CrewMember>)
+            .map((crew) => CrewMember(
+          name: crew.name,
+          flightWeight: crew.flightWeight,
+          position: crew.position,
+          personalTools: crew.personalTools?.map((tool) => tool.copyWith()).toList(),
+          id: crew.id, // Keep ID, but detach from Hive
+        ))
+            .toList();
+
+        crewMembersToSave.add(copiedSawTeam); // Store detached List<CrewMember>
       } else if (member is CrewMember) {
-        // Add the individual Crew Member directly
-        crewMembersToSave.add(member);
+        // Fully copy CrewMember to ensure it's detached from Hive
+        crewMembersToSave.add(CrewMember(
+          name: member.name,
+          flightWeight: member.flightWeight,
+          position: member.position,
+          personalTools: member.personalTools?.map((tool) => tool.copyWith()).toList(),
+          id: member.id, // Keep ID, but detach from Hive
+        ));
       }
     }
-
     // Create a new PositionalPreference with the updated crew members list
     final newPositionalPreference = PositionalPreference(
       priority: 1, // Adjusted later through UI
@@ -554,17 +570,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
     // Add the new preference to the TripPreference object
     savedPreferences.addPositionalPreference(newTripPreference, newPositionalPreference);
-
-    // Debugging `crewMembersDynamic`
-    // widget.tripPreference.positionalPreferences.forEach((posPref) {
-    //   posPref.crewMembersDynamic.forEach((item) {
-    //     if (item is CrewMember) {
-    //       print('Individual: ${item.name}');
-    //     } else if (item is List<CrewMember>) {
-    //       print('Saw Team: ${item.map((member) => member.name).join(', ')}');
-    //     }
-    //   });
-    // });
 
     // Trigger the update callback
     widget.onUpdate();

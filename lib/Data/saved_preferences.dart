@@ -21,7 +21,7 @@ class SavedPreferences {
   void removeTripPreference(TripPreference tripPreference) {
     var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
     final keyToRemove = tripPreferenceBox.keys.firstWhere(
-      (key) => tripPreferenceBox.get(key) == tripPreference,
+          (key) => tripPreferenceBox.get(key) == tripPreference,
       orElse: () => null,
     );
     if (keyToRemove != null) {
@@ -29,6 +29,8 @@ class SavedPreferences {
     }
     tripPreferences.remove(tripPreference); // Remove from in-memory list
   }
+
+
   void removePositionalPreference(TripPreference tripPreference, PositionalPreference positionalPreferenceToRemove) {
     var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
 
@@ -133,11 +135,43 @@ class SavedPreferences {
     return quantityIssueFound; // Return true if quantity issue was found
   }
 
-  // Helper function to update a TripPreference in Hive
+  void updateCrewMemberInPreferences(String oldCrewMemberName, CrewMember updatedCrewMember) {
+    final tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+
+    // Loop through all saved TripPreferences
+    for (TripPreference tripPref in savedPreferences.tripPreferences) {
+      for (PositionalPreference posPref in tripPref.positionalPreferences) {
+        for (int i = 0; i < posPref.crewMembersDynamic.length; i++) {
+          var item = posPref.crewMembersDynamic[i];
+
+          if (item is CrewMember && item.name.trim().toLowerCase() == oldCrewMemberName.trim().toLowerCase()) {
+            // Update individual CrewMember object
+            posPref.crewMembersDynamic[i] = updatedCrewMember.copy(); // Use copy() to prevent unintended references
+          } else if (item is List<CrewMember>) {
+            // Check within Saw Teams (Lists of CrewMembers)
+            for (int j = 0; j < item.length; j++) {
+              if (item[j].name.trim().toLowerCase() == oldCrewMemberName.trim().toLowerCase()) {
+                item[j] = updatedCrewMember.copy(); // Update the specific CrewMember inside the Saw Team
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Save all TripPreferences back to Hive
+    for (var key in tripPreferenceBox.keys) {
+      tripPreferenceBox.put(key, savedPreferences.tripPreferences.firstWhere(
+            (tripPref) => tripPref.tripPreferenceName == tripPreferenceBox.get(key)!.tripPreferenceName,
+        orElse: () => tripPreferenceBox.get(key)!, // Fallback to existing preference
+      ));
+    }
+  }
+
   void _updateTripPreferenceInHive(TripPreference tripPreference) {
     var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
     final keyToUpdate = tripPreferenceBox.keys.firstWhere(
-      (key) => tripPreferenceBox.get(key) == tripPreference,
+          (key) => tripPreferenceBox.get(key) == tripPreference,
       orElse: () => null,
     );
     if (keyToUpdate != null) {
@@ -148,8 +182,9 @@ class SavedPreferences {
   // Load all preferences from Hive to in-memory lists
   Future<void> loadPreferencesFromHive() async {
     var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
-    savedPreferences.tripPreferences = tripPreferenceBox.values.toList(); // Load into memory
+    tripPreferences = tripPreferenceBox.values.toList(); // Load into memory
   }
+
 
   void printTripPreferencesFromHive() {
     var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
