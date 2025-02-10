@@ -89,10 +89,13 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         // for theme based text-> style: Theme.of(context).textTheme.headlineMedium,
       ),
-      home: showDisclaimer ? const DisclaimerScreen() : const MyHomePage(),
+      home: showDisclaimer ? const DisclaimerScreen() : MyHomePage(key: homePageKey),
     );
   }
 }
+
+final GlobalKey<_MyHomePageState> homePageKey = GlobalKey<_MyHomePageState>();
+final ValueNotifier<int> selectedIndexNotifier = ValueNotifier<int>(0);
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -124,6 +127,12 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ];
 
+  void switchTab(int index) {
+    if (!mounted) return; // Prevents calling setState() on disposed widget
+    print("Switching to tab $index");
+    selectedIndexNotifier.value = index;
+  }
+
   void _toggleTheme(bool isDarkMode) async {
     setState(() {
       AppColors.isDarkMode = isDarkMode;
@@ -154,41 +163,35 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+
+
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex], // Display the selected page
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        // Ensures all icons are visible
-        selectedItemColor: AppColors.primaryColor,
-        unselectedItemColor: AppColors.tabIconColor,
-        backgroundColor: AppColors.appBarColor,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Manifest',
+    return ValueListenableBuilder<int>(
+      valueListenable: selectedIndexNotifier,
+      builder: (context, index, child) {
+        return Scaffold(
+          body: _pages[index], // Use the selected page
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: index,
+            onTap: (i) => switchTab(i),
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: AppColors.primaryColor,
+            unselectedItemColor: AppColors.tabIconColor,
+            backgroundColor: AppColors.appBarColor,
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Manifest'),
+              BottomNavigationBarItem(icon: Icon(FontAwesomeIcons.helicopter), label: 'Trips'),
+              BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Crew'),
+              BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(FontAwesomeIcons.helicopter),
-            label: 'Trips',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Crew',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
-
 class DisclaimerScreen extends StatefulWidget {
   const DisclaimerScreen({super.key});
 

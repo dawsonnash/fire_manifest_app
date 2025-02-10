@@ -325,8 +325,11 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
   }
 }
 
-Future<void> startCalculation(BuildContext context, Trip newTrip, TripPreference? selectedTripPreference) async {
-  // Show calculating animation
+Future<void> startCalculation(
+    BuildContext context,
+    Trip newTrip,
+    TripPreference? selectedTripPreference,
+    ) async {
   await showDialog(
     context: context,
     barrierDismissible: false,
@@ -334,30 +337,29 @@ Future<void> startCalculation(BuildContext context, Trip newTrip, TripPreference
   );
 
   try {
-    // Run calculation while animation plays
     await loadCalculator(context, newTrip, selectedTripPreference);
   } finally {
-    // Ensure we only pop if the context is still valid and navigator stack is not empty
     if (context.mounted && Navigator.canPop(context)) {
       Navigator.pop(context);
     }
   }
 
-  // Show Snackbar after the animation finishes
   scaffoldMessengerKey.currentState?.showSnackBar(
     const SnackBar(
       content: Center(
         child: Text(
           'Trip Saved!',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.black, fontSize: 32, fontWeight: FontWeight.bold),
         ),
       ),
       duration: Duration(seconds: 2),
       backgroundColor: Colors.green,
     ),
   );
+
+  // Switch tab globally after delay
+  Future.delayed(Duration(milliseconds: 300), () {
+    print("Switching tabs globally...");
+    selectedIndexNotifier.value = 1; // Switch to "Saved Trips"
+  });
 }
