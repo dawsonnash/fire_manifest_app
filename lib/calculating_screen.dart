@@ -278,7 +278,7 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.black.withValues(alpha: 0.6),
         body: Stack(
           children: [
             // **Full-Screen Background Code Snippets**
