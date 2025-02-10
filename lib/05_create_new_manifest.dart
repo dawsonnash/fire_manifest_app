@@ -13,6 +13,8 @@ import 'Data/load_calculator.dart';
 import 'Data/trip_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'calculating_screen.dart';
+
 class CreateNewManifest extends StatelessWidget {
   final void Function(int) onSwitchTab; // Callback to switch tabs
 
@@ -742,27 +744,13 @@ class _QuickManifestState extends State<QuickManifest> {
     // Add the new trip to the global crew object
     savedTrips.addTrip(newTrip);
 
-    // Manifest that load, baby
-    loadCalculator(context, newTrip, selectedTripPreference);
 
-    // Show successful save popup
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Center(
-          child: Text(
-            'Trip Saved!',
-            // Maybe change look
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        duration: Duration(seconds: 2),
-        backgroundColor: Colors.green,
-      ),
-    );
+    // Load Calculation with animation
+    startCalculation(context, newTrip, selectedTripPreference);
+
+    // Load Calculation without animation
+   // loadCalculator(context, newTrip, selectedTripPreference);
+
 
     // Clear the text fields (reset them to empty), so we can add more trips
     tripNameController.text = '';

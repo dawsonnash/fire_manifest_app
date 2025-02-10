@@ -20,6 +20,7 @@ import 'Data/crewMemberList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'CodeShare/colors.dart'; // Your colors.dart.dart file
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
   // Set up for Hive that needs to run before starting app
@@ -81,6 +82,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scaffoldMessengerKey: scaffoldMessengerKey,
       title: 'Fire Manifest App',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.fireColor),
