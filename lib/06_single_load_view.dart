@@ -879,6 +879,12 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
   final TextEditingController _manifestPreparerController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _manifestPreparerController.text = AppData.userName ?? ''; // Default to empty if null
+
+  }
+  @override
   void dispose() {
     _helicopterNumController.dispose();
     _departureController.dispose();

@@ -492,14 +492,20 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
     loadIndex = (loadIndex + 1) % loads.length;
   }
 
-  // Ensure all identical gear items are combined within each load, i,e, removes identical items and increases quantity
+  // Ensure all identical gear items are combined within each load, but only if they are BOTH personal tools or BOTH regular gear
   for (var load in loads) {
     List<Gear> consolidatedGear = [];
 
     for (var gear in load.loadGear) {
       var existingGear = consolidatedGear.firstWhere(
-            (item) => item.name == gear.name,
-        orElse: () => Gear(name: gear.name, weight: gear.weight, quantity: 0,   isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat),
+            (item) => item.name == gear.name && item.isPersonalTool == gear.isPersonalTool,
+        orElse: () => Gear(
+          name: gear.name,
+          weight: gear.weight,
+          quantity: 0,
+          isPersonalTool: gear.isPersonalTool, // Keep the personal tool flag
+          isHazmat: gear.isHazmat,
+        ),
       );
 
       if (existingGear.quantity == 0) {
@@ -510,6 +516,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
 
     load.loadGear = consolidatedGear;
   }
+
 
   // Sort load contents: crew first, then personal tools, then general gear
   for (var load in loads) {
