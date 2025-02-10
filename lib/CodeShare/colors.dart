@@ -34,6 +34,7 @@ class AppColors {
 class AppData {
   static String crewName = 'Crew Name';
   static double spacingStandard = 12.0;
+  static String userName = '';
 }
 
 
@@ -41,6 +42,8 @@ class ThemePreferences {
   static const _key = 'isDarkMode';
   static const _backgroundImageKey = 'enableBackgroundImage';
   static const _crewNameKey = '';
+  static const _userNameKey = '';
+
 
   static Future<bool> getTheme() async {
     final prefs = await SharedPreferences.getInstance();
@@ -72,6 +75,15 @@ class ThemePreferences {
     await prefs.setString(_crewNameKey, crewName);
   }
 
+  static Future<String> getUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_userNameKey) ?? '';
+  }
+
+  static Future<void> setUserName(String crewName) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userNameKey, crewName);
+  }
 
 }
 

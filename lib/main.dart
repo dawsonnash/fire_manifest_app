@@ -67,6 +67,7 @@ void main() async {
   AppColors.isDarkMode = await ThemePreferences.getTheme();
   AppColors.enableBackgroundImage = await ThemePreferences.getBackgroundImagePreference();
   AppData.crewName = await ThemePreferences.getCrewName(); // Initialize AppData.crewName
+  AppData.userName = await ThemePreferences.getUserName();
 
   // start app
   runApp(MyApp(showDisclaimer: !agreedToTerms));
@@ -111,9 +112,12 @@ class _MyHomePageState extends State<MyHomePage> {
           isDarkMode: AppColors.isDarkMode,
           enableBackgroundImage: AppColors.enableBackgroundImage,
           crewName: AppData.crewName,
+          userName: AppData.userName,
           onThemeChanged: _toggleTheme,
           onBackgroundImageChange: _toggleBackgroundImage,
           onCrewNameChanged: _changeCrewName,
+          onUserNameChanged: _changeUserName,
+
 
         ),
       ];
@@ -136,7 +140,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     await ThemePreferences.setCrewName(crewName);
   }
-
+  void _changeUserName(String userName) async {
+    setState(() {
+      AppData.userName = userName;
+    });
+    await ThemePreferences.setCrewName(userName);
+  }
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
