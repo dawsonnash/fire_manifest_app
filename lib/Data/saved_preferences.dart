@@ -135,36 +135,99 @@ class SavedPreferences {
     return quantityIssueFound; // Return true if quantity issue was found
   }
 
-  void updateCrewMemberInPreferences(String oldCrewMemberName, CrewMember updatedCrewMember) {
+  void updateCrewMemberInPreferences(String oldCrewMemberName, int oldCrewMemberPosition, CrewMember updatedCrewMember) {
     final tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+    List<TripPreference> preferencesToRemove = [];
 
     // Loop through all saved TripPreferences
     for (TripPreference tripPref in savedPreferences.tripPreferences) {
+      List<PositionalPreference> preferencesToDelete = [];
+
       for (PositionalPreference posPref in tripPref.positionalPreferences) {
+        List<int> indexesToRemove = [];
+        bool wasUpdated = false;
+
         for (int i = 0; i < posPref.crewMembersDynamic.length; i++) {
           var item = posPref.crewMembersDynamic[i];
 
           if (item is CrewMember && item.name.trim().toLowerCase() == oldCrewMemberName.trim().toLowerCase()) {
             // Update individual CrewMember object
-            posPref.crewMembersDynamic[i] = updatedCrewMember.copy(); // Use copy() to prevent unintended references
+            posPref.crewMembersDynamic[i] = updatedCrewMember.copy();
+            wasUpdated = true;
+
+            // If the old position was a Saw Team, remove them from the Saw Team in preferences
+            if (oldCrewMemberPosition >= 9 && oldCrewMemberPosition <= 14) {
+              indexesToRemove.add(i);
+            }
           } else if (item is List<CrewMember>) {
             // Check within Saw Teams (Lists of CrewMembers)
+            List<int> sawIndexesToRemove = [];
             for (int j = 0; j < item.length; j++) {
               if (item[j].name.trim().toLowerCase() == oldCrewMemberName.trim().toLowerCase()) {
-                item[j] = updatedCrewMember.copy(); // Update the specific CrewMember inside the Saw Team
+                item[j] = updatedCrewMember.copy();
+                wasUpdated = true;
+
+                // If old position was a Saw Team, remove the CrewMember
+                if (oldCrewMemberPosition >= 9 && oldCrewMemberPosition <= 14) {
+                  sawIndexesToRemove.add(j);
+                }
+              }
+            }
+
+            // Remove CrewMember from the Saw Team if necessary
+            for (var index in sawIndexesToRemove.reversed) {
+              item.removeAt(index);
+            }
+
+            // If the Saw Team is empty, remove it from the Positional Preference
+            if (item.isEmpty) {
+              indexesToRemove.add(i);
+            }
+          }
+        }
+
+        // Remove items from the dynamic list
+        for (var index in indexesToRemove.reversed) {
+          posPref.crewMembersDynamic.removeAt(index);
+        }
+
+        // If this preference is now empty, mark it for deletion
+        if (posPref.crewMembersDynamic.isEmpty) {
+          preferencesToDelete.add(posPref);
+        }
+
+        // If the new CrewMember position is a Saw Team, add them to the existing Saw Team in preferences
+        if (updatedCrewMember.position >= 9 && updatedCrewMember.position <= 14) {
+          for (var entry in posPref.crewMembersDynamic) {
+            if (entry is List<CrewMember>) {
+              if (entry.every((crew) => crew.position == updatedCrewMember.position)) {
+                entry.add(updatedCrewMember);
+                wasUpdated = true;
               }
             }
           }
         }
+
+        // Save the updated preference if modified
+        if (wasUpdated) {
+          tripPref.save();
+        }
+      }
+
+      // Remove empty Positional Preferences
+      for (var pref in preferencesToDelete) {
+        tripPref.positionalPreferences.remove(pref);
+      }
+
+      // If this Trip Preference is now empty, mark it for deletion
+      if (tripPref.positionalPreferences.isEmpty && tripPref.gearPreferences.isEmpty) {
+        preferencesToRemove.add(tripPref);
       }
     }
 
-    // Save all TripPreferences back to Hive
-    for (var key in tripPreferenceBox.keys) {
-      tripPreferenceBox.put(key, savedPreferences.tripPreferences.firstWhere(
-            (tripPref) => tripPref.tripPreferenceName == tripPreferenceBox.get(key)!.tripPreferenceName,
-        orElse: () => tripPreferenceBox.get(key)!, // Fallback to existing preference
-      ));
+    // Remove empty Trip Preferences from Hive
+    for (var tripPref in preferencesToRemove) {
+      savedPreferences.removeTripPreference(tripPref);
     }
   }
 

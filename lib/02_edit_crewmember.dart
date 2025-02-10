@@ -200,6 +200,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     // Get updated crew member name
     final String newCrewMemberName = nameController.text;
     final String originalCrewMemberName = widget.crewMember.name;
+    final int originalCrewMemberPosition = widget.crewMember.position;
 
     // Check if new crew member name already exists
     bool crewMemberNameExists = crew.crewMembers.any(
@@ -234,7 +235,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     widget.crewMember.personalTools = List.from(addedTools ?? []);
 
     // Update the CrewMember in the preferences
-    savedPreferences.updateCrewMemberInPreferences(originalCrewMemberName, widget.crewMember);
+    savedPreferences.updateCrewMemberInPreferences(originalCrewMemberName, originalCrewMemberPosition, widget.crewMember);
 
     final key = crewmemberBox.keys.firstWhere(
           (key) => crewmemberBox.get(key) == widget.crewMember,
