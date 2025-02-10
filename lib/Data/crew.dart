@@ -98,13 +98,36 @@ class Crew {
     totalCrewWeight = crewWeight + personalToolWeight + gearWeight;
   }
 
-  addCrewMember(CrewMember member) {
-    var crewmemberBox = Hive.box<CrewMember>('crewmemberBox'); // assign hive box to variable we can use
-    crewMembers.add(member); // add crewmember in memory as well
-    crewmemberBox.add(member); // save to hive memory
+  void addCrewMember(CrewMember member) {
+    var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
+    crewMembers.add(member); // Add CrewMember to in-memory list
+    crewmemberBox.add(member); // Save to Hive storage
+
+    // Check if the CrewMember is in a Saw Team
+    if (member.position >= 9 && member.position <= 14) { // Positions 9-14 are Saw Teams
+      int sawTeamNumber = member.position - 8; // Convert position index to team number (Saw Team 1-6)
+
+      var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+      for (var tripPreference in tripPreferenceBox.values) {
+        for (var posPref in tripPreference.positionalPreferences) {
+          for (var entry in posPref.crewMembersDynamic) {
+            if (entry is List<CrewMember>) {
+              // Check if this Saw Team exists in Positional Preference
+              if (entry.every((crew) => crew.position == member.position)) {
+                // Add the new CrewMember to the existing Saw Team
+                entry.add(member);
+                tripPreference.save(); // Save the updated TripPreference to Hive
+                break; // Exit loop once added
+              }
+            }
+          }
+        }
+      }
+    }
+
     updateTotalCrewWeight();
-    print('Updated Total Crew Weight: $totalCrewWeight');
   }
+
 
   void addPersonalTool(Gear tool) {
     final personalToolsBox = Hive.box<Gear>('personalToolsBox');
