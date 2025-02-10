@@ -1097,8 +1097,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         Dismissible(
                                           key: ValueKey(item),
                                           // Unique key for each item
-                                          direction: DismissDirection.endToStart,
-                                          // Allow swipe from right to left
+                                          direction: (item is Gear && item.isPersonalTool)
+                                              ? DismissDirection.none // Disable swipe for personal tools
+                                              : DismissDirection.endToStart, // Allow swipe for other items
+
                                           background: Container(
                                             color: Colors.red,
                                             // Red background for delete action
@@ -1135,7 +1137,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                     for (var tool in item.personalTools!) {
                                                       // Check if the tool exists in the gearList first
                                                       final gearListIndex = gearList.indexWhere(
-                                                            (gear) => gear.name == tool.name && gear.isPersonalTool == tool.isPersonalTool,
+                                                        (gear) => gear.name == tool.name && gear.isPersonalTool == tool.isPersonalTool,
                                                       );
 
                                                       if (gearListIndex != -1) {
@@ -1151,7 +1153,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                       } else {
                                                         // Check if the tool exists in the current load
                                                         final toolIndex = loads[index].indexWhere(
-                                                              (loadItem) => loadItem is Gear && loadItem.name == tool.name && loadItem.isPersonalTool == tool.isPersonalTool,
+                                                          (loadItem) => loadItem is Gear && loadItem.name == tool.name && loadItem.isPersonalTool == tool.isPersonalTool,
                                                         );
 
                                                         if (toolIndex != -1) {
@@ -1221,158 +1223,160 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                   ),
 
                                                   // Single Item Deletion
-                                                  IconButton(
-                                                    icon: const Icon(Icons.delete, color: Colors.red),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        if (loads[index].contains(item)) {
-                                                          if (item is Gear) {
-                                                            if (item.quantity > 1) {
-                                                              showDialog(
-                                                                context: context,
-                                                                builder: (BuildContext context) {
-                                                                  int quantityToRemove = 1; // Default to 1 for selection
-                                                                  return StatefulBuilder(builder: (BuildContext context, StateSetter setDialogState) {
-                                                                    return AlertDialog(
-                                                                      backgroundColor: AppColors.textFieldColor2,
-                                                                      title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary)),
-                                                                      content: Column(
-                                                                        mainAxisSize: MainAxisSize.min,
-                                                                        children: [
-                                                                          Text('Select the quantity to remove:', style: TextStyle(color: AppColors.textColorPrimary)),
-                                                                          SizedBox(height: 8),
-                                                                          DropdownButton<int>(
-                                                                            dropdownColor: AppColors.textFieldColor2,
-                                                                            value: quantityToRemove,
-                                                                            items: List.generate(
-                                                                              item.quantity,
-                                                                              (index) => DropdownMenuItem(
-                                                                                value: index + 1,
-                                                                                child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                  if (!(item is Gear && item.isPersonalTool))
+                                                    IconButton(
+                                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          if (loads[index].contains(item)) {
+                                                            if (item is Gear) {
+                                                              if (item.quantity > 1) {
+                                                                showDialog(
+                                                                  context: context,
+                                                                  builder: (BuildContext context) {
+                                                                    int quantityToRemove = 1; // Default to 1 for selection
+                                                                    return StatefulBuilder(builder: (BuildContext context, StateSetter setDialogState) {
+                                                                      return AlertDialog(
+                                                                        backgroundColor: AppColors.textFieldColor2,
+                                                                        title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                        content: Column(
+                                                                          mainAxisSize: MainAxisSize.min,
+                                                                          children: [
+                                                                            Text('Select the quantity to remove:', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                            SizedBox(height: 8),
+                                                                            DropdownButton<int>(
+                                                                              dropdownColor: AppColors.textFieldColor2,
+                                                                              value: quantityToRemove,
+                                                                              items: List.generate(
+                                                                                item.quantity,
+                                                                                (index) => DropdownMenuItem(
+                                                                                  value: index + 1,
+                                                                                  child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                                ),
                                                                               ),
+                                                                              onChanged: (value) {
+                                                                                setDialogState(() {
+                                                                                  quantityToRemove = value ?? 1; // Update dialog state
+                                                                                });
+                                                                              },
                                                                             ),
-                                                                            onChanged: (value) {
-                                                                              setDialogState(() {
-                                                                                quantityToRemove = value ?? 1; // Update dialog state
-                                                                              });
+                                                                          ],
+                                                                        ),
+                                                                        actions: [
+                                                                          TextButton(
+                                                                            onPressed: () {
+                                                                              Navigator.of(context).pop(); // Cancel action
                                                                             },
+                                                                            child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                                                          ),
+                                                                          TextButton(
+                                                                            onPressed: () {
+                                                                              setState(() {
+                                                                                // Deduct the selected quantity from the load item
+                                                                                // item is in load. existingGear is in inventory
+                                                                                var originalWeight = item.weight ~/ item.quantity;
+                                                                                item.quantity -= quantityToRemove;
+                                                                                item.weight -= (item.weight ~/ (item.quantity + quantityToRemove)) * quantityToRemove;
+
+                                                                                // Handle returning the removed item to the inventory
+                                                                                var existingGear = gearList.firstWhere(
+                                                                                  (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
+                                                                                  // Ensure same isPersonalTool status
+                                                                                  orElse: () => Gear(
+                                                                                      name: item.name, quantity: 0, weight: item.weight, isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat),
+                                                                                );
+
+                                                                                // Update the quantity
+                                                                                existingGear.quantity += quantityToRemove;
+                                                                                existingGear.weight = originalWeight;
+
+                                                                                if (!gearList.contains(existingGear)) {
+                                                                                  gearList.add(existingGear);
+                                                                                }
+
+                                                                                // Remove the item from the load if its quantity reaches zero
+                                                                                if (item.quantity <= 0) {
+                                                                                  loads[index].remove(item);
+                                                                                }
+                                                                              });
+
+                                                                              Navigator.of(context).pop(); // Close the dialog
+                                                                            },
+                                                                            child: const Text('Remove', style: TextStyle(color: Colors.red)),
                                                                           ),
                                                                         ],
-                                                                      ),
-                                                                      actions: [
-                                                                        TextButton(
-                                                                          onPressed: () {
-                                                                            Navigator.of(context).pop(); // Cancel action
-                                                                          },
-                                                                          child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
-                                                                        ),
-                                                                        TextButton(
-                                                                          onPressed: () {
-                                                                            setState(() {
-                                                                              // Deduct the selected quantity from the load item
-                                                                              // item is in load. existingGear is in inventory
-                                                                              var originalWeight = item.weight ~/ item.quantity;
-                                                                              item.quantity -= quantityToRemove;
-                                                                              item.weight -= (item.weight ~/ (item.quantity + quantityToRemove)) * quantityToRemove;
-
-                                                                              // Handle returning the removed item to the inventory
-                                                                              var existingGear = gearList.firstWhere(
-                                                                                (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool, // Ensure same isPersonalTool status
-                                                                                orElse: () => Gear(
-                                                                                    name: item.name, quantity: 0, weight: item.weight, isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat),
-                                                                              );
-
-                                                                              // Update the quantity
-                                                                              existingGear.quantity += quantityToRemove;
-                                                                              existingGear.weight = originalWeight;
-
-                                                                              if (!gearList.contains(existingGear)) {
-                                                                                gearList.add(existingGear);
-                                                                              }
-
-                                                                              // Remove the item from the load if its quantity reaches zero
-                                                                              if (item.quantity <= 0) {
-                                                                                loads[index].remove(item);
-                                                                              }
-                                                                            });
-
-                                                                            Navigator.of(context).pop(); // Close the dialog
-                                                                          },
-                                                                          child: const Text('Remove', style: TextStyle(color: Colors.red)),
-                                                                        ),
-                                                                      ],
-                                                                    );
-                                                                  });
-                                                                },
-                                                              );
-                                                            } else {
-                                                              loads[index].remove(item);
-                                                              var existingGear = gearList.firstWhere(
-                                                                (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool, // Ensure same isPersonalTool status
-                                                                orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight, isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat),
-                                                              );
-
-                                                              // Update the quantity
-                                                              existingGear.quantity += item.quantity;
-
-                                                              if (!gearList.contains(existingGear)) {
-                                                                gearList.add(existingGear);
-                                                              }
-                                                            }
-                                                          } else if (item is CrewMember) {
-                                                            // Handle personal tools
-                                                            if (item.personalTools != null) {
-                                                              for (var tool in item.personalTools!) {
-                                                                // Check if the tool exists in the gearList first
-                                                                // Ensure the removal only applies to personal tools
-                                                                final gearListIndex = gearList.indexWhere(
-                                                                      (gear) => gear.name == tool.name && gear.isPersonalTool == tool.isPersonalTool,
+                                                                      );
+                                                                    });
+                                                                  },
+                                                                );
+                                                              } else {
+                                                                loads[index].remove(item);
+                                                                var existingGear = gearList.firstWhere(
+                                                                  (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool, // Ensure same isPersonalTool status
+                                                                  orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight, isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat),
                                                                 );
 
-                                                                if (gearListIndex != -1) {
-                                                                  // Decrement the quantity of the tool in the gearList
-                                                                  Gear gearTool = gearList[gearListIndex];
-                                                                  gearTool.quantity -= tool.quantity;
-                                                                  gearTool.weight -= tool.weight * tool.quantity; // Adjust weight
+                                                                // Update the quantity
+                                                                existingGear.quantity += item.quantity;
 
-                                                                  // If the quantity reaches zero, remove the tool from the gearList
-                                                                  if (gearTool.quantity <= 0) {
-                                                                    gearList.removeAt(gearListIndex);
-                                                                  }
-                                                                } else {
-                                                                  // Check if the tool exists in the current load
-                                                                  // Ensure removal from load only applies to personal tools
-                                                                  final toolIndex = loads[index].indexWhere(
-                                                                        (loadItem) => loadItem is Gear && loadItem.name == tool.name && loadItem.isPersonalTool == tool.isPersonalTool,
+                                                                if (!gearList.contains(existingGear)) {
+                                                                  gearList.add(existingGear);
+                                                                }
+                                                              }
+                                                            } else if (item is CrewMember) {
+                                                              // Handle personal tools
+                                                              if (item.personalTools != null) {
+                                                                for (var tool in item.personalTools!) {
+                                                                  // Check if the tool exists in the gearList first
+                                                                  // Ensure the removal only applies to personal tools
+                                                                  final gearListIndex = gearList.indexWhere(
+                                                                    (gear) => gear.name == tool.name && gear.isPersonalTool == tool.isPersonalTool,
                                                                   );
 
-                                                                  if (toolIndex != -1) {
-                                                                    // Decrement the quantity of the tool in the load
-                                                                    Gear loadTool = loads[index][toolIndex];
-                                                                    loadTool.quantity -= tool.quantity;
-                                                                    loadTool.weight -= tool.weight * tool.quantity; // Adjust weight
+                                                                  if (gearListIndex != -1) {
+                                                                    // Decrement the quantity of the tool in the gearList
+                                                                    Gear gearTool = gearList[gearListIndex];
+                                                                    gearTool.quantity -= tool.quantity;
+                                                                    gearTool.weight -= tool.weight * tool.quantity; // Adjust weight
 
-                                                                    // If the quantity reaches zero, remove the tool from the load
-                                                                    if (loadTool.quantity <= 0) {
-                                                                      loads[index].removeAt(toolIndex);
+                                                                    // If the quantity reaches zero, remove the tool from the gearList
+                                                                    if (gearTool.quantity <= 0) {
+                                                                      gearList.removeAt(gearListIndex);
+                                                                    }
+                                                                  } else {
+                                                                    // Check if the tool exists in the current load
+                                                                    // Ensure removal from load only applies to personal tools
+                                                                    final toolIndex = loads[index].indexWhere(
+                                                                      (loadItem) => loadItem is Gear && loadItem.name == tool.name && loadItem.isPersonalTool == tool.isPersonalTool,
+                                                                    );
+
+                                                                    if (toolIndex != -1) {
+                                                                      // Decrement the quantity of the tool in the load
+                                                                      Gear loadTool = loads[index][toolIndex];
+                                                                      loadTool.quantity -= tool.quantity;
+                                                                      loadTool.weight -= tool.weight * tool.quantity; // Adjust weight
+
+                                                                      // If the quantity reaches zero, remove the tool from the load
+                                                                      if (loadTool.quantity <= 0) {
+                                                                        loads[index].removeAt(toolIndex);
+                                                                      }
                                                                     }
                                                                   }
                                                                 }
                                                               }
-                                                            }
 
-                                                            // Add the crew member back to the crew list if necessary
-                                                            if (!crewList.contains(item)) {
-                                                              crewList.add(item);
+                                                              // Add the crew member back to the crew list if necessary
+                                                              if (!crewList.contains(item)) {
+                                                                crewList.add(item);
+                                                              }
+                                                              loads[index].remove(item);
+                                                            } else if (item is CustomItem) {
+                                                              loads[index].remove(item);
                                                             }
-                                                            loads[index].remove(item);
-                                                          } else if (item is CustomItem) {
-                                                            loads[index].remove(item);
                                                           }
-                                                        }
-                                                      });
-                                                    },
-                                                  ),
+                                                        });
+                                                      },
+                                                    ),
                                                 ],
                                               ),
                                             ),

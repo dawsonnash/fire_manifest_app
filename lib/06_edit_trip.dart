@@ -1110,8 +1110,10 @@ class _EditTripState extends State<EditTrip> {
                                         Dismissible(
                                           key: ValueKey(item),
                                           // Unique key for each item
-                                          direction: DismissDirection.endToStart,
-                                          // Allow swipe from right to left
+                                          direction: (item is Gear && item.isPersonalTool)
+                                              ? DismissDirection.none // Disable swipe for personal tools
+                                              : DismissDirection.endToStart, // Allow swipe for other items
+
                                           background: Container(
                                             color: Colors.red,
                                             // Red background for delete action
@@ -1119,6 +1121,7 @@ class _EditTripState extends State<EditTrip> {
                                             padding: const EdgeInsets.symmetric(horizontal: 20),
                                             child: Icon(Icons.delete, color: AppColors.textColorSecondary), // Trash icon
                                           ),
+
                                           onDismissed: (direction) {
                                             setState(() {
                                               if (loads[index].contains(item)) {
@@ -1231,7 +1234,8 @@ class _EditTripState extends State<EditTrip> {
                                                   ),
 
                                                   // Single Item Deletion
-                                                  IconButton(
+                                                  if (!(item is Gear && item.isPersonalTool))
+                                                    IconButton(
                                                     icon: const Icon(Icons.delete, color: Colors.red),
                                                     onPressed: () {
                                                       setState(() {
