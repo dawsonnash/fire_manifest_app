@@ -205,7 +205,6 @@ class Crew {
     }
   }
 
-
   void deleteAllCrewMembers() {
     var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
     var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox'); // Assume TripPreference is stored here

@@ -11,7 +11,9 @@ import 'CodeShare/colors.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'Data/crew.dart';
+import 'Data/crewmember.dart';
 import 'Data/gear.dart';
+import 'Data/trip_preferences.dart';
 
 class EditCrew extends StatefulWidget {
   const EditCrew({super.key});
@@ -993,6 +995,63 @@ class _EditCrewState extends State<EditCrew> {
                                                                           }
                                                                         }
 
+                                                                        // Loop through all `TripPreferences` to update tools in `PositionalPreferences`
+                                                                        var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+                                                                        for (var tripPreference in tripPreferenceBox.values) {
+                                                                          bool preferenceUpdated = false;
+
+                                                                          for (var posPref in tripPreference.positionalPreferences) {
+                                                                            for (int i = 0; i < posPref.crewMembersDynamic.length; i++) {
+                                                                              var member = posPref.crewMembersDynamic[i];
+
+                                                                              if (member is CrewMember) {
+                                                                                // Update individual CrewMember's tools
+                                                                                if (member.personalTools != null) {
+                                                                                  for (var personalTool in member.personalTools!) {
+                                                                                  if (personalTool.name.toLowerCase() == selectedTool?.toLowerCase()) {
+                                                                                      personalTool.name = toolNameRaw;
+                                                                                      personalTool.weight = int.parse(toolWeightText);
+                                                                                      personalTool.isHazmat = isHazmat;
+                                                                                      preferenceUpdated = true;
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              } else if (member is List<CrewMember>) {
+                                                                                // Update tools for each CrewMember in Saw Teams (List<CrewMember>)
+                                                                                for (var crewMember in member) {
+                                                                                  if (crewMember.personalTools != null) {
+                                                                                    for (var personalTool in crewMember.personalTools!) {
+                                                                                      if (personalTool.name.toLowerCase() == selectedTool!.toLowerCase()) {
+                                                                                        personalTool.name = toolNameRaw;
+                                                                                        personalTool.weight = int.parse(toolWeightText);
+                                                                                        personalTool.isHazmat = isHazmat;
+                                                                                        preferenceUpdated = true;
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                          // Save updated crew members to Hive
+                                                                          var crewMemberBox = Hive.box<CrewMember>('crewmemberBox');
+                                                                          for (var crewMember in crew.crewMembers) {
+                                                                            crewMember.save();
+                                                                          }
+
+                                                                          // Save updated gear to Hive
+                                                                          var gearBox = Hive.box<Gear>('gearBox');
+                                                                          for (var gearItem in crew.gear) {
+                                                                            gearItem.save();
+                                                                          }
+
+
+                                                                          // Save updated trip preference to Hive
+                                                                          if (preferenceUpdated) {
+                                                                            tripPreference.save();
+                                                                          }
+                                                                        }
+                                                                        crew.updateTotalCrewWeight();
                                                                         Navigator.of(dialogContext).pop(); // Close the main dialog
                                                                         setState(() {}); // Reflect changes in the parent state
                                                                       },
