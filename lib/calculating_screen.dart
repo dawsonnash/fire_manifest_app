@@ -18,6 +18,8 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
   final Random _random = Random();
   Timer? _calculationTimer;
   bool isCalculating = true;
+  int dotCount = 0;
+
 
   final List<String> algorithmLines = [
     "int availableSeats = trip.availableSeats;",
@@ -165,6 +167,18 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
     "}"
   ];
 
+  void _startDotAnimation() {
+    _calculationTimer = Timer.periodic(Duration(milliseconds: 500), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+
+      setState(() {
+        dotCount = (dotCount + 1) % 3;
+      });
+    });
+  }
 
   @override
   void initState() {
@@ -173,6 +187,7 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
     _controller = AnimationController(vsync: this, duration: Duration(milliseconds: 500))..repeat();
 
     _startCodeDisplayInOrder();
+    _startDotAnimation();
 
     // Stop animation after 2 seconds
     Future.delayed(Duration(seconds: 4), () {
@@ -296,22 +311,13 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "Calculating...",
+                    "Calculating${"." * (dotCount + 1)}", // Dynamically appends ".", "..", or "..."
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
-                  SizedBox(height: 20),
-                  AnimatedBuilder(
-                    animation: _controller,
-                    builder: (context, child) {
-                      return Transform.rotate(
-                        angle: _controller.value * 2 * pi,
-                        child: Icon(Icons.sync, size: 50, color: Colors.green),
-                      );
-                    },
                   ),
                 ],
               ),
             ),
+
           ],
         ),
       ),
