@@ -6,6 +6,7 @@ import 'Data/crew.dart';
 import 'Data/gear.dart';
 import 'package:hive/hive.dart';
 import 'CodeShare/functions.dart';
+import 'Data/saved_preferences.dart';
 
 class EditGear extends StatefulWidget {
   // THis page requires a gear item to be passed to it - to edit it
@@ -245,8 +246,53 @@ class _EditGearState extends State<EditGear> {
     // Update the gear's attributes
     widget.gear.name = capitalizedGearName;
     widget.gear.weight = int.parse(gearWeightController.text);
-    widget.gear.quantity = int.parse(gearQuantityController.text);
     widget.gear.isHazmat = newHazmatValue;
+
+
+    // Check if any GearPreference prevents reducing quantity
+    bool quantityConflict = savedPreferences.updateGearInPreferences(oldGearName, newGearQuantity, widget.gear);
+
+    if (quantityConflict) {
+      // Show an error and prevent saving
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: AppColors.textFieldColor2,
+            title: Text(
+              'Quantity Reduction Not Allowed',
+              style: TextStyle(color: AppColors.textColorPrimary),
+            ),
+            content: Text(
+              'The quantity you are trying to set ($newGearQuantity) is less than the quantity used in an existing gear preference. '
+                  'You must first delete the affected gear preference before reducing the quantity. All other fields have been updated.',
+              style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                },
+                child: Text('OK', style: TextStyle(color: AppColors.cancelButton)),
+              ),
+            ],
+          );
+        },
+      );
+
+      // Reset value for quantity
+      setState(() {
+        gearQuantityController.text = oldGearQuantity.toString();
+        // Update the gear's attributes
+        oldGearName= capitalizedGearName;
+        oldGearWeight = int.parse(gearWeightController.text);
+        oldGearHazmatValue = newHazmatValue;
+        _checkInput(); // Re-validate inputs
+      });
+    }
+    else {
+      widget.gear.quantity = int.parse(gearQuantityController.text);
+    }
 
     // Find the key for this item, if it's not a new item, update it in Hive
     final key = gearBox.keys.firstWhere(
@@ -263,11 +309,14 @@ class _EditGearState extends State<EditGear> {
     }
 
     crew.updateTotalCrewWeight();
+    //  savedPreferences.saveAllTripPreferencesToHive();
+
     // Callback function, Update previous page UI with setState()
     widget.onUpdate();
 
     // Show successful save popup
-    ScaffoldMessenger.of(context).showSnackBar(
+    if (!quantityConflict) {
+      ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Center(
           child: Text(
@@ -282,8 +331,11 @@ class _EditGearState extends State<EditGear> {
         duration: Duration(seconds: 1),
         backgroundColor: Colors.green,
       ),
-    );
-    Navigator.of(context).pop(); // Return to previous screen
+    );}
+
+    if(!quantityConflict) {
+      Navigator.of(context).pop(); // Return to previous screen
+    }
   }
 
   @override

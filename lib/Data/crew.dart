@@ -70,6 +70,7 @@ class Crew {
       default: return [];
     }
   }
+
   void updateTotalCrewWeight() {
 
     // Get all flight weight
@@ -97,19 +98,43 @@ class Crew {
     totalCrewWeight = crewWeight + personalToolWeight + gearWeight;
   }
 
-  addCrewMember(CrewMember member) {
-    var crewmemberBox = Hive.box<CrewMember>('crewmemberBox'); // assign hive box to variable we can use
-    crewMembers.add(member); // add crewmember in memory as well
-    crewmemberBox.add(member); // save to hive memory
+  void addCrewMember(CrewMember member) {
+    var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
+    crewMembers.add(member); // Add CrewMember to in-memory list
+    crewmemberBox.add(member); // Save to Hive storage
+
+    // Check if the CrewMember is in a Saw Team
+    if (member.position >= 9 && member.position <= 14) { // Positions 9-14 are Saw Teams
+      int sawTeamNumber = member.position - 8; // Convert position index to team number (Saw Team 1-6)
+
+      var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+      for (var tripPreference in tripPreferenceBox.values) {
+        for (var posPref in tripPreference.positionalPreferences) {
+          for (var entry in posPref.crewMembersDynamic) {
+            if (entry is List<CrewMember>) {
+              // Check if this Saw Team exists in Positional Preference
+              if (entry.every((crew) => crew.position == member.position)) {
+                // Add the new CrewMember to the existing Saw Team
+                entry.add(member);
+                tripPreference.save(); // Save the updated TripPreference to Hive
+                break; // Exit loop once added
+              }
+            }
+          }
+        }
+      }
+    }
+
     updateTotalCrewWeight();
-    print('Updated Total Crew Weight: $totalCrewWeight');
   }
+
 
   void addPersonalTool(Gear tool) {
     final personalToolsBox = Hive.box<Gear>('personalToolsBox');
     personalTools.add(tool);
     personalToolsBox.add(tool);
   }
+
   void removePersonalTool(String toolName) {
     var personalToolsBox = Hive.box<Gear>('personalToolsBox');
 
@@ -130,7 +155,6 @@ class Crew {
     personalTools.removeWhere((tool) => tool.name == toolName);
   }
 
-
   void removeCrewMember(CrewMember member) {
     var crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
     var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox'); // Assume TripPreference is stored here
@@ -147,34 +171,61 @@ class Crew {
     // Remove the crew member from the in-memory list
     crewMembers.remove(member);
 
-    // Iterate through all trip preferences to update them
+    // Update trip preference
+    removeCrewMemberFromPreferences(member);
+
+    // Update total crew weight
+    updateTotalCrewWeight();
+  }
+
+  void removeCrewMemberFromPreferences(CrewMember member) {
+    var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+
+    List<TripPreference> tripPreferencesToRemove = [];
+
     for (var tripPreference in tripPreferenceBox.values) {
-      // Remove entire positional preferences if the crew member exists in them
+      bool preferenceUpdated = false;
+
+      // Filter `positionalPreferences`
       tripPreference.positionalPreferences.removeWhere((positionalPreference) {
-        // Check if the crew member exists in the dynamic list (either directly or in nested lists)
-        return positionalPreference.crewMembersDynamic.any((entry) {
+        List<dynamic> updatedCrewMembersDynamic = [];
+
+        for (var entry in positionalPreference.crewMembersDynamic) {
           if (entry is CrewMember) {
-            // Direct match with a CrewMember
-            return entry == member;
+            // If the entry is an individual CrewMember, exclude it if it matches
+            if (entry != member) {
+              updatedCrewMembersDynamic.add(entry);
+            }
           } else if (entry is List<CrewMember>) {
-            // Check within a nested list
-            return entry.contains(member);
+            // If the entry is a Saw Team (List<CrewMember>), remove the CrewMember if present
+            entry.removeWhere((teamMember) => teamMember == member);
+
+            // Only keep the list if it still has members
+            if (entry.isNotEmpty) {
+              updatedCrewMembersDynamic.add(entry);
+            }
           }
-          return false;
-        });
+        }
+
+        // Update crewMembersDynamic and check if it’s now empty
+        positionalPreference.crewMembersDynamic = updatedCrewMembersDynamic;
+        preferenceUpdated = true;
+
+        return updatedCrewMembersDynamic.isEmpty; // Remove preference if empty
       });
 
-      // If no positional or gear preferences remain, delete the trip preference
+      // Remove the trip preference if no positional or gear preferences remain
       if (tripPreference.positionalPreferences.isEmpty && tripPreference.gearPreferences.isEmpty) {
-        savedPreferences.removeTripPreference(tripPreference);
-      } else {
+        tripPreferencesToRemove.add(tripPreference);
+      } else if (preferenceUpdated) {
         tripPreference.save(); // Save the updated trip preference
       }
     }
 
-    // Update total crew weight
-    updateTotalCrewWeight();
-    print('Updated Total Crew Weight: $totalCrewWeight');
+    // Remove empty trip preferences from Hive
+    for (var tripPref in tripPreferencesToRemove) {
+      savedPreferences.removeTripPreference(tripPref);
+    }
   }
 
   void deleteAllCrewMembers() {
@@ -222,17 +273,18 @@ class Crew {
 
     // Iterate through all trip preferences
     for (var tripPreference in tripPreferenceBox.values.toList()) {
+      // First, remove the specific gear item from each gear preference
+      for (var gearPreference in tripPreference.gearPreferences) {
+        gearPreference.gear.removeWhere((g) => g.name == gearItem.name);
+      }
 
-      // Remove gear preferences containing gear with the same name
-      tripPreference.gearPreferences.removeWhere((gearPreference) {
+      // Then, remove any gear preference that is now empty
+      tripPreference.gearPreferences.removeWhere((gearPreference) => gearPreference.gear.isEmpty);
 
-        // Remove the gearPreference if it contains a gear with the same name
-        return gearPreference.gear.any((g) => g.name == gearItem.name);
-      });
-
-      // Check if the trip preference is empty after removing the gear preferences
+      // Check if the entire trip preference is empty after removing gear preferences
       if (tripPreference.positionalPreferences.isEmpty && tripPreference.gearPreferences.isEmpty) {
         savedPreferences.removeTripPreference(tripPreference);
+        tripPreferenceBox.delete(tripPreference); // Ensure it's removed from Hive
       } else {
         tripPreference.save(); // Save the updated trip preference
       }

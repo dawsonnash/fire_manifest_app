@@ -20,12 +20,15 @@ class PositionalPreferenceAdapter extends TypeAdapter<PositionalPreference> {
     final rawList = fields[2] as List;
     final crewMembersDynamic = rawList.map((item) {
       if (item is HiveList) {
-        return item.cast<CrewMember>();
+        return item.cast<CrewMember>(); // Convert HiveList back to List<CrewMember>
       } else if (item is CrewMember) {
-        return item;
-      } else {
-        return item; // Fallback for other types
+        return item; // Individual CrewMember
+      } else if (item is CrewMemberList) {
+        return item.crewMembers; // Convert CrewMemberList to List<CrewMember>
+      } else if (item is List) {
+        return CrewMemberList(crewMembers: item.cast<CrewMember>()).crewMembers; // Cast plain lists correctly
       }
+      return item; // Fallback for other types
     }).toList();
 
     return PositionalPreference(
@@ -34,6 +37,7 @@ class PositionalPreferenceAdapter extends TypeAdapter<PositionalPreference> {
       crewMembersDynamic: crewMembersDynamic,
     );
   }
+
 
   @override
   void write(BinaryWriter writer, PositionalPreference obj) {
@@ -47,18 +51,19 @@ class PositionalPreferenceAdapter extends TypeAdapter<PositionalPreference> {
       ..write(obj.loadPreference)
       ..writeByte(2);
 
-    // Serialize the dynamic list
+    // Store lists of CrewMembers (Saw Teams) as `CrewMemberList`
     final serializedList = obj.crewMembersDynamic.map((item) {
       if (item is List<CrewMember>) {
-        return HiveList(crewMemberBox, objects: item); // Use the CrewMember box
+        return CrewMemberList(crewMembers: item); // Store as CrewMemberList
       } else if (item is CrewMember) {
-        return item; // Store individual CrewMembers
+        return item; // Store individual CrewMembers directly
       }
       return item; // Fallback for other types
     }).toList();
 
     writer.write(serializedList);
   }
+
 
 
   @override

@@ -428,7 +428,7 @@ class _SettingsState extends State<SettingsView> {
                             return AlertDialog(
                               backgroundColor: AppColors.textFieldColor2,
                               title: Text("No crew to export", style: TextStyle(color: AppColors.textColorPrimary),),
-                              content: Text("There are no Crew Members or Gear in your inventory. Before exporting, create a crew.", style: TextStyle(color: AppColors.textColorPrimary)),
+                              content: Text("There are no Crew Members or Gear in your inventory.", style: TextStyle(color: AppColors.textColorPrimary)),
                               actions: [
                                 TextButton(
                                   onPressed: () {
@@ -871,7 +871,7 @@ class _SettingsState extends State<SettingsView> {
                       IconButton(onPressed: importExportDialog, icon: Icon(Icons.sync, color: Colors.white, size: 28,)),
                       TextButton(
                         onPressed: importExportDialog,
-                        child: const Text('Share Crew', style: TextStyle(color: Colors.white, fontSize: 18)),
+                        child: const Text('Crew Sharing', style: TextStyle(color: Colors.white, fontSize: 18)),
                       ),
                     ],
                   ),

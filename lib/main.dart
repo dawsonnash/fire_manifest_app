@@ -51,7 +51,7 @@ void main() async {
   // Load data from Hive
   await crew.loadCrewDataFromHive();
   await savedPreferences.loadPreferencesFromHive();
-  await savedTrips.loadTripDataFromHive(); // do we need to load trip data as well?
+  await savedTrips.loadTripDataFromHive();
 
   // Test data for user testing
   // if (crew.crewMembers.isEmpty && crew.gear.isEmpty) {

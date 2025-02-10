@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import '../Data/load.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 // For exporting to pdf
 import 'package:pdf/widgets.dart' as pw;
@@ -59,7 +60,16 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, String? helicopter
     pageFormat = PdfPageFormat.letter;
   } else if (manifestForm == 'of252') {
     imagePath = 'assets/images/helicopter_manifest_form.jpg';
-    fillFormFields = (load, pageIndex, totalPages, pageItems) => fillFormFieldsOF252(load, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer);
+    fillFormFields = (load, pageIndex, totalPages, pageItems) =>
+        fillFormFieldsOF252(
+            load,
+            pageIndex,
+            totalPages,
+            pageItems,
+            helicopterNum,
+            departure,
+            destination,
+            manifestPreparer);
     pageFormat = PdfPageFormat.a4;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
@@ -77,13 +87,15 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, String? helicopter
   ];
 
   // Count hazmat items
-  int numHaz = allItems.where((item) => item is Gear && item.isHazmat).length;
+  int numHaz = allItems
+      .where((item) => item is Gear && item.isHazmat)
+      .length;
 
   // Calculate the required number of pages
   int totalPages = calculatePagesNeeded(allItems.length, numHaz);
 
   // Paginate items if `of252`
-  final paginatedItems = manifestForm == 'of252' ? paginateItems(allItems, totalPages): [allItems];
+  final paginatedItems = manifestForm == 'of252' ? paginateItems(allItems, totalPages) : [allItems];
 
   // Generate pages based on pagination
   for (int i = 0; i < paginatedItems.length; i++) {
@@ -147,8 +159,7 @@ void previewPDF(BuildContext context, Load load, String manifestForm, String? he
   );
 }
 
-pw.Widget fillFormFieldsOF252(
-    Load load,
+pw.Widget fillFormFieldsOF252(Load load,
     int pageIndex,
     int totalPages,
     List<dynamic> pageItems,
@@ -185,7 +196,7 @@ pw.Widget fillFormFieldsOF252(
     adjustedPosition -= itemSpacing;
 
     // Add a slight extra offset after two items for better spacing
-    if (i >= 2) {
+    if (i == 2) {
       adjustedPosition -= 18; // Increase spacing upward
     }
 
@@ -256,7 +267,6 @@ pw.Widget fillFormFieldsOF252(
             style: pw.TextStyle(fontSize: fontSizeOF252),
           ),
         ),
-
 
 
       // **Gear Quantities**
@@ -560,7 +570,10 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                       ),
                     ),
                     content: SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.15, // Dynamic height
+                      height: MediaQuery
+                          .of(context)
+                          .size
+                          .height * 0.15, // Dynamic height
                       child: CupertinoPicker(
                         itemExtent: 50, // Height of each item in the picker
                         onSelectedItemChanged: (int index) {
@@ -593,14 +606,28 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                               builder: (BuildContext context) {
                                 return AdditionalInfoDialog(
                                   onConfirm: (String helicopterNum, String departure, String destination, String manifestPreparer) {
-                                    previewPDF(context, widget.load, 'of252', helicopterNum, departure, destination, manifestPreparer);
+                                    previewPDF(
+                                        context,
+                                        widget.load,
+                                        'of252',
+                                        helicopterNum,
+                                        departure,
+                                        destination,
+                                        manifestPreparer);
                                   },
                                 );
                               },
                             );
                           } else {
                             // Fixed-Wing manifest
-                            previewPDF(context, widget.load, 'pms245', null, null, null, null);
+                            previewPDF(
+                                context,
+                                widget.load,
+                                'pms245',
+                                null,
+                                null,
+                                null,
+                                null);
                           }
                         },
                         child: Text(
@@ -624,34 +651,34 @@ class _SingleLoadViewState extends State<SingleLoadView> {
             color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
             child: AppColors.isDarkMode
                 ? (AppColors.enableBackgroundImage
-                    ? Stack(
-                        children: [
-                          ImageFiltered(
-                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                            child: Image.asset(
-                              'assets/images/logo1.png',
-                              fit: BoxFit.cover, // Cover the entire background
-                              width: double.infinity,
-                              height: double.infinity,
-                            ),
-                          ),
-                          Container(
-                            color: AppColors.logoImageOverlay, // Semi-transparent overlay
-                            width: double.infinity,
-                            height: double.infinity,
-                          ),
-                        ],
-                      )
-                    : null) // No image if background is disabled
-                : ImageFiltered(
-                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
-                    child: Image.asset(
-                      'assets/images/logo1.png',
-                      fit: BoxFit.cover, // Cover the entire background
-                      width: double.infinity,
-                      height: double.infinity,
-                    ),
+                ? Stack(
+              children: [
+                ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                  child: Image.asset(
+                    'assets/images/logo1.png',
+                    fit: BoxFit.cover, // Cover the entire background
+                    width: double.infinity,
+                    height: double.infinity,
                   ),
+                ),
+                Container(
+                  color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              ],
+            )
+                : null) // No image if background is disabled
+                : ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+              child: Image.asset(
+                'assets/images/logo1.png',
+                fit: BoxFit.cover, // Cover the entire background
+                width: double.infinity,
+                height: double.infinity,
+              ),
+            ),
           ),
           Container(
             color: Colors.white.withValues(alpha: 0.05),
@@ -733,15 +760,15 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                               // Show a crew member's position when the tile is held
                               if (gearItem.quantity > 1) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    '${gearItem.name} • ${gearItem.weight} lbs each',
-                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
+                                  SnackBar(
+                                    content: Text(
+                                      '${gearItem.name} • ${gearItem.weight} lbs each',
+                                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
+                                    ),
+                                    backgroundColor: AppColors.textFieldColor2,
+                                    duration: Duration(seconds: 2), // How long the message appears
                                   ),
-                                  backgroundColor: AppColors.textFieldColor2,
-                                  duration: Duration(seconds: 2), // How long the message appears
-                                ),
-                              );
+                                );
                               }
                             },
                             child: ListTile(
@@ -755,9 +782,15 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                       Row(
                                         children: [
                                           Text(
-                                            gearItem.name,
+                                            '${gearItem.name} ',
                                             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
                                           ),
+                                          if (gearItem.isHazmat)
+                                            Icon(
+                                              FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                              color: Colors.red, // Red color for hazard
+                                              size: 18, // Icon size
+                                            ),
                                           Text(
                                             ' (x${gearItem.quantity})',
                                             style: TextStyle(fontSize: 18, color: Colors.black),

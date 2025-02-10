@@ -255,7 +255,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                       backgroundColor: AppColors.textFieldColor2,
                                       title: Text(
                                         'Confirm Deletion',
-                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                        style: TextStyle(color: AppColors.textColorPrimary),
                                       ),
                                       content: Text(
                                         'Are you sure you want to delete this trip?',
