@@ -204,6 +204,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppData.updateScreenData(context);
     return Scaffold(
       appBar: AppBar(
         title: Center(
@@ -228,14 +229,12 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
             padding: EdgeInsets.all(18.0),
             child: Center(
               child: Container(
-              
+                width: AppData.termsAndConditionsWidth,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(4.0),
                 ),
-                constraints: BoxConstraints(
-                  maxWidth: AppData.termsNConditionsMax, // Set the max width of the TextField
-                ),
+
                 child: Column(
                   children: [
                     Expanded(
@@ -249,33 +248,36 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
                           'you acknowledge and accept full responsibility for reviewing and confirming all calculations.',
                           style: TextStyle(
                             color: Colors.black,
-                            fontSize: 22,
+                            fontSize: AppData.text22,
                           ),
                         ),
                       ),
                     ),
                     Row(
                       children: [
-                        Checkbox(
-                          activeColor: Colors.black,
-                          checkColor: Colors.white,
-                          side: BorderSide(
-                            color: Colors.black, // Outline color
-                            width: 2.0, // Outline width
-                          ),//
-                          value: userAgreed,
-                          onChanged: (value) {
-                            setState(() {
-                              userAgreed = value!;
-                            });
-                          },
+                        Transform.scale(
+                          scale: AppData.checkboxScalingFactor, // Scales dynamically based on screen width
+                          child: Checkbox(
+                            activeColor: Colors.black,
+                            checkColor: Colors.white,
+                            side: BorderSide(
+                              color: Colors.black, // Outline color
+                              width: 2.0, // Outline width
+                            ),//
+                            value: userAgreed,
+                            onChanged: (value) {
+                              setState(() {
+                                userAgreed = value!;
+                              });
+                            },
+                          ),
                         ),
                         Flexible(
                           child: Text(
                             'I agree to the terms and conditions',
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 18,
+                              fontSize: AppData.text22,
                               // fontWeight: FontWeight.bold
                             ),
                           ),
@@ -302,10 +304,10 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
                           backgroundColor: AppColors.textFieldColor,
                           padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
                         ),
-                        child: const Text(
+                        child:  Text(
                           'Continue',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: AppData.text20,
                             color: Colors.white,
                           ),
                         ),
