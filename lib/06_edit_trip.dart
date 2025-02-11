@@ -547,9 +547,8 @@ class _EditTripState extends State<EditTrip> {
                           // Respect the selected quantity
                           int selectedQuantity = selectedGearQuantities[item] ?? 1;
 
-                          // Check if a gear with the same name already exists in the load
                           final existingGearIndex = loads[selectedLoadIndex].indexWhere(
-                            (loadItem) => loadItem is Gear && loadItem.name == item.name,
+                            (loadItem) => loadItem is Gear && loadItem.name == item.name && loadItem.isPersonalTool == item.isPersonalTool, // Ensure same isPersonalTool status
                           );
 
                           if (existingGearIndex != -1) {
@@ -583,7 +582,7 @@ class _EditTripState extends State<EditTrip> {
                           if (item.personalTools != null) {
                             for (var tool in item.personalTools!) {
                               final existingToolIndex = loads[selectedLoadIndex].indexWhere(
-                                (loadItem) => loadItem is Gear && loadItem.name == tool.name,
+                                (loadItem) => loadItem is Gear && loadItem.name == tool.name && loadItem.isPersonalTool == tool.isPersonalTool, // Ensure same isPersonalTool status
                               );
 
                               if (existingToolIndex != -1) {
@@ -1111,8 +1110,10 @@ class _EditTripState extends State<EditTrip> {
                                         Dismissible(
                                           key: ValueKey(item),
                                           // Unique key for each item
-                                          direction: DismissDirection.endToStart,
-                                          // Allow swipe from right to left
+                                          direction: (item is Gear && item.isPersonalTool)
+                                              ? DismissDirection.none // Disable swipe for personal tools
+                                              : DismissDirection.endToStart, // Allow swipe for other items
+
                                           background: Container(
                                             color: Colors.red,
                                             // Red background for delete action
@@ -1120,6 +1121,7 @@ class _EditTripState extends State<EditTrip> {
                                             padding: const EdgeInsets.symmetric(horizontal: 20),
                                             child: Icon(Icons.delete, color: AppColors.textColorSecondary), // Trash icon
                                           ),
+
                                           onDismissed: (direction) {
                                             setState(() {
                                               if (loads[index].contains(item)) {
@@ -1128,7 +1130,7 @@ class _EditTripState extends State<EditTrip> {
                                                 if (item is Gear) {
                                                   // No changes needed for Gear removal
                                                   var existingGear = gearList.firstWhere(
-                                                    (gear) => gear.name == item.name,
+                                                    (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
                                                     orElse: () => Gear(
                                                         name: item.name,
                                                         quantity: 0,
@@ -1148,9 +1150,9 @@ class _EditTripState extends State<EditTrip> {
                                                   // Handle personal tools for CrewMembers
                                                   if (item.personalTools != null) {
                                                     for (var tool in item.personalTools!) {
-                                                      // Check and update in the gearList
+                                                      // Check and update in the gearList, ensuring it matches `isPersonalTool`
                                                       final gearListIndex = gearList.indexWhere(
-                                                        (gear) => gear.name == tool.name,
+                                                            (gear) => gear.name == tool.name && gear.isPersonalTool == tool.isPersonalTool,
                                                       );
 
                                                       if (gearListIndex != -1) {
@@ -1164,7 +1166,7 @@ class _EditTripState extends State<EditTrip> {
                                                       } else {
                                                         // Check and update in the load
                                                         final toolIndex = loads[index].indexWhere(
-                                                          (loadItem) => loadItem is Gear && loadItem.name == tool.name,
+                                                              (loadItem) => loadItem is Gear && loadItem.name == tool.name && loadItem.isPersonalTool == tool.isPersonalTool,
                                                         );
 
                                                         if (toolIndex != -1) {
@@ -1232,7 +1234,8 @@ class _EditTripState extends State<EditTrip> {
                                                   ),
 
                                                   // Single Item Deletion
-                                                  IconButton(
+                                                  if (!(item is Gear && item.isPersonalTool))
+                                                    IconButton(
                                                     icon: const Icon(Icons.delete, color: Colors.red),
                                                     onPressed: () {
                                                       setState(() {
@@ -1290,14 +1293,10 @@ class _EditTripState extends State<EditTrip> {
 
                                                                                 // Handle returning the removed quantity to the inventory
                                                                                 var existingGear = gearList.firstWhere(
-                                                                                  (gear) => gear.name == item.name,
+                                                                                  (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
+                                                                                  // Ensure same isPersonalTool status
                                                                                   orElse: () => Gear(
-                                                                                      name: item.name,
-                                                                                      quantity: 0,
-                                                                                      weight: item.weight,
-                                                                                      // Per-item weight
-                                                                                      isPersonalTool: item.isPersonalTool,
-                                                                                      isHazmat: item.isHazmat),
+                                                                                      name: item.name, quantity: 0, weight: item.weight, isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat),
                                                                                 );
 
                                                                                 // Update inventory quantity
@@ -1330,14 +1329,8 @@ class _EditTripState extends State<EditTrip> {
                                                               // Remove single gear item
                                                               loads[index].remove(item);
                                                               var existingGear = gearList.firstWhere(
-                                                                (gear) => gear.name == item.name,
-                                                                orElse: () => Gear(
-                                                                    name: item.name,
-                                                                    quantity: 0,
-                                                                    weight: item.weight,
-                                                                    // Per-item weight
-                                                                    isPersonalTool: item.isPersonalTool,
-                                                                    isHazmat: item.isHazmat),
+                                                                (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool, // Ensure same isPersonalTool status
+                                                                orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight, isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat),
                                                               );
 
                                                               // Update inventory quantity
@@ -1351,8 +1344,9 @@ class _EditTripState extends State<EditTrip> {
                                                             // Handle CrewMember logic
                                                             if (item.personalTools != null) {
                                                               for (var tool in item.personalTools!) {
+                                                                // Ensure the removal only applies to personal tools
                                                                 final gearListIndex = gearList.indexWhere(
-                                                                  (gear) => gear.name == tool.name,
+                                                                      (gear) => gear.name == tool.name && gear.isPersonalTool == tool.isPersonalTool,
                                                                 );
 
                                                                 if (gearListIndex != -1) {
@@ -1364,8 +1358,9 @@ class _EditTripState extends State<EditTrip> {
                                                                   }
                                                                 } else {
                                                                   // Update load quantities
+                                                                  // Ensure removal from load only applies to personal tools
                                                                   final toolIndex = loads[index].indexWhere(
-                                                                    (loadItem) => loadItem is Gear && loadItem.name == tool.name,
+                                                                        (loadItem) => loadItem is Gear && loadItem.name == tool.name && loadItem.isPersonalTool == tool.isPersonalTool,
                                                                   );
 
                                                                   if (toolIndex != -1) {

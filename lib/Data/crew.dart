@@ -1,6 +1,7 @@
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/Data/trip_preferences.dart';
 
+import '../CodeShare/colors.dart';
 import 'crewmember.dart';
 import 'gear.dart';
 import 'package:hive/hive.dart';
@@ -22,6 +23,7 @@ class Crew {
   // Convert Crew object to JSON
   Map<String, dynamic> toJson() {
     return {
+      "crewName": AppData.crewName,
       "crewMembers": crewMembers.map((member) => member.toJson()).toList(),
       "gear": gear.map((g) => g.toJson()).toList(),
       "personalTools": personalTools.map((p) => p.toJson()).toList(),
@@ -42,6 +44,10 @@ class Crew {
         .map((p) => Gear.fromJson(p))
         .toList();
     crew.totalCrewWeight = json["totalCrewWeight"];
+
+    if (json.containsKey("crewName")) {
+      AppData.crewName = json["crewName"];
+    }
     return crew;
   }
 

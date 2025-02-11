@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../CodeShare/colors.dart';
 import '../main.dart';
+import 'crew.dart';
 import 'gear_preferences.dart';
 import 'trip.dart';
 import 'dart:math';
@@ -492,14 +493,20 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
     loadIndex = (loadIndex + 1) % loads.length;
   }
 
-  // Ensure all identical gear items are combined within each load, i,e, removes identical items and increases quantity
+  // Ensure all identical gear items are combined within each load, but only if they are BOTH personal tools or BOTH regular gear
   for (var load in loads) {
     List<Gear> consolidatedGear = [];
 
     for (var gear in load.loadGear) {
       var existingGear = consolidatedGear.firstWhere(
-            (item) => item.name == gear.name,
-        orElse: () => Gear(name: gear.name, weight: gear.weight, quantity: 0,   isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat),
+            (item) => item.name == gear.name && item.isPersonalTool == gear.isPersonalTool,
+        orElse: () => Gear(
+          name: gear.name,
+          weight: gear.weight,
+          quantity: 0,
+          isPersonalTool: gear.isPersonalTool, // Keep the personal tool flag
+          isHazmat: gear.isHazmat,
+        ),
       );
 
       if (existingGear.quantity == 0) {
@@ -510,6 +517,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
 
     load.loadGear = consolidatedGear;
   }
+
 
   // Sort load contents: crew first, then personal tools, then general gear
   for (var load in loads) {
@@ -533,17 +541,39 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
     trip.addLoad(trip, load);
   }
 
-// Error dialogue for user notification
-  if (crewMembersCopy.isNotEmpty || gearCopy.isNotEmpty) {
-    String errorMessage =
-        "Not all crew members or gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable.";
+// Find duplicate crew members
+  Set<String> crewNames = {}; // Store unique crew member names
+  List<String> duplicateCrew = [];
+
+  for (var member in crew.crewMembers) {
+    if (!crewNames.add(member.name)) {
+      duplicateCrew.add(member.name); // Add to duplicate list if already exists
+    }
+  }
+
+// Find duplicate gear
+  Set<String> gearNames = {}; // Store unique gear names
+  List<String> duplicateGear = [];
+
+  for (var item in crew.gear) {
+    if (!gearNames.add(item.name)) {
+      duplicateGear.add(item.name); // Add to duplicate list if already exists
+    }
+  }
+// Error message setup
+  if (crewMembersCopy.isNotEmpty || gearCopy.isNotEmpty || duplicateCrew.isNotEmpty || duplicateGear.isNotEmpty) {
+    String errorMessage = "Not all crew members or gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable.";
+
+    if (duplicateCrew.isNotEmpty || duplicateGear.isNotEmpty) {
+      errorMessage += "\nAdditionally, duplicate items were detected.";
+    }
 
     // Show error dialog
     await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: AppColors.textFieldColor,
+          backgroundColor: AppColors.textFieldColor2,
           title: Text(
             "Load Calculation Error",
             style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
@@ -553,6 +583,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("$errorMessage\n", style: TextStyle(color: AppColors.textColorPrimary)),
+
               if (crewMembersCopy.isNotEmpty)
                 RichText(
                   text: TextSpan(
@@ -564,9 +595,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                     ),
                     children: [
                       TextSpan(
-                        text: crewMembersCopy
-                            .map((member) => member.name)
-                            .join(', '),
+                        text: crewMembersCopy.map((member) => member.name).join(', '),
                         style: TextStyle(
                           fontWeight: FontWeight.normal,
                           color: AppColors.textColorPrimary,
@@ -575,7 +604,9 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                     ],
                   ),
                 ),
+
               if (gearCopy.isNotEmpty) const SizedBox(height: 8), // Add spacing
+
               if (gearCopy.isNotEmpty)
                 RichText(
                   text: TextSpan(
@@ -588,6 +619,52 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                     children: [
                       TextSpan(
                         text: gearCopy.map((item) => item.name).join(', '),
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          color: AppColors.textColorPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              if (duplicateCrew.isNotEmpty) const SizedBox(height: 8), // Add spacing
+
+              if (duplicateCrew.isNotEmpty)
+                RichText(
+                  text: TextSpan(
+                    text: "Duplicate crew members detected:\n",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red, // Highlight duplicates
+                      fontSize: 16,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: duplicateCrew.join(', '),
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          color: AppColors.textColorPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              if (duplicateGear.isNotEmpty) const SizedBox(height: 8), // Add spacing
+
+              if (duplicateGear.isNotEmpty)
+                RichText(
+                  text: TextSpan(
+                    text: "Duplicate gear items detected:\n",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red, // Highlight duplicates
+                      fontSize: 16,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: duplicateGear.join(', '),
                         style: TextStyle(
                           fontWeight: FontWeight.normal,
                           color: AppColors.textColorPrimary,
@@ -609,8 +686,9 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
         );
       },
     );
-
   }
+
+
   Navigator.of(context).pushAndRemoveUntil(
     MaterialPageRoute(
       builder: (context) => MyHomePage(),

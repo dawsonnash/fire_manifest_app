@@ -26,9 +26,11 @@ class SettingsView extends StatefulWidget {
   final Function(bool) onThemeChanged;
   final Function(bool) onBackgroundImageChange;
   final String crewName;
+  final String userName;
   final Function(String) onCrewNameChanged;
+  final Function(String) onUserNameChanged;
 
-  const SettingsView({super.key, required this.isDarkMode, required this.onThemeChanged, required this.enableBackgroundImage, required this.onBackgroundImageChange, required this.crewName, required this.onCrewNameChanged});
+  const SettingsView({super.key, required this.isDarkMode, required this.onThemeChanged, required this.enableBackgroundImage, required this.onBackgroundImageChange, required this.crewName, required this.userName, required this.onCrewNameChanged, required this.onUserNameChanged});
 
   @override
   State<SettingsView> createState() => _SettingsState();
@@ -38,6 +40,7 @@ class _SettingsState extends State<SettingsView> {
   late bool isDarkMode;
   late bool enableBackgroundImage;
   late TextEditingController crewNameController;
+  late TextEditingController userNameController;
 
   @override
   void initState() {
@@ -45,11 +48,14 @@ class _SettingsState extends State<SettingsView> {
     isDarkMode = widget.isDarkMode;
     enableBackgroundImage = widget.enableBackgroundImage;
     crewNameController = TextEditingController(text: widget.crewName); // Initialize with the current crew name
+    userNameController = TextEditingController(text: widget.userName); // Initialize with the current user name
+
 
   }
   @override
   void dispose() {
     crewNameController.dispose(); // Dispose the controller to free resources
+    userNameController.dispose(); // Dispose the controller to free resources
     super.dispose();
   }
 
@@ -163,7 +169,8 @@ class _SettingsState extends State<SettingsView> {
       }
 
       // Validate required fields
-      if (!jsonData.containsKey("crewMembers") ||
+      if (!jsonData.containsKey("crewName") ||
+          !jsonData.containsKey("crewMembers") ||
           !jsonData.containsKey("gear") ||
           !jsonData.containsKey("personalTools") ||
           !jsonData.containsKey("totalCrewWeight")) {
@@ -172,7 +179,8 @@ class _SettingsState extends State<SettingsView> {
       }
 
       // Validate data types
-      if (jsonData["crewMembers"] is! List ||
+      if (jsonData["crewName"] is! String ||
+          jsonData["crewMembers"] is! List ||
           jsonData["gear"] is! List ||
           jsonData["personalTools"] is! List ||
           jsonData["totalCrewWeight"] is! num) {
@@ -188,6 +196,11 @@ class _SettingsState extends State<SettingsView> {
         showErrorDialog("Error processing data. Ensure the file is in the correct format.");
         return;
       }
+
+      // Import the Crew Name
+      String importedCrewName = jsonData["crewName"];
+      AppData.crewName = importedCrewName;  // Update crew name in memory
+      await ThemePreferences.setCrewName(importedCrewName); // Persist to local storage
 
       // Clear old data first
       await Hive.box<CrewMember>('crewmemberBox').clear();
@@ -222,8 +235,6 @@ class _SettingsState extends State<SettingsView> {
       showErrorDialog("Unexpected error during import: $e");
     }
   }
-
-// Helper function to show an error dialog
   void showErrorDialog(String message) {
     showDialog(
       context: context,
@@ -253,7 +264,6 @@ class _SettingsState extends State<SettingsView> {
       },
     );
   }
-
   Future<void> _sendFeedback() async {
     final TextEditingController feedbackController = TextEditingController();
 
@@ -327,7 +337,6 @@ class _SettingsState extends State<SettingsView> {
       },
     );
   }
-
   void importExportDialog(){
     showDialog(
       context: context,
@@ -471,7 +480,7 @@ class _SettingsState extends State<SettingsView> {
         title:  Center(
           child: Text(
             'Settings',
-            style: TextStyle(fontSize: 24, color: AppColors.textColorPrimary),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
           ),
         ),
         backgroundColor: AppColors.appBarColor,
@@ -725,7 +734,7 @@ class _SettingsState extends State<SettingsView> {
                                                   }
                                                 });
                                                 // Call a callback or save preference
-                                                ThemePreferences.setCrewName(value.trim()); // Save crew name preference (optional)
+                                                ThemePreferences.setCrewName(value.trim());
                                               },
                                             ),
                                           ),
@@ -756,7 +765,7 @@ class _SettingsState extends State<SettingsView> {
                                             child: Padding(
                                               padding: EdgeInsets.only(left: 8, right: 8),
                                               child: TextField(
-                                                //controller: userNameController, // Pre-fill with current crew name
+                                                controller: userNameController, // Pre-fill with current user name
                                                 style: const TextStyle(color: Colors.white, fontSize: 18),
                                                 inputFormatters: [
                                                   LengthLimitingTextInputFormatter(30),
@@ -774,12 +783,12 @@ class _SettingsState extends State<SettingsView> {
                                                 ),
                                                 onSubmitted: (value) {
                                                   setState(() {
-                                                    // if (value.trim().isNotEmpty) {
-                                                    //   widget.onCrewNameChanged(value.trim()); // Notify parent widget of the change
-                                                    // }
+                                                    if (value.trim().isNotEmpty) {
+                                                      widget.onUserNameChanged(value.trim());
+                                                    }
                                                   });
                                                   // Call a callback or save preference
-                                                  //ThemePreferences.setCrewName(value.trim()); // Save crew name preference (optional)
+                                                  ThemePreferences.setUserName(value.trim());
                                                 },
                                               ),
                                             ),

@@ -379,6 +379,16 @@ pw.Widget fillFormFieldsPMS245(Load load) {
 
   return pw.Stack(
     children: [
+
+      // Crew Name
+      pw.Positioned(
+        left: 96,
+        top: yOffset - 58,
+        child: pw.Text(
+          AppData.crewName,
+          style: pw.TextStyle(fontSize: 10),
+        ),
+      ),
       // Crew Members
       for (var i = 0; i < load.loadPersonnel.length; i++)
         pw.Positioned(
@@ -878,6 +888,12 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
   final TextEditingController _destinationController = TextEditingController();
   final TextEditingController _manifestPreparerController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    _manifestPreparerController.text = AppData.userName ?? ''; // Default to empty if null
+
+  }
   @override
   void dispose() {
     _helicopterNumController.dispose();

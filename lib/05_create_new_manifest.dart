@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 import 'package:fire_app/CodeShare/colors.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
@@ -12,6 +13,8 @@ import 'Data/gear.dart';
 import 'Data/load_calculator.dart';
 import 'Data/trip_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import 'calculating_screen.dart';
 
 class CreateNewManifest extends StatelessWidget {
   final void Function(int) onSwitchTab; // Callback to switch tabs
@@ -742,27 +745,13 @@ class _QuickManifestState extends State<QuickManifest> {
     // Add the new trip to the global crew object
     savedTrips.addTrip(newTrip);
 
-    // Manifest that load, baby
-    loadCalculator(context, newTrip, selectedTripPreference);
 
-    // Show successful save popup
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Center(
-          child: Text(
-            'Trip Saved!',
-            // Maybe change look
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        duration: Duration(seconds: 2),
-        backgroundColor: Colors.green,
-      ),
-    );
+    // Load Calculation with animation
+    startCalculation(context, newTrip, selectedTripPreference);
+
+    // Load Calculation without animation
+   // loadCalculator(context, newTrip, selectedTripPreference);
+
 
     // Clear the text fields (reset them to empty), so we can add more trips
     tripNameController.text = '';
@@ -794,19 +783,6 @@ class _QuickManifestState extends State<QuickManifest> {
 
   @override
   Widget build(BuildContext context) {
-    // Main theme button style
-    final ButtonStyle style = ElevatedButton.styleFrom(
-        foregroundColor: Colors.black,
-        textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        backgroundColor: Colors.green,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        //surfaceTintColor: Colors.grey,
-        elevation: 15,
-        shadowColor: Colors.black,
-        side: const BorderSide(color: Colors.black, width: 2),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        // Maybe change? Dynamic button size based on screen size
-        fixedSize: Size(MediaQuery.of(context).size.width / 2, MediaQuery.of(context).size.height / 10));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -835,60 +811,65 @@ class _QuickManifestState extends State<QuickManifest> {
                       // Trip Name input field
                       Padding(
                           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                          child: TextField(
-                            controller: tripNameController,
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(20),
-                            ],
-                            textCapitalization: TextCapitalization.words,
-                            onChanged: (value) {
-                              setState(() {
-                                // Check if the trip name exists in the savedTrips list (case-insensitive)
-                                final String tripName = tripNameController.text;
-
-                                // Check if crew member name already exists
-                                bool tripNameExists = savedTrips.savedTrips.any(
-                                      (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
-                                );
-
-                                // Validate the input and set error message
-                                if (tripNameExists) {
-                                  tripNameErrorMessage = 'Trip name already used';
-                                } else {
-                                  tripNameErrorMessage = null;
-                                }
-                              });
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Enter Trip Name',
-                              labelStyle: TextStyle(
-                                color: AppColors.textColorPrimary, // Label color when not focused
-                                fontSize: 18, // Label font size
-                              ),
-                              errorText: tripNameErrorMessage,
-                              filled: true,
-                              fillColor: AppColors.textFieldColor,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: AppColors.borderPrimary,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(4.0), // Rounded corners
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: AppColors.primaryColor,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
+                          child: Container(
+                            constraints: BoxConstraints(
+                              maxWidth: AppData.inputFieldMax, // Set the max width of the TextField
                             ),
-                            style: TextStyle(
-                              color: AppColors.textColorPrimary,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                            child: TextField(
+                              controller: tripNameController,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(20),
+                              ],
+                              textCapitalization: TextCapitalization.words,
+                              onChanged: (value) {
+                                setState(() {
+                                  // Check if the trip name exists in the savedTrips list (case-insensitive)
+                                  final String tripName = tripNameController.text;
+                            
+                                  // Check if crew member name already exists
+                                  bool tripNameExists = savedTrips.savedTrips.any(
+                                        (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
+                                  );
+                            
+                                  // Validate the input and set error message
+                                  if (tripNameExists) {
+                                    tripNameErrorMessage = 'Trip name already used';
+                                  } else {
+                                    tripNameErrorMessage = null;
+                                  }
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Enter Trip Name',
+                                labelStyle: TextStyle(
+                                  color: AppColors.textColorPrimary, // Label color when not focused
+                                  fontSize: 18, // Label font size
+                                ),
+                                errorText: tripNameErrorMessage,
+                                filled: true,
+                                fillColor: AppColors.textFieldColor,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.borderPrimary,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.primaryColor,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.0),
+                                ),
+                              ),
+                              style: TextStyle(
+                                color: AppColors.textColorPrimary,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           )),
 
@@ -897,53 +878,58 @@ class _QuickManifestState extends State<QuickManifest> {
                       // Available Seats input field
                       Padding(
                           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                          child: TextField(
-                            controller: availableSeatsController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(1),
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                // Validate the input and set error message
-                                if (value == '0') {
-                                  availableSeatsErrorMessage = 'Available seats cannot be 0.';
-                                } else {
-                                  availableSeatsErrorMessage = null;
-                                }
-                              });
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Enter # of Available Seats',
-                              labelStyle: TextStyle(
-                                color: AppColors.textColorPrimary, // Label color when not focused
-                                fontSize: 18, // Label font size
-                              ),
-                              errorText: availableSeatsErrorMessage,
-                              filled: true,
-                              fillColor: AppColors.textFieldColor,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: AppColors.borderPrimary,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(4.0), // Rounded corners
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: AppColors.primaryColor,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
+                          child: Container(
+                            constraints: BoxConstraints(
+                              maxWidth: AppData.inputFieldMax, // Set the max width of the TextField
                             ),
-                            style: TextStyle(
-                              color: AppColors.textColorPrimary,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                            child: TextField(
+                              controller: availableSeatsController,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(1),
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  // Validate the input and set error message
+                                  if (value == '0') {
+                                    availableSeatsErrorMessage = 'Available seats cannot be 0.';
+                                  } else {
+                                    availableSeatsErrorMessage = null;
+                                  }
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Enter # of Available Seats',
+                                labelStyle: TextStyle(
+                                  color: AppColors.textColorPrimary, // Label color when not focused
+                                  fontSize: 18, // Label font size
+                                ),
+                                errorText: availableSeatsErrorMessage,
+                                filled: true,
+                                fillColor: AppColors.textFieldColor,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.borderPrimary,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.primaryColor,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.0),
+                                ),
+                              ),
+                              style: TextStyle(
+                                color: AppColors.textColorPrimary,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           )),
 
@@ -953,6 +939,9 @@ class _QuickManifestState extends State<QuickManifest> {
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 5.0),
                         child: Container(
+                          constraints: BoxConstraints(
+                            maxWidth: AppData.inputFieldMax, // Set the max width of the TextField
+                          ),
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
@@ -1033,6 +1022,9 @@ class _QuickManifestState extends State<QuickManifest> {
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Container(
+                          constraints: BoxConstraints(
+                            maxWidth: AppData.inputFieldMax,
+                          ),
                           width: double.infinity,
                           decoration: BoxDecoration(
                             color: AppColors.fireColor,
@@ -1065,6 +1057,9 @@ class _QuickManifestState extends State<QuickManifest> {
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Container(
+                          constraints: BoxConstraints(
+                            maxWidth: AppData.inputFieldMax,
+                          ),
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
@@ -1110,6 +1105,9 @@ class _QuickManifestState extends State<QuickManifest> {
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Container(
+                          constraints: BoxConstraints(
+                            maxWidth: AppData.inputFieldMax,
+                          ),
                           width: double.infinity,
                           decoration: BoxDecoration(
                             color: AppColors.fireColor,
@@ -1238,98 +1236,103 @@ class _QuickManifestState extends State<QuickManifest> {
                       // Allowable Slider
                       Padding(
                         padding: const EdgeInsets.only(right: 16.0, left: 16.0),
-                        child: Stack(
-                          children: [
-                            // Background container with white background, black outline, and rounded corners
-                            Positioned.fill(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.textFieldColor, // Background color
-                                  border: Border.all(color: AppColors.borderPrimary, width: 2), // Black outline
-                                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                                ),
-                              ),
-                            ),
-                            // Column with existing widgets
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton(
-                                        onPressed: _decrementSlider,
-                                        style: ElevatedButton.styleFrom(
-                                          foregroundColor: Colors.black,
-                                          backgroundColor: AppColors.fireColor,
-                                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                          elevation: 15,
-                                          shadowColor: Colors.black,
-                                          side: BorderSide(color: Colors.black, width: 2),
-                                          shape: CircleBorder(),
-                                        ),
-                                        child: Icon(Icons.remove, color: Colors.black, size: 32),
-                                      ),
-                                      const Spacer(),
-                                      Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          // Slider value
-                                          Visibility(
-                                            visible: lastInputFromSlider,
-                                            child: Text(
-                                              '${_sliderValue.toStringAsFixed(0)} lbs',
-                                              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                            ),
-                                          ),
-                                          // Keyboard input value
-                                          Visibility(
-                                            visible: !lastInputFromSlider,
-                                            child: Text(
-                                              '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lbs',
-                                              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const Spacer(),
-                                      ElevatedButton(
-                                        onPressed: _incrementSlider,
-                                        style: ElevatedButton.styleFrom(
-                                          foregroundColor: Colors.black,
-                                          backgroundColor: AppColors.fireColor,
-                                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                          elevation: 15,
-                                          shadowColor: Colors.black,
-                                          side: const BorderSide(color: Colors.black, width: 2),
-                                          shape: CircleBorder(),
-                                        ),
-                                        child: Icon(Icons.add, color: Colors.black, size: 32),
-                                      ),
-                                    ],
+                        child: Container(
+                          constraints: BoxConstraints(
+                            maxWidth: AppData.inputFieldMax,
+                          ),
+                          child: Stack(
+                            children: [
+                              // Background container with white background, black outline, and rounded corners
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.textFieldColor, // Background color
+                                    border: Border.all(color: AppColors.borderPrimary, width: 2), // Black outline
+                                    borderRadius: BorderRadius.circular(8), // Rounded corners
                                   ),
                                 ),
-                                Slider(
-                                  value: _sliderValue,
-                                  min: 1000,
-                                  max: 5000,
-                                  divisions: 40,
-                                  label: null,
-                                  onChanged: (double value) {
-                                    setState(() {
-                                      _sliderValue = value;
-                                      lastInputFromSlider = true;
-                                      allowableController.text = _sliderValue.toStringAsFixed(0);
-                                    });
-                                  },
-                                  activeColor: AppColors.fireColor,
-                                  // Color when the slider is active
-                                  inactiveColor: Colors.grey, // Color for the inactive part
-                                ),
-                              ],
-                            ),
-                          ],
+                              ),
+                              // Column with existing widgets
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20.0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: _decrementSlider,
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.black,
+                                            backgroundColor: AppColors.fireColor,
+                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                            elevation: 15,
+                                            shadowColor: Colors.black,
+                                            side: BorderSide(color: Colors.black, width: 2),
+                                            shape: CircleBorder(),
+                                          ),
+                                          child: Icon(Icons.remove, color: Colors.black, size: 32),
+                                        ),
+                                        const Spacer(),
+                                        Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            // Slider value
+                                            Visibility(
+                                              visible: lastInputFromSlider,
+                                              child: Text(
+                                                '${_sliderValue.toStringAsFixed(0)} lbs',
+                                                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                              ),
+                                            ),
+                                            // Keyboard input value
+                                            Visibility(
+                                              visible: !lastInputFromSlider,
+                                              child: Text(
+                                                '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lbs',
+                                                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Spacer(),
+                                        ElevatedButton(
+                                          onPressed: _incrementSlider,
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.black,
+                                            backgroundColor: AppColors.fireColor,
+                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                            elevation: 15,
+                                            shadowColor: Colors.black,
+                                            side: const BorderSide(color: Colors.black, width: 2),
+                                            shape: CircleBorder(),
+                                          ),
+                                          child: Icon(Icons.add, color: Colors.black, size: 32),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Slider(
+                                    value: _sliderValue,
+                                    min: 1000,
+                                    max: 5000,
+                                    divisions: 40,
+                                    label: null,
+                                    onChanged: (double value) {
+                                      setState(() {
+                                        _sliderValue = value;
+                                        lastInputFromSlider = true;
+                                        allowableController.text = _sliderValue.toStringAsFixed(0);
+                                      });
+                                    },
+                                    activeColor: AppColors.fireColor,
+                                    // Color when the slider is active
+                                    inactiveColor: Colors.grey, // Color for the inactive part
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
 
@@ -1347,7 +1350,17 @@ class _QuickManifestState extends State<QuickManifest> {
                                   });
                                 }
                               : null,
-                          style: style,
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.black,
+                            textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            backgroundColor: Colors.green,
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            elevation: 15,
+                            shadowColor: Colors.black,
+                            side: const BorderSide(color: Colors.black, width: 2),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            fixedSize: Size(min(MediaQuery.of(context).size.width / 2, AppData.buttonMax),  MediaQuery.of(context).size.height / 10),
+                          ),
                           child: const Text('Calculate'),
                         ),
                       ),
