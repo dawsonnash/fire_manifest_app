@@ -23,6 +23,7 @@ class CreateNewManifest extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppData.updateScreenData(context); // Updates width and orientation
     return DefaultTabController(
       length: 2, // Number of tabs
       child: Stack(
@@ -783,7 +784,7 @@ class _QuickManifestState extends State<QuickManifest> {
 
   @override
   Widget build(BuildContext context) {
-
+    AppData.updateScreenData(context); // Updates width and orientation
     return Scaffold(
       backgroundColor: Colors.transparent,
       resizeToAvoidBottomInset: false, // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
@@ -812,9 +813,7 @@ class _QuickManifestState extends State<QuickManifest> {
                       Padding(
                           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: Container(
-                            constraints: BoxConstraints(
-                              maxWidth: AppData.inputFieldMax, // Set the max width of the TextField
-                            ),
+                            width: AppData.inputFieldWidth,
                             child: TextField(
                               controller: tripNameController,
                               inputFormatters: [

@@ -36,10 +36,28 @@ class AppData {
   static double spacingStandard = 12.0;
   static String userName = '';
   static double inputFieldMax = 450;
+  static double termsNConditionsMax = 500;
   static double buttonMax = 200;
   static double savedTripsMax = 450;
 
+  // Dynamic Widths
+  static double get inputFieldWidth => isLandscape ? screenWidth / 3 : screenWidth / 2;
+  static double get buttonWidth => isLandscape ? screenWidth / 4 : screenWidth / 2;
 
+  // Dynamic Heights
+  static double get inputFieldHeight => isLandscape ? 40 : 50;
+  static double get buttonHeight => isLandscape ? 45 : 55;
+
+  // Utility
+  static double get screenWidth => _screenSize.width;
+  static double get screenHeight => _screenSize.height;
+  static bool get isLandscape => _screenSize.aspectRatio > 1;
+
+  static Size _screenSize = Size.zero;
+
+  static void updateScreenData(BuildContext context) {
+    _screenSize = MediaQuery.of(context).size;
+  }
 }
 
 
