@@ -35,6 +35,11 @@ class AppData {
   static String crewName = 'Crew Name';
   static double spacingStandard = 12.0;
   static String userName = '';
+  static double inputFieldMax = 450;
+  static double buttonMax = 200;
+  static double savedTripsMax = 450;
+
+
 }
 
 

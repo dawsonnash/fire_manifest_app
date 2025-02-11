@@ -310,86 +310,91 @@ class _SavedTripsState extends State<SavedTripsView> {
                                   );
                                   setState(() {}); // Refresh the list after returning
                                 },
-                                child: Card(
-                                  color: Colors.transparent,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: AppColors.textFieldColor,
-                                      borderRadius: BorderRadius.circular(9),
-                                    ),
-                                    child: ListTile(
-                                      title: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Flexible(
-                                                      child: Text(
-                                                        trip.tripName,
+                                child: Center(
+                                  child: Card(
+                                    color: Colors.transparent,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: AppColors.textFieldColor,
+                                        borderRadius: BorderRadius.circular(9),
+                                      ),
+                                      constraints: BoxConstraints(
+                                        maxWidth: AppData.savedTripsMax,
+                                      ),
+                                      child: ListTile(
+                                        title: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Flexible(
+                                                        child: Text(
+                                                          trip.tripName,
+                                                          style: TextStyle(
+                                                            fontSize: 22,
+                                                            fontWeight: FontWeight.bold,
+                                                            color: AppColors.textColorPrimary,
+                                                          ),
+                                                          overflow: TextOverflow.ellipsis,
+                                                          maxLines: 1,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                       Text(
+                                                        '•',
                                                         style: TextStyle(
                                                           fontSize: 22,
-                                                          fontWeight: FontWeight.bold,
                                                           color: AppColors.textColorPrimary,
                                                         ),
-                                                        overflow: TextOverflow.ellipsis,
-                                                        maxLines: 1,
                                                       ),
-                                                    ),
-                                                    const SizedBox(width: 8),
-                                                     Text(
-                                                      '•',
-                                                      style: TextStyle(
-                                                        fontSize: 22,
-                                                        color: AppColors.textColorPrimary,
+                                                      const SizedBox(width: 8),
+                                                      Text(
+                                                        formatTimestamp(trip.timestamp),
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight.w400,
+                                                          color: AppColors.textColorPrimary,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    const SizedBox(width: 8),
-                                                    Text(
-                                                      formatTimestamp(trip.timestamp),
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.w400,
-                                                        color: AppColors.textColorPrimary,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  'Allowable: ${trip.allowable} lbs',
-                                                  style: TextStyle(
-                                                    fontSize: 18,
-                                                    color: AppColors.textColorPrimary,
+                                                    ],
                                                   ),
-                                                )
-                                              ],
+                                                  Text(
+                                                    'Allowable: ${trip.allowable} lbs',
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      color: AppColors.textColorPrimary,
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                          IconButton(
-                                            icon: Icon(
-                                              Icons.arrow_forward_ios,
-                                              color: AppColors.textColorPrimary,
-                                              size: 32,
-                                            ),
-                                            onPressed: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => SingleTripView(
-                                                    trip: trip,
+                                            IconButton(
+                                              icon: Icon(
+                                                Icons.arrow_forward_ios,
+                                                color: AppColors.textColorPrimary,
+                                                size: 32,
+                                              ),
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => SingleTripView(
+                                                      trip: trip,
+                                                    ),
                                                   ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                      leading: Icon(
-                                        FontAwesomeIcons.helicopter,
-                                        color: AppColors.primaryColor,
+                                                );
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                        leading: Icon(
+                                          FontAwesomeIcons.helicopter,
+                                          color: AppColors.primaryColor,
+                                        ),
                                       ),
                                     ),
                                   ),

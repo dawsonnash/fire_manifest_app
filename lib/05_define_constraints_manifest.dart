@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -119,13 +120,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
       shadowColor: Colors.black,
       side: const BorderSide(color: Colors.black, width: 2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      fixedSize: Size(MediaQuery
-          .of(context)
-          .size
-          .width / 2, MediaQuery
-          .of(context)
-          .size
-          .height / 10),
+        fixedSize: Size(min(MediaQuery.of(context).size.width / 2, AppData.buttonMax),  MediaQuery.of(context).size.height / 10)
     );
 
     return Scaffold(
@@ -157,60 +152,65 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                       // Enter Trip Name Input Field
                       Padding(
                           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                          child: TextField(
-                            controller: tripNameController,
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(20),
-                            ],
-                            textCapitalization: TextCapitalization.words,
-                            onChanged: (value) {
-                              setState(() {
-                                // Check if the trip name exists in the savedTrips list (case-insensitive)
-                                final String tripName = tripNameController.text;
-
-                                // Check if crew member name already exists
-                                bool tripNameExists = savedTrips.savedTrips.any(
-                                      (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
-                                );
-
-                                // Validate the input and set error message
-                                if (tripNameExists) {
-                                  tripNameErrorMessage = 'Trip name already used';
-                                } else {
-                                  tripNameErrorMessage = null;
-                                }
-                              });
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Enter Trip Name',
-                              errorText: tripNameErrorMessage,
-                              labelStyle: TextStyle(
-                                color: AppColors.textColorPrimary, // Label color when not focused
-                                fontSize: 18, // Label font size
-                              ),
-                              filled: true,
-                              fillColor: AppColors.textFieldColor,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: AppColors.borderPrimary,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(4.0), // Rounded corners
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: AppColors.primaryColor,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
+                          child: Container(
+                            constraints: BoxConstraints(
+                              maxWidth: AppData.inputFieldMax,
                             ),
-                            style: TextStyle(
-                              color: AppColors.textColorPrimary,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                            child: TextField(
+                              controller: tripNameController,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(20),
+                              ],
+                              textCapitalization: TextCapitalization.words,
+                              onChanged: (value) {
+                                setState(() {
+                                  // Check if the trip name exists in the savedTrips list (case-insensitive)
+                                  final String tripName = tripNameController.text;
+
+                                  // Check if crew member name already exists
+                                  bool tripNameExists = savedTrips.savedTrips.any(
+                                        (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
+                                  );
+
+                                  // Validate the input and set error message
+                                  if (tripNameExists) {
+                                    tripNameErrorMessage = 'Trip name already used';
+                                  } else {
+                                    tripNameErrorMessage = null;
+                                  }
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Enter Trip Name',
+                                errorText: tripNameErrorMessage,
+                                labelStyle: TextStyle(
+                                  color: AppColors.textColorPrimary, // Label color when not focused
+                                  fontSize: 18, // Label font size
+                                ),
+                                filled: true,
+                                fillColor: AppColors.textFieldColor,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.borderPrimary,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.primaryColor,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.0),
+                                ),
+                              ),
+                              style: TextStyle(
+                                color: AppColors.textColorPrimary,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           )),
 
@@ -219,53 +219,58 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                       // Enter Available Seats Input Field
                       Padding(
                           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                          child: TextField(
-                            controller: availableSeatsController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(1),
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                // Validate the input and set error message
-                                if (value == '0') {
-                                  availableSeatsErrorMessage = 'Available seats cannot be 0.';
-                                } else {
-                                  availableSeatsErrorMessage = null;
-                                }
-                              });
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Enter # of Available Seats',
-                              errorText: availableSeatsErrorMessage,
-                              labelStyle: TextStyle(
-                                color: AppColors.textColorPrimary, // Label color when not focused
-                                fontSize: 18, // Label font size
-                              ),
-                              filled: true,
-                              fillColor: AppColors.textFieldColor,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: AppColors.borderPrimary,
-                                  // Border color when the TextField is not focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(4.0), // Rounded corners
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: AppColors.primaryColor,
-                                  // Border color when the TextField is focused
-                                  width: 2.0, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
+                          child: Container(
+                            constraints: BoxConstraints(
+                              maxWidth: AppData.inputFieldMax,
                             ),
-                            style: TextStyle(
-                              color: AppColors.textColorPrimary,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                            child: TextField(
+                              controller: availableSeatsController,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(1),
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  // Validate the input and set error message
+                                  if (value == '0') {
+                                    availableSeatsErrorMessage = 'Available seats cannot be 0.';
+                                  } else {
+                                    availableSeatsErrorMessage = null;
+                                  }
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Enter # of Available Seats',
+                                errorText: availableSeatsErrorMessage,
+                                labelStyle: TextStyle(
+                                  color: AppColors.textColorPrimary, // Label color when not focused
+                                  fontSize: 18, // Label font size
+                                ),
+                                filled: true,
+                                fillColor: AppColors.textFieldColor,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.borderPrimary,
+                                    // Border color when the TextField is not focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.primaryColor,
+                                    // Border color when the TextField is focused
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.0),
+                                ),
+                              ),
+                              style: TextStyle(
+                                color: AppColors.textColorPrimary,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           )),
 
@@ -275,6 +280,9 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Container(
+                          constraints: BoxConstraints(
+                            maxWidth: AppData.inputFieldMax,
+                          ),
                           width: double.infinity,
                           decoration: BoxDecoration(
                             color: AppColors.fireColor,
@@ -405,106 +413,112 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                       // Choose Allowable Slider
                       Padding(
                         padding: const EdgeInsets.only(top: 0.0, right: 16.0, left: 16.0),
-                        child: Stack(
-                          children: [
-                            // Background container with white background, black outline, and rounded corners
-                            Positioned.fill(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.textFieldColor, // Background color
-                                  border: Border.all(color: Colors.black, width: 2), // Black outline
-                                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                                ),
-                              ),
-                            ),
-                            // Column with existing widgets
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton(
-                                        onPressed: _decrementSlider,
-                                        style: ElevatedButton.styleFrom(
-                                          foregroundColor: Colors.black,
-                                          backgroundColor: AppColors.fireColor,
-                                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                          elevation: 15,
-                                          shadowColor: Colors.black,
-                                          side: const BorderSide(color: Colors.black, width: 2),
-                                          shape: CircleBorder(),
-                                        ),
-                                        child: const Icon(Icons.remove, color: Colors.black, size: 32),
-                                      ),
-                                      const Spacer(),
-                                      Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          // Slider value
-                                          Visibility(
-                                            visible: lastInputFromSlider,
-                                            child: Text(
-                                              '${_sliderValue.toStringAsFixed(0)} lbs',
-                                              style: TextStyle(
-                                                fontSize: 32,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.textColorPrimary,
-                                              ),
-                                            ),
-                                          ),
-                                          // Keyboard input value
-                                          Visibility(
-                                            visible: !lastInputFromSlider,
-                                            child: Text(
-                                              '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lbs',
-                                              style: TextStyle(
-                                                fontSize: 32,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.textColorPrimary,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const Spacer(),
-                                      ElevatedButton(
-                                        onPressed: _incrementSlider,
-                                        style: ElevatedButton.styleFrom(
-                                          foregroundColor: Colors.black,
-                                          backgroundColor: AppColors.fireColor,
-                                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                          elevation: 15,
-                                          shadowColor: Colors.black,
-                                          side: const BorderSide(color: Colors.black, width: 2),
-                                          shape: CircleBorder(),
-                                        ),
-                                        child: const Icon(Icons.add, color: Colors.black, size: 32),
-                                      ),
-                                    ],
+                        child: Container(
+                          constraints: BoxConstraints(
+                            maxWidth: AppData.inputFieldMax,
+                          ),
+                          child: Stack(
+                            children: [
+                              // Background container with white background, black outline, and rounded corners
+                              Positioned.fill(
+                                child: Container(
+
+                                  decoration: BoxDecoration(
+                                    color: AppColors.textFieldColor, // Background color
+                                    border: Border.all(color: Colors.black, width: 2), // Black outline
+                                    borderRadius: BorderRadius.circular(8), // Rounded corners
                                   ),
                                 ),
-                                Slider(
-                                  value: _sliderValue,
-                                  min: 1000,
-                                  max: 5000,
-                                  divisions: 40,
-                                  label: null,
-                                  onChanged: (double value) {
-                                    setState(() {
-                                      _sliderValue = value;
-                                      lastInputFromSlider = true;
-                                      allowableController.text = _sliderValue.toStringAsFixed(0);
-                                    });
-                                  },
-                                  activeColor: AppColors.fireColor,
-                                  // Color when the slider is active
-                                  inactiveColor: Colors.grey, // Color for the inactive part
-                                ),
-                              ],
-                            ),
-                          ],
+                              ),
+                              // Column with existing widgets
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20.0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: _decrementSlider,
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.black,
+                                            backgroundColor: AppColors.fireColor,
+                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                            elevation: 15,
+                                            shadowColor: Colors.black,
+                                            side: const BorderSide(color: Colors.black, width: 2),
+                                            shape: CircleBorder(),
+                                          ),
+                                          child: const Icon(Icons.remove, color: Colors.black, size: 32),
+                                        ),
+                                        const Spacer(),
+                                        Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            // Slider value
+                                            Visibility(
+                                              visible: lastInputFromSlider,
+                                              child: Text(
+                                                '${_sliderValue.toStringAsFixed(0)} lbs',
+                                                style: TextStyle(
+                                                  fontSize: 32,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.textColorPrimary,
+                                                ),
+                                              ),
+                                            ),
+                                            // Keyboard input value
+                                            Visibility(
+                                              visible: !lastInputFromSlider,
+                                              child: Text(
+                                                '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lbs',
+                                                style: TextStyle(
+                                                  fontSize: 32,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.textColorPrimary,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Spacer(),
+                                        ElevatedButton(
+                                          onPressed: _incrementSlider,
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.black,
+                                            backgroundColor: AppColors.fireColor,
+                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                            elevation: 15,
+                                            shadowColor: Colors.black,
+                                            side: const BorderSide(color: Colors.black, width: 2),
+                                            shape: CircleBorder(),
+                                          ),
+                                          child: const Icon(Icons.add, color: Colors.black, size: 32),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Slider(
+                                    value: _sliderValue,
+                                    min: 1000,
+                                    max: 5000,
+                                    divisions: 40,
+                                    label: null,
+                                    onChanged: (double value) {
+                                      setState(() {
+                                        _sliderValue = value;
+                                        lastInputFromSlider = true;
+                                        allowableController.text = _sliderValue.toStringAsFixed(0);
+                                      });
+                                    },
+                                    activeColor: AppColors.fireColor,
+                                    // Color when the slider is active
+                                    inactiveColor: Colors.grey, // Color for the inactive part
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
 
