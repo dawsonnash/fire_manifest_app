@@ -47,5 +47,12 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>NSPhotoLibraryUsageDescription</key>
+			<string>This app does not use photo gallery access.</string>
+		<key>NSDocumentsDirectoryUsageDescription</key>
+			<string>This app needs access to documents to allow file sharing.</string>
+		<key>NSMicrophoneUsageDescription</key>
+			<string>This app does not record audio, but some features require microphone access.</string>
+
 	</dict>
 </plist>
