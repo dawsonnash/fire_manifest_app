@@ -52,7 +52,7 @@
 		<key>NSDocumentsDirectoryUsageDescription</key>
 			<string>This app needs access to documents to allow file sharing.</string>
 		<key>NSMicrophoneUsageDescription</key>
-			<string>This app does not record audio, but some features require microphone access.</string>
+			<string>This app does not record audio or need microphone access.</string>
 
 	</dict>
 </plist>
