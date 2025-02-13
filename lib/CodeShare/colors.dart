@@ -8,43 +8,27 @@ import 'package:flutter/material.dart';
 // Dark Modes on left side
 class AppColors {
   static Color get fireColor => Colors.deepOrangeAccent;
-
   static Color get primaryColor => isDarkMode ? Colors.deepOrangeAccent : Colors.black;
-
   static Color get appBarColor => isDarkMode ? Colors.grey[900]! : Colors.deepOrangeAccent;
-
   static Color get panelColor => isDarkMode ? Colors.grey[900]!.withValues(alpha: 0.9) : Colors.deepOrangeAccent;
-
   static Color get textFieldColor => isDarkMode ? Colors.grey[900]!.withValues(alpha: 0.9) : Colors.white;
-
   static Color get textFieldColor2 => isDarkMode ? Colors.grey[900]! : Colors.white;
-
   static Color get textColorPrimary => isDarkMode ? Colors.white : Colors.black;
-
   static Color get textColorPrimary2 => isDarkMode ? Colors.white : Colors.grey;
-
   static Color get textColorSecondary => isDarkMode ? Colors.black : Colors.white;
-
   static Color get textColorEditToolDetails => isDarkMode ? Colors.white : Colors.blue;
-
   static Color get tabIconColor => isDarkMode ? Colors.grey[300]! : Colors.grey[800]!;
-
   static Color get borderPrimary => isDarkMode ? Colors.grey[900]! : Colors.black;
-
   static Color get saveButtonAllowableWeight => isDarkMode ? Colors.deepOrangeAccent : Colors.blue;
-
   static Color get toolBlue => isDarkMode ? Colors.blue[200]! : Colors.blue[100]!;
-
   static Color get gearYellow => isDarkMode ? Colors.orange[200]! : Colors.orange[100]!;
+  static Color get quickGuideSection => enableBackgroundImage ? Colors.deepOrangeAccent : Colors.deepOrangeAccent;
+  static Color get quickGuideSubsection => enableBackgroundImage ? Colors.grey : Colors.grey;
 
   static Color get buttonStyle1 => Colors.green;
-
   static Color get cancelButton => isDarkMode ? Colors.white : Colors.grey;
-
   static Color get logoImageOverlay => Colors.black.withValues(alpha: 0.6);
-
   static Color get settingsTabs => Colors.white.withValues(alpha: 0.1);
-
   static bool isDarkMode = true; // This will be toggled based on SharedPreferences
   static bool enableBackgroundImage = false; // Default to background image disabled
 }
@@ -103,18 +87,24 @@ class AppData {
   static double get termsAndConditionsWidth => isLandscape ? (screenWidth * 0.35) : (screenWidth * 0.75);
   static double get selectionDialogWidth => isLandscape ? (screenWidth * 0.5) : (screenWidth * 0.8);
   static double get miniSelectionDialogWidth => isLandscape ? (screenWidth * 0.4) : (screenWidth * 0.7);
-
+  static double get quickGuideImageWidth => isLandscape ? screenWidth * 0.3 : screenWidth * 0.6;
 
   // **Dynamic Heights Based on Screen Height**
   static double get buttonHeight => isLandscape ? (screenHeight * 0.12) : (screenHeight * 0.1);
   static double get miniSelectionDialogHeight => isLandscape ? (screenHeight * 0.32) : (screenHeight * 0.3);
+  static double get quickGuideContentHeight => 50 + quickGuideContentTextSize;
 
   // **Dynamic Spacing
 
+  static double sizedBox10 = 10.0 * _scalingFactorSizedBox;
   static double spacingStandard = 12.0 * _scalingFactorSizedBox;
   static double sizedBox16 = 16.0 * _scalingFactorSizedBox;
+  static double sizedBox18 = 18.0 * _scalingFactorSizedBox;
+  static double sizedBox20 = 20.0 * _scalingFactorSizedBox;
+  static double sizedBox22 = 22.0 * _scalingFactorSizedBox;
 
   // **Dynamic Padding Templates**
+  static double get padding32 => 32.0 * _scalingFactorPadding;
   static double get padding20 => 20.0 * _scalingFactorPadding;
   static double get padding16 => 16.0 * _scalingFactorPadding;
   static double get padding12 => 12.0 * _scalingFactorPadding;
@@ -141,6 +131,7 @@ class AppData {
   static double get cupertinoPickerItemSize => 16 * _textScalingFactor * _textOrientationFactor;
   static double get miniDialogTitleTextSize => 22 * _textScalingFactor * _textOrientationFactor;
   static double get miniDialogBodyTextSize => 18 * _textScalingFactor * _textOrientationFactor;
+  static double get quickGuideContentTextSize => 16 * _textScalingFactor * _textOrientationFactor;
 
 }
 
