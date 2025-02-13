@@ -87,12 +87,12 @@ class AppData {
   static double get termsAndConditionsWidth => isLandscape ? (screenWidth * 0.35) : (screenWidth * 0.75);
   static double get selectionDialogWidth => isLandscape ? (screenWidth * 0.5) : (screenWidth * 0.8);
   static double get miniSelectionDialogWidth => isLandscape ? (screenWidth * 0.4) : (screenWidth * 0.7);
-  static double get quickGuideImageWidth => isLandscape ? screenWidth * 0.3 : screenWidth * 0.6;
+  static double get quickGuideImageWidth => isLandscape ? screenWidth * 0.3 : screenWidth * 0.9;
 
   // **Dynamic Heights Based on Screen Height**
   static double get buttonHeight => isLandscape ? (screenHeight * 0.12) : (screenHeight * 0.1);
   static double get miniSelectionDialogHeight => isLandscape ? (screenHeight * 0.32) : (screenHeight * 0.3);
-  static double get quickGuideContentHeight => 50 + quickGuideContentTextSize;
+  static double get quickGuideContentHeight => 45 + quickGuideContentTextSize;
 
   // **Dynamic Spacing
 

@@ -18,17 +18,16 @@ class _QuickGuideState extends State<QuickGuide> {
   bool _showContentBar = true;
 
   final List<Map<String, dynamic>> sectionKeys = [
-    {"number": "1.0", "title": "App Overview", "key": GlobalKey()},
-    {"number": "2.0", "title": "Crew Management", "key": GlobalKey()},
-    {"number": "2.1", "title": "Crew Members and Gear", "key": GlobalKey()},
-    {"number": "2.2", "title": "Trip Preferences", "key": GlobalKey()},
-    {"number": "2.3", "title": "Tools", "key": GlobalKey()},
-    {"number": "2.4", "title": "Crew Sharing", "key": GlobalKey()},
-    {"number": "3.0", "title": "Manifesting", "key": GlobalKey()},
-    {"number": "3.1", "title": "Quick Manifest", "key": GlobalKey()},
-    {"number": "3.2", "title": "Build Your Own", "key": GlobalKey()},
-    {"number": "3.3", "title": "Editing Trips", "key": GlobalKey()},
-    {"number": "3.4", "title": "Exporting Trips", "key": GlobalKey()},
+    {"number": "1.0", "title": "Crew Management", "key": GlobalKey()},
+    {"number": "1.1", "title": "Crew Members and Gear", "key": GlobalKey()},
+    {"number": "1.2", "title": "Trip Preferences", "key": GlobalKey()},
+    {"number": "1.3", "title": "Tools", "key": GlobalKey()},
+    {"number": "1.4", "title": "Crew Sharing", "key": GlobalKey()},
+    {"number": "2.0", "title": "Manifesting", "key": GlobalKey()},
+    {"number": "2.1", "title": "Quick Manifest", "key": GlobalKey()},
+    {"number": "2.2", "title": "Build Your Own", "key": GlobalKey()},
+    {"number": "2.3", "title": "Editing Trips", "key": GlobalKey()},
+    {"number": "2.4", "title": "Exporting Trips", "key": GlobalKey()},
   ];
 
   @override
@@ -281,7 +280,7 @@ class _QuickGuideState extends State<QuickGuide> {
                         Center(
                           child: Image.asset(
                             'assets/images/quick_guide/quick_guide_overview.png',
-                            width: MediaQuery.of(context).size.width * 0.9,
+                            width: AppData.quickGuideImageWidth,
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -297,29 +296,7 @@ class _QuickGuideState extends State<QuickGuide> {
                         ),
                         SizedBox(height: AppData.sizedBox22),
 
-                        // 1.0 App Overview
-                        Container(
-                          key: sectionKeys.firstWhere((item) => item["title"] == "App Overview", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
-                              )["key"],
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text("1.0", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSection)),
-                                  Text("  App Overview", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
-                                ],
-                              ),
-                              SelectableText(
-                                "\n Overview here...\n",
-                                style: TextStyle(fontSize: AppData.text16, color: Colors.white),
-                              ),
-                              SizedBox(height: AppData.sizedBox20),
-                            ],
-                          ),
-                        ),
-
-                        // 2.0 Crew Management
+                        // 1.0 Crew Management
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Crew Management", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
                               )["key"],
@@ -328,12 +305,12 @@ class _QuickGuideState extends State<QuickGuide> {
                             children: [
                               Row(
                                 children: [
-                                  Text("2.0", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSection)),
+                                  Text("1.0", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSection)),
                                   Text("  Crew Management ", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
                                   Icon(Icons.person, size: AppData.text24, color: AppColors.quickGuideSection,)
                                 ],
                               ),
-                              SelectableText("\n Description here...\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText("\nThe Fire Manifesting App allows you to manage...\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
                               SizedBox(height: AppData.sizedBox10),
                               Image.asset("assets/help_screenshot_2.png"),
                               SizedBox(height: AppData.sizedBox20),
@@ -341,7 +318,7 @@ class _QuickGuideState extends State<QuickGuide> {
                           ),
                         ),
 
-                        // 2.1 Crew Members and Gear
+                        //1.1 Crew Members and Gear
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Crew Members and Gear", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
                               )["key"],
@@ -350,19 +327,23 @@ class _QuickGuideState extends State<QuickGuide> {
                             children: [
                               Row(
                                 children: [
-                                  Text("2.1", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
+                                  Text("1.1", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
                                   Text("  Crew Members and Gear", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
                                 ],
                               ),
-                              SelectableText("\n Description here...\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText("\nCrew members and gear items can be added and edited via the Crew page. When making a new crew member, required fields include the last name, flight weight (consisting of the total weight on your person when on the aircraft: body, helmet, pack, and uniform weights), primary position (e.g. 'Saw Team 1' is primary over 'Supply'), and all personal tools.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
                               SizedBox(height: AppData.sizedBox10),
-                              Image.asset("assets/help_screenshot_2.png"),
+                              Image.asset("assets/images/quick_guide/edit_crewmember.png"),
                               SizedBox(height: AppData.sizedBox20),
+                              SelectableText("\nWhen adding gear items, include the name, weight, quantity, and whether the item is a hazardous material (anything potentially combustible). The hazardous material items will be placed in their designated slots in any generated manifests. Items from the Incident Response Pocket Guide (IRPG) can also be selected and added to your crew inventory; weights for these items can be adjusted.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SizedBox(height: AppData.sizedBox10),
+                              Image.asset("assets/images/quick_guide/edit_gear.png"),
+                              SizedBox(height: AppData.sizedBox10),
                             ],
                           ),
                         ),
 
-                        // 2.2 Trip Preferences
+                        // 1.2 Trip Preferences
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Trip Preferences", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
                           )["key"],
@@ -371,19 +352,21 @@ class _QuickGuideState extends State<QuickGuide> {
                             children: [
                               Row(
                                 children: [
-                                  Text("2.2", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
+                                  Text("1.2", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
                                   Text("  Trip Preferences", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
                                 ],
                               ),
-                              SelectableText("\n Description here...\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText("\nTrip Preferences are your way to decide how you want your crew sorted into loads. Each Trip Preference can contain both positional or gear load preferences that can be defined based on the standard operating procedures that you or your crew follow.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText("Whenever you use the Quick Manifest feature and select a Trip Preference, you utilize a built in load-calculating algorithm. There are 3 ways to customize this algorithm: first, last, and balanced load preferences. Giving a crew member or gear item a 'First' preference places it on the first load available - if there is not enough weight it will place it on the next available load working from the first to the last load. The 'Last' preference does the exact same thing except in the opposite direction. When you select the 'Balanced' preference, all crew members and gear items in that load preference will be placed cyclically (e.g. 1, 2, 3, 1, 2, 3, ...) onto the loads in the order that you placed them in the preference.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText("Below is an example of a Trip Preference for going to a fire, a situation where you may need certain gear items or positions to go on specific loads. This preference set up ensures a Superintendent (Ex. Burnham) and Assistant Superintendent (Ex. Burnett) go first to a fire to gain situational awareness, Saw Teams are distributed evenly, and food, water, and emergency gear are appropriately allocated to the right loads.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
                               SizedBox(height: AppData.sizedBox10),
-                              Image.asset("assets/help_screenshot_2.png"),
+                              Image.asset("assets/images/quick_guide/trip_preference.png"),
                               SizedBox(height: AppData.sizedBox20),
                             ],
                           ),
                         ),
 
-                        // 2.3 Tools
+                        // 1.3 Tools
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Tools", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
                           )["key"],
@@ -392,19 +375,19 @@ class _QuickGuideState extends State<QuickGuide> {
                             children: [
                               Row(
                                 children: [
-                                  Text("2.2", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
+                                  Text("1.3", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
                                   Text("  Tools", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
                                 ],
                               ),
-                              SelectableText("\n Description here...\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText("\nThe Tools panel allows you to create and manage personal tool templates for your crew. These are the tools that will constantly be with your person when you travel via helicopter. They must be created and edited within the designated tools panel first before adding to any crew member. Once you add a personal tool to a crew member, it will be attached to them. Whenever you create a new trip, a crew member's personal tools will always accompany them on their load. If you wish to travel without a tool, you must first delete it within the Edit Crew Member page.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
                               SizedBox(height: AppData.sizedBox10),
-                              Image.asset("assets/help_screenshot_2.png"),
+                              Image.asset("assets/images/quick_guide/add_tool.png"),
                               SizedBox(height: AppData.sizedBox20),
                             ],
                           ),
                         ),
 
-                        // 2.4  Crew Sharing
+                        // 1.4  Crew Sharing
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Crew Sharing", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
                           )["key"],
@@ -413,19 +396,17 @@ class _QuickGuideState extends State<QuickGuide> {
                             children: [
                               Row(
                                 children: [
-                                  Text("2.4", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
+                                  Text("1.4", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
                                   Text("  Crew Sharing", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
                                 ],
                               ),
-                              SelectableText("\n Description here...\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText("\nWithin the Settings page, you will find the Crew Sharing feature. This allows you to have one person on your crew to manage all the data you input. Once a crew is created, you may export your crew members, gear, and tools to a file that can be shared with users. To share on iOS, you will need to export and AirDrop. On Android, you will need to export and send the file via the internet. Importing will be overwrite any crew information you have on your own device. The file will be in a .json format.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
                               SizedBox(height: AppData.sizedBox10),
-                              Image.asset("assets/help_screenshot_2.png"),
-                              SizedBox(height: AppData.sizedBox20),
                             ],
                           ),
                         ),
 
-                        // 3.0 Manifesting
+                        // 2.0 Manifesting
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Manifesting", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
                           )["key"],
@@ -434,9 +415,9 @@ class _QuickGuideState extends State<QuickGuide> {
                             children: [
                               Row(
                                 children: [
-                                  Text("3.0", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSection)),
+                                  Text("2.0", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSection)),
                                   Text("  Manifesting ", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
-                                  Icon(Icons.person, size: AppData.text24, color: AppColors.quickGuideSection,)
+                                  Icon(Icons.assignment, size: AppData.text24, color: AppColors.quickGuideSection,)
                                 ],
                               ),
                               SelectableText("\n Description here...\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
@@ -447,7 +428,7 @@ class _QuickGuideState extends State<QuickGuide> {
                           ),
                         ),
 
-                        // 3.1 Quick Manifest
+                        // 2.1 Quick Manifest
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Quick Manifest", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
                           )["key"],
@@ -456,7 +437,7 @@ class _QuickGuideState extends State<QuickGuide> {
                             children: [
                               Row(
                                 children: [
-                                  Text("3.1", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
+                                  Text("2.1", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
                                   Text("  Quick Manifest", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
                                 ],
                               ),
@@ -468,7 +449,7 @@ class _QuickGuideState extends State<QuickGuide> {
                           ),
                         ),
 
-                        // 3.2 BYOM
+                        // 2.2 BYOM
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Build Your Own", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
                           )["key"],
@@ -477,7 +458,7 @@ class _QuickGuideState extends State<QuickGuide> {
                             children: [
                               Row(
                                 children: [
-                                  Text("3.2", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
+                                  Text("2.2", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
                                   Text("  Build Your Own", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
                                 ],
                               ),
@@ -489,7 +470,7 @@ class _QuickGuideState extends State<QuickGuide> {
                           ),
                         ),
 
-                        // 3.3 Editing Trips
+                        // 2.3 Editing Trips
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Editing Trips", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
                           )["key"],
@@ -498,7 +479,7 @@ class _QuickGuideState extends State<QuickGuide> {
                             children: [
                               Row(
                                 children: [
-                                  Text("3.3", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
+                                  Text("2.3", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
                                   Text("  Editing Trips", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
                                 ],
                               ),
@@ -510,7 +491,7 @@ class _QuickGuideState extends State<QuickGuide> {
                           ),
                         ),
 
-                        // 3.4  Exporting Trips
+                        // 2.4  Exporting Trips
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Exporting Trips", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
                           )["key"],
@@ -519,7 +500,7 @@ class _QuickGuideState extends State<QuickGuide> {
                             children: [
                               Row(
                                 children: [
-                                  Text("3.4", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
+                                  Text("2.4", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSubsection)),
                                   Text("  Exporting Trips", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
                                 ],
                               ),
