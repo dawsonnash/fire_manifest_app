@@ -17,6 +17,7 @@ import 'Data/crew.dart';
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 
+import 'Data/crewMemberList.dart';
 import 'Data/crewmember.dart';
 import 'Data/gear.dart';
 
@@ -62,8 +63,13 @@ class _SettingsState extends State<SettingsView> {
 
   Future<void> exportCrewData() async {
     try {
-      // Convert crew object to JSON string
-      String jsonData = jsonEncode(crew.toJson());
+      // Convert crew and saved preferences to JSON
+      Map<String, dynamic> exportData = {
+        "crew": crew.toJson(),
+        "savedPreferences": savedPreferences.toJson(),
+      };
+
+      String jsonData = jsonEncode(exportData);
 
       // Get directory for temporary storage
       Directory directory = await getApplicationDocumentsDirectory();
@@ -159,58 +165,28 @@ class _SettingsState extends State<SettingsView> {
     try {
       // Read file contents
       String jsonString = await File(file.path!).readAsString();
-
-      // Decode JSON safely
-      Map<String, dynamic> jsonData;
-      try {
-        jsonData = jsonDecode(jsonString);
-      } catch (e) {
-        showErrorDialog("Invalid JSON file. Could not be read.");
-        return;
-      }
+      Map<String, dynamic> jsonData = jsonDecode(jsonString);
 
       // Validate required fields
-      if (!jsonData.containsKey("crewName") ||
-          !jsonData.containsKey("crewMembers") ||
-          !jsonData.containsKey("gear") ||
-          !jsonData.containsKey("personalTools") ||
-          !jsonData.containsKey("totalCrewWeight")) {
+      if (!jsonData.containsKey("crew") || !jsonData.containsKey("savedPreferences")) {
         showErrorDialog("Invalid JSON format. Missing required fields.");
         return;
       }
 
-      // Validate data types
-      if (jsonData["crewName"] is! String ||
-          jsonData["crewMembers"] is! List ||
-          jsonData["gear"] is! List ||
-          jsonData["personalTools"] is! List ||
-          jsonData["totalCrewWeight"] is! num) {
-        showErrorDialog("Invalid JSON format. Incorrect data types.");
-        return;
-      }
+      // ✅ Import Crew Data
+      Crew importedCrew = Crew.fromJson(jsonData["crew"]);
 
-      // Convert JSON to Crew object
-      Crew importedCrew;
-      try {
-        importedCrew = Crew.fromJson(jsonData);
-      } catch (e) {
-        showErrorDialog("Error processing data. Ensure the file is in the correct format.");
-        return;
-      }
+      // ✅ Import Trip Preferences with correct crewMembersDynamic processing
+      SavedPreferences importedSavedPreferences = SavedPreferences.fromJson(jsonData["savedPreferences"]);
 
-      // Import the Crew Name
-      String importedCrewName = jsonData["crewName"];
-      AppData.crewName = importedCrewName;  // Update crew name in memory
-      await ThemePreferences.setCrewName(importedCrewName); // Persist to local storage
-
-      // Clear old data first
+      // Clear old data
       await Hive.box<CrewMember>('crewmemberBox').clear();
       await Hive.box<Gear>('gearBox').clear();
       await Hive.box<Gear>('personalToolsBox').clear();
       await Hive.box<TripPreference>('tripPreferenceBox').clear();
       savedPreferences.deleteAllTripPreferences();
 
-      // Save imported data to Hive
+      // Save Crew Data
       var crewMemberBox = Hive.box<CrewMember>('crewmemberBox');
       for (var member in importedCrew.crewMembers) {
         await crewMemberBox.add(member);
@@ -226,16 +202,37 @@ class _SettingsState extends State<SettingsView> {
         await personalToolsBox.add(tool);
       }
 
-      // Reload crew data from Hive
+      // ✅ Save Trip Preferences with proper Hive storage
+      var tripPrefBox = Hive.box<TripPreference>('tripPreferenceBox');
+      for (var tripPref in importedSavedPreferences.tripPreferences) {
+        for (var posPref in tripPref.positionalPreferences) {
+          // ✅ Convert lists of CrewMembers into Hive-friendly format
+          List<dynamic> processedCrewMembers = posPref.crewMembersDynamic.map((item) {
+            if (item is List<CrewMember>) {
+              return CrewMemberList(crewMembers: item); // ✅ Convert Saw Teams properly
+            } else if (item is CrewMember) {
+              return item; // ✅ Store individual CrewMembers as-is
+            }
+            return item;
+          }).toList();
+          posPref.crewMembersDynamic = processedCrewMembers;
+        }
+        await tripPrefBox.add(tripPref);
+      }
+
+      savedPreferences.tripPreferences = tripPrefBox.values.toList();
+
+      // Reload data from Hive
       await crew.loadCrewDataFromHive();
+      await savedPreferences.loadPreferencesFromHive();
       setState(() {});
 
-      print("Import successful! Crew data updated.");
-
+      print("Import successful! Crew and trip preferences updated.");
     } catch (e) {
       showErrorDialog("Unexpected error during import: $e");
     }
   }
+
   void showErrorDialog(String message) {
     showDialog(
       context: context,

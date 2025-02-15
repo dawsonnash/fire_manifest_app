@@ -23,4 +23,22 @@ class TripPreference extends HiveObject{
 
   TripPreference({required this.tripPreferenceName});
 
+  Map<String, dynamic> toJson() {
+    return {
+      "tripPreferenceName": tripPreferenceName,
+      "positionalPreferences": positionalPreferences.map((pp) => pp.toJson()).toList(),
+      "gearPreferences": gearPreferences.map((gp) => gp.toJson()).toList(),
+    };
+  }
+
+  factory TripPreference.fromJson(Map<String, dynamic> json) {
+    return TripPreference(tripPreferenceName: json["tripPreferenceName"])
+      ..positionalPreferences = (json["positionalPreferences"] as List)
+          .map((pp) => PositionalPreference.fromJson(pp))
+          .toList()
+      ..gearPreferences = (json["gearPreferences"] as List)
+          .map((gp) => GearPreference.fromJson(gp))
+          .toList();
+  }
+
 }
