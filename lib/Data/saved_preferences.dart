@@ -20,34 +20,10 @@ class SavedPreferences {
 
   factory SavedPreferences.fromJson(Map<String, dynamic> json) {
     return SavedPreferences()
-      ..tripPreferences = (json["tripPreferences"] as List).map((tp) {
-        // Convert JSON into TripPreference object
-        TripPreference tripPref = TripPreference.fromJson(tp);
-
-        // ✅ Apply same logic as Hive adapter for deserializing crewMembersDynamic
-        for (var posPref in tripPref.positionalPreferences) {
-          List<dynamic> processedCrewMembers = posPref.crewMembersDynamic.map((item) {
-            if (item is List) {
-              // If it's a list, deserialize each CrewMember inside it
-              return item.map((cm) {
-                if (cm is Map<String, dynamic>) {
-                  return CrewMember.fromJson(cm); // ✅ Correctly deserialize from JSON
-                }
-                return cm; // Already a CrewMember object
-              }).toList();
-            } else if (item is Map<String, dynamic>) {
-              return CrewMember.fromJson(item); // ✅ Convert single CrewMember from JSON
-            }
-            return item; // Return as is if already in correct format
-          }).toList();
-
-          posPref.crewMembersDynamic = processedCrewMembers;
-        }
-        return tripPref;
-      }).toList();
+      ..tripPreferences = (json["tripPreferences"] as List)
+          .map((tp) => TripPreference.fromJson(tp))
+          .toList();
   }
-
-
   // Add a new TripPreference
   void addTripPreference(TripPreference newTripPreference) {
     var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');

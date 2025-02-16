@@ -37,8 +37,22 @@ class PositionalPreference extends HiveObject
       priority: json["priority"],
       loadPreference: json["loadPreference"],
       crewMembersDynamic: (json["crewMembersDynamic"] as List).map((cm) {
-        if (cm is Map<String, dynamic>) return CrewMember.fromJson(cm);
-        if (cm is List) return cm.map((m) => CrewMember.fromJson(m)).toList();
+        if (cm is Map<String, dynamic>) {
+          return CrewMember(
+            name: cm['name'],
+            flightWeight: cm['flightWeight'],
+            position: cm['position'],
+            personalTools: (cm['personalTools'] as List?)?.map((tool) => Gear.fromJson(tool)).toList(),
+          );
+        }
+        if (cm is List) {
+          return cm.map((m) => CrewMember(
+            name: m['name'],
+            flightWeight: m['flightWeight'],
+            position: m['position'],
+            personalTools: (m['personalTools'] as List?)?.map((tool) => Gear.fromJson(tool)).toList(),
+          )).toList();
+        }
         return cm;
       }).toList(),
     );

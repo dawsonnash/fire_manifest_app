@@ -14,10 +14,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'Data/crew.dart';
-import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 
-import 'Data/crewMemberList.dart';
 import 'Data/crewmember.dart';
 import 'Data/gear.dart';
 
@@ -70,7 +68,6 @@ class _SettingsState extends State<SettingsView> {
       };
 
       String jsonData = jsonEncode(exportData);
-
       // Get directory for temporary storage
       Directory directory = await getApplicationDocumentsDirectory();
 
@@ -173,10 +170,10 @@ class _SettingsState extends State<SettingsView> {
         return;
       }
 
-      // ✅ Import Crew Data
+      // Import Crew Data
       Crew importedCrew = Crew.fromJson(jsonData["crew"]);
 
-      // ✅ Import Trip Preferences with correct crewMembersDynamic processing
+      // Import Trip Preferences (SavedPreferences)
       SavedPreferences importedSavedPreferences = SavedPreferences.fromJson(jsonData["savedPreferences"]);
 
       // Clear old data
@@ -202,30 +199,19 @@ class _SettingsState extends State<SettingsView> {
         await personalToolsBox.add(tool);
       }
 
-      // ✅ Save Trip Preferences with proper Hive storage
-      var tripPrefBox = Hive.box<TripPreference>('tripPreferenceBox');
+      // Save Trip Preferences to Hive
+      var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
       for (var tripPref in importedSavedPreferences.tripPreferences) {
-        for (var posPref in tripPref.positionalPreferences) {
-          // ✅ Convert lists of CrewMembers into Hive-friendly format
-          List<dynamic> processedCrewMembers = posPref.crewMembersDynamic.map((item) {
-            if (item is List<CrewMember>) {
-              return CrewMemberList(crewMembers: item); // ✅ Convert Saw Teams properly
-            } else if (item is CrewMember) {
-              return item; // ✅ Store individual CrewMembers as-is
-            }
-            return item;
-          }).toList();
-          posPref.crewMembersDynamic = processedCrewMembers;
-        }
-        await tripPrefBox.add(tripPref);
+        await tripPreferenceBox.add(tripPref);
       }
-
-      savedPreferences.tripPreferences = tripPrefBox.values.toList();
+      savedPreferences.tripPreferences = tripPreferenceBox.values.toList();
 
       // Reload data from Hive
       await crew.loadCrewDataFromHive();
       await savedPreferences.loadPreferencesFromHive();
       setState(() {});
+
+
 
       print("Import successful! Crew and trip preferences updated.");
     } catch (e) {
