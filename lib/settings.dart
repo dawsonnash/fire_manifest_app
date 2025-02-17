@@ -63,9 +63,11 @@ class _SettingsState extends State<SettingsView> {
     try {
       // Convert crew and saved preferences to JSON
       Map<String, dynamic> exportData = {
+        "crewName": AppData.crewName,
         "crew": crew.toJson(),
         "savedPreferences": savedPreferences.toJson(),
       };
+
 
       String jsonData = jsonEncode(exportData);
       // Get directory for temporary storage
@@ -177,21 +179,19 @@ class _SettingsState extends State<SettingsView> {
       SavedPreferences importedSavedPreferences = SavedPreferences.fromJson(jsonData["savedPreferences"]);
 
 
-      // ✅ Debug: Check if crewName exists and is not empty
-      if (jsonData.containsKey("crewName")) {
-        print("🔍 crewName Key Exists! Value: '${jsonData["crewName"]}'");
+      // Handle Crew Name separately
+      if (jsonData.containsKey("crewName") && jsonData["crewName"].trim().isNotEmpty) {
+        print("Found crewName: '${jsonData["crewName"]}'");
 
-        if (jsonData["crewName"].trim().isNotEmpty) {
-          print("✅ crewName is NOT empty: '${jsonData["crewName"]}'");
+        AppData.crewName = jsonData["crewName"].trim();  // Update AppData
 
-          // ✅ Update Crew Name
-          widget.onCrewNameChanged(jsonData["crewName"].trim());
-        } else {
-          print("⚠️ crewName is EMPTY!");
-        }
+        // Notify parent widget to update UI
+        widget.onCrewNameChanged(AppData.crewName);
       } else {
-        print("❌ crewName Key DOES NOT EXIST in JSON!");
+        print("crewName is missing or empty in JSON!");
       }
+
+
       // Clear old data
       await Hive.box<CrewMember>('crewmemberBox').clear();
       await Hive.box<Gear>('gearBox').clear();

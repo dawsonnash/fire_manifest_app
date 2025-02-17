@@ -23,7 +23,6 @@ class Crew {
   // Convert Crew object to JSON
   Map<String, dynamic> toJson() {
     return {
-      "crewName": AppData.crewName,
       "crewMembers": crewMembers.map((member) => member.toJson()).toList(),
       "gear": gear.map((g) => g.toJson()).toList(),
       "personalTools": personalTools.map((p) => p.toJson()).toList(),
