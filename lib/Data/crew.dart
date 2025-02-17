@@ -363,8 +363,6 @@ class Crew {
 
     // Update total weight
     crew.updateTotalCrewWeight();
-
-    print(' Crew data loaded from Hive. Total weight: ${crew.totalCrewWeight}');
   }
 
   void loadPersonalTools() {

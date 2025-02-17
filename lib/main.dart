@@ -147,16 +147,23 @@ class _MyHomePageState extends State<MyHomePage> {
     await ThemePreferences.setBackgroundImagePreference(enableBackgroundImage);
   }
   void _changeCrewName(String crewName) async {
+    print("🚀 Updating Crew Name: $crewName");
+
     setState(() {
       AppData.crewName = crewName;
     });
     await ThemePreferences.setCrewName(crewName);
+
+    // Verify if it's saved correctly
+    String savedCrewName = await ThemePreferences.getCrewName();
+    print("🔍 Saved Crew Name in SharedPreferences: $savedCrewName");
+
   }
   void _changeUserName(String userName) async {
     setState(() {
       AppData.userName = userName;
     });
-    await ThemePreferences.setCrewName(userName);
+    await ThemePreferences.setUserName(userName);
   }
   void _onItemTapped(int index) {
     setState(() {

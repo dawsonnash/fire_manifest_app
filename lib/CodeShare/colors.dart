@@ -138,8 +138,8 @@ class AppData {
 class ThemePreferences {
   static const _key = 'isDarkMode';
   static const _backgroundImageKey = 'enableBackgroundImage';
-  static const _crewNameKey = '';
-  static const _userNameKey = '';
+  static const _crewNameKey = 'crewName';
+  static const _userNameKey = 'userName';
 
   static Future<bool> getTheme() async {
     final prefs = await SharedPreferences.getInstance();
@@ -176,9 +176,9 @@ class ThemePreferences {
     return prefs.getString(_userNameKey) ?? '';
   }
 
-  static Future<void> setUserName(String crewName) async {
+  static Future<void> setUserName(String userName) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_userNameKey, crewName);
+    await prefs.setString(_userNameKey, userName);
   }
 }
 

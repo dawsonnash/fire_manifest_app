@@ -176,6 +176,22 @@ class _SettingsState extends State<SettingsView> {
       // Import Trip Preferences (SavedPreferences)
       SavedPreferences importedSavedPreferences = SavedPreferences.fromJson(jsonData["savedPreferences"]);
 
+
+      // ✅ Debug: Check if crewName exists and is not empty
+      if (jsonData.containsKey("crewName")) {
+        print("🔍 crewName Key Exists! Value: '${jsonData["crewName"]}'");
+
+        if (jsonData["crewName"].trim().isNotEmpty) {
+          print("✅ crewName is NOT empty: '${jsonData["crewName"]}'");
+
+          // ✅ Update Crew Name
+          widget.onCrewNameChanged(jsonData["crewName"].trim());
+        } else {
+          print("⚠️ crewName is EMPTY!");
+        }
+      } else {
+        print("❌ crewName Key DOES NOT EXIST in JSON!");
+      }
       // Clear old data
       await Hive.box<CrewMember>('crewmemberBox').clear();
       await Hive.box<Gear>('gearBox').clear();
@@ -212,8 +228,7 @@ class _SettingsState extends State<SettingsView> {
       setState(() {});
 
 
-
-      print("Import successful! Crew and trip preferences updated.");
+    //Crew Name
     } catch (e) {
       showErrorDialog("Unexpected error during import: $e");
     }
@@ -428,7 +443,7 @@ class _SettingsState extends State<SettingsView> {
                         builder: (BuildContext context) {
                           return AlertDialog(
                             backgroundColor: AppColors.textFieldColor2,
-                            title: Text("Crew Sharing", style: TextStyle(color: AppColors.textColorPrimary),),
+                            title: Text("Crew Sharing", style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal),),
                             content: SingleChildScrollView(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -903,7 +918,7 @@ class _SettingsState extends State<SettingsView> {
                                     backgroundColor: AppColors.textFieldColor2, // Dark grey background
                                     title: Text(
                                       'Terms and Conditions',
-                                      style: TextStyle(color: AppColors.textColorPrimary),
+                                      style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal),
                                     ),
                                     content: SingleChildScrollView(
                                       child: Text(
