@@ -8,7 +8,6 @@ import 'CodeShare/colors.dart';
 import 'Data/crew.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-
 class CrewmembersView extends StatefulWidget {
   const CrewmembersView({super.key});
 
@@ -19,6 +18,8 @@ class CrewmembersView extends StatefulWidget {
 class _CrewmembersViewState extends State<CrewmembersView> {
   late final Box<CrewMember> crewmemberBox;
   List<CrewMember> crewmemberList = [];
+  Set<CrewMember> selectedCrew = {}; // Stores selected crew members
+  bool isSelectionMode = false; // Tracks if selection mode is active
 
   @override
   void initState() {
@@ -35,6 +36,79 @@ class _CrewmembersViewState extends State<CrewmembersView> {
     });
   }
 
+  void toggleSelection(CrewMember member) {
+    setState(() {
+      if (selectedCrew.contains(member)) {
+        selectedCrew.remove(member);
+      } else {
+        selectedCrew.add(member);
+      }
+
+      // If nothing is selected, exit selection mode
+      isSelectionMode = selectedCrew.isNotEmpty;
+    });
+  }
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.textFieldColor2,
+          title: Text(
+            'Confirm Deletion',
+            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          ),
+          content: Text(
+            'Are you sure you want to delete these crew members?',
+            style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: AppColors.cancelButton),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteSelectedCrew(); // Proceed with deletion
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deleteSelectedCrew() {
+
+    for (var member in selectedCrew) {
+      crew.removeCrewMember(member);
+    }
+
+    setState(() {
+      selectedCrew.clear();
+      isSelectionMode = false;
+      loadCrewMemberList();
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Selected crew members deleted", style: TextStyle(fontSize: AppData.text22, color: Colors.black)),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 1),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<CrewMember> sortedCrewMemberList = sortCrewListByPosition(crewmemberList);
@@ -48,87 +122,118 @@ class _CrewmembersViewState extends State<CrewmembersView> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: AppColors.appBarColor,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back, // The back arrow icon
-            color: AppColors.textColorPrimary, // Set the desired color
-          ),
-          onPressed: () {
-            Navigator.of(context).pop(); // Navigate back when pressed
-          },
-        ),
+        leading: isSelectionMode
+            ? IconButton(
+                icon: Icon(Icons.close, color: AppColors.textColorPrimary),
+                onPressed: () {
+                  setState(() {
+                    isSelectionMode = false;
+                    selectedCrew.clear();
+                  });
+                },
+              )
+            : IconButton(
+                icon: Icon(
+                  Icons.arrow_back, // The back arrow icon
+                  color: AppColors.textColorPrimary, // Set the desired color
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Navigate back when pressed
+                },
+              ),
         title: Text(
-          'Crew Members',
+          isSelectionMode ? "Delete Crew Members" : "Crew Members",
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
-          IconButton(
+          if (isSelectionMode)
+            IconButton(
+              icon: Icon(Icons.delete, color: Colors.red),
               onPressed: () {
-                showModalBottomSheet(
-                  backgroundColor: AppColors.textFieldColor2,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        ListTile(
-                          leading: Icon(Icons.delete, color: Colors.red),
-                          title: Text(
-                            'Delete All Crew Members',
-                            style: TextStyle(color: AppColors.textColorPrimary),
-                          ),
-                          onTap: () {
-                            Navigator.of(context).pop(); // Close the dialog without deleting
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  backgroundColor: AppColors.textFieldColor2,
-                                  title: Text(
-                                    'Confirm Deletion',
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                  ),
-                                  content: Text(
-                                    'Are you sure you want to delete all crew members?',
-                                    style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(); // Close the dialog without deleting
-                                      },
-                                      child: Text(
-                                        'Cancel',
-                                        style: TextStyle(color: AppColors.cancelButton),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        crew.deleteAllCrewMembers();
-                                        setState(() {});
-                                        Navigator.of(context).pop(); // Close the dialog after deletion
-                                        Navigator.of(context).pop(); // Home screen
-                                      },
-                                      child: const Text(
-                                        'Delete',
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
+                _showDeleteConfirmationDialog();
               },
-              icon: Icon(
-                Icons.more_vert,
-                color: AppColors.textColorPrimary,
-              ))
+            ),
+          if (!isSelectionMode)
+            IconButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    backgroundColor: AppColors.textFieldColor2,
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            leading: Icon(Icons.person_remove, color: Colors.red),
+                            title: Text(
+                              'Delete Select Crew Members',
+                              style: TextStyle(color: AppColors.textColorPrimary),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              setState(() {
+                                isSelectionMode = true;
+                              });
+                            },
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.delete, color: Colors.red),
+                            title: Text(
+                              'Delete All Crew Members',
+                              style: TextStyle(color: AppColors.textColorPrimary),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop(); // Close the dialog without deleting
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: AppColors.textFieldColor2,
+                                    title: Text(
+                                      'Confirm Deletion',
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                    ),
+                                    content: Text(
+                                      'Are you sure you want to delete all crew members?',
+                                      style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Close the dialog without deleting
+                                        },
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(color: AppColors.cancelButton),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          crew.deleteAllCrewMembers();
+                                          setState(() {});
+                                          Navigator.of(context).pop(); // Close the dialog after deletion
+                                          Navigator.of(context).pop(); // Home screen
+                                        },
+                                        child: const Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                icon: Icon(
+                  Icons.more_vert,
+                  color: AppColors.textColorPrimary,
+                ))
         ],
       ),
       body: Stack(
@@ -210,7 +315,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                   SizedBox(height: 8), // Adds spacing between the list and the panel
 
                                   GestureDetector(
-                                    onTap: ()  {
+                                    onTap: () {
                                       Navigator.of(context).pop(); // Navigate back when pressed
                                       Navigator.push(
                                         context,
@@ -220,7 +325,10 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
                                       children: [
-                                        Icon(FontAwesomeIcons.circlePlus, color: AppColors.primaryColor,),
+                                        Icon(
+                                          FontAwesomeIcons.circlePlus,
+                                          color: AppColors.primaryColor,
+                                        ),
                                         SizedBox(width: 8), // Space between the icon and the text
                                         Text(
                                           'Crew Member',
@@ -246,6 +354,17 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                     border: Border(top: BorderSide(color: Colors.black, width: 1)), // Add a border
                                   ),
                                   child: ListTile(
+                                    onLongPress: () {
+                                      setState(() {
+                                        isSelectionMode = true;
+                                        selectedCrew.add(crewMember);
+                                      });
+                                    },
+                                    onTap: () {
+                                      if (isSelectionMode) {
+                                        toggleSelection(crewMember);
+                                      }
+                                    },
                                     iconColor: AppColors.primaryColor,
                                     title: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -278,22 +397,31 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                             ],
                                           ),
                                         ),
-                                        IconButton(
-                                            icon: Icon(Icons.edit, color: AppColors.textColorPrimary, size: 32),
+                                      ],
+                                    ),
+                                    trailing: isSelectionMode
+                                        ? null
+                                        : IconButton(
+                                      icon: Icon(Icons.edit, color: AppColors.textColorPrimary, size: 32),
                                             onPressed: () {
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) => EditCrewmember(
                                                     crewMember: crewMember,
-                                                    onUpdate: loadCrewMemberList, // refresh list on return
+                                                    onUpdate: loadCrewMemberList,
                                                   ),
                                                 ),
                                               );
-                                            })
-                                      ],
-                                    ),
-                                    leading: Icon(Icons.person),
+                                            },
+                                          ),
+                                    leading: isSelectionMode
+                                        ? Checkbox(
+                                            value: selectedCrew.contains(crewMember),
+                                            onChanged: (checked) => toggleSelection(crewMember),
+                                            activeColor: AppColors.primaryColor,
+                                          )
+                                        : Icon(Icons.person),
                                   ),
                                 );
                               },

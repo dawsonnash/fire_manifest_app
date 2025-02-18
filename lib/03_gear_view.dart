@@ -18,7 +18,8 @@ class GearView extends StatefulWidget {
 class _GearViewState extends State<GearView> {
   late final Box<Gear> gearBox;
   List<Gear> gearList = [];
-
+  Set<Gear> selectedGear = {};
+  bool isSelectionMode = false; // Tracks if selection mode is active
   @override
   void initState() {
     super.initState();
@@ -26,6 +27,79 @@ class _GearViewState extends State<GearView> {
     // Open the Hive box and load the list of Gear items
     gearBox = Hive.box<Gear>('gearBox');
     loadGearList();
+  }
+
+  void toggleSelection(Gear gear) {
+    setState(() {
+      if (selectedGear.contains(gear)) {
+        selectedGear.remove(gear);
+      } else {
+        selectedGear.add(gear);
+      }
+
+      // If nothing is selected, exit selection mode
+      isSelectionMode = selectedGear.isNotEmpty;
+    });
+  }
+
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.textFieldColor2,
+          title: Text(
+            'Confirm Deletion',
+            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          ),
+          content: Text(
+            'Are you sure you want to delete these gear items?',
+            style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: AppColors.cancelButton),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteSelectedGear(); // Proceed with deletion
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deleteSelectedGear() {
+    for (var gear in selectedGear) {
+      crew.removeGear(gear);
+    }
+
+    setState(() {
+      selectedGear.clear();
+      isSelectionMode = false;
+      loadGearList();
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Selected gear deleted", style: TextStyle(fontSize: AppData.text22, color: Colors.black)),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 1),
+      ),
+    );
   }
 
   // Function to load the list of Gear items from the Hive box
@@ -49,81 +123,115 @@ class _GearViewState extends State<GearView> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: AppColors.appBarColor,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back, // The back arrow icon
-            color: AppColors.textColorPrimary, // Set the desired color
-          ),
-          onPressed: () {
-            Navigator.of(context).pop(); // Navigate back when pressed
-          },
-        ),
+        leading: isSelectionMode
+            ? IconButton(
+                icon: Icon(Icons.close, color: AppColors.textColorPrimary),
+                onPressed: () {
+                  setState(() {
+                    isSelectionMode = false;
+                    selectedGear.clear();
+                  });
+                },
+              )
+            : IconButton(
+                icon: Icon(
+                  Icons.arrow_back, // The back arrow icon
+                  color: AppColors.textColorPrimary, // Set the desired color
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Navigate back when pressed
+                },
+              ),
         title: Text(
-          'Gear',
+          isSelectionMode ? "Delete Gear" : "Gear",
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
-          IconButton(
+          if (isSelectionMode)
+            IconButton(
+              icon: Icon(Icons.delete, color: Colors.red),
               onPressed: () {
-                showModalBottomSheet(
-                  backgroundColor: AppColors.textFieldColor2,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        ListTile(
-                          leading: Icon(Icons.delete, color: Colors.red),
-                          title: Text('Delete All Gear', style: TextStyle(color: AppColors.textColorPrimary)),
-                          onTap: () {
-                            Navigator.of(context).pop(); // Close the dialog without deleting
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  backgroundColor: AppColors.textFieldColor2 ,
-                                  title:  Text(
-                                    'Confirm Deletion',
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                  ),
-                                  content:  Text(
-                                    'Are you sure you want to delete all gear? All gear and gear preference data will be erased.',
-                                    style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(); // Close the dialog without deleting
-                                      },
-                                      child:  Text(
-                                        'Cancel',
-                                        style: TextStyle(color: AppColors.cancelButton),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        crew.deleteAllGear();
-                                        setState(() {});
-                                        Navigator.of(context).pop();
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text(
-                                        'Delete',
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
+                _showDeleteConfirmationDialog();
               },
-              icon: Icon(Icons.more_vert,  color: AppColors.textColorPrimary,))
+            ),
+          if (!isSelectionMode)
+            IconButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    backgroundColor: AppColors.textFieldColor2,
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            leading: Icon(Icons.person_remove, color: Colors.red),
+                            title: Text(
+                              'Delete Select Gear',
+                              style: TextStyle(color: AppColors.textColorPrimary),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              setState(() {
+                                isSelectionMode = true;
+                              });
+                            },
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.delete, color: Colors.red),
+                            title: Text('Delete All Gear', style: TextStyle(color: AppColors.textColorPrimary)),
+                            onTap: () {
+                              Navigator.of(context).pop(); // Close the dialog without deleting
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: AppColors.textFieldColor2,
+                                    title: Text(
+                                      'Confirm Deletion',
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                    ),
+                                    content: Text(
+                                      'Are you sure you want to delete all gear? All gear and gear preference data will be erased.',
+                                      style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Close the dialog without deleting
+                                        },
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(color: AppColors.cancelButton),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          crew.deleteAllGear();
+                                          setState(() {});
+                                          Navigator.of(context).pop();
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                icon: Icon(
+                  Icons.more_vert,
+                  color: AppColors.textColorPrimary,
+                ))
         ],
       ),
       body: Stack(
@@ -170,157 +278,173 @@ class _GearViewState extends State<GearView> {
                     children: [
                       gearList.isEmpty
                           ? Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                Card(
-                                                        color: AppColors.textFieldColor,
-                                                        child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(9),
-                                ),
-                                child: ListTile(
-                                  iconColor: AppColors.primaryColor,
-                                  title: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          'No gear created...',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.textColorPrimary,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                                        ),
-                                                      ),
-                                SizedBox(height: 8), // Adds spacing between the list and the panel
-
-                                GestureDetector(
-                                  onTap: ()  {
-                                    Navigator.of(context).pop(); // Navigate back when pressed
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const AddGear()),
-                                    );
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
-                                    children: [
-                                      Icon(FontAwesomeIcons.circlePlus, color: AppColors.primaryColor,),
-                                      SizedBox(width: 8), // Space between the icon and the text
-                                      Text(
-                                        'Gear',
-                                        textAlign: TextAlign.center,
-                                        softWrap: true,
-                                        style: panelTextStyle,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                          :
-                      // ListView
-                      ListView.builder(
-                        itemCount: sortedGearList.length,
-                        padding: EdgeInsets.only(
-                          bottom: 80, // Ensure space for the button at the bottom
-                        ),
-                        itemBuilder: (context, index) {
-                          final gear = sortedGearList[index];
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.textFieldColor, // Background color
-                              border: Border(top: BorderSide(color: Colors.black, width: 1)), // Add a border
-                            ),
-                            child: ListTile(
-                              iconColor: AppColors.primaryColor,
-                              title: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
                                 children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
+                                  Card(
+                                    color: AppColors.textFieldColor,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(9),
+                                      ),
+                                      child: ListTile(
+                                        iconColor: AppColors.primaryColor,
+                                        title: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            // Gear name with ellipsis
-                                            Flexible(
-                                              child: Row(
-                                                children: [
-                                                  Text(
-                                                    '${gear.name} ',
-                                                    style: TextStyle(
-                                                      fontSize: 22,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: AppColors.textColorPrimary,
-                                                    ),
-                                                    maxLines: 1, // Limit to one line
-                                                    overflow: TextOverflow.ellipsis, // Show ellipsis if text overflows
-                                                  ),
-                                                  if (gear.isHazmat)
-                                                    Tooltip(
-                                                      message: 'HAZMAT', // The hint displayed on long-press
-                                                      waitDuration: const Duration(milliseconds: 500), // Time before the tooltip shows
-                                                      child: Icon(
-                                                        FontAwesomeIcons.triangleExclamation, // Hazard icon
-                                                        color: Colors.red, // Red color for hazard
-                                                        size: 18, // Icon size
-                                                      ),
-                                                    ),
-                                                ],
-
+                                            Expanded(
+                                              child: Text(
+                                                'No gear created...',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.textColorPrimary,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
                                               ),
                                             ),
-                                            // Hazard icon (conditionally rendered)
-                                            // Hazard icon with Tooltip
-
                                           ],
                                         ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 8), // Adds spacing between the list and the panel
+
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).pop(); // Navigate back when pressed
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const AddGear()),
+                                      );
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                                      children: [
+                                        Icon(
+                                          FontAwesomeIcons.circlePlus,
+                                          color: AppColors.primaryColor,
+                                        ),
+                                        SizedBox(width: 8), // Space between the icon and the text
                                         Text(
-                                          '${gear.weight} lbs x ${gear.quantity}',
-                                          style:  TextStyle(
-                                            fontSize: 16,
-                                              color: AppColors.textColorPrimary
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                          'Gear',
+                                          textAlign: TextAlign.center,
+                                          softWrap: true,
+                                          style: panelTextStyle,
                                         ),
                                       ],
                                     ),
                                   ),
-
-                                  IconButton(
-                                    icon:  Icon(Icons.edit, color: AppColors.textColorPrimary, size: 32),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => EditGear(
-                                            gear: gear,
-                                            onUpdate: loadGearList, // Refresh the list on return
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
                                 ],
                               ),
-                              leading:  Icon(Icons.work_outline_outlined),
+                            )
+                          :
+                          // ListView
+                          ListView.builder(
+                              itemCount: sortedGearList.length,
+                              padding: EdgeInsets.only(
+                                bottom: 80, // Ensure space for the button at the bottom
+                              ),
+                              itemBuilder: (context, index) {
+                                final gear = sortedGearList[index];
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.textFieldColor, // Background color
+                                    border: Border(top: BorderSide(color: Colors.black, width: 1)), // Add a border
+                                  ),
+                                  child: ListTile(
+                                    onLongPress: () {
+                                      setState(() {
+                                        isSelectionMode = true;
+                                        selectedGear.add(gear);
+                                      });
+                                    },
+                                    onTap: () {
+                                      if (isSelectionMode) {
+                                        toggleSelection(gear);
+                                      }
+                                    },
+                                    iconColor: AppColors.primaryColor,
+                                    title: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  // Gear name with ellipsis
+                                                  Flexible(
+                                                    child: Row(
+                                                      children: [
+                                                        Text(
+                                                          '${gear.name} ',
+                                                          style: TextStyle(
+                                                            fontSize: 22,
+                                                            fontWeight: FontWeight.bold,
+                                                            color: AppColors.textColorPrimary,
+                                                          ),
+                                                          maxLines: 1, // Limit to one line
+                                                          overflow: TextOverflow.ellipsis, // Show ellipsis if text overflows
+                                                        ),
+                                                        if (gear.isHazmat)
+                                                          Tooltip(
+                                                            message: 'HAZMAT', // The hint displayed on long-press
+                                                            waitDuration: const Duration(milliseconds: 500), // Time before the tooltip shows
+                                                            child: Icon(
+                                                              FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                              color: Colors.red, // Red color for hazard
+                                                              size: 18, // Icon size
+                                                            ),
+                                                          ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  // Hazard icon (conditionally rendered)
+                                                  // Hazard icon with Tooltip
+                                                ],
+                                              ),
+                                              Text(
+                                                '${gear.weight} lbs x ${gear.quantity}',
+                                                style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    trailing: isSelectionMode
+                                        ? null
+                                        : IconButton(
+                                            icon: Icon(Icons.edit, color: AppColors.textColorPrimary, size: 32),
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => EditGear(
+                                                    gear: gear,
+                                                    onUpdate: loadGearList, // Refresh the list on return
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                    leading: isSelectionMode
+                                        ? Checkbox(
+                                            value: selectedGear.contains(gear),
+                                            onChanged: (checked) => toggleSelection(gear),
+                                            activeColor: AppColors.primaryColor,
+                                          )
+                                        : Icon(Icons.work_outline_outlined),
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
                     ],
                   ),
                 ),

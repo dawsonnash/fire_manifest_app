@@ -147,7 +147,6 @@ class _SettingsState extends State<SettingsView> {
     try {
       // Convert crew and saved preferences to JSON
       Map<String, dynamic> exportData = {
-        "crewName": AppData.crewName,
         "crew": crew.toJson(),
         "savedPreferences": savedPreferences.toJson(),
       };
@@ -198,7 +197,7 @@ class _SettingsState extends State<SettingsView> {
             style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
           ),
           content: Text(
-            'Importing this file will delete all existing data besides your Saved Trips. This action is irreversible if you do not already have your data saved into a Crew Loadout. Proceed?',
+            'Importing this file will overwrite all existing crew data (Crew Members, Gear, Tools, Trip Preferences). Proceed?',
             style: TextStyle(color: AppColors.textColorPrimary),
           ),
           actions: [
@@ -229,7 +228,7 @@ class _SettingsState extends State<SettingsView> {
                         // Maybe change look
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 32,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -268,18 +267,6 @@ class _SettingsState extends State<SettingsView> {
       // Import Trip Preferences (SavedPreferences)
       SavedPreferences importedSavedPreferences = SavedPreferences.fromJson(jsonData["savedPreferences"]);
 
-      // Handle Crew Name separately
-      if (jsonData.containsKey("crewName") && jsonData["crewName"].trim().isNotEmpty) {
-        print("Found crewName: '${jsonData["crewName"]}'");
-
-        AppData.crewName = jsonData["crewName"].trim(); // Update AppData
-
-        // Notify parent widget to update UI
-        widget.onCrewNameChanged(AppData.crewName);
-        crewNameController.text = AppData.crewName;
-      } else {
-        print("crewName is missing or empty in JSON!");
-      }
 
       updateUI();
       // Clear old data
@@ -651,7 +638,7 @@ class _SettingsState extends State<SettingsView> {
     );
   }
 
-  void _promptNewLoadoutName() {
+  void _promptNewLoadoutName(bool isEmptyCrew) {
     TextEditingController nameController = TextEditingController();
 
     showDialog(
@@ -662,6 +649,9 @@ class _SettingsState extends State<SettingsView> {
           title: Text('Save New Loadout', style: TextStyle(color: AppColors.textColorPrimary)),
           content: TextField(
             controller: nameController,
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(30),
+            ],
             decoration: InputDecoration(
               hintText: "Enter Loadout Name",
               hintStyle: TextStyle(color: AppColors.textColorPrimary),
@@ -671,17 +661,17 @@ class _SettingsState extends State<SettingsView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text("Cancel", style: TextStyle(color: Colors.red)),
+              child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
             ),
             TextButton(
               onPressed: () {
                 String loadoutName = nameController.text.trim();
                 if (loadoutName.isNotEmpty) {
-                  _saveNewLoadout(loadoutName);
+                  _saveNewLoadout(loadoutName, isEmptyCrew);
                   Navigator.of(context).pop();
                 }
               },
-              child: Text("Save", style: TextStyle(color: Colors.green)),
+              child: Text("Save", style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
             ),
           ],
         );
@@ -689,10 +679,24 @@ class _SettingsState extends State<SettingsView> {
     );
   }
 
-  Future<void> _saveNewLoadout(String loadoutName) async {
+  Future<void> _saveNewLoadout(String loadoutName, bool isEmptyCrew) async {
+
     String timestamp = DateFormat('dd MMM yy, h:mm a').format(DateTime.now());
 
-    Map<String, dynamic> loadoutData = {
+    Map<String, dynamic> loadoutData = isEmptyCrew
+        ? {
+      "crew": {
+        "crewMembers": [], // Empty list instead of null
+        "gear": [],
+        "personalTools": [],
+        "totalCrewWeight": 0.0
+      },
+      "savedPreferences": {
+        "tripPreferences": [] // Empty trip preferences list
+      },
+      "lastSaved": timestamp,
+    }
+        : {
       "crew": crew.toJson(),
       "savedPreferences": savedPreferences.toJson(),
       "lastSaved": timestamp,
@@ -709,8 +713,14 @@ class _SettingsState extends State<SettingsView> {
       selectedLoadout = loadoutName; // Set it as the selected option
       lastSavedTimestamp = timestamp; // UI timestamp
     });
-    //Check sync status
-    await _checkSyncStatus(loadoutName);
+
+
+    // Check if it's an empty loadout
+    if (isEmptyCrew) {
+      await _loadSelectedLoadout(loadoutName);
+    } else {
+      await _checkSyncStatus(loadoutName);
+    }
 
     setState(() {});
 
@@ -722,7 +732,7 @@ class _SettingsState extends State<SettingsView> {
             // Maybe change look
             style: TextStyle(
               color: Colors.black,
-              fontSize: 32,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -758,7 +768,7 @@ class _SettingsState extends State<SettingsView> {
               // Maybe change look
               style: TextStyle(
                 color: Colors.black,
-                fontSize: 32,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -787,8 +797,21 @@ class _SettingsState extends State<SettingsView> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("$loadoutName deleted"), backgroundColor: Colors.red),
-    );
+      SnackBar(
+        content: Center(
+          child: Text(
+            'Loadout Deleted!',
+            // Maybe change look
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        duration: Duration(seconds: 1),
+        backgroundColor: Colors.red,
+      ),    );
   }
 
 
@@ -860,54 +883,11 @@ class _SettingsState extends State<SettingsView> {
       showErrorDialog("Loadout not found.");
       return;
     }
+
     String lastSaved = loadoutData.containsKey("lastSaved") ? loadoutData["lastSaved"] : "Unknown";
 
+    await _applyLoadout(loadoutName, loadoutData);
 
-    // Ask for confirmation before wiping current data
-    if (isOutOfSync ) {
-      showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: AppColors.textFieldColor2,
-          title: Text(
-            'Warning',
-            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-          ),
-          content: Text(
-            'Loading this crew will delete all existing data besides your Saved Trips. '
-            'This action is irreversible if you do not already have your data saved into another Crew Loadout. Proceed?',
-            style: TextStyle(color: AppColors.textColorPrimary),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Cancel
-              },
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: AppColors.cancelButton),
-              ),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop(); // Close the dialog
-                await _applyLoadout(loadoutName, loadoutData);
-              },
-              child: Text(
-                'Confirm',
-                style: TextStyle(color: Colors.red),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-    }
-    else{
-      // If in sync, switch immediately
-      await _applyLoadout(loadoutName, loadoutData);
-    }
   }
 
   @override
@@ -1382,93 +1362,389 @@ class _SettingsState extends State<SettingsView> {
                                           child: Text(loadout, style: TextStyle(color: AppColors.textColorPrimary)),
                                         );
                                       }),
+                                      // **Reset to Last Saved (Only appears if out of sync)**
+                                      if (isOutOfSync)
+                                        DropdownMenuItem<String>(
+                                          value: 'Reset Last',
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.refresh, color: Colors.orange), // Reset icon
+                                              SizedBox(width: 8),
+                                              Text('Reset to Last Saved', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.normal)),
+                                            ],
+                                          ),
+                                        ),
+                                      // Save Current Loadout Option
                                       DropdownMenuItem<String>(
-                                        value: 'Save New',
-                                        child: Text('+ Save New', style: TextStyle(color: Colors.green, fontWeight: FontWeight.normal)),
+                                        value: 'Save Current',
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.save_outlined, color: Colors.green), // Save icon
+                                            SizedBox(width: 8), // Space between icon and text
+                                            Text('Save New', style: TextStyle(color: Colors.green, fontWeight: FontWeight.normal)),
+                                          ],
+                                        ),
+                                      ),
+                                      // Save Empty Crew (Start Fresh)
+                                      DropdownMenuItem<String>(
+                                        value: 'Start Empty',
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.add, color: Colors.blue), // Fresh start icon
+                                            SizedBox(width: 8),
+                                            Text('Start Empty Crew', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.normal)),
+                                          ],
+                                        ),
                                       ),
                                     ],
-                                    onChanged: (String? newValue) {
-                                      setState(() {
-                                        if (newValue == 'Save New') {
-                                          _promptNewLoadoutName();
-                                        } else {
-                                          selectedLoadout = newValue;
-                                          if (newValue != null) {
-                                            _loadSelectedLoadout(newValue);
-                                          } else {
-                                            lastSavedTimestamp = "N/A"; // Clear timestamp when no loadout is selected
+                                      onChanged: (String? newValue) async {
+                                        String? previousLoadout = selectedLoadout;
+
+                                        if (newValue == 'Reset Last') {
+                                          if (selectedLoadout != null) {
+                                            // Confirm reset before applying
+                                            bool? confirmed = await showDialog(
+                                              context: context,
+                                              barrierDismissible: true, // Allows tapping outside to cancel
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  backgroundColor: AppColors.textFieldColor2,
+                                                  title: Text(
+                                                    'Confirm Reset',
+                                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                  ),
+                                                  content: Text(
+                                                    'Resetting will revert your crew loadout to the last saved version. This will erase any unsaved changes. Proceed?',
+                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(false); // Cancel reset
+                                                      },
+                                                      child: Text(
+                                                        'Cancel',
+                                                        style: TextStyle(color: AppColors.cancelButton),
+                                                      ),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(true); // Confirm reset
+                                                      },
+                                                      child: Text(
+                                                        'Reset',
+                                                        style: TextStyle(color: AppColors.textColorPrimary),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+
+                                            if (confirmed == true) {
+                                              // Apply reset (reload last saved loadout)
+                                              await _loadSelectedLoadout(selectedLoadout!);
+                                              setState(() {
+                                                isOutOfSync = false; // Now back in sync
+                                              });
+                                            }
+                                          }
+                                          return;
+                                        }
+                                        if (newValue == 'Save Current') {
+                                          if (isOutOfSync) {
+                                            // Ask for confirmation before switching
+                                            bool? confirmed = await showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  backgroundColor: AppColors.textFieldColor2,
+                                                  title: Text(
+                                                    'Confirm Save Current',
+                                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                  ),
+                                                  content: Text(
+                                                    'Saving a new loadout will erase any recent changes made to your current crew loadout.'
+                                                        'This action is irreversible. Proceed?',
+                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(false); // Return false to cancel
+                                                      },
+                                                      child: Text(
+                                                        'Cancel',
+                                                        style: TextStyle(color: AppColors.cancelButton),
+                                                      ),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(true); // Return true to confirm
+                                                      },
+                                                      child: Text(
+                                                        'Confirm',
+                                                        style: TextStyle(color: Colors.red),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+
+                                            // If the user cancels, restore the previous selection
+                                            if (confirmed == false || confirmed == null ) {
+                                              setState(() {
+                                                selectedLoadout = previousLoadout;
+                                              });
+                                              return;
+                                            }
+
+                                          }
+                                          _promptNewLoadoutName(false);
+                                          return;
+                                        }
+                                        if (newValue == 'Start Empty'){
+                                          if (isOutOfSync) {
+                                            // Ask for confirmation before switching
+                                            bool? confirmed = await showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  backgroundColor: AppColors.textFieldColor2,
+                                                  title: Text(
+                                                    'Confirm Save Current',
+                                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                  ),
+                                                  content: Text(
+                                                    'Saving a new loadout will erase any recent changes made to your current crew loadout.'
+                                                        'This action is irreversible. Proceed?',
+                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(false); // Return false to cancel
+                                                      },
+                                                      child: Text(
+                                                        'Cancel',
+                                                        style: TextStyle(color: AppColors.cancelButton),
+                                                      ),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(true); // Return true to confirm
+                                                      },
+                                                      child: Text(
+                                                        'Confirm',
+                                                        style: TextStyle(color: Colors.red),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+
+                                            // If the user cancels, restore the previous selection
+                                            if (confirmed == false || confirmed == null ) {
+                                              setState(() {
+                                                selectedLoadout = previousLoadout;
+                                              });
+                                              return;
+                                            }
+
+                                          }
+                                          // Pass true for isEmptyCrew -> Creates empty crew loadout
+                                          _promptNewLoadoutName(true);
+                                          return;
+                                        }
+                                        if (newValue == null || (newValue == previousLoadout)) {
+                                          return;
+                                        }
+
+                                        // Standard Switching
+                                        if (isOutOfSync) {
+                                          // Ask for confirmation before switching
+                                          bool? confirmed = await showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                backgroundColor: AppColors.textFieldColor2,
+
+                                                title: Text(
+                                                  'Confirm Switch',
+                                                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                ),
+                                                content: Text(
+                                                  'Switching to the loadout, $newValue, will erase any recent changes made to your current crew loadout.'
+                                                      'This action is irreversible. Proceed?',
+                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop(false); // Return false to cancel
+                                                    },
+                                                    child: Text(
+                                                      'Cancel',
+                                                      style: TextStyle(color: AppColors.cancelButton),
+                                                    ),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop(true); // Return true to confirm
+                                                    },
+                                                    child: Text(
+                                                      'Confirm',
+                                                      style: TextStyle(color: Colors.red),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+
+                                          // If the user cancels, restore the previous selection
+                                          if (confirmed == false || confirmed == null ) {
+                                            setState(() {
+                                              selectedLoadout = previousLoadout;
+                                            });
+                                            return;
                                           }
                                         }
-                                      });
-                                    },
+                                        if (previousLoadout == null) {
+                                          // Ask for confirmation before switching
+                                          bool? confirmed = await showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                backgroundColor: AppColors.textFieldColor2,
+                                                title: Text(
+                                                  'Confirm Switch',
+                                                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                ),
+                                                content: Text(
+                                                  'Switching to the loadout, $newValue, will erase your current crew data which is not saved to any loadouts.'
+                                                      'This action is irreversible. Proceed?',
+                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop(false); // Return false to cancel
+                                                    },
+                                                    child: Text(
+                                                      'Cancel',
+                                                      style: TextStyle(color: AppColors.cancelButton),
+                                                    ),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop(true); // Return true to confirm
+                                                    },
+                                                    child: Text(
+                                                      'Confirm',
+                                                      style: TextStyle(color: Colors.red),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+
+                                          // If the user cancels, restore the previous selection
+                                          if (confirmed == false || confirmed == null ) {
+                                            setState(() {
+                                              selectedLoadout = previousLoadout;
+                                            });
+                                            return;
+                                          }
+                                        }
+
+                                        await _loadSelectedLoadout(newValue);
+
+                                        // Now update the UI
+                                        setState(() {
+                                          selectedLoadout = newValue;
+                                        });
+                                      }
+
                                   ),
                                 ),
                               ),
                             ),
                             SizedBox(width: 10), // Space between dropdown and buttons
 
-                            // Delete Button
-                            IconButton(
-                              icon: Icon(Icons.delete, color: selectedLoadout != null ? Colors.red : Colors.grey),
-                              onPressed: selectedLoadout != null && selectedLoadout != 'Save New'
-                                  ? () =>
-                              {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      backgroundColor: AppColors.textFieldColor2,
-                                      title: Text(
-                                        'Confirm Deletion',
-                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                      ),
-                                      content: Text(
-                                        'Are you sure you want to delete this loadout?',
-                                        style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop(); // Close the dialog without deleting
-                                          },
-                                          child: Text(
-                                            'Cancel',
-                                            style: TextStyle(color: AppColors.textColorPrimary),
-                                          ),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            // Perform deletion
-                                            _deleteLoadout(selectedLoadout!);
-                                            // Close the dialogs
-                                            Navigator.of(context).pop(); // Close confirmation dialog
-                                          },
-                                          child: const Text(
-                                            'Delete',
-                                            style: TextStyle(color: Colors.red),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
+
+
+                            // Sync Button
+                            Tooltip(
+                              message: "Update",
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.sync,
+                                  color: (selectedLoadout != null && isOutOfSync) ? Colors.green : Colors.grey,
+                                  size: AppData.text32,
                                 ),
-                              }
-                                  : null,
+                                onPressed: (selectedLoadout != null && isOutOfSync)
+                                    ? () async {
+                                  bool? confirmed = await showDialog(
+                                    context: context,
+                                    barrierDismissible: true, // Allows tapping outside to dismiss
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        backgroundColor: AppColors.textFieldColor2,
+                                        title: Text(
+                                          'Confirm Update',
+                                          style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                        ),
+                                        content: Text(
+                                          'Updating this loadout will overwrite all previously saved crew data (Crew Members, Gear, Trip Preferences) '
+                                              'from $lastSavedTimestamp with your current crew data. This action is irreversible. Proceed?',
+                                          style: TextStyle(color: AppColors.textColorPrimary),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop(false); // Return false to cancel
+                                            },
+                                            child: Text(
+                                              'Cancel',
+                                              style: TextStyle(color: AppColors.cancelButton),
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop(true); // Return true to confirm
+                                            },
+                                            child: Text(
+                                              'Confirm',
+                                              style: TextStyle(color: AppColors.saveButtonAllowableWeight),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                              
+                                  // If the user cancels (taps outside or presses cancel), do nothing
+                                  if (confirmed == null || !confirmed) {
+                                    return;
+                                  }
+                              
+                                  // If confirmed, proceed with updating the loadout
+                                  await _updateCurrentLoadout(selectedLoadout!);
+                                }
+                                    : null, // Button is disabled if loadout is null or already in sync
+                              ),
                             ),
 
-                            // Save Button
-                            IconButton(
-                              icon: Icon(Icons.save_outlined, color: selectedLoadout != null ? Colors.green : Colors.grey),
-                              onPressed: selectedLoadout != null && selectedLoadout != 'Save New'
-                                  ? () => _updateCurrentLoadout(selectedLoadout!)
-                                  : null,
-                            ),
                           ],
                         ),
 
-                        SizedBox(height: 5),
                         if (selectedLoadout != null && selectedLoadout!.isNotEmpty)
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Icon(
                                 !isOutOfSync ? Icons.check: Icons.sync_disabled_outlined, // Info icon
@@ -1476,13 +1752,61 @@ class _SettingsState extends State<SettingsView> {
                                 size: 22, // Adjust size if needed
                               ),
                               Text(
-                                ' Last Updated: $lastSavedTimestamp ${isOutOfSync ? "(Out of Sync!)" : ""}',
+                                ' Last Updated: $lastSavedTimestamp',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: isOutOfSync ? Colors.red : Colors.green.withOpacity(0.8),
                                   fontStyle: FontStyle.italic,
                                   fontWeight: isOutOfSync ? FontWeight.bold : FontWeight.normal,
                                 ),
+                              ),
+                              // Delete Button
+                              IconButton(
+                                icon: Icon(Icons.delete, color: selectedLoadout != null ? Colors.red : Colors.grey, size: AppData.text18),
+                                onPressed: selectedLoadout != null && selectedLoadout != 'Save Current'
+                                    ? () =>
+                                {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        backgroundColor: AppColors.textFieldColor2,
+                                        title: Text(
+                                          'Confirm Deletion',
+                                          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                        ),
+                                        content: Text(
+                                          'Are you sure you want to delete this loadout?',
+                                          style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop(); // Close the dialog without deleting
+                                            },
+                                            child: Text(
+                                              'Cancel',
+                                              style: TextStyle(color: AppColors.textColorPrimary),
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              // Perform deletion
+                                              _deleteLoadout(selectedLoadout!);
+                                              // Close the dialogs
+                                              Navigator.of(context).pop(); // Close confirmation dialog
+                                            },
+                                            child: const Text(
+                                              'Delete',
+                                              style: TextStyle(color: Colors.red),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                }
+                                    : null,
                               ),
                             ],
                           ),
@@ -1499,7 +1823,7 @@ class _SettingsState extends State<SettingsView> {
                       IconButton(
                           onPressed: importExportDialog,
                           icon: Icon(
-                            Icons.sync,
+                            Icons.people_outline_rounded,
                             color: Colors.white,
                             size: 28,
                           )),
