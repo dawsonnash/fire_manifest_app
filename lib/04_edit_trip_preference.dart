@@ -296,10 +296,18 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                             // Check which Saw Team the list matches and return the appropriate Saw Team name
                                             for (int i = 1; i <= 6; i++) {
                                               List<CrewMember> sawTeam = crew.getSawTeam(i);
-                                              if (sawTeam.every((member) => item.contains(member)) && item.length == sawTeam.length) {
+
+                                              bool isMatchingSawTeam = sawTeam.length == item.length &&
+                                                  sawTeam.every((teamMember) =>
+                                                      item.any((importedMember) =>
+                                                      importedMember.name == teamMember.name &&
+                                                          importedMember.position == teamMember.position));
+
+                                              if (isMatchingSawTeam) {
                                                 return 'Saw Team $i'; // Return Saw Team name
                                               }
                                             }
+
                                           }
                                           return '';
                                         }).join(', '),

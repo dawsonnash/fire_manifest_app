@@ -1,11 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:hive/hive.dart';
 
 import 'CodeShare/colors.dart';
 import 'Data/crew.dart';
-import 'Data/crewMemberList.dart';
 import 'Data/gear.dart';
 import 'Data/saved_preferences.dart';
 import 'Data/gear_preferences.dart';
@@ -67,7 +65,9 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     final usedCrewMembers = widget.tripPreference.positionalPreferences
         .expand((posPref) => posPref.crewMembersDynamic)
         .expand((member) => member is List<CrewMember> ? member : [member])
+        .map((cm) => (cm as CrewMember).name + "_" + cm.position.toString()) // Store "name_position" key
         .toSet();
+
 
     // Populate saw team options
     for (int i = 1; i <= 6; i++) {
@@ -76,8 +76,12 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
       // Only add the Saw Team if NONE of its members are in usedCrewMembers or selectedCrewMembers
       if (sawTeam.isNotEmpty &&
           sawTeam.every((member) =>
-          !usedCrewMembers.contains(member) &&
-              !selectedCrewMembers.contains(member))) {
+          !usedCrewMembers.contains(member.name + "_" + member.position.toString()) &&
+              !selectedCrewMembers.any((selected) =>
+              selected is CrewMember &&
+                  selected.name == member.name &&
+                  selected.position == member.position)
+          )) {
         sawTeamOptions.add({'name': 'Saw Team $i', 'members': sawTeam});
       }
     }
@@ -85,7 +89,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
     // Populate individual crew member options, so they remain visible and checked if selected
     for (var member in crew.crewMembers) {
-      if (!usedCrewMembers.contains(member)) {
+      if (!usedCrewMembers.contains(member.name + "_" + member.position.toString())) {
         // only consider members not in usedCrewMembers
         bool isPartOfSelectedSawTeam = false;
 
@@ -138,42 +142,48 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
         return StatefulBuilder(
           builder: (context, setState) {
             void updateSelection() {
-              // clear and repopulate options based on the current selection
+              // Clear and repopulate options based on the current selection
               sawTeamOptions.clear();
               individualOptions.clear();
 
-              // Collect all used crew members again
-              final usedCrewMembers = widget
-                  .tripPreference.positionalPreferences
+              // Recollect usedCrewMembers
+              final usedCrewMembers = widget.tripPreference.positionalPreferences
                   .expand((posPref) => posPref.crewMembersDynamic)
-                  .expand((member) =>
-                      member is List<CrewMember> ? member : [member])
+                  .expand((member) => member is List<CrewMember> ? member : [member])
+                  .map((cm) => cm.name.trim().toLowerCase() + "_" + cm.position.toString()) // Normalize comparison
                   .toSet();
 
               // Repopulate Saw Team options
               for (int i = 1; i <= 6; i++) {
                 List<CrewMember> sawTeam = crew.getSawTeam(i);
+                List<String> sawTeamKeys = sawTeam.map((m) =>
+                m.name.trim().toLowerCase() + "_" + m.position.toString()).toList();
 
-                // Add Saw Team only if all its members are not in usedCrewMembers or selectedCrewMembers
                 if (sawTeam.isNotEmpty &&
                     sawTeam.every((member) =>
-                    !usedCrewMembers.contains(member) &&
-                        !selectedCrewMembers.contains(member))) {
+                    !usedCrewMembers.contains(member.name.trim().toLowerCase() + "_" + member.position.toString()) &&
+                        !selectedCrewMembers.any((selected) =>
+                        selected is CrewMember &&
+                            selected.name.trim().toLowerCase() == member.name.trim().toLowerCase() &&
+                            selected.position == member.position))) {
                   sawTeamOptions.add({'name': 'Saw Team $i', 'members': sawTeam});
                 }
               }
 
               // Repopulate individual crew member options
               for (var member in crew.crewMembers) {
-                if (!usedCrewMembers.contains(member)) {
+                String memberKey = member.name.trim().toLowerCase() + "_" + member.position.toString();
+
+                if (!usedCrewMembers.contains(memberKey)) {
                   bool isPartOfSelectedSawTeam = false;
 
-                  // Check if the member is part of a fully selected Saw Team
                   for (int i = 1; i <= 6; i++) {
                     List<CrewMember> sawTeam = crew.getSawTeam(i);
+                    List<String> sawTeamKeys = sawTeam.map((m) =>
+                    m.name.trim().toLowerCase() + "_" + m.position.toString()).toList();
+
                     if (sawTeam.contains(member) &&
-                        selectedCrewMembers.any((item) =>
-                            item is Map && item['name'] == 'Saw Team $i')) {
+                        selectedCrewMembers.any((item) => item is Map && item['name'] == 'Saw Team $i')) {
                       isPartOfSelectedSawTeam = true;
                       break;
                     }
@@ -183,11 +193,16 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                     individualOptions.add({
                       'name': member.name,
                       'members': [member],
-                      'isSelected': selectedCrewMembers.contains(member)
+                      'isSelected': selectedCrewMembers.any((selected) =>
+                      selected is CrewMember &&
+                          selected.name.trim().toLowerCase() == member.name.trim().toLowerCase() &&
+                          selected.position == member.position)
                     });
                   }
                 }
               }
+
+              setState(() {}); // Refresh UI
             }
 
             return AlertDialog(
@@ -237,17 +252,17 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                       if (sawTeamOptions.isNotEmpty &&
                           individualOptions.isNotEmpty)
                          Divider(color: AppColors.textColorPrimary, thickness: 1),
-                      ...individualOptions.map((option) {
-                        bool isSelected = option['isSelected'] ?? false;
-                        CrewMember member = option['members'].first;
+                      ...sortCrewListByPosition(
+                          individualOptions.map((option) => option['members'].first as CrewMember).toList()
+                      ).map((CrewMember member) {
+                        bool isSelected = selectedCrewMembers.contains(member);
 
                         return CheckboxListTile(
                           activeColor: AppColors.textColorPrimary,
-                          // Checkbox outline color when active
                           checkColor: AppColors.textColorSecondary,
                           side: BorderSide(
-                            color: AppColors.textColorPrimary, // Outline color
-                            width: 2.0, // Outline width
+                            color: AppColors.textColorPrimary,
+                            width: 2.0,
                           ),
                           title: Text(
                             member.name,
@@ -275,6 +290,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                           },
                         );
                       }).toList(),
+
                     ],
                   ),
                 ),

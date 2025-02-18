@@ -8,6 +8,8 @@ import 'Data/trip_preferences.dart';
 import 'main.dart';
 
 class CalculatingScreen extends StatefulWidget {
+  const CalculatingScreen({super.key});
+
   @override
   _CalculatingScreenState createState() => _CalculatingScreenState();
 }

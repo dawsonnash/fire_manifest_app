@@ -82,6 +82,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       scaffoldMessengerKey: scaffoldMessengerKey,
       title: 'Fire Manifest App',
       theme: ThemeData(
@@ -146,16 +147,23 @@ class _MyHomePageState extends State<MyHomePage> {
     await ThemePreferences.setBackgroundImagePreference(enableBackgroundImage);
   }
   void _changeCrewName(String crewName) async {
+    print("🚀 Updating Crew Name: $crewName");
+
     setState(() {
       AppData.crewName = crewName;
     });
     await ThemePreferences.setCrewName(crewName);
+
+    // Verify if it's saved correctly
+    String savedCrewName = await ThemePreferences.getCrewName();
+    print("🔍 Saved Crew Name in SharedPreferences: $savedCrewName");
+
   }
   void _changeUserName(String userName) async {
     setState(() {
       AppData.userName = userName;
     });
-    await ThemePreferences.setCrewName(userName);
+    await ThemePreferences.setUserName(userName);
   }
   void _onItemTapped(int index) {
     setState(() {
@@ -204,6 +212,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppData.updateScreenData(context);
     return Scaffold(
       appBar: AppBar(
         title: Center(
@@ -226,87 +235,94 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
           ),
           Padding(
             padding: EdgeInsets.all(18.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(4.0),
-              ),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(16.0),
-                      child:  Text(
-                        'The calculations provided by this app are intended for informational purposes only. '
-                        'While every effort has been made to ensure accuracy, users must independently verify and validate '
-                        'all data before relying on it for operational or decision-making purposes. The developers assume no '
-                        'liability for errors, omissions, or any outcomes resulting from the use of this app. By continuing, '
-                        'you acknowledge and accept full responsibility for reviewing and confirming all calculations.',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 22,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Checkbox(
-                        activeColor: Colors.black,
-                        checkColor: Colors.white,
-                        side: BorderSide(
-                          color: Colors.black, // Outline color
-                          width: 2.0, // Outline width
-                        ),//
-                        value: userAgreed,
-                        onChanged: (value) {
-                          setState(() {
-                            userAgreed = value!;
-                          });
-                        },
-                      ),
-                      Flexible(
-                        child: Text(
-                          'I agree to the terms and conditions',
+            child: Center(
+              child: Container(
+                width: AppData.termsAndConditionsWidth,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4.0),
+                ),
+
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(16.0),
+                        child:  Text(
+                          'The calculations provided by this app are intended for informational purposes only. '
+                          'While every effort has been made to ensure accuracy, users must independently verify and validate '
+                          'all data before relying on it for operational or decision-making purposes. The developers assume no '
+                          'liability for errors, omissions, or any outcomes resulting from the use of this app. By continuing, '
+                          'you acknowledge and accept full responsibility for reviewing and confirming all calculations.',
                           style: TextStyle(
                             color: Colors.black,
-                            fontSize: 18,
-                            // fontWeight: FontWeight.bold
+                            fontSize: AppData.text22,
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ElevatedButton(
-                      onPressed: userAgreed
-                          ? () async {
-                              SharedPreferences prefs = await SharedPreferences.getInstance();
-                              await prefs.setBool('agreedToTerms', true);
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => const MyHomePage()),
-                              );
-                            }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    Row(
+                      children: [
+                        Transform.scale(
+                          scale: AppData.checkboxScalingFactor, // Scales dynamically based on screen width
+                          child: Checkbox(
+                            activeColor: Colors.black,
+                            checkColor: Colors.white,
+                            side: BorderSide(
+                              color: Colors.black, // Outline color
+                              width: 2.0, // Outline width
+                            ),//
+                            value: userAgreed,
+                            onChanged: (value) {
+                              setState(() {
+                                userAgreed = value!;
+                              });
+                            },
+                          ),
                         ),
-                        backgroundColor: AppColors.textFieldColor,
-                        padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-                      ),
-                      child: const Text(
-                        'Continue',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
+                        Flexible(
+                          child: Text(
+                            'I agree to the terms and conditions',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: AppData.text22,
+                              // fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ElevatedButton(
+                        onPressed: userAgreed
+                            ? () async {
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                await prefs.setBool('agreedToTerms', true);
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const MyHomePage()),
+                                );
+                              }
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          backgroundColor: AppColors.textFieldColor,
+                          padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                        ),
+                        child:  Text(
+                          'Continue',
+                          style: TextStyle(
+                            fontSize: AppData.text20,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           )

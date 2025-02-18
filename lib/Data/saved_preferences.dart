@@ -10,6 +10,20 @@ import 'package:hive/hive.dart';
 class SavedPreferences {
   List<TripPreference> tripPreferences = []; // In-memory list for TripPreferences
 
+  SavedPreferences();
+
+  Map<String, dynamic> toJson() {
+    return {
+      "tripPreferences": tripPreferences.map((tp) => tp.toJson()).toList(),
+    };
+  }
+
+  factory SavedPreferences.fromJson(Map<String, dynamic> json) {
+    return SavedPreferences()
+      ..tripPreferences = (json["tripPreferences"] as List)
+          .map((tp) => TripPreference.fromJson(tp))
+          .toList();
+  }
   // Add a new TripPreference
   void addTripPreference(TripPreference newTripPreference) {
     var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');

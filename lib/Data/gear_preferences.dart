@@ -17,6 +17,22 @@ class GearPreference extends HiveObject{
 
   GearPreference({required this.priority, required this.loadPreference, required this.gear});
 
+
+  Map<String, dynamic> toJson() {
+    return {
+      "priority": priority,
+      "loadPreference": loadPreference,
+      "gear": gear.map((g) => g.toJson()).toList(),
+    };
+  }
+
+  factory GearPreference.fromJson(Map<String, dynamic> json) {
+    return GearPreference(
+      priority: json["priority"],
+      loadPreference: json["loadPreference"],
+      gear: (json["gear"] as List).map((g) => Gear.fromJson(g)).toList(),
+    );
+  }
 // If  there are more than 1 items, quantity is disabled in UI.
 // If quantity is 1, then 'Balanced' load option is turned off in UI.
 }

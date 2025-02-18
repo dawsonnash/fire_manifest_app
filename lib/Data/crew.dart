@@ -23,7 +23,6 @@ class Crew {
   // Convert Crew object to JSON
   Map<String, dynamic> toJson() {
     return {
-      "crewName": AppData.crewName,
       "crewMembers": crewMembers.map((member) => member.toJson()).toList(),
       "gear": gear.map((g) => g.toJson()).toList(),
       "personalTools": personalTools.map((p) => p.toJson()).toList(),
@@ -199,12 +198,12 @@ class Crew {
         for (var entry in positionalPreference.crewMembersDynamic) {
           if (entry is CrewMember) {
             // If the entry is an individual CrewMember, exclude it if it matches
-            if (entry != member) {
+            if (entry.name != member.name) {
               updatedCrewMembersDynamic.add(entry);
             }
           } else if (entry is List<CrewMember>) {
             // If the entry is a Saw Team (List<CrewMember>), remove the CrewMember if present
-            entry.removeWhere((teamMember) => teamMember == member);
+            entry.removeWhere((teamMember) => teamMember.name == member.name);
 
             // Only keep the list if it still has members
             if (entry.isNotEmpty) {
@@ -363,8 +362,6 @@ class Crew {
 
     // Update total weight
     crew.updateTotalCrewWeight();
-
-    print(' Crew data loaded from Hive. Total weight: ${crew.totalCrewWeight}');
   }
 
   void loadPersonalTools() {

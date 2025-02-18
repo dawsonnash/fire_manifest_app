@@ -33,7 +33,8 @@ class Trip extends HiveObject {
     DateTime? timestamp,}) : timestamp = timestamp ?? DateTime.now(); // Default to current time if not provided;
 
   void addLoad(Trip trip, Load newLoad) {
-    trip.loads.add(newLoad); //
+    trip.loads.add(newLoad);
+    save();
   }
 
   // For LogCat testing purposes
