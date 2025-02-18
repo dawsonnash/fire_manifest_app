@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/04_add_load_preference.dart';
+import 'package:flutter/services.dart';
 import 'Data/gear_preferences.dart';
 import 'Data/positional_preferences.dart';
 import 'Data/trip_preferences.dart';
@@ -48,7 +49,9 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
               ),
               content: TextField(
                 controller: titleController,
-                maxLength: 20,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(20),
+                ],
                 textCapitalization: TextCapitalization.words,
                 decoration: InputDecoration(
                   labelText: "Trip Preference Name",

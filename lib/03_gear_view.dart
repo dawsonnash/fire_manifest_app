@@ -95,7 +95,7 @@ class _GearViewState extends State<GearView> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Selected gear deleted", style: TextStyle(fontSize: AppData.text22, color: Colors.black)),
+        content: Text("Selected gear deleted", style: TextStyle(fontSize: AppData.text22, fontWeight: FontWeight.bold, color: Colors.black)),
         backgroundColor: Colors.red,
         duration: Duration(seconds: 1),
       ),

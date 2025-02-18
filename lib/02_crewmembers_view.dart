@@ -102,7 +102,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Selected crew members deleted", style: TextStyle(fontSize: AppData.text22, color: Colors.black)),
+        content: Text("Selected crew members deleted", style: TextStyle(fontSize: AppData.text22,  fontWeight: FontWeight.bold, color: Colors.black)),
         backgroundColor: Colors.red,
         duration: Duration(seconds: 1),
       ),

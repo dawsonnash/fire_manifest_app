@@ -638,42 +638,100 @@ class _SettingsState extends State<SettingsView> {
     );
   }
 
-  void _promptNewLoadoutName(bool isEmptyCrew) {
-    TextEditingController nameController = TextEditingController();
+  void _promptNewLoadoutName(String previousLoadout, bool isEmptyCrew, bool isEdit) {
+    TextEditingController nameController = isEdit
+        ? TextEditingController(text: previousLoadout)
+        : TextEditingController();
+    String? errorMessage;
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: AppColors.textFieldColor2,
-          title: Text('Save New Loadout', style: TextStyle(color: AppColors.textColorPrimary)),
-          content: TextField(
-            controller: nameController,
-            inputFormatters: [
-              LengthLimitingTextInputFormatter(30),
-            ],
-            decoration: InputDecoration(
-              hintText: "Enter Loadout Name",
-              hintStyle: TextStyle(color: AppColors.textColorPrimary),
-            ),
-            style: TextStyle(color: AppColors.textColorPrimary),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
-            ),
-            TextButton(
-              onPressed: () {
-                String loadoutName = nameController.text.trim();
-                if (loadoutName.isNotEmpty) {
-                  _saveNewLoadout(loadoutName, isEmptyCrew);
-                  Navigator.of(context).pop();
-                }
-              },
-              child: Text("Save", style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.textFieldColor2,
+              title: Text(
+                isEdit ? 'Edit Loadout Name' : (isEmptyCrew ? 'Save New Loadout' : 'Save New Loadout from $previousLoadout'),
+                style: TextStyle(color: AppColors.textColorPrimary),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameController,
+                    inputFormatters: [LengthLimitingTextInputFormatter(30)],
+                    decoration: InputDecoration(
+                      errorText: errorMessage,
+                      hintText: "Enter Loadout Name",
+                      hintStyle: TextStyle(color: AppColors.textColorPrimary),
+                    ),
+                    style: TextStyle(color: AppColors.textColorPrimary),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    String loadoutName = nameController.text.trim();
+
+                    if (loadoutName.isNotEmpty) {
+                      List<String> existingLoadouts = await CrewLoadoutStorage.getAllLoadoutNames();
+                      bool nameExists = existingLoadouts.any(
+                            (existingName) => existingName.toLowerCase() == loadoutName.toLowerCase(),
+                      );
+
+                      if (nameExists) {
+                        setDialogState(() {
+                          errorMessage = "Loadout name already exists";
+                        });
+
+                        Future.delayed(Duration(seconds: 2), () {
+                          setDialogState(() {
+                            errorMessage = null;
+                          });
+                        });
+                      } else {
+                        if (isEdit) {
+                          bool success = await CrewLoadoutStorage.renameLoadout(previousLoadout, loadoutName);
+                          if (success) {
+                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                            await prefs.setString('last_selected_loadout', loadoutName);
+
+                            setState(() {
+                              if (selectedLoadout == previousLoadout) {
+                                selectedLoadout = loadoutName; // Keep the selection
+                              }
+                            });
+
+                            await _loadLoadoutNames();
+                          }
+                        } else {
+                          _saveNewLoadout(loadoutName, isEmptyCrew);
+                        }
+                        Navigator.of(context).pop();
+                      }
+                    } else {
+                      setDialogState(() {
+                        errorMessage = "Loadout name cannot be empty";
+                      });
+
+                      Future.delayed(Duration(seconds: 2), () {
+                        setDialogState(() {
+                          errorMessage = null;
+                        });
+                      });
+                    }
+                  },
+                  child: Text("Save", style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -884,7 +942,9 @@ class _SettingsState extends State<SettingsView> {
       return;
     }
 
-    String lastSaved = loadoutData.containsKey("lastSaved") ? loadoutData["lastSaved"] : "Unknown";
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('last_selected_loadout', loadoutName); // Save the selection persistently
+
 
     await _applyLoadout(loadoutName, loadoutData);
 
@@ -1359,7 +1419,15 @@ class _SettingsState extends State<SettingsView> {
                                       ...loadoutNames.map((String loadout) {
                                         return DropdownMenuItem<String>(
                                           value: loadout,
-                                          child: Text(loadout, style: TextStyle(color: AppColors.textColorPrimary)),
+                                          child: GestureDetector(
+                                            onLongPress: () {
+                                              _promptNewLoadoutName(loadout, false, true); // Open rename dialog
+                                            },
+
+                                            child: Container(
+                                              width: double.infinity,
+                                                child: Text(loadout, style: TextStyle(color: AppColors.textColorPrimary))),
+                                          ),
                                         );
                                       }),
                                       // **Reset to Last Saved (Only appears if out of sync)**
@@ -1501,7 +1569,7 @@ class _SettingsState extends State<SettingsView> {
                                             }
 
                                           }
-                                          _promptNewLoadoutName(false);
+                                          _promptNewLoadoutName(previousLoadout!, false, false);
                                           return;
                                         }
                                         if (newValue == 'Start Empty'){
@@ -1555,7 +1623,7 @@ class _SettingsState extends State<SettingsView> {
 
                                           }
                                           // Pass true for isEmptyCrew -> Creates empty crew loadout
-                                          _promptNewLoadoutName(true);
+                                          _promptNewLoadoutName(previousLoadout!, true, false);
                                           return;
                                         }
                                         if (newValue == null || (newValue == previousLoadout)) {
@@ -1726,12 +1794,12 @@ class _SettingsState extends State<SettingsView> {
                                       );
                                     },
                                   );
-                              
+
                                   // If the user cancels (taps outside or presses cancel), do nothing
                                   if (confirmed == null || !confirmed) {
                                     return;
                                   }
-                              
+
                                   // If confirmed, proceed with updating the loadout
                                   await _updateCurrentLoadout(selectedLoadout!);
                                 }

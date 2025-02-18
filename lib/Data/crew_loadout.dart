@@ -77,4 +77,22 @@ class CrewLoadoutStorage {
     List<File> loadoutFiles = await _getLoadoutFiles();
     return loadoutFiles.map((file) => file.uri.pathSegments.last.replaceAll('.json', '')).toList();
   }
+
+
+  /// **Rename an existing loadout**
+  static Future<bool> renameLoadout(String oldName, String newName) async {
+    Directory loadoutDir = await _getLoadoutDirectory();
+    String oldPath = '${loadoutDir.path}/$oldName.json';
+    String newPath = '${loadoutDir.path}/$newName.json';
+
+    File oldFile = File(oldPath);
+
+    if (await oldFile.exists()) {
+      await oldFile.rename(newPath);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 }
