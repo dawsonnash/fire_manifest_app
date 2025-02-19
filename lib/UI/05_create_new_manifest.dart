@@ -6,12 +6,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
-import '../Data/trip.dart';
-import '05_define_constraints_manifest.dart';
-import 'Data/crewmember.dart';
-import 'Data/gear.dart';
-import 'Data/load_calculator.dart';
-import 'Data/trip_preferences.dart';
+import '../../Data/trip.dart';
+import '../UI/05_define_constraints_manifest.dart';
+import '../Data/crewmember.dart';
+import '../Data/gear.dart';
+import '../Algorithms/load_calculator.dart';
+import '../Data/trip_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'calculating_screen.dart';

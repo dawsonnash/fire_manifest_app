@@ -1,12 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'CodeShare/colors.dart';
-import 'Data/crew.dart';
-import 'Data/gear.dart';
+import '../CodeShare/colors.dart';
+import '../Data/crew.dart';
+import '../Data/gear.dart';
 import 'package:hive/hive.dart';
-import 'CodeShare/functions.dart';
-import 'Data/saved_preferences.dart';
+import '../CodeShare/functions.dart';
+import '../Data/saved_preferences.dart';
 
 class EditGear extends StatefulWidget {
   // THis page requires a gear item to be passed to it - to edit it

@@ -2,10 +2,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
-import 'CodeShare/colors.dart';
-import 'Data/crew.dart';
-import 'Data/gear.dart';
-import 'CodeShare/functions.dart';
+import '../CodeShare/colors.dart';
+import '../Data/crew.dart';
+import '../Data/gear.dart';
+import '../CodeShare/functions.dart';
 
 // Tester data
 class AddGear extends StatefulWidget {

@@ -1,40 +1,65 @@
 import 'dart:ui';
+import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../Data/crew.dart';
+import '../../Data/crewmember.dart';
 import 'package:hive/hive.dart';
-import 'CodeShare/colors.dart';
-import 'Data/crew.dart';
-import 'Data/crewmember.dart';
-import 'Data/gear.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class AddCrewmember extends StatefulWidget {
-  const AddCrewmember({super.key});
+import '../CodeShare/colors.dart';
+import '../Data/gear.dart';
+
+class EditCrewmember extends StatefulWidget {
+  // This page requires a crewmember to be passed to it - to edit it
+  final CrewMember crewMember;
+  final VoidCallback onUpdate; // Callback for deletion to update previous page
+
+  const EditCrewmember({
+    super.key,
+    required this.crewMember,
+    required this.onUpdate,
+  });
 
   @override
-  State<AddCrewmember> createState() => _AddCrewmemberState();
+  State<EditCrewmember> createState() => _EditCrewmemberState();
 }
 
-class _AddCrewmemberState extends State<AddCrewmember> {
+class _EditCrewmemberState extends State<EditCrewmember> {
+
   late final Box<Gear> personalToolsBox;
   List<Gear> personalToolsList = [];
 
   // Variables to store user input
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController flightWeightController = TextEditingController();
-  final TextEditingController toolNameController = TextEditingController();
-  final TextEditingController toolWeightController = TextEditingController();
-  bool isSaveButtonEnabled = false; // Controls whether saving button is showing
-  int? selectedPosition;
+  late TextEditingController nameController;
+  late TextEditingController flightWeightController;
+
+  late List<TextEditingController> toolNameControllers = [];
+  late List<TextEditingController> toolWeightControllers = [];
+  late TextEditingController newToolNameController;
+  late TextEditingController newToolWeightController;
   late bool isHazmatTool;
-  List<Gear>? addedTools = []; // List to hold added Gear objects, i.e., personal tools
+  int? selectedPosition;
+  List<Gear>? addedTools = [];
+
+  bool isSaveButtonEnabled = false; // Controls whether saving button is showing
+
+  // Store old CrewMember info for ensuring user only can save if they change data
+  late String oldCrewMemberName;
+  late int oldCrewMemberFlightWeight;
+  late int oldCrewMemberPosition;
+  late List oldCrewMemberTools = List.from(widget.crewMember.personalTools ?? []); // Store old tools
+
+  // initialize HiveBox for crewmember
+  late final Box<CrewMember> crewmemberBox;
 
   @override
   void initState() {
     super.initState();
-
     // Open the Hive box and load the list of tool items
     personalToolsBox = Hive.box<Gear>('personalToolsBox');
+    // Initialize crewmemberBox variable here
+    crewmemberBox = Hive.box<CrewMember>('crewmemberBox');
     loadPersonalToolsList();
 
     // Set default isHazmatTool value
@@ -43,13 +68,36 @@ class _AddCrewmemberState extends State<AddCrewmember> {
     } else {
       isHazmatTool = false; // Default to false if the list is empty
     }
+
+    // Initializing the controllers with the current crew member's data to be edited
+    nameController = TextEditingController(text: widget.crewMember.name);
+    flightWeightController = TextEditingController(text: widget.crewMember.flightWeight.toString());
+    selectedPosition = widget.crewMember.position; // Set initial position
+    // Initialize tool controllers with each of the existing tools
+    widget.crewMember.personalTools?.forEach((gearItem) {
+      toolNameControllers.add(TextEditingController(text: gearItem.name));
+      toolWeightControllers.add(TextEditingController(text: gearItem.weight.toString()));
+    });
+
+    // Store original crewmember data
+    oldCrewMemberName = widget.crewMember.name;
+    oldCrewMemberFlightWeight = widget.crewMember.flightWeight;
+    oldCrewMemberPosition = widget.crewMember.position;
+
     // Listeners to the TextControllers
     nameController.addListener(_checkInput);
     flightWeightController.addListener(_checkInput);
-    toolNameController.addListener(_checkInput);
-    toolWeightController.addListener(_checkInput);
-  }
+    toolNameControllers.forEach((controller) => controller.addListener(_checkInput));
+    toolWeightControllers.forEach((controller) => controller.addListener(_checkInput));
 
+    // Initialize separate controllers for adding new tools
+    newToolNameController = TextEditingController();
+    newToolWeightController = TextEditingController();
+    newToolNameController.addListener(_checkInput);
+    newToolWeightController.addListener(_checkInput);
+
+    addedTools = List.from(widget.crewMember.personalTools ?? []);
+  }
   // Function to load the list of tool items from the Hive box
   void loadPersonalToolsList() {
     setState(() {
@@ -61,28 +109,16 @@ class _AddCrewmemberState extends State<AddCrewmember> {
   void dispose() {
     nameController.dispose();
     flightWeightController.dispose();
-    toolNameController.dispose();
-    toolWeightController.dispose();
+    toolNameControllers.forEach((controller) => controller.dispose());
+    toolWeightControllers.forEach((controller) => controller.dispose());
+    newToolNameController.dispose();
+    newToolWeightController.dispose();
     super.dispose();
   }
 
-  // Function to check if input is valid and update button state
-  void _checkInput() {
-    final isNameValid = nameController.text.isNotEmpty;
-    final isFlightWeightValid =
-        flightWeightController.text.isNotEmpty && int.tryParse(flightWeightController.text) != null && int.parse(flightWeightController.text) > 0 && int.parse(flightWeightController.text) < 500;
-
-    final isPositionSelected = selectedPosition != null;
-
-    setState(() {
-      // Need to adjust for position as well
-      isSaveButtonEnabled = isNameValid && isFlightWeightValid && isPositionSelected;
-    });
-  }
-
   void addTool() {
-    final String toolName = toolNameController.text;
-    final int toolWeight = int.parse(toolWeightController.text);
+    final String toolName = newToolNameController.text;
+    final int toolWeight = int.parse(newToolWeightController.text);
 
     // Find the selected tool in the personalToolsList
     final Gear selectedGear = personalToolsList.firstWhere(
@@ -93,7 +129,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
     // Check for duplicate tool names
     final bool isDuplicate = addedTools?.any(
           (tool) => tool.name.toLowerCase() == toolName.toLowerCase(),
-        ) ??
+    ) ??
         false;
 
     if (isDuplicate) {
@@ -112,27 +148,65 @@ class _AddCrewmemberState extends State<AddCrewmember> {
       return; // Exit function if the tool is a duplicate
     }
 
-      setState(() {
-        addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true, isHazmat: selectedGear.isHazmat));
-        toolNameController.clear();
-        toolWeightController.clear();
-        setState(() {});
-      });
+    setState(() {
+      addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true, isHazmat: selectedGear.isHazmat));
+      newToolNameController.clear();
+      newToolWeightController.clear();
+      setState(() {});
+    });
   }
 
   void removeTool(int index) {
     setState(() {
       addedTools?.removeAt(index);
+      _checkInput();
+    });
+  }
+
+  // Function to check if input is valid and update button state
+  bool compareLists(List<Gear>? list1, List<Gear>? list2) {
+    if (list1 == null && list2 == null) return true; // Both are null, so they are the same
+    if (list1 == null || list2 == null) return false; // One is null, the other isn't
+    if (list1.length != list2.length) return false; // Different lengths, so they are different
+
+    for (int i = 0; i < list1.length; i++) {
+      if (list1[i].name != list2[i].name || list1[i].weight != list2[i].weight) {
+        return false; // Lists differ
+      }
+    }
+    return true; // Lists are the same
+  }
+
+  void _checkInput() {
+    final isNameValid = nameController.text.isNotEmpty;
+    final isFlightWeightValid = flightWeightController.text.isNotEmpty && int.tryParse(flightWeightController.text) != null;
+    final isNameChanged = nameController.text != oldCrewMemberName;
+    final isFlightWeightChanged =
+        int.tryParse(flightWeightController.text) != null && // Ensure valid input
+            int.parse(flightWeightController.text) > 0 &&       // Greater than zero
+            int.parse(flightWeightController.text) < 500 &&     // Less than 500
+            int.parse(flightWeightController.text) != oldCrewMemberFlightWeight;
+    final isPositionChanged = (selectedPosition ?? -1) != oldCrewMemberPosition; // Assuming -1 as an invalid/initial value
+
+    final areToolsChanged = !compareLists(oldCrewMemberTools.cast<Gear>(), addedTools);
+
+    setState(() {
+      isSaveButtonEnabled = (isNameValid && isFlightWeightValid) && (isNameChanged || isFlightWeightChanged || isPositionChanged || areToolsChanged);
     });
   }
 
   // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
-  void saveCrewMemberData() {
-    // Take what the name contrller has saved
-    final String name = nameController.text;
+  void saveData() {
+    // Get updated crew member name
+    final String newCrewMemberName = nameController.text;
+    final String originalCrewMemberName = widget.crewMember.name;
+    final int originalCrewMemberPosition = widget.crewMember.position;
 
-    // Check if crew member name already exists (case-insensitive)
-    bool crewMemberNameExists = crew.crewMembers.any((member) => member.name.toLowerCase() == name.toLowerCase());
+    // Check if new crew member name already exists
+    bool crewMemberNameExists = crew.crewMembers.any(
+          (member) => member.name.toLowerCase() == newCrewMemberName.toLowerCase() &&
+          member.name.toLowerCase() != originalCrewMemberName.toLowerCase(),
+    );
 
     if (crewMemberNameExists) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -152,26 +226,39 @@ class _AddCrewmemberState extends State<AddCrewmember> {
           backgroundColor: Colors.red,
         ),
       );
-      return; // Exit function if the gear name is already used
+      return;
     }
-    // Convert flight weight text to integer
-    final int flightWeight = int.parse(flightWeightController.text);
 
-    final List<Gear> personalTools = List.from(addedTools!);
+    widget.crewMember.name = nameController.text;
+    widget.crewMember.flightWeight = int.parse(flightWeightController.text);
+    widget.crewMember.position = selectedPosition ?? widget.crewMember.position; // Keep old position if not changed
+    widget.crewMember.personalTools = List.from(addedTools ?? []);
 
-    // Creating a new CrewMember object. Dont have positioin yet
-    CrewMember newCrewMember = CrewMember(name: name, flightWeight: flightWeight, position: selectedPosition ?? 26, personalTools: personalTools);
+    // Update the CrewMember in the preferences
+    savedPreferences.updateCrewMemberInPreferences(originalCrewMemberName, originalCrewMemberPosition, widget.crewMember);
 
-    // Add the new crewmember to the global crew object
-    crew.addCrewMember(newCrewMember);
+    final key = crewmemberBox.keys.firstWhere(
+          (key) => crewmemberBox.get(key) == widget.crewMember,
+      orElse: () => null,
+    );
 
-    // Show successful save popup
+    if (key != null) {
+      crewmemberBox.put(key, widget.crewMember);
+    } else {
+      crewmemberBox.add(widget.crewMember);
+    }
+
+    crew.updateTotalCrewWeight();
+
+    // Callback to update UI
+    widget.onUpdate();
+
+    // Show confirmation message
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Center(
           child: Text(
-            'Crew Member Saved!',
-            // Maybe change look
+            'Crew Member Updated!',
             style: TextStyle(
               color: Colors.black,
               fontSize: 32,
@@ -184,19 +271,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
       ),
     );
 
-    // Clear all input fields (reset them to empty), so you can add more ppl
-    clearInputs();
-  }
-
-  void clearInputs() {
-    nameController.text = '';
-    flightWeightController.text = '';
-    toolNameController.text = '';
-    toolWeightController.text = '';
-    selectedPosition = null;
-    // THis destroys everything
-    addedTools?.clear();
-    setState(() {}); // Rebuild UI to reflect changes
+    Navigator.of(context).pop();
   }
 
   @override
@@ -214,11 +289,13 @@ class _AddCrewmemberState extends State<AddCrewmember> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         // Maybe change? Dynamic button size based on screen size
         fixedSize: Size(MediaQuery.of(context).size.width / 2, MediaQuery.of(context).size.height / 10));
+    // Black style input field decoration
 
     return Scaffold(
       resizeToAvoidBottomInset: false, // Ensures the layout doesn't adjust for  keyboard - which causes pixel overflow
       appBar: AppBar(
         centerTitle: true,
+        backgroundColor: AppColors.appBarColor,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back, // The back arrow icon
@@ -228,11 +305,114 @@ class _AddCrewmemberState extends State<AddCrewmember> {
             Navigator.of(context).pop(); // Navigate back when pressed
           },
         ),
-        backgroundColor: AppColors.appBarColor,
-        title: Text(
-          'Add Crew Member',
+        title:  Text(
+          'Edit Crew Member',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  backgroundColor: AppColors.textFieldColor2,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        ListTile(
+                          leading: Icon(Icons.delete, color: Colors.red),
+                          title: Text(
+                            'Delete Crew Member',
+                            style: TextStyle(color: AppColors.textColorPrimary),
+                          ),
+                          onTap: () {
+                            Navigator.of(context).pop(); // Close the dialog without deleting
+
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  backgroundColor: AppColors.textFieldColor2,
+                                  title: Text(
+                                    'Confirm Deletion',
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                  ),
+                                  content: Text(
+                                    'This crew member data ($oldCrewMemberName) and any positional preference data containing them will be erased!',
+                                    style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(); // Close the dialog without deleting
+
+                                      },
+                                      child: Text(
+                                        'Cancel',
+                                        style: TextStyle(color: AppColors.cancelButton),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        // Remove item from the Hive box
+                                        final keyToRemove = crewmemberBox.keys.firstWhere(
+                                              (key) => crewmemberBox.get(key) == widget.crewMember,
+                                          orElse: () => null,
+                                        );
+
+                                        if (keyToRemove != null) {
+                                          crewmemberBox.delete(keyToRemove);
+                                        }
+
+                                        // Remove the crew member
+                                        crew.removeCrewMember(widget.crewMember);
+
+                                        widget.onUpdate(); // Callback function to update UI with new data
+
+                                        // Show deletion pop-up
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Center(
+                                              child: Text(
+                                                '$oldCrewMemberName Deleted!',
+                                                // Maybe change look
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 32,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            duration: Duration(seconds: 2),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+
+                                        Navigator.of(context).pop(); // Dismiss the dialog
+                                        Navigator.of(context).pop(); // Return to previous screen
+                                      },
+
+                                      child: const Text(
+                                        'Delete',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              icon: Icon(
+                Icons.more_vert,
+                color: AppColors.textColorPrimary,
+              ))
+        ],
       ),
       body: GestureDetector(
         onTap: () {
@@ -253,35 +433,36 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                     color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
                     child: AppColors.isDarkMode
                         ? (AppColors.enableBackgroundImage
-                            ? Stack(
-                                children: [
-                                  ImageFiltered(
-                                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                                    child: Image.asset(
-                                      'assets/images/logo1.png',
-                                      fit: BoxFit.cover, // Cover the entire background
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                    ),
-                                  ),
-                                  Container(
-                                    color: AppColors.logoImageOverlay, // Semi-transparent overlay
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                  ),
-                                ],
-                              )
-                            : null) // No image if background is disabled
-                        : ImageFiltered(
-                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
-                            child: Image.asset(
-                              'assets/images/logo1.png',
-                              fit: BoxFit.cover, // Cover the entire background
-                              width: double.infinity,
-                              height: double.infinity,
-                            ),
+                        ? Stack(
+                      children: [
+                        ImageFiltered(
+                          imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                          child: Image.asset(
+                            'assets/images/logo1.png',
+                            fit: BoxFit.cover, // Cover the entire background
+                            width: double.infinity,
+                            height: double.infinity,
                           ),
+                        ),
+                        Container(
+                          color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      ],
+                    )
+                        : null) // No image if background is disabled
+                        : ImageFiltered(
+                      imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+                      child: Image.asset(
+                        'assets/images/logo1.png',
+                        fit: BoxFit.cover, // Cover the entire background
+                        width: double.infinity,
+                        height: double.infinity,
+                      ),
+                    ),
                   ),
+
                   Container(
                     width: double.infinity,
                     height: double.infinity,
@@ -289,17 +470,17 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        // Enter Name
+                        // Edit Name
                         Padding(
                             padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
                             child: TextField(
                               controller: nameController,
-                              textCapitalization: TextCapitalization.words,
                               inputFormatters: [
-                                LengthLimitingTextInputFormatter(12),
+                                LengthLimitingTextInputFormatter(23),
                               ],
+                              textCapitalization: TextCapitalization.words,
                               decoration: InputDecoration(
-                                labelText: 'Last Name',
+                                labelText: 'Edit name',
                                 labelStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
                                   fontSize: 22,
@@ -308,7 +489,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                 filled: true,
                                 fillColor: AppColors.textFieldColor,
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
+                                  borderSide:  BorderSide(
                                     color: AppColors.borderPrimary,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
@@ -316,7 +497,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                   borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
+                                  borderSide:  BorderSide(
                                     color: AppColors.primaryColor,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
@@ -324,46 +505,50 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
                               ),
-                              style: TextStyle(
+                              style:  TextStyle(
                                 color: AppColors.textColorPrimary,
                                 fontSize: 28,
                               ),
                             )),
+
                         SizedBox(height: AppData.spacingStandard),
-                        // Enter Flight Weight
+
+                        // Edit Flight Weight
                         Padding(
                             padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                             child: TextField(
                               controller: flightWeightController,
-                              keyboardType: TextInputType.number,
                               inputFormatters: [
                                 LengthLimitingTextInputFormatter(3),
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
+                              keyboardType: TextInputType.number,
+                              // Only show numeric keyboard
+
                               decoration: InputDecoration(
-                                labelText: 'Flight Weight',
-                                hintText: 'Up to 500 lbs',
-                                hintStyle: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: 20,
-                                ),
-                                labelStyle: TextStyle(
+                                labelText: 'Edit flight weight',
+                                labelStyle:  TextStyle(
                                   color: AppColors.textColorPrimary,
                                   fontSize: 22,
                                   //fontWeight: FontWeight.bold,
                                 ),
+                                hintText: 'Up to 500 lbs',
+                                hintStyle: TextStyle(
+                                  color: AppColors.textColorPrimary,
+                                  fontSize: 20, // Optional: Customize hint text size
+                                ),
                                 filled: true,
                                 fillColor: AppColors.textFieldColor,
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppColors.borderPrimary,
+                                  borderSide:  BorderSide(
+                                    color: AppColors.textFieldColor,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
                                   ),
                                   borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
+                                  borderSide:  BorderSide(
                                     color: AppColors.primaryColor,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
@@ -371,11 +556,12 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
                               ),
-                              style: TextStyle(
+                              style:  TextStyle(
                                 color: AppColors.textColorPrimary,
                                 fontSize: 28,
                               ),
                             )),
+
                         SizedBox(height: AppData.spacingStandard),
 
                         // Enter Position(s)
@@ -392,15 +578,8 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<int>(
                                 value: selectedPosition,
-                                hint: Text(
-                                  'Primary Position',
-                                  style: TextStyle(
-                                    color: AppColors.textColorPrimary,
-                                    fontSize: 22,
-                                  ),
-                                ),
                                 dropdownColor: AppColors.textFieldColor2,
-                                style: TextStyle(
+                                style:  TextStyle(
                                   color: AppColors.textColorPrimary,
                                   fontSize: 22,
                                 ),
@@ -423,16 +602,17 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                             ),
                           ),
                         ),
+
                         SizedBox(height: AppData.spacingStandard),
 
                         // Enter tool(s) & weight
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 4.0, left: 16.0, right: 16.0),
+                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: GestureDetector(
                             onTap: () {
                               String? selectedTool = personalToolsList.isNotEmpty ? personalToolsList.first.name : null; // Default to first tool
-                              toolWeightController.text = personalToolsList.isNotEmpty ? personalToolsList.first.weight.toString() : '';
-                              toolNameController.text = personalToolsList.isNotEmpty ? personalToolsList.first.name : '';
+                              newToolWeightController.text = personalToolsList.isNotEmpty ? personalToolsList.first.weight.toString() : '';
+                              newToolNameController.text = personalToolsList.isNotEmpty ? personalToolsList.first.name : '';
 
                               showDialog(
                                 context: context,
@@ -441,7 +621,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                     builder: (BuildContext context, StateSetter setState) {
                                       return AlertDialog(
                                         backgroundColor: AppColors.textFieldColor2,
-                                        title: Text(
+                                        title:  Text(
                                           '+ Add Personal Tool',
                                           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                         ),
@@ -449,8 +629,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             DropdownButtonFormField<String>(
-                                              value: personalToolsList.isNotEmpty ? selectedTool : null,
-                                              // Set to null if no tools are available
+                                              value: personalToolsList.isNotEmpty ? selectedTool : null, // Set to null if no tools are available
                                               decoration: InputDecoration(
                                                 labelText: 'Select a Tool',
                                                 labelStyle: TextStyle(color: AppColors.textColorPrimary),
@@ -471,33 +650,32 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                               dropdownColor: AppColors.textFieldColor2,
                                               items: personalToolsList.isNotEmpty
                                                   ? personalToolsList.map((tool) {
-                                                      return DropdownMenuItem<String>(
-                                                        value: tool.name,
-                                                        child: Text(tool.name),
-                                                      );
-                                                    }).toList()
+                                                return DropdownMenuItem<String>(
+                                                  value: tool.name,
+                                                  child: Text(tool.name),
+                                                );
+                                              }).toList()
                                                   : [
-                                                      DropdownMenuItem<String>(
-                                                        value: null,
-                                                        child: Text(
-                                                          'No tools available',
-                                                          style: TextStyle(color: Colors.grey), // Optional styling for "No tools" message
-                                                        ),
-                                                      ),
-                                                    ],
+                                                DropdownMenuItem<String>(
+                                                  value: null,
+                                                  child: Text(
+                                                    'No tools available',
+                                                    style: TextStyle(color: Colors.grey), // Optional styling for "No tools" message
+                                                  ),
+                                                ),
+                                              ],
                                               onChanged: personalToolsList.isNotEmpty
                                                   ? (value) {
-                                                      setState(() {
-                                                        // Select existing tool and update weight
-                                                        selectedTool = value;
-                                                        final selectedGear = personalToolsList.firstWhere((tool) => tool.name == value);
-                                                        toolWeightController.text = selectedGear.weight.toString();
-                                                        toolNameController.text = selectedGear.name;
-                                                        isHazmatTool = selectedGear.isHazmat; // Correctly update isHazmatTool
-                                                      });
-                                                    }
-                                                  : null,
-                                              // Disable dropdown if no tools are available
+                                                setState(() {
+                                                  // Select existing tool and update weight
+                                                  selectedTool = value;
+                                                  final selectedGear = personalToolsList.firstWhere((tool) => tool.name == value);
+                                                  newToolWeightController.text = selectedGear.weight.toString();
+                                                  newToolNameController.text = selectedGear.name;
+                                                  isHazmatTool = selectedGear.isHazmat; // Correctly update isHazmatTool
+                                                });
+                                              }
+                                                  : null, // Disable dropdown if no tools are available
                                               style: TextStyle(
                                                 color: AppColors.textColorPrimary,
                                                 fontSize: 16,
@@ -506,7 +684,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                             SizedBox(height: AppData.spacingStandard),
                                             if (selectedTool != null)
                                               TextField(
-                                                controller: toolWeightController,
+                                                controller: newToolWeightController,
                                                 enabled: false, // Non-editable field
                                                 decoration: InputDecoration(
                                                   labelText: 'Tool Weight (lbs)',
@@ -518,7 +696,10 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                                     borderSide: BorderSide(color: AppColors.textColorPrimary, width: 2), // Border for disabled state
                                                   ),
                                                 ),
-                                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: 16),
+                                                style:  TextStyle(
+                                                    color: AppColors.textColorPrimary,
+                                                    fontSize: 16
+                                                ),
                                               ),
                                           ],
                                         ),
@@ -527,7 +708,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                             onPressed: () {
                                               Navigator.of(context).pop(); // Close the dialog
                                             },
-                                            child: Text(
+                                            child:  Text(
                                               'Cancel',
                                               style: TextStyle(color: AppColors.cancelButton),
                                             ),
@@ -538,10 +719,9 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                                 addTool(); // Save tool logic
                                                 Navigator.of(context).pop(); // Close current dialog
                                               },
-                                              child: Text(
+                                              child:  Text(
                                                 'Add',
-                                                style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold),
-                                              ),
+                                                style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold),                                              ),
                                             ),
                                         ],
                                       );
@@ -562,7 +742,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                 ),
                               ),
                               alignment: Alignment.center,
-                              child: const Text(
+                              child:  Text(
                                 '+ Add Tools',
                                 style: TextStyle(
                                   fontSize: 22,
@@ -578,7 +758,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                         // Display added tools
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                             child: ListView.builder(
                               itemCount: addedTools?.length,
                               itemBuilder: (context, index) {
@@ -588,18 +768,20 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                   color: AppColors.textFieldColor,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: AppColors.borderPrimary, // Border color
-                                        width: 2.0, // Border thickness
-                                      ),
-                                      borderRadius: BorderRadius.circular(12), // Rounded corners (optional)
+                                    color: AppColors.textFieldColor, // Background color (optional)
+                                    border: Border.all(
+                                      color: AppColors.borderPrimary, // Border color
+                                      width: 2.0,          // Border thickness
                                     ),
+                                    borderRadius: BorderRadius.circular(12), // Rounded corners (optional)
+                                  ),
+
                                     child: ListTile(
                                       title: Row(
                                         children: [
                                           Text(
                                             tool!.name,
-                                            style: TextStyle(color: AppColors.textColorPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                                            style:  TextStyle(color: AppColors.textColorPrimary, fontSize: 20, fontWeight: FontWeight.bold),
                                           ),
                                           if (tool.isHazmat)
                                             Padding(
@@ -618,11 +800,14 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                       ),
                                       subtitle: Text(
                                         '${tool.weight} lbs',
-                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: 20),
+                                        style:  TextStyle(color: AppColors.textColorPrimary, fontSize: 20),
                                       ),
                                       trailing: IconButton(
                                         icon: const Icon(Icons.delete, color: Colors.red, size: 28),
-                                        onPressed: () => removeTool(index),
+                                        onPressed: () {
+                                          removeTool(index);
+                                          _checkInput();
+                                        },
                                       ),
                                     ),
                                   ),
@@ -633,14 +818,18 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                         ),
 
                         // Save Button
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: ElevatedButton(
-                                onPressed: isSaveButtonEnabled ? () => saveCrewMemberData() : null, // Button is only enabled if there is input
-                                style: style, // Main button theme
-                                child: const Text('Save')),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Spacer(),
+                              ElevatedButton(
+                                  onPressed: isSaveButtonEnabled ? () => saveData() : null, // Button is only enabled if there is input
+                                  style: style, // Main button theme
+                                  child: const Text('Save')),
+                              const Spacer(),
+                            ],
                           ),
                         ),
                       ],
@@ -655,3 +844,4 @@ class _AddCrewmemberState extends State<AddCrewmember> {
     );
   }
 }
+

@@ -1,19 +1,19 @@
 import 'dart:ui';
-import 'package:fire_app/06_single_load_view.dart';
+import 'package:fire_app/UI/06_single_load_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
-import '../Data/trip.dart';
+import '../../Data/trip.dart';
 
 // For exporting to pdf
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import '06_edit_trip.dart';
-import 'CodeShare/colors.dart';
-import 'Data/gear.dart';
-import 'Data/load.dart';
+import '../UI/06_edit_trip.dart';
+import '../CodeShare/colors.dart';
+import '../Data/gear.dart';
+import '../Data/load.dart';
 
 // Generates PDF
 Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {

@@ -1,11 +1,11 @@
 import 'dart:ui';
-import 'package:fire_app/04_add_trip_preference.dart';
+import 'package:fire_app/UI/04_add_trip_preference.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '04_edit_trip_preference.dart';
-import 'CodeShare/colors.dart';
-import 'Data/trip_preferences.dart';
+import '../CodeShare/colors.dart';
+import '../Data/trip_preferences.dart';
 import 'package:hive/hive.dart';
 
 class TripPreferences extends StatefulWidget {

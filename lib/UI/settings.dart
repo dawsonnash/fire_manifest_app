@@ -1,25 +1,25 @@
 import 'dart:ui';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/Data/trip_preferences.dart';
-import 'package:fire_app/quick_guide.dart';
+import 'package:fire_app/UI/quick_guide.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'CodeShare/colors.dart';
+import '../CodeShare/colors.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
-import 'Data/crew.dart';
+import '../Data/crew.dart';
 import 'package:file_picker/file_picker.dart';
 
-import 'Data/crew_loadout.dart';
-import 'Data/crewmember.dart';
-import 'Data/gear.dart';
+import '../Data/crew_loadout.dart';
+import '../Data/crewmember.dart';
+import '../Data/gear.dart';
 
 class SettingsView extends StatefulWidget {
   final bool isDarkMode;
@@ -652,7 +652,7 @@ class _SettingsState extends State<SettingsView> {
             return AlertDialog(
               backgroundColor: AppColors.textFieldColor2,
               title: Text(
-                isEdit ? 'Edit Loadout Name' : (isEmptyCrew ? 'Save New Loadout' : 'Save New Loadout from $previousLoadout'),
+                isEdit ? 'Edit Loadout Name' : 'Save New Loadout',
                 style: TextStyle(color: AppColors.textColorPrimary),
               ),
               content: Column(
@@ -686,9 +686,16 @@ class _SettingsState extends State<SettingsView> {
                       );
 
                       if (nameExists) {
-                        setDialogState(() {
-                          errorMessage = "Loadout name already exists";
-                        });
+                        if (loadoutName == previousLoadout){
+                          setDialogState(() {
+                            errorMessage = "Loadout name is unchanged";
+                          });
+                        }
+                        else {
+                          setDialogState(() {
+                            errorMessage = "Loadout name already exists";
+                          });
+                        }
 
                         Future.delayed(Duration(seconds: 2), () {
                           setDialogState(() {
@@ -739,7 +746,7 @@ class _SettingsState extends State<SettingsView> {
 
   Future<void> _saveNewLoadout(String loadoutName, bool isEmptyCrew) async {
 
-    String timestamp = DateFormat('dd MMM yy, h:mm a').format(DateTime.now());
+    String timestamp = DateFormat('EEE, dd MMM yy, h:mm a').format(DateTime.now());
 
     Map<String, dynamic> loadoutData = isEmptyCrew
         ? {
@@ -802,7 +809,7 @@ class _SettingsState extends State<SettingsView> {
   }
 
   Future<void> _updateCurrentLoadout(String loadoutName) async {
-    String timestamp = DateFormat('dd MMM yy, h:mm a').format(DateTime.now());
+    String timestamp = DateFormat('EEE, dd MMM yy, h:mm a').format(DateTime.now());
 
     Map<String, dynamic> loadoutData = {
       "crew": crew.toJson(),
@@ -1569,7 +1576,7 @@ class _SettingsState extends State<SettingsView> {
                                             }
 
                                           }
-                                          _promptNewLoadoutName(previousLoadout!, false, false);
+                                          _promptNewLoadoutName(previousLoadout ?? "New Loadout", false, false);
                                           return;
                                         }
                                         if (newValue == 'Start Empty'){
@@ -1623,7 +1630,7 @@ class _SettingsState extends State<SettingsView> {
 
                                           }
                                           // Pass true for isEmptyCrew -> Creates empty crew loadout
-                                          _promptNewLoadoutName(previousLoadout!, true, false);
+                                          _promptNewLoadoutName(previousLoadout ?? "New Loadout", true, false);
                                           return;
                                         }
                                         if (newValue == null || (newValue == previousLoadout)) {

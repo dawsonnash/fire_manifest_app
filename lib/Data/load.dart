@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 
-import '../05_build_your_own_manifest.dart';
+import '../UI/05_build_your_own_manifest.dart';
 import 'crewmember.dart';
 import 'customItem.dart';
 import 'gear.dart';

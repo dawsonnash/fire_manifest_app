@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-import 'Data/load_calculator.dart';
-import 'Data/trip.dart';
-import 'Data/trip_preferences.dart';
+import '../Algorithms/load_calculator.dart';
+import '../Data/trip.dart';
+import '../Data/trip_preferences.dart';
 import 'main.dart';
 
 class CalculatingScreen extends StatefulWidget {

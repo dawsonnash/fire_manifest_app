@@ -1,19 +1,20 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:fire_app/02_add_crewmember.dart';
-import 'package:fire_app/02_crewmembers_view.dart';
-import 'package:fire_app/03_gear_view.dart';
-import 'package:fire_app/04_trip_preferences_view.dart';
+import 'package:fire_app/UI/02_add_crewmember.dart';
+import 'package:fire_app/UI/02_crewmembers_view.dart';
+import 'package:fire_app/UI/03_gear_view.dart';
+import 'package:fire_app/UI/04_trip_preferences_view.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '03_add_gear.dart';
-import 'CodeShare/colors.dart';
+import '../CodeShare/colors.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import 'Data/crew.dart';
-import 'Data/crewmember.dart';
-import 'Data/gear.dart';
-import 'Data/trip_preferences.dart';
+import '../Data/crew.dart';
+import '../Data/crewmember.dart';
+import '../Data/gear.dart';
+import '../Data/trip_preferences.dart';
 
 class EditCrew extends StatefulWidget {
   const EditCrew({super.key});
@@ -31,13 +32,23 @@ class _EditCrewState extends State<EditCrew> {
   bool isHazmat = false;
   String? toolNameErrorMessage;
   String? toolWeightErrorMessage;
+  String? lastUsedLoadout;
+
 
   @override
   void initState() {
     super.initState();
+    _loadLastUsedLoadout();
+
     // Open the Hive box and load the list of tool items
     personalToolsBox = Hive.box<Gear>('personalToolsBox');
     loadPersonalToolsList();
+  }
+  Future<void> _loadLastUsedLoadout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      lastUsedLoadout = prefs.getString('last_selected_loadout');
+    });
   }
 
   // Function to load the list of tool items from the Hive box
@@ -179,53 +190,7 @@ class _EditCrewState extends State<EditCrew> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            // children: [
-                            //   GestureDetector(
-                            //     onTap: () {
-                            //       setState(() {
-                            //         isEditing = true; // Enter editing mode on tap
-                            //       });
-                            //     },
-                            //     onDoubleTap: () {
-                            //       setState(() {
-                            //         isEditing = true; // Enter editing mode on double-tap
-                            //       });
-                            //     },
-                            //     onLongPress: () {
-                            //       setState(() {
-                            //         isEditing = true; // Enter editing mode on long press
-                            //       });
-                            //     },
-                            //     child: isEditing
-                            //         ? TextField(
-                            //       autofocus: true,
-                            //       controller: TextEditingController(text: crewName),
-                            //       style: headerTextStyle,
-                            //       textAlign: TextAlign.center,
-                            //       onSubmitted: (value) {
-                            //         if (value.trim().isNotEmpty) {
-                            //           setState(() {
-                            //             crewName = value.trim(); // Update the crew name
-                            //             isEditing = false; // Exit editing mode
-                            //           });
-                            //           widget.onCrewNameChanged(crewName); // Notify parent of the change
-                            //         } else {
-                            //           setState(() {
-                            //             isEditing = false; // Exit editing mode without saving
-                            //           });
-                            //         }
-                            //       },
-                            //       onEditingComplete: () {
-                            //         setState(() {
-                            //           isEditing = false; // Exit editing mode
-                            //         });
-                            //       },
-                            //       decoration: InputDecoration(
-                            //         border: InputBorder.none, // No borders for a seamless look
-                            //         hintText: 'Enter crew name',
-                            //       ),
-                            //     )
-                            //         :
+
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end, // Aligns the text and underline to the right
                               children: [
@@ -266,18 +231,52 @@ class _EditCrewState extends State<EditCrew> {
                               ],
                             ),
 
-                            Padding(
-                              padding: EdgeInsets.only(top: 4.0),
-                              child: Text(
-                                '${crew.crewMembers.length} persons',
-                                style: subHeaderTextStyle,
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Text(
-                              '${crew.totalCrewWeight.toInt()} lbs',
-                              style: subHeaderTextStyle,
-                              textAlign: TextAlign.center,
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start, // Ensures both elements align from the top
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween, // Spread elements apart
+                              children: [
+                                if (lastUsedLoadout != null)
+                                  Expanded(
+                                    flex: 2, // Allocate space for loadout text
+                                    child: Align(
+                                      alignment: Alignment.topLeft, // Ensures Loadout aligns with the top
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          maxWidth: screenWidth * 0.5, // Ensures it doesn’t take too much space
+                                        ),
+                                        child: Text(
+                                          '$lastUsedLoadout',
+                                          style: subHeaderTextStyle,
+                                          textAlign: TextAlign.left,
+                                          maxLines: 2, // Allows wrapping up to two lines
+                                          overflow: TextOverflow.ellipsis, // Use ellipsis if text is too long
+                                          softWrap: true,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                // Crew Info Column
+                                Align(
+                                  alignment: Alignment.topRight, // Aligns the column with Loadout text
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end, // Aligns text to the right
+                                    mainAxisSize: MainAxisSize.min, // Prevents unnecessary stretching
+                                    children: [
+                                      Text(
+                                        '${crew.crewMembers.length} persons',
+                                        style: subHeaderTextStyle,
+                                        textAlign: TextAlign.right,
+                                      ),
+                                      Text(
+                                        '${crew.totalCrewWeight.toInt()} lbs',
+                                        style: subHeaderTextStyle,
+                                        textAlign: TextAlign.right,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

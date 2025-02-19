@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'CodeShare/colors.dart';
+import '../CodeShare/colors.dart';
 
 class QuickGuide extends StatefulWidget {
   const QuickGuide({super.key});

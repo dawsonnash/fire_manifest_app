@@ -1,25 +1,25 @@
 import 'dart:ui';
 
-import 'package:fire_app/05_create_new_manifest.dart';
-import 'package:fire_app/06_saved_trips.dart';
-import 'package:fire_app/settings.dart';
+import 'package:fire_app/UI/05_create_new_manifest.dart';
+import 'package:fire_app/UI/06_saved_trips.dart';
+import 'package:fire_app/UI/settings.dart';
 import 'package:flutter/material.dart';
-import '../01_edit_crew.dart';
+import '01_edit_crew.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import '../Data/gear.dart';
-import '../Data/crewmember.dart';
-import 'Data/crew.dart';
-import 'Data/customItem.dart';
-import 'Data/load.dart';
-import 'Data/trip.dart';
-import 'Data/trip_preferences.dart';
-import 'Data/positional_preferences.dart';
-import 'Data/gear_preferences.dart';
-import 'Data/saved_preferences.dart';
-import 'Data/crewMemberList.dart';
+import '../../Data/gear.dart';
+import '../../Data/crewmember.dart';
+import '../Data/crew.dart';
+import '../Data/customItem.dart';
+import '../Data/load.dart';
+import '../Data/trip.dart';
+import '../Data/trip_preferences.dart';
+import '../Data/positional_preferences.dart';
+import '../Data/gear_preferences.dart';
+import '../Data/saved_preferences.dart';
+import '../Data/crewMemberList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'CodeShare/colors.dart'; // Your colors.dart.dart file
+import '../CodeShare/colors.dart'; // Your colors.dart.dart file
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 void main() async {

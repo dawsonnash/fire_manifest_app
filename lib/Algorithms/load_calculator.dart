@@ -2,15 +2,15 @@ import 'package:fire_app/Data/positional_preferences.dart';
 import 'package:flutter/material.dart';
 
 import '../CodeShare/colors.dart';
-import '../main.dart';
-import 'crew.dart';
-import 'gear_preferences.dart';
-import 'trip.dart';
+import '../UI/main.dart';
+import '../Data/crew.dart';
+import '../Data/gear_preferences.dart';
+import '../Data/trip.dart';
 import 'dart:math';
-import 'load.dart';
-import 'crewmember.dart';
-import 'gear.dart';
-import 'trip_preferences.dart';
+import '../Data/load.dart';
+import '../Data/crewmember.dart';
+import '../Data/gear.dart';
+import '../Data/trip_preferences.dart';
 
 // TripPreference based sorting algorithm
 Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference) async {

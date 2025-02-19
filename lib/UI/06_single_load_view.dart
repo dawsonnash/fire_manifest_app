@@ -12,10 +12,10 @@ import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 
-import 'CodeShare/colors.dart';
-import 'Data/crewmember.dart';
-import 'Data/customItem.dart';
-import 'Data/gear.dart';
+import '../CodeShare/colors.dart';
+import '../Data/crewmember.dart';
+import '../Data/customItem.dart';
+import '../Data/gear.dart';
 
 const int maxItemsPerPage = 14; // Maximum items (crew + gear + custom) per page
 

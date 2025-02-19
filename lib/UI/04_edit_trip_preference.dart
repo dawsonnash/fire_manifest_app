@@ -1,15 +1,15 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
-import 'package:fire_app/04_add_load_preference.dart';
+import 'package:fire_app/UI/04_add_load_preference.dart';
 import 'package:flutter/services.dart';
-import 'Data/gear_preferences.dart';
-import 'Data/positional_preferences.dart';
-import 'Data/trip_preferences.dart';
-import 'Data/crew.dart';
-import 'Data/crewmember.dart';
+import '../Data/gear_preferences.dart';
+import '../Data/positional_preferences.dart';
+import '../Data/trip_preferences.dart';
+import '../Data/crew.dart';
+import '../Data/crewmember.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'CodeShare/colors.dart';
+import '../CodeShare/colors.dart';
 
 class EditTripPreference extends StatefulWidget {
   final TripPreference tripPreference;
