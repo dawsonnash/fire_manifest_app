@@ -57,36 +57,35 @@ class CreateNewManifest extends StatelessWidget {
                   color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
                   child: AppColors.isDarkMode
                       ? (AppColors.enableBackgroundImage
-                      ? Stack(
-                    children: [
-                      ImageFiltered(
-                        imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                        child: Image.asset(
-                          'assets/images/logo1.png',
-                          fit: BoxFit.cover, // Cover the entire background
-                          width: double.infinity,
-                          height: double.infinity,
-                        ),
-                      ),
-                      Container(
-                        color: AppColors.logoImageOverlay, // Semi-transparent overlay
-                        width: double.infinity,
-                        height: double.infinity,
-                      ),
-                    ],
-                  )
-                      : null) // No image if background is disabled
+                          ? Stack(
+                              children: [
+                                ImageFiltered(
+                                  imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                                  child: Image.asset(
+                                    'assets/images/logo1.png',
+                                    fit: BoxFit.cover, // Cover the entire background
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  ),
+                                ),
+                                Container(
+                                  color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
+                              ],
+                            )
+                          : null) // No image if background is disabled
                       : ImageFiltered(
-                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
-                    child: Image.asset(
-                      'assets/images/logo1.png',
-                      fit: BoxFit.cover, // Cover the entire background
-                      width: double.infinity,
-                      height: double.infinity,
-                    ),
-                  ),
+                          imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+                          child: Image.asset(
+                            'assets/images/logo1.png',
+                            fit: BoxFit.cover, // Cover the entire background
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ),
                 ),
-
                 GestureDetector(
                   onTap: () {
                     FocusScope.of(context).unfocus(); // Dismiss the keyboard
@@ -129,6 +128,7 @@ class _QuickManifestState extends State<QuickManifest> {
 
   String? tripNameErrorMessage;
   String? availableSeatsErrorMessage;
+  String? safetyBufferErrorMessage;
 
   // Lists for actual crew going into trip object
   List<CrewMember> thisTripCrewMemberList = [];
@@ -141,6 +141,8 @@ class _QuickManifestState extends State<QuickManifest> {
   final TextEditingController tripNameController = TextEditingController();
   final TextEditingController allowableController = TextEditingController();
   final TextEditingController availableSeatsController = TextEditingController();
+  final TextEditingController safetyBufferController = TextEditingController(text: '0');
+
   final TextEditingController keyboardController = TextEditingController();
   double _sliderValue = 1000;
 
@@ -148,6 +150,7 @@ class _QuickManifestState extends State<QuickManifest> {
   TripPreference? selectedTripPreference;
 
   bool isCalculateButtonEnabled = false; // Controls whether saving button is showing
+  bool isExternalManifest = false; // Default to internal manifest (personnel + cargo)
 
   @override
   void initState() {
@@ -160,6 +163,7 @@ class _QuickManifestState extends State<QuickManifest> {
     tripNameController.addListener(_checkInput);
     allowableController.addListener(_checkInput);
     availableSeatsController.addListener(_checkInput);
+    safetyBufferController.addListener(_checkInput);
 
     // Initialize allowableController with the default slider value
     allowableController.text = _sliderValue.toStringAsFixed(0);
@@ -185,7 +189,7 @@ class _QuickManifestState extends State<QuickManifest> {
     bool isGearExpanded = false;
 
     // "Select All" starts as true because everything is selected by default
-    bool isSelectAllChecked = selectedItems.length == (crewList.length + gearList.length);
+    bool isSelectAllChecked = isExternalManifest ? selectedItems.length == (gearList.length) : selectedItems.length == (crewList.length + gearList.length);
 
     await showDialog(
       context: context,
@@ -195,17 +199,17 @@ class _QuickManifestState extends State<QuickManifest> {
             // Function to update "Select All" checkbox dynamically
             void updateSelectAllState() {
               dialogSetState(() {
-                isSelectAllChecked = selectedItems.length == (crewList.length + gearList.length);
+                 isSelectAllChecked = isExternalManifest ? selectedItems.length == (gearList.length) : selectedItems.length == (crewList.length + gearList.length);
               });
             }
 
             return AlertDialog(
               backgroundColor: AppColors.textFieldColor2,
               title: Text(
-                'Select Crew Members and Gear',
+                isExternalManifest ? 'Select Gear' : 'Select Crew Members and Gear', // Change title dynamically
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text20, color: AppColors.textColorPrimary),
               ),
-              contentPadding:  EdgeInsets.all(AppData.padding16),
+              contentPadding: EdgeInsets.all(AppData.padding16),
               content: ConstrainedBox(
                 constraints: BoxConstraints(
                   maxHeight: MediaQuery.of(context).size.height * 0.7,
@@ -243,10 +247,10 @@ class _QuickManifestState extends State<QuickManifest> {
                                 isSelectAllChecked = isChecked ?? false;
 
                                 if (isSelectAllChecked) {
-                                  selectedItems = [
-                                    ...crewList,
-                                    ...gearList,
-                                  ];
+                                  selectedItems = isExternalManifest
+                                      ? [...gearList] // Only gear if external manifest
+                                      : [...crewList, ...gearList]; // Both crew and gear if internal manifest
+
                                   selectedGearQuantities = {
                                     for (var gear in gearList) gear: gear.quantity,
                                   };
@@ -256,90 +260,89 @@ class _QuickManifestState extends State<QuickManifest> {
                                 }
                               });
                             },
-
-
                           ),
                         ),
-                         SizedBox(height: AppData.sizedBox16),
+                        SizedBox(height: AppData.sizedBox16),
 
                         // Crew Member Dropdown
-                        ExpansionPanelList(
-                          elevation: 8,
-                          expandedHeaderPadding: const EdgeInsets.all(0),
-                          expansionCallback: (int index, bool isExpanded) {
-                            dialogSetState(() {
-                              isCrewExpanded = !isCrewExpanded;
-                            });
-                          },
-                          children: [
-                            ExpansionPanel(
-                              isExpanded: isCrewExpanded,
-                              backgroundColor: AppColors.fireColor,
-                              // Set background color
-                              headerBuilder: (context, isExpanded) {
-                                return Container(
-                                  child: ListTile(
-                                    title: Text(
-                                      'Crew Members',
-                                      style: TextStyle(fontWeight: FontWeight.bold,fontSize: AppData.text18, color: Colors.black),
-                                    ),
-                                  ),
-                                );
-                              },
-                              body: Column(
-                                children: sortedCrewList.map((crew) {
+                        if (!isExternalManifest)
+                          ExpansionPanelList(
+                            elevation: 8,
+                            expandedHeaderPadding: const EdgeInsets.all(0),
+                            expansionCallback: (int index, bool isExpanded) {
+                              dialogSetState(() {
+                                isCrewExpanded = !isCrewExpanded;
+                              });
+                            },
+                            children: [
+                              ExpansionPanel(
+                                isExpanded: isCrewExpanded,
+                                backgroundColor: AppColors.fireColor,
+                                // Set background color
+                                headerBuilder: (context, isExpanded) {
                                   return Container(
-                                    //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
-                                    decoration: BoxDecoration(
-                                      color: AppColors.textFieldColor,
-                                      borderRadius: BorderRadius.circular(0.0),
-                                      // Rounded corners
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.8),
-                                          spreadRadius: 1,
-                                          blurRadius: 5,
-                                          offset: Offset(0, 3), // Shadow position
-                                        ),
-                                      ],
-                                    ),
-                                    child: CheckboxListTile(
-                                      activeColor: AppColors.textColorPrimary,
-                                      // Checkbox outline color when active
-                                      checkColor: AppColors.textColorSecondary,
-                                      // Checkmark color
-                                      side: BorderSide(
-                                        color: AppColors.textColorPrimary, // Outline color
-                                        width: 2.0, // Outline width
-                                      ),
+                                    child: ListTile(
                                       title: Text(
-                                        '${crew.name}, ${crew.flightWeight} lbs',
-                                        style: TextStyle(fontWeight: FontWeight.bold,fontSize:  AppData.text16, color: AppColors.textColorPrimary),
-                                        textAlign: TextAlign.start,
+                                        'Crew Members',
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text18, color: Colors.black),
                                       ),
-                                      subtitle: Text(
-                                        crew.getPositionTitle(crew.position),
-                                        style: TextStyle(fontStyle: FontStyle.italic, fontSize: AppData.text14, color: AppColors.textColorPrimary),
-                                      ),
-                                      value: selectedItems.contains(crew),
-                                      onChanged: (bool? isChecked) {
-                                        dialogSetState(() {
-                                          if (isChecked == true) {
-                                            selectedItems.add(crew);
-                                          } else {
-                                            selectedItems.remove(crew);
-                                          }
-                                          updateSelectAllState(); // Dynamically update "Select All" state
-                                        });
-                                      },
                                     ),
                                   );
-                                }).toList(),
+                                },
+                                body: Column(
+                                  children: sortedCrewList.map((crew) {
+                                    return Container(
+                                      //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
+                                      decoration: BoxDecoration(
+                                        color: AppColors.textFieldColor,
+                                        borderRadius: BorderRadius.circular(0.0),
+                                        // Rounded corners
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.8),
+                                            spreadRadius: 1,
+                                            blurRadius: 5,
+                                            offset: Offset(0, 3), // Shadow position
+                                          ),
+                                        ],
+                                      ),
+                                      child: CheckboxListTile(
+                                        activeColor: AppColors.textColorPrimary,
+                                        // Checkbox outline color when active
+                                        checkColor: AppColors.textColorSecondary,
+                                        // Checkmark color
+                                        side: BorderSide(
+                                          color: AppColors.textColorPrimary, // Outline color
+                                          width: 2.0, // Outline width
+                                        ),
+                                        title: Text(
+                                          '${crew.name}, ${crew.flightWeight} lbs',
+                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                          textAlign: TextAlign.start,
+                                        ),
+                                        subtitle: Text(
+                                          crew.getPositionTitle(crew.position),
+                                          style: TextStyle(fontStyle: FontStyle.italic, fontSize: AppData.text14, color: AppColors.textColorPrimary),
+                                        ),
+                                        value: selectedItems.contains(crew),
+                                        onChanged: (bool? isChecked) {
+                                          dialogSetState(() {
+                                            if (isChecked == true) {
+                                              selectedItems.add(crew);
+                                            } else {
+                                              selectedItems.remove(crew);
+                                            }
+                                            updateSelectAllState(); // Dynamically update "Select All" state
+                                          });
+                                        },
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                         SizedBox(height: AppData.sizedBox16),
+                            ],
+                          ),
+                        if (!isExternalManifest) SizedBox(height: AppData.sizedBox16),
 
                         // Gear Dropdown
                         ExpansionPanelList(
@@ -359,7 +362,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                 return Container(
                                   //color: Colors.deepOrangeAccent, // Set the background color for the header
                                   child: ListTile(
-                                    title:  Text(
+                                    title: Text(
                                       'Gear',
                                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text18),
                                     ),
@@ -460,14 +463,12 @@ class _QuickManifestState extends State<QuickManifest> {
                                                             ),
                                                           ),
                                                           actions: [
-
                                                             TextButton(
                                                               onPressed: () {
                                                                 Navigator.of(context).pop();
                                                               },
-                                                              child:  Text('Cancel',style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize) ),
+                                                              child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                                                             ),
-
                                                             TextButton(
                                                               onPressed: () {
                                                                 // Finalize the selection
@@ -477,7 +478,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                                 });
                                                                 Navigator.of(context).pop();
                                                               },
-                                                              child:  Text('Confirm', style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize)),
+                                                              child: Text('Confirm', style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize)),
                                                             ),
                                                           ],
                                                         );
@@ -496,7 +497,12 @@ class _QuickManifestState extends State<QuickManifest> {
                                                           color: AppColors.textColorPrimary,
                                                         ),
                                                       ),
-                                                    if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorPrimary, size: AppData.dropDownArrowSize,),
+                                                    if (gear.quantity > 1)
+                                                      Icon(
+                                                        Icons.arrow_drop_down,
+                                                        color: AppColors.textColorPrimary,
+                                                        size: AppData.dropDownArrowSize,
+                                                      ),
                                                   ],
                                                 ),
                                               ),
@@ -618,6 +624,7 @@ class _QuickManifestState extends State<QuickManifest> {
     tripNameController.dispose();
     allowableController.dispose();
     availableSeatsController.dispose();
+    safetyBufferController.dispose();
     keyboardController.dispose();
     super.dispose();
   }
@@ -627,13 +634,15 @@ class _QuickManifestState extends State<QuickManifest> {
     final String tripName = tripNameController.text;
 // Validate trip name existence (case-insensitive)
     final bool isTripNameUnique = !savedTrips.savedTrips.any(
-          (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
+      (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
     );
 
-
     final bool isTripNameValid = tripName.isNotEmpty && isTripNameUnique;
-    final isAvailableSeatsValid = availableSeatsController.text.isNotEmpty && int.tryParse(availableSeatsController.text) != null && int.parse(availableSeatsController.text) > 0;
+    var isAvailableSeatsValid = availableSeatsController.text.isNotEmpty && int.tryParse(availableSeatsController.text) != null && int.parse(availableSeatsController.text) > 0;
 
+    if (isExternalManifest) {
+      isAvailableSeatsValid = true;
+    }
     setState(() {
       // Need to adjust for position as well
       isCalculateButtonEnabled = isTripNameValid && isAvailableSeatsValid;
@@ -647,7 +656,7 @@ class _QuickManifestState extends State<QuickManifest> {
 
     // Check if crew member name already exists
     bool tripNameExists = savedTrips.savedTrips.any(
-          (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
+      (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
     );
 
     final String tripNameCapitalized = tripNameController.text
@@ -656,10 +665,9 @@ class _QuickManifestState extends State<QuickManifest> {
         .map((word) => word.isNotEmpty ? '${word[0].toUpperCase()}${word.substring(1)}' : '')
         .join(' '); // Join the words back with a space
 
-
     if (tripNameExists) {
       ScaffoldMessenger.of(context).showSnackBar(
-         SnackBar(
+        SnackBar(
           content: Center(
             child: Text(
               'Trip name already used!',
@@ -748,13 +756,11 @@ class _QuickManifestState extends State<QuickManifest> {
     // Add the new trip to the global crew object
     savedTrips.addTrip(newTrip);
 
-
     // Load Calculation with animation
     startCalculation(context, newTrip, selectedTripPreference);
 
     // Load Calculation without animation
-   // loadCalculator(context, newTrip, selectedTripPreference);
-
+    // loadCalculator(context, newTrip, selectedTripPreference);
 
     // Clear the text fields (reset them to empty), so we can add more trips
     tripNameController.text = '';
@@ -811,9 +817,74 @@ class _QuickManifestState extends State<QuickManifest> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       SizedBox(height: 16),
+
+                      // Internal/External Manifest toggle
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: AppData.padding16),
+                        child: Container(
+                          width: AppData.inputFieldWidth,
+                          decoration: BoxDecoration(
+                            color: AppColors.textFieldColor,
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: ListTile(
+                            title: Text(
+                              isExternalManifest ? "External" : "Internal",
+                              style: TextStyle(
+                                fontSize: AppData.text18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textColorPrimary,
+                              ),
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min, // Keeps row from expanding
+                              children: [
+                                Icon(
+                                  isExternalManifest ? FontAwesomeIcons.battleNet : FontAwesomeIcons.helicopter,
+                                  color: AppColors.primaryColor,
+                                  size: AppData.text24,
+                                ),
+                                SizedBox(width: 8), // Add spacing between icon and switch
+                                Switch(
+                                  value: isExternalManifest,
+                                  activeColor: AppColors.primaryColor,
+                                  inactiveThumbColor: AppColors.primaryColor,
+                                  inactiveTrackColor: AppColors.textFieldColor,
+                                  onChanged: (bool value) {
+                                    setState(() {
+                                      isExternalManifest = value;
+                                      // Reset selected items and gear quantities
+                                      selectedItems.clear();
+                                      selectedGearQuantities.clear();
+
+                                      thisTripCrewMemberList.clear();
+                                      thisTripGearList.clear();
+
+                                      // Re-populate selection based on the mode
+                                      if (isExternalManifest) {
+                                        // External: Only gear is selectable
+                                        selectedItems = [...gearList];
+                                        selectedGearQuantities = {for (var gear in gearList) gear: gear.quantity};
+                                      } else {
+                                        // Internal: Both crew and gear are selectable
+                                        selectedItems = [...crewList, ...gearList];
+                                        selectedGearQuantities = {for (var gear in gearList) gear: gear.quantity};
+                                      }
+                                    });
+                                    _checkInput();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: AppData.spacingStandard),
+
                       // Trip Name input field
                       Padding(
-                          padding:  EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
+                          padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
                           child: Container(
                             width: AppData.inputFieldWidth,
                             child: TextField(
@@ -826,12 +897,12 @@ class _QuickManifestState extends State<QuickManifest> {
                                 setState(() {
                                   // Check if the trip name exists in the savedTrips list (case-insensitive)
                                   final String tripName = tripNameController.text;
-                            
+
                                   // Check if crew member name already exists
                                   bool tripNameExists = savedTrips.savedTrips.any(
-                                        (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
+                                    (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
                                   );
-                            
+
                                   // Validate the input and set error message
                                   if (tripNameExists) {
                                     tripNameErrorMessage = 'Trip name already used';
@@ -877,69 +948,119 @@ class _QuickManifestState extends State<QuickManifest> {
                       SizedBox(height: AppData.spacingStandard),
 
                       // Available Seats input field
-                      Padding(
-                        padding:  EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
-                          child: Container(
-                            width: AppData.inputFieldWidth,
-                            child: TextField(
-                              controller: availableSeatsController,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(1),
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              onChanged: (value) {
-                                setState(() {
-                                  // Validate the input and set error message
-                                  if (value == '0') {
-                                    availableSeatsErrorMessage = 'Available seats cannot be 0.';
-                                  } else {
-                                    availableSeatsErrorMessage = null;
-                                  }
-                                });
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Enter # of Available Seats',
-                                labelStyle: TextStyle(
-                                  color: AppColors.textColorPrimary, // Label color when not focused
-                                  fontSize: AppData.text18, // Label font size
-                                ),
-                                errorText: availableSeatsErrorMessage,
-                                filled: true,
-                                fillColor: AppColors.textFieldColor,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppColors.borderPrimary,
-                                    // Border color when the TextField is not focused
-                                    width: 2.0, // Border width
+                      if (!isExternalManifest)
+                        Padding(
+                            padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
+                            child: Container(
+                              width: AppData.inputFieldWidth,
+                              child: TextField(
+                                controller: availableSeatsController,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(1),
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    // Validate the input and set error message
+                                    if (value == '0') {
+                                      availableSeatsErrorMessage = 'Available seats cannot be 0.';
+                                    } else {
+                                      availableSeatsErrorMessage = null;
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Enter # of Available Seats',
+                                  labelStyle: TextStyle(
+                                    color: AppColors.textColorPrimary, // Label color when not focused
+                                    fontSize: AppData.text18, // Label font size
                                   ),
-                                  borderRadius: BorderRadius.circular(4.0), // Rounded corners
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppColors.primaryColor,
-                                    // Border color when the TextField is focused
-                                    width: 2.0, // Border width
+                                  errorText: availableSeatsErrorMessage,
+                                  filled: true,
+                                  fillColor: AppColors.textFieldColor,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.borderPrimary,
+                                      // Border color when the TextField is not focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(4.0), // Rounded corners
                                   ),
-                                  borderRadius: BorderRadius.circular(4.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.primaryColor,
+                                      // Border color when the TextField is focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(4.0),
+                                  ),
+                                ),
+                                style: TextStyle(
+                                  color: AppColors.textColorPrimary,
+                                  fontSize: AppData.text24,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              style: TextStyle(
-                                color: AppColors.textColorPrimary,
-                                fontSize: AppData.text24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          )),
+                            )),
 
+                      // Safety Buffer
+                      if (isExternalManifest)
+                        Padding(
+                            padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
+                            child: Container(
+                              width: AppData.inputFieldWidth,
+                              child: TextField(
+                                controller: safetyBufferController,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(3),
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                onChanged: (value) {
+                                  setState(() {});
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Enter Safety Buffer (lbs)',
+                                  labelStyle: TextStyle(
+                                    color: AppColors.textColorPrimary, // Label color when not focused
+                                    fontSize: AppData.text18, // Label font size
+                                  ),
+                                  errorText: safetyBufferErrorMessage,
+                                  filled: true,
+                                  fillColor: AppColors.textFieldColor,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.borderPrimary,
+                                      // Border color when the TextField is not focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.primaryColor,
+                                      // Border color when the TextField is focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(4.0),
+                                  ),
+                                ),
+                                style: TextStyle(
+                                  color: AppColors.textColorPrimary,
+                                  fontSize: AppData.text24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            )),
                       SizedBox(height: AppData.spacingStandard),
 
                       // Select All/Some Crew
                       Padding(
-                        padding:  EdgeInsets.only(left: AppData.padding16, right: AppData.padding16, top: 0.0, bottom: AppData.padding5),
+                        padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16, top: 0.0, bottom: AppData.padding5),
                         child: Container(
                           width: AppData.inputFieldWidth,
-                          padding:  EdgeInsets.symmetric(vertical: AppData.padding8),
+                          padding: EdgeInsets.symmetric(vertical: AppData.padding8),
                           decoration: BoxDecoration(
                             color: AppColors.textFieldColor,
                             borderRadius: BorderRadius.circular(4.0),
@@ -950,11 +1071,11 @@ class _QuickManifestState extends State<QuickManifest> {
                             children: [
                               // Checkbox
                               Padding(
-                                padding:  EdgeInsets.only(left: AppData.padding5, right: AppData.padding5),
+                                padding: EdgeInsets.only(left: AppData.padding5, right: AppData.padding5),
                                 child: IconButton(
                                   padding: EdgeInsets.zero,
                                   icon: Icon(
-                                    selectedItems.length == (crewList.length + gearList.length)
+                                    (isExternalManifest ? selectedItems.length == (gearList.length) : selectedItems.length == (crewList.length + gearList.length))
                                         ? Icons.check_box // Fully selected
                                         : Icons.check_box_outline_blank, // Partially or none selected
                                     color: AppColors.textColorPrimary,
@@ -989,7 +1110,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               ),
 
                               Text(
-                                'Select All Crew',
+                                isExternalManifest ? 'Select All Gear' : 'Select All Crew',
                                 style: TextStyle(
                                   fontSize: AppData.text18,
                                   color: AppColors.textColorPrimary,
@@ -1035,7 +1156,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               ),
                             ],
                           ),
-                          padding:  EdgeInsets.symmetric(horizontal: AppData.padding10, vertical: AppData.padding10),
+                          padding: EdgeInsets.symmetric(horizontal: AppData.padding10, vertical: AppData.padding10),
                           //alignment: Alignment.center,
                           child: Text(
                             'Choose Trip Preference',
@@ -1048,13 +1169,12 @@ class _QuickManifestState extends State<QuickManifest> {
                         ),
                       ),
 
-
                       // Choose Trip Preference
                       Padding(
-                        padding:  EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
+                        padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
                         child: Container(
                           width: AppData.inputFieldWidth,
-                          padding:  EdgeInsets.symmetric(horizontal: AppData.padding12, vertical: AppData.padding8),
+                          padding: EdgeInsets.symmetric(horizontal: AppData.padding12, vertical: AppData.padding8),
                           decoration: BoxDecoration(
                             color: AppColors.textFieldColor,
                             borderRadius: BorderRadius.circular(4.0),
@@ -1063,7 +1183,7 @@ class _QuickManifestState extends State<QuickManifest> {
                           child: DropdownButtonHideUnderline(
                               child: DropdownButton<TripPreference?>(
                             value: selectedTripPreference,
-                            dropdownColor: AppColors.textFieldColor,
+                            dropdownColor: AppColors.textFieldColor2,
                             style: TextStyle(
                               color: AppColors.textColorPrimary,
                               fontSize: AppData.text24,
@@ -1112,12 +1232,12 @@ class _QuickManifestState extends State<QuickManifest> {
                               ),
                             ],
                           ),
-                          padding:  EdgeInsets.symmetric(horizontal: AppData.padding5, vertical: AppData.padding5), // Reduced padding
+                          padding: EdgeInsets.symmetric(horizontal: AppData.padding5, vertical: AppData.padding5), // Reduced padding
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
-                                padding:  EdgeInsets.only(left: AppData.padding8),
+                                padding: EdgeInsets.only(left: AppData.padding8),
                                 child: Text(
                                   'Choose Allowable',
                                   style: TextStyle(
@@ -1205,8 +1325,8 @@ class _QuickManifestState extends State<QuickManifest> {
                                                 child: Text(
                                                   'Save',
                                                   style: TextStyle(
-                                                    color: isSaveEnabled ? AppColors.saveButtonAllowableWeight : Colors.grey, fontSize: AppData.bottomDialogTextSize // Show enabled/disabled state
-                                                  ),
+                                                      color: isSaveEnabled ? AppColors.saveButtonAllowableWeight : Colors.grey, fontSize: AppData.bottomDialogTextSize // Show enabled/disabled state
+                                                      ),
                                                 ),
                                               ),
                                             ],
@@ -1225,7 +1345,7 @@ class _QuickManifestState extends State<QuickManifest> {
 
                       // Allowable Slider
                       Padding(
-                        padding:  EdgeInsets.only(right: AppData.padding16, left: AppData.padding16),
+                        padding: EdgeInsets.only(right: AppData.padding16, left: AppData.padding16),
                         child: Container(
                           width: AppData.inputFieldWidth,
                           child: Stack(
@@ -1244,7 +1364,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               Column(
                                 children: [
                                   Padding(
-                                    padding:  EdgeInsets.only(top: AppData.padding20),
+                                    padding: EdgeInsets.only(top: AppData.padding20),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
@@ -1253,7 +1373,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                           style: ElevatedButton.styleFrom(
                                             foregroundColor: Colors.black,
                                             backgroundColor: AppColors.fireColor,
-                                            padding:  EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
+                                            padding: EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
                                             elevation: 15,
                                             shadowColor: Colors.black,
                                             side: BorderSide(color: Colors.black, width: 2),
@@ -1289,7 +1409,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                           style: ElevatedButton.styleFrom(
                                             foregroundColor: Colors.black,
                                             backgroundColor: AppColors.fireColor,
-                                            padding:  EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
+                                            padding: EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
                                             elevation: 15,
                                             shadowColor: Colors.black,
                                             side: const BorderSide(color: Colors.black, width: 2),
@@ -1324,10 +1444,10 @@ class _QuickManifestState extends State<QuickManifest> {
                         ),
                       ),
 
-                      SizedBox(height: AppData.spacingStandard *2),
+                      SizedBox(height: AppData.spacingStandard * 2),
                       // Calculate Button
                       Padding(
-                        padding:  EdgeInsets.only(left: AppData.padding16, right: AppData.padding16, bottom: AppData.padding16),
+                        padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16, bottom: AppData.padding16),
                         child: ElevatedButton(
                           onPressed: isCalculateButtonEnabled
                               ? () {
@@ -1340,14 +1460,14 @@ class _QuickManifestState extends State<QuickManifest> {
                               : null,
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.black,
-                            textStyle:  TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold),
+                            textStyle: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold),
                             backgroundColor: Colors.green,
-                            padding:  EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
+                            padding: EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
                             elevation: 15,
                             shadowColor: Colors.black,
                             side: const BorderSide(color: Colors.black, width: 2),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            fixedSize: Size(AppData.buttonWidth,  AppData.buttonHeight),
+                            fixedSize: Size(AppData.buttonWidth, AppData.buttonHeight),
                           ),
                           child: const Text('Calculate'),
                         ),
