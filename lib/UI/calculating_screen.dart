@@ -329,8 +329,10 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
 
 Future<void> startCalculation(
     BuildContext context,
+    bool isExternalManifest,
     Trip newTrip,
     TripPreference? selectedTripPreference,
+    int safetyBuffer
     ) async {
   await showDialog(
     context: context,
@@ -339,7 +341,7 @@ Future<void> startCalculation(
   );
 
   try {
-    await loadCalculator(context, newTrip, selectedTripPreference);
+    await loadCalculator(context, newTrip, selectedTripPreference, isExternalManifest, safetyBuffer);
   } finally {
     if (context.mounted && Navigator.canPop(context)) {
       Navigator.pop(context);

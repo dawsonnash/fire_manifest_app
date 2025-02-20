@@ -13,12 +13,12 @@ import '../Data/gear.dart';
 import '../Data/trip_preferences.dart';
 
 // TripPreference based sorting algorithm
-Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference) async {
+Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference, bool isExternalManifest, int safetyBuffer) async {
   int availableSeats = trip.availableSeats;
-  int maxLoadWeight = trip.allowable;
+  int maxLoadWeight = isExternalManifest ? trip.allowable - safetyBuffer : trip.allowable; /// Crews have option to add a safety buffer to minimize error
 
   // Get  number of loads based on allowable
-  int numLoadsByAllowable = (trip.totalCrewWeight! / trip.allowable).ceil();
+  int numLoadsByAllowable = (trip.totalCrewWeight! / maxLoadWeight).ceil();
   // Get number of loads based on seats available in the helicopter
   int numLoadsBySeat = (trip.crewMembers.length / trip.availableSeats).ceil();
 
@@ -27,6 +27,9 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
       ? numLoadsByAllowable
       : numLoadsBySeat;
 
+  if (isExternalManifest){
+    numLoads = numLoadsByAllowable;
+  }
   // Create copies of crew and gear
   var crewMembersCopy = trip.crewMembers.map((member) {
     return CrewMember(

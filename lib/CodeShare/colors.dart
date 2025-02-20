@@ -128,7 +128,7 @@ class AppData {
   static double get tabBarIconSize => 24 * _textScalingFactor * _textOrientationFactor;
   static double get bottomDialogTextSize => 12 * _textScalingFactor * _textOrientationFactor;
   static double get dropDownArrowSize => 14 * _textScalingFactor * _textOrientationFactor;
-  static double get cupertinoPickerItemSize => 16 * _textScalingFactor * _textOrientationFactor;
+  static double get cupertinoPickerItemSize => 24 * _textScalingFactor * _textOrientationFactor;
   static double get miniDialogTitleTextSize => 22 * _textScalingFactor * _textOrientationFactor;
   static double get miniDialogBodyTextSize => 18 * _textScalingFactor * _textOrientationFactor;
   static double get quickGuideContentTextSize => 16 * _textScalingFactor * _textOrientationFactor;
