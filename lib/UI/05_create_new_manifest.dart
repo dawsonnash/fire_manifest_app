@@ -124,6 +124,7 @@ class _QuickManifestState extends State<QuickManifest> {
 
   // Lists for Select All/Some dialog
   List<Gear> gearList = [];
+  List<Gear> gearListExternal = [];
   List<CrewMember> crewList = [];
 
   String? tripNameErrorMessage;
@@ -133,9 +134,14 @@ class _QuickManifestState extends State<QuickManifest> {
   // Lists for actual crew going into trip object
   List<CrewMember> thisTripCrewMemberList = [];
   List<Gear> thisTripGearList = [];
+  List<Gear> thisTripGearListExternal = [];
+
 
   late Map<Gear, int> selectedGearQuantities;
   late List<dynamic> selectedItems;
+
+  late Map<Gear, int> selectedGearQuantitiesExternal;
+  late List<dynamic> selectedItemsExternal;
 
   // Variables to store user input
   final TextEditingController tripNameController = TextEditingController();
@@ -176,37 +182,83 @@ class _QuickManifestState extends State<QuickManifest> {
       ...gearList,
     ];
 
-    // Optionally initialize selectedGearQuantities
+    // Initialize selectedGearQuantities
     selectedGearQuantities = {
       for (var gear in gearList) gear: gear.quantity,
     };
+
+    // Do the same for External Manifesting
+    selectedItemsExternal = [
+      ...gearListExternal,
+    ];
+    selectedGearQuantitiesExternal = {
+      for (var gear in gearListExternal) gear: gear.quantity,
+    };
   }
 
-  void _showSelectionDialog() async {
-    List<CrewMember> sortedCrewList = sortCrewListByPosition(crewList);
-    List<Gear> sortedGearList = sortGearListAlphabetically(gearList);
-    bool isCrewExpanded = false;
+  void loadItems() {
+    setState(() {
+      // Create deep copies of the gear and crew member data
+      gearList = gearBox.values.map((gear) {
+        return Gear(
+          name: gear.name,
+          quantity: gear.quantity,
+          weight: gear.weight,
+          isPersonalTool: gear.isPersonalTool,
+        );
+      }).toList();
+      gearListExternal = gearBox.values.map((gear) {
+        return Gear(
+          name: gear.name,
+          quantity: gear.quantity,
+          weight: gear.weight,
+          isPersonalTool: gear.isPersonalTool,
+        );
+      }).toList();
+
+      crewList = crewmemberBox.values.map((crew) {
+        return CrewMember(
+          name: crew.name,
+          flightWeight: crew.flightWeight,
+          position: crew.position,
+          personalTools: crew.personalTools,
+        );
+      }).toList();
+    });
+    // Load CrewMembers from Hive
+    thisTripCrewMemberList.addAll(crewmemberBox.values.toList());
+
+    // Load Gear from Hive
+    thisTripGearList.addAll(gearBox.values.toList());
+    thisTripGearListExternal.addAll(gearBox.values.toList());
+
+  }
+
+  void _showExternalManifestSelectionDialog() async {
+    List<Gear> sortedGearList = sortGearListAlphabetically(gearListExternal);
     bool isGearExpanded = false;
 
     // "Select All" starts as true because everything is selected by default
-    bool isSelectAllChecked = isExternalManifest ? selectedItems.length == (gearList.length) : selectedItems.length == (crewList.length + gearList.length);
-
+    bool isSelectAllChecked = selectedItemsExternal.length == gearListExternal.length &&
+        selectedGearQuantitiesExternal.entries.every((entry) => entry.value == entry.key.quantity);
     await showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, dialogSetState) {
             // Function to update "Select All" checkbox dynamically
             void updateSelectAllState() {
               dialogSetState(() {
-                 isSelectAllChecked = isExternalManifest ? selectedItems.length == (gearList.length) : selectedItems.length == (crewList.length + gearList.length);
+                isSelectAllChecked =  selectedItemsExternal.length == gearListExternal.length &&
+                    selectedGearQuantitiesExternal.entries.every((entry) => entry.value == entry.key.quantity);
               });
             }
 
             return AlertDialog(
               backgroundColor: AppColors.textFieldColor2,
               title: Text(
-                isExternalManifest ? 'Select Gear' : 'Select Crew Members and Gear', // Change title dynamically
+                'Select Gear' ,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text20, color: AppColors.textColorPrimary),
               ),
               contentPadding: EdgeInsets.all(AppData.padding16),
@@ -247,9 +299,343 @@ class _QuickManifestState extends State<QuickManifest> {
                                 isSelectAllChecked = isChecked ?? false;
 
                                 if (isSelectAllChecked) {
-                                  selectedItems = isExternalManifest
-                                      ? [...gearList] // Only gear if external manifest
-                                      : [...crewList, ...gearList]; // Both crew and gear if internal manifest
+                                  selectedItemsExternal =  [...gearListExternal]; // Only gear if external manifest
+
+                                  selectedGearQuantitiesExternal = {
+                                    for (var gear in gearListExternal) gear: gear.quantity,
+                                  };
+                                } else {
+                                  selectedItemsExternal.clear();
+                                  selectedGearQuantitiesExternal.clear();
+                                }
+                              });
+                            },
+                          ),
+                        ),
+                        SizedBox(height: AppData.sizedBox16),
+
+
+                        // Gear Dropdown
+                        ExpansionPanelList(
+                          elevation: 8,
+                          expandedHeaderPadding: const EdgeInsets.all(0),
+                          expansionCallback: (int index, bool isExpanded) {
+                            dialogSetState(() {
+                              isGearExpanded = !isGearExpanded;
+                            });
+                          },
+                          children: [
+                            ExpansionPanel(
+                              isExpanded: isGearExpanded,
+                              backgroundColor: AppColors.fireColor,
+                              // Set background color
+                              headerBuilder: (context, isExpanded) {
+                                return Container(
+                                  //color: Colors.deepOrangeAccent, // Set the background color for the header
+                                  child: ListTile(
+                                    title: Text(
+                                      'Gear',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text18),
+                                    ),
+                                  ),
+                                );
+                              },
+                              body: Column(
+                                children: sortedGearList.map((gear) {
+                                  int remainingQuantity = gear.quantity - (selectedGearQuantitiesExternal[gear] ?? 0);
+
+                                  return Container(
+                                    //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
+                                    decoration: BoxDecoration(
+                                      color: AppColors.textFieldColor,
+                                      borderRadius: BorderRadius.circular(0.0),
+                                      // Rounded corners
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.8),
+                                          spreadRadius: 1,
+                                          blurRadius: 5,
+                                          offset: Offset(0, 3), // Shadow position
+                                        ),
+                                      ],
+                                    ),
+                                    child: CheckboxListTile(
+                                      activeColor: AppColors.textColorPrimary,
+                                      // Checkbox outline color when active
+                                      checkColor: AppColors.textColorSecondary,
+                                      side: BorderSide(
+                                        color: AppColors.textColorPrimary, // Outline color
+                                        width: 2.0, // Outline width
+                                      ),
+                                      title: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                Flexible(
+                                                  child: Text(
+                                                    gear.name,
+                                                    style: TextStyle(
+                                                      fontSize: AppData.text16,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: AppColors.textColorPrimary,
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  ' (x$remainingQuantity)  ',
+                                                  style: TextStyle(
+                                                    fontSize: AppData.text12,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: AppColors.textColorPrimary,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          if (selectedItemsExternal.contains(gear))
+                                            if (selectedItemsExternal.contains(gear))
+                                              GestureDetector(
+                                                onTap: () {
+                                                  final int gearQuantity = gear.quantity;
+                                                  if (gearQuantity > 1) {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return AlertDialog(
+                                                          backgroundColor: AppColors.textFieldColor2,
+                                                          title: Text(
+                                                            'Select Quantity for ${gear.name}',
+                                                            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18),
+                                                          ),
+                                                          content: SizedBox(
+                                                            height: AppData.miniSelectionDialogHeight,
+                                                            child: CupertinoPicker(
+                                                              scrollController: FixedExtentScrollController(
+                                                                initialItem: (selectedGearQuantitiesExternal[gear] ?? 1) - 1,
+                                                              ),
+                                                              itemExtent: 32.0,
+                                                              onSelectedItemChanged: (int value) {
+                                                                dialogSetState(() {
+                                                                  selectedGearQuantitiesExternal[gear] = value + 1;
+                                                                });
+                                                              },
+                                                              children: List<Widget>.generate(
+                                                                gear.quantity,
+                                                                // Use the full quantity for selection
+                                                                    (int index) {
+                                                                  return Center(
+                                                                    child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.cupertinoPickerItemSize)),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          actions: [
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(context).pop();
+                                                              },
+                                                              child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
+                                                            ),
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                // Finalize the selection
+                                                                dialogSetState(() {
+                                                                  int selectedQuantity = selectedGearQuantitiesExternal[gear] ?? 1;
+                                                                  remainingQuantity = gear.quantity - selectedQuantity;
+                                                                  updateSelectAllState();
+                                                                });
+                                                                Navigator.of(context).pop();
+                                                              },
+                                                              child: Text('Confirm', style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize)),
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                  }
+                                                },
+                                                child: Row(
+                                                  children: [
+                                                    if (gear.quantity > 1)
+                                                      Text(
+                                                        'Qty: ${selectedGearQuantitiesExternal[gear] ?? 1}',
+                                                        style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: AppData.text14,
+                                                          color: AppColors.textColorPrimary,
+                                                        ),
+                                                      ),
+                                                    if (gear.quantity > 1)
+                                                      Icon(
+                                                        Icons.arrow_drop_down,
+                                                        color: AppColors.textColorPrimary,
+                                                        size: AppData.dropDownArrowSize,
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                        ],
+                                      ),
+                                      value: selectedItemsExternal.contains(gear),
+                                      onChanged: (bool? isChecked) {
+                                        dialogSetState(() {
+                                          if (isChecked == true) {
+                                            selectedItemsExternal.add(gear);
+                                            selectedGearQuantitiesExternal[gear] = 1; // Default quantity
+                                          } else {
+                                            selectedItemsExternal.remove(gear);
+                                            selectedGearQuantitiesExternal.remove(gear);
+                                          }
+                                        });
+                                        updateSelectAllState(); // Dynamically update "Select All" state
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      if (selectedItemsExternal.isEmpty) {
+                        // Select all items again
+                        selectedItemsExternal = [
+                          ...gearListExternal,
+                        ];
+                        selectedGearQuantitiesExternal = {
+                          for (var gear in gearListExternal) gear: gear.quantity,
+                        };
+
+                        // Update trip lists to reflect the selection
+                        thisTripGearListExternal = gearListExternal.map((gear) => gear.copyWith()).toList();
+                      }
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (selectedItemsExternal.isEmpty) {
+                      // Select all items again
+                      selectedItemsExternal = [
+                        ...gearListExternal,
+                      ];
+                      selectedGearQuantitiesExternal = {
+                        for (var gear in gearListExternal) gear: gear.quantity,
+                      };
+
+                      // Update trip lists to reflect the selection
+                      thisTripGearListExternal = gearListExternal.map((gear) => gear.copyWith()).toList();
+                    }
+                    else {
+                      // Update thisTripGearListExternal with only selected gear items and quantities
+                      thisTripGearListExternal = selectedItemsExternal.whereType<Gear>().map((gear) {
+                        final selectedQuantity = selectedGearQuantitiesExternal[gear] ?? 1; // Get selected quantity
+                        return Gear(
+                          name: gear.name,
+                          quantity: selectedQuantity,
+                          weight: gear.weight,
+                          isPersonalTool: gear.isPersonalTool,
+                        );
+                      }).toList();
+                    }
+                    // Close the dialog
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Select', style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+  void _showInternalManifestSelectionDialog() async {
+    List<CrewMember> sortedCrewList = sortCrewListByPosition(crewList);
+    List<Gear> sortedGearList = sortGearListAlphabetically(gearList);
+    bool isCrewExpanded = false;
+    bool isGearExpanded = false;
+
+    // "Select All" starts as true because everything is selected by default
+    bool isSelectAllChecked =  selectedItems.length == (crewList.length + gearList.length) &&
+        selectedGearQuantities.entries.every((entry) => entry.value == entry.key.quantity);
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, dialogSetState) {
+            // Function to update "Select All" checkbox dynamically
+            void updateSelectAllState() {
+              dialogSetState(() {
+                 isSelectAllChecked = selectedItems.length == (crewList.length + gearList.length) &&
+                     selectedGearQuantities.entries.every((entry) => entry.value == entry.key.quantity);
+              });
+            }
+
+            return AlertDialog(
+              backgroundColor: AppColors.textFieldColor2,
+              title: Text(
+                'Select Crew Members and Gear',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text20, color: AppColors.textColorPrimary),
+              ),
+              contentPadding: EdgeInsets.all(AppData.padding16),
+              content: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.7,
+                ),
+                child: Container(
+                  width: AppData.selectionDialogWidth,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // Select All Checkbox
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: AppColors.primaryColor, // Outline color
+                              width: 1.0, // Outline thickness
+                            ),
+                            //    borderRadius: BorderRadius.circular(8.0), // Rounded corners (optional)
+                          ),
+                          child: CheckboxListTile(
+                            activeColor: AppColors.textColorPrimary,
+                            // Checkbox outline color when active
+                            checkColor: AppColors.textColorSecondary,
+                            side: BorderSide(
+                              color: AppColors.textColorPrimary, // Outline color
+                              width: 2.0, // Outline width
+                            ),
+                            // Checkmark color
+                            title: Text(
+                              'Select All',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text18, color: AppColors.textColorPrimary),
+                            ),
+                            value: isSelectAllChecked,
+                            onChanged: (bool? isChecked) {
+                              dialogSetState(() {
+                                isSelectAllChecked = isChecked ?? false;
+
+                                if (isSelectAllChecked) {
+                                  selectedItems = [...crewList, ...gearList]; // Both crew and gear if internal manifest
 
                                   selectedGearQuantities = {
                                     for (var gear in gearList) gear: gear.quantity,
@@ -265,7 +651,6 @@ class _QuickManifestState extends State<QuickManifest> {
                         SizedBox(height: AppData.sizedBox16),
 
                         // Crew Member Dropdown
-                        if (!isExternalManifest)
                           ExpansionPanelList(
                             elevation: 8,
                             expandedHeaderPadding: const EdgeInsets.all(0),
@@ -342,7 +727,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               ),
                             ],
                           ),
-                        if (!isExternalManifest) SizedBox(height: AppData.sizedBox16),
+                           SizedBox(height: AppData.sizedBox16),
 
                         // Gear Dropdown
                         ExpansionPanelList(
@@ -475,6 +860,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                                 dialogSetState(() {
                                                                   int selectedQuantity = selectedGearQuantities[gear] ?? 1;
                                                                   remainingQuantity = gear.quantity - selectedQuantity;
+                                                                  updateSelectAllState();
                                                                 });
                                                                 Navigator.of(context).pop();
                                                               },
@@ -561,20 +947,35 @@ class _QuickManifestState extends State<QuickManifest> {
                 ),
                 TextButton(
                   onPressed: () {
-                    // Update thisTripCrewMemberList with only selected crew members
-                    thisTripCrewMemberList = selectedItems.whereType<CrewMember>().toList();
+                    if (selectedItems.isEmpty) {
+                      // Select all items again
+                      selectedItems = [
+                        ...crewList,
+                        ...gearList,
+                      ];
+                      selectedGearQuantities = {
+                        for (var gear in gearList) gear: gear.quantity,
+                      };
 
-                    // Update thisTripGearList with only selected gear items and quantities
-                    thisTripGearList = selectedItems.whereType<Gear>().map((gear) {
-                      final selectedQuantity = selectedGearQuantities[gear] ?? 1; // Get selected quantity
-                      return Gear(
-                        name: gear.name,
-                        quantity: selectedQuantity,
-                        weight: gear.weight,
-                        isPersonalTool: gear.isPersonalTool,
-                      );
-                    }).toList();
+                      // Update trip lists to reflect the selection
+                      thisTripCrewMemberList = crewList.map((crew) => crew.copy()).toList();
+                      thisTripGearList = gearList.map((gear) => gear.copyWith()).toList();
+                    }
+                    else {
+                      // Update thisTripCrewMemberList with only selected crew members
+                      thisTripCrewMemberList = selectedItems.whereType<CrewMember>().toList();
 
+                      // Update thisTripGearList with only selected gear items and quantities
+                      thisTripGearList = selectedItems.whereType<Gear>().map((gear) {
+                        final selectedQuantity = selectedGearQuantities[gear] ?? 1; // Get selected quantity
+                        return Gear(
+                          name: gear.name,
+                          quantity: selectedQuantity,
+                          weight: gear.weight,
+                          isPersonalTool: gear.isPersonalTool,
+                        );
+                      }).toList();
+                    }
                     // Close the dialog
                     Navigator.of(context).pop();
                   },
@@ -588,33 +989,6 @@ class _QuickManifestState extends State<QuickManifest> {
     );
   }
 
-  void loadItems() {
-    setState(() {
-      // Create deep copies of the gear and crew member data
-      gearList = gearBox.values.map((gear) {
-        return Gear(
-          name: gear.name,
-          quantity: gear.quantity,
-          weight: gear.weight,
-          isPersonalTool: gear.isPersonalTool,
-        );
-      }).toList();
-
-      crewList = crewmemberBox.values.map((crew) {
-        return CrewMember(
-          name: crew.name,
-          flightWeight: crew.flightWeight,
-          position: crew.position,
-          personalTools: crew.personalTools,
-        );
-      }).toList();
-    });
-    // Load CrewMembers from Hive (or another data source)
-    thisTripCrewMemberList.addAll(crewmemberBox.values.toList());
-
-    // Load Gear from Hive (or another data source)
-    thisTripGearList.addAll(gearBox.values.toList());
-  }
 
   // Track the last input source
   bool lastInputFromSlider = true;
@@ -792,6 +1166,17 @@ class _QuickManifestState extends State<QuickManifest> {
 
   @override
   Widget build(BuildContext context) {
+    // Select All is only checked if full item selection + full quantity selection
+     bool isSelectAllChecked() {
+      if (isExternalManifest) {
+        return selectedItemsExternal.length == gearListExternal.length &&
+            selectedGearQuantitiesExternal.entries.every((entry) => entry.value == entry.key.quantity);
+      } else {
+        return selectedItems.length == (crewList.length + gearList.length) &&
+            selectedGearQuantities.entries.every((entry) => entry.value == entry.key.quantity);
+      }
+    }
+
     AppData.updateScreenData(context); // Updates width and orientation
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -1075,7 +1460,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                 child: IconButton(
                                   padding: EdgeInsets.zero,
                                   icon: Icon(
-                                    (isExternalManifest ? selectedItems.length == (gearList.length) : selectedItems.length == (crewList.length + gearList.length))
+                                    isSelectAllChecked()
                                         ? Icons.check_box // Fully selected
                                         : Icons.check_box_outline_blank, // Partially or none selected
                                     color: AppColors.textColorPrimary,
@@ -1083,26 +1468,48 @@ class _QuickManifestState extends State<QuickManifest> {
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      if (selectedItems.length != (crewList.length + gearList.length)) {
-                                        // Select all items again
-                                        selectedItems = [
-                                          ...crewList,
-                                          ...gearList,
-                                        ];
-                                        selectedGearQuantities = {
-                                          for (var gear in gearList) gear: gear.quantity,
-                                        };
+                                      if (!isExternalManifest) {
+                                        if (selectedItems.length != (crewList.length + gearList.length)) {
+                                          // Select all items again
+                                          selectedItems = [
+                                            ...crewList,
+                                            ...gearList,
+                                          ];
+                                          selectedGearQuantities = {
+                                            for (var gear in gearList) gear: gear.quantity,
+                                          };
 
-                                        // Update trip lists to reflect the selection
-                                        thisTripCrewMemberList = crewList.map((crew) => crew.copy()).toList();
-                                        thisTripGearList = gearList.map((gear) => gear.copyWith()).toList();
-                                      } else {
-                                        // Clear selections
-                                        thisTripCrewMemberList.clear();
-                                        thisTripGearList.clear();
-                                        selectedItems.clear();
-                                        selectedGearQuantities.clear();
-                                        _showSelectionDialog();
+                                          // Update trip lists to reflect the selection
+                                          thisTripCrewMemberList = crewList.map((crew) => crew.copy()).toList();
+                                          thisTripGearList = gearList.map((gear) => gear.copyWith()).toList();
+                                        } else {
+                                          // Clear selections
+                                          thisTripCrewMemberList.clear();
+                                          thisTripGearList.clear();
+                                          selectedItems.clear();
+                                          selectedGearQuantities.clear();
+                                          _showInternalManifestSelectionDialog();
+                                        }
+                                      }
+                                      else{
+                                        if (selectedItemsExternal.length != (gearListExternal.length)) {
+                                          // Select all items again
+                                          selectedItemsExternal = [
+                                            ...gearListExternal,
+                                          ];
+                                          selectedGearQuantitiesExternal = {
+                                            for (var gear in gearListExternal) gear: gear.quantity,
+                                          };
+
+                                          // Update trip lists to reflect the selection
+                                          thisTripGearListExternal = gearListExternal.map((gear) => gear.copyWith()).toList();
+                                        } else {
+                                          // Clear selections
+                                          thisTripGearListExternal.clear();
+                                          selectedItemsExternal.clear();
+                                          selectedGearQuantitiesExternal.clear();
+                                          _showExternalManifestSelectionDialog();
+                                        }
                                       }
                                     });
                                   },
@@ -1127,7 +1534,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                   size: AppData.text32,
                                 ),
                                 onPressed: () {
-                                  _showSelectionDialog();
+                                  isExternalManifest ? _showExternalManifestSelectionDialog() : _showInternalManifestSelectionDialog();
                                   setState(() {});
                                 },
                               ),

@@ -91,7 +91,7 @@ class AppData {
 
   // **Dynamic Heights Based on Screen Height**
   static double get buttonHeight => isLandscape ? (screenHeight * 0.12) : (screenHeight * 0.1);
-  static double get miniSelectionDialogHeight => isLandscape ? (screenHeight * 0.32) : (screenHeight * 0.3);
+  static double get miniSelectionDialogHeight => isLandscape ? (screenHeight * 0.32) : (screenHeight * 0.2);
   static double get quickGuideContentHeight => 45 + quickGuideContentTextSize;
 
   // **Dynamic Spacing
