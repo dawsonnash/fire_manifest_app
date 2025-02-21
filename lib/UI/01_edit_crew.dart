@@ -1110,6 +1110,7 @@ class _EditCrewState extends State<EditCrew> {
                                 ),
                               ),
                             ),
+
                             // Trip Preferences Panel
                             Padding(
                               padding: const EdgeInsets.all(16.0),

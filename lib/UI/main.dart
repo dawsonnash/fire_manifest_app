@@ -17,6 +17,7 @@ import '../Data/positional_preferences.dart';
 import '../Data/gear_preferences.dart';
 import '../Data/saved_preferences.dart';
 import '../Data/crewMemberList.dart';
+import '../Data/load_accoutrements.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../CodeShare/colors.dart'; // Your colors.dart.dart file
@@ -39,6 +40,7 @@ void main() async {
   Hive.registerAdapter(TripPreferenceAdapter());
   Hive.registerAdapter(PositionalPreferenceAdapter());
   Hive.registerAdapter(GearPreferenceAdapter());
+  Hive.registerAdapter(LoadAccoutrementAdapter());
 
   // Open a Hive boxes to store objects
   await Hive.openBox<Gear>('gearBox');
@@ -48,6 +50,7 @@ void main() async {
   await Hive.openBox<Trip>('tripBox');
   await Hive.openBox<TripPreference>('tripPreferenceBox');
   await Hive.openBox<Gear>('personalToolsBox');
+  await Hive.openBox<Gear>('loadAccoutrementBox');
 
   // Load data from Hive
   await crew.loadCrewDataFromHive();

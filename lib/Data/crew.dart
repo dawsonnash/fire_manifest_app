@@ -26,7 +26,7 @@ class Crew {
       "crewMembers": crewMembers.map((member) => member.toJson()).toList(),
       "gear": gear.map((g) => g.toJson()).toList(),
       "personalTools": personalTools.map((p) => p.toJson()).toList(),
-    "totalCrewWeight": totalCrewWeight ?? 0.0,
+      "totalCrewWeight": totalCrewWeight ?? 0.0,
     };
   }
 

@@ -1435,7 +1435,7 @@ class _SettingsState extends State<SettingsView> {
 
                   Divider(color: Colors.white),
 
-                  // Settings Title
+                  // App Settings Title
                   ListTile(
                     leading: Icon(Icons.settings, color: Colors.white),
                     title: const Text(
@@ -1444,12 +1444,13 @@ class _SettingsState extends State<SettingsView> {
                     ),
                   ),
 
-                  // Settings Sectioin
+                  // App Settings Sectioin
                   Padding(
                     padding: EdgeInsets.only(left: 48),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Display
                         ExpansionTile(
                           title: Text(
                             'Display',
@@ -1686,70 +1687,142 @@ class _SettingsState extends State<SettingsView> {
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
 
-                  Divider(color: Colors.white),
-
-                  // Legal Section
-                  ListTile(
-                    leading: Icon(Icons.gavel, color: Colors.white),
-                    title: const Text(
-                      'LEGAL',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                  ),
-
-                  GestureDetector(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 48.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    backgroundColor: AppColors.textFieldColor2, // Dark grey background
-                                    title: Text(
-                                      'Terms and Conditions',
-                                      style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal),
-                                    ),
-                                    content: SingleChildScrollView(
-                                      child: Text(
-                                        'The calculations provided by this app are intended for informational purposes only. '
-                                        'While every effort has been made to ensure accuracy, users must independently verify and validate '
-                                        'all data before relying on it for operational or decision-making purposes. The developers assume no '
-                                        'liability for errors, omissions, or any outcomes resulting from the use of this app. By continuing, '
-                                        'you acknowledge and accept full responsibility for reviewing and confirming all calculations.',
-                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(); // Close the dialog
-                                        },
-                                        child: Text(
-                                          'Close',
-                                          style: TextStyle(color: AppColors.textColorPrimary),
+                        // External Manifesting Settings
+                        ExpansionTile(
+                          title: Text(
+                            'External Manifesting',
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                          trailing: Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Safety Buffer Section
+                                ExpansionTile(
+                                  title: Text(
+                                    'Safety Buffer',
+                                    style: TextStyle(color: Colors.white, fontSize: 18,),
+                                  ),
+                                  trailing: Icon(
+                                    Icons.keyboard_arrow_down,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                                  children: [
+                                    ListTile(
+                                      title: Container(
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.settingsTabs,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 8),
+                                          child: TextField(
+                                           // controller: safetyBufferController,
+                                            style: TextStyle(color: Colors.white, fontSize: 18),
+                                            inputFormatters: [
+                                              LengthLimitingTextInputFormatter(30),
+                                            ],
+                                            decoration: InputDecoration(
+                                              hintText: 'Enter Safety Buffer',
+                                              hintStyle: TextStyle(color: Colors.white54),
+                                              enabledBorder: UnderlineInputBorder(
+                                                borderSide: BorderSide(color: Colors.white54),
+                                              ),
+                                              focusedBorder: UnderlineInputBorder(
+                                                borderSide: BorderSide(color: AppColors.fireColor),
+                                              ),
+                                            ),
+                                            onSubmitted: (value) {
+                                              setState(() {
+                                                if (value.trim().isNotEmpty) {
+                                                 // widget.onSafetyBufferChange(value.trim());
+                                                }
+                                              });
+                                              // ThemePreferences.setSafetyBuffer(value.trim());
+                                            },
+                                          ),
                                         ),
                                       ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            child: const Text(
-                              'Terms and Conditions',
-                              style: TextStyle(color: Colors.white, fontSize: 18),
+                                    ),
+                                  ],
+                                ),
+
+                                // Load Accoutrements Styled Like a Header (Aligned with Safety Buffer)
+                                Padding(
+                                  padding: EdgeInsets.only(left: 16, top: 8, bottom: 8), // Adjust left padding to match ExpansionTile
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      // Bottom modal here like personal tools
+
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                'Load Accoutrements ',
+                                                style: TextStyle(color: Colors.white, fontSize: 18),
+                                              ),
+                                              IconButton(
+                                                icon: Icon(
+                                                  Icons.info_outline, // Info icon
+                                                  color: Colors.white,
+                                                  size: 22, // Adjust size if needed
+                                                ),
+                                                onPressed: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (BuildContext context) {
+                                                      return AlertDialog(
+                                                        backgroundColor: AppColors.textFieldColor2,
+                                                        title: Text(
+                                                          "Load Accoutrements Info",
+                                                          style: TextStyle(color: AppColors.textColorPrimary),
+                                                        ),
+                                                        content:
+                                                        Text("These are items that are included in each external cargo manifest (per net/sling load). These items are necessary for sling operations, e.g., cargo net, lead line, swivel. They are automatically included into the weight considerations when you make an external trip.", style: TextStyle(color: AppColors.textColorPrimary)),
+                                                        actions: [
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              Navigator.of(context).pop(); // Close the dialog
+                                                            },
+                                                            child: Text(
+                                                              "OK",
+                                                              style: TextStyle(color: AppColors.textColorPrimary),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                              ),
+
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
+
+                          ],
+                        ),
+                      ],
                     ),
                   ),
 
@@ -2289,6 +2362,69 @@ class _SettingsState extends State<SettingsView> {
                       ),
                     ],
                   ),
+
+                  Divider(color: Colors.white),
+
+                  // Legal Section
+                  ListTile(
+                    leading: Icon(Icons.gavel, color: Colors.white),
+                    title: const Text(
+                      'LEGAL',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                  ),
+                  GestureDetector(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 48.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: AppColors.textFieldColor2, // Dark grey background
+                                    title: Text(
+                                      'Terms and Conditions',
+                                      style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal),
+                                    ),
+                                    content: SingleChildScrollView(
+                                      child: Text(
+                                        'The calculations provided by this app are intended for informational purposes only. '
+                                            'While every effort has been made to ensure accuracy, users must independently verify and validate '
+                                            'all data before relying on it for operational or decision-making purposes. The developers assume no '
+                                            'liability for errors, omissions, or any outcomes resulting from the use of this app. By continuing, '
+                                            'you acknowledge and accept full responsibility for reviewing and confirming all calculations.',
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Close the dialog
+                                        },
+                                        child: Text(
+                                          'Close',
+                                          style: TextStyle(color: AppColors.textColorPrimary),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            child: const Text(
+                              'Terms and Conditions',
+                              style: TextStyle(color: Colors.white, fontSize: 18),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
                 ],
               ),
             ),
