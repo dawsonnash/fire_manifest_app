@@ -3,6 +3,7 @@ import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/Data/trip_preferences.dart';
 import 'package:fire_app/UI/quick_guide.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
@@ -16,10 +17,12 @@ import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import '../Data/crew.dart';
 import 'package:file_picker/file_picker.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../Data/crew_loadout.dart';
 import '../Data/crewmember.dart';
 import '../Data/gear.dart';
+import '../Data/gear_preferences.dart';
+import '../Data/positional_preferences.dart';
 
 class SettingsView extends StatefulWidget {
   final bool isDarkMode;
@@ -68,7 +71,8 @@ class _SettingsState extends State<SettingsView> {
       if (selectedLoadout != null) {
         _checkSyncStatus(selectedLoadout!); // Check sync status ONCE when Settings opens
       }
-    });  }
+    });
+  }
 
   @override
   void dispose() {
@@ -103,7 +107,169 @@ class _SettingsState extends State<SettingsView> {
     }
   }
 
+  bool _areTripPreferencesEqual(TripPreference a, TripPreference b) {
+    // Compare positional and gear preferences as JSON (ignores ordering issues)
+    String aJson = jsonEncode({
+      "positionalPreferences": a.positionalPreferences.map((pp) => pp.toJson()).toList(),
+      "gearPreferences": a.gearPreferences.map((gp) => gp.toJson()).toList(),
+    });
 
+    String bJson = jsonEncode({
+      "positionalPreferences": b.positionalPreferences.map((pp) => pp.toJson()).toList(),
+      "gearPreferences": b.gearPreferences.map((gp) => gp.toJson()).toList(),
+    });
+
+    return aJson == bJson;
+  }
+
+  Map<String, List<String>> _getCrewMemberDifferences(List<CrewMember> currentList, List<CrewMember> savedList) {
+    List<String> removed = [];
+    List<String> added = [];
+    List<String> modified = [];
+
+    for (var saved in savedList) {
+      var current = currentList.firstWhere(
+        (c) => c.name == saved.name, // Match by name
+        orElse: () => CrewMember(name: "", flightWeight: -1, position: -1, personalTools: []),
+      );
+
+      if (current.name.isEmpty) {
+        removed.add(saved.name); // Store only the name for removed crew
+        continue;
+      }
+
+      List<String> changes = [];
+      if (current.flightWeight != saved.flightWeight) {
+        changes.add("\n-- ${saved.flightWeight} → ${current.flightWeight} lbs");
+      }
+      if (current.position != saved.position) {
+        changes.add("\n-- ${positionMap[saved.position]} → ${positionMap[current.position]}");
+      }
+
+      // Check tool differences
+      Map<String, List<String>> toolChanges = _getToolDifferences(current.personalTools ?? [], saved.personalTools ?? []);
+      List<String> toolSummary = [];
+
+      if (toolChanges["removed"]!.isNotEmpty) {
+        toolSummary.add("Removed ${toolChanges["removed"]!.join(", ")}");
+      }
+      if (toolChanges["added"]!.isNotEmpty) {
+        toolSummary.add("Added ${toolChanges["added"]!.join(", ")}");
+      }
+
+      if (toolSummary.isNotEmpty) {
+        changes.add("\n-- ${toolSummary.join(", ")}");
+      }
+
+      if (changes.isNotEmpty) {
+        modified.add("${saved.name}: ${changes.join(", ")}");
+      }
+    }
+
+    // Detect **new crew members**
+    for (var current in currentList) {
+      if (!savedList.any((saved) => saved.name == current.name)) {
+        added.add(current.name); // Store only the name for new crew
+      }
+    }
+
+    return {
+      "removed": removed,
+      "added": added,
+      "modified": modified,
+    };
+  }
+
+  Map<String, List<String>> _getGearDifferences(List<Gear> currentList, List<Gear> savedList) {
+    List<String> removed = [];
+    List<String> added = [];
+    List<String> modified = [];
+
+    for (var saved in savedList) {
+      var current = currentList.firstWhere(
+        (g) => g.name == saved.name, // Match by name
+        orElse: () => Gear(name: "", weight: 0, quantity: 0, isPersonalTool: false, isHazmat: false),
+      );
+
+      if (current.name.isEmpty) {
+        removed.add(saved.name); // Store only the name for removed gear
+        continue;
+      }
+
+      List<String> changes = [];
+      if (current.weight != saved.weight) {
+        changes.add("\n-- ${saved.weight} → ${current.weight} lbs");
+      }
+      if (current.quantity != saved.quantity) {
+        changes.add("\n-- Quantity: ${saved.quantity} → ${current.quantity}");
+      }
+      if (current.isHazmat != saved.isHazmat) {
+        changes.add("\n-- Hazmat: ${saved.isHazmat ? 'Yes' : 'No'} → ${current.isHazmat ? 'Yes' : 'No'}");
+      }
+
+      if (changes.isNotEmpty) {
+        modified.add("${saved.name}: ${changes.join(", ")}");
+      }
+    }
+
+    // Detect **new gear items**
+    for (var current in currentList) {
+      if (!savedList.any((saved) => saved.name == current.name)) {
+        added.add(current.name); // Store only the name for new gear
+      }
+    }
+
+    return {
+      "removed": removed,
+      "added": added,
+      "modified": modified,
+    };
+  }
+
+  Map<String, List<String>> _getToolDifferences(List<Gear> currentTools, List<Gear> savedTools) {
+    List<String> removed = [];
+    List<String> added = [];
+    List<String> modified = [];
+
+    for (var saved in savedTools) {
+      var current = currentTools.firstWhere(
+        (t) => t.name == saved.name, // Match by name
+        orElse: () => Gear(name: "", weight: 0, quantity: 0, isPersonalTool: false, isHazmat: false),
+      );
+
+      if (current.name.isEmpty) {
+        removed.add(saved.name); // Store only the name for removed tools
+        continue;
+      }
+
+      // Compare attributes
+      List<String> changes = [];
+      if (current.weight != saved.weight) {
+        changes.add("\n-- ${saved.weight} → ${current.weight}lbs");
+      }
+
+      if (current.isHazmat != saved.isHazmat) {
+        changes.add("\n-- Hazmat: ${saved.isHazmat ? 'Yes' : 'No'} → ${current.isHazmat ? 'Yes' : 'No'}");
+      }
+
+      if (changes.isNotEmpty) {
+        modified.add("${saved.name}: ${changes.join(", ")}");
+      }
+    }
+
+    // Detect newly added tools
+    for (var current in currentTools) {
+      if (!savedTools.any((saved) => saved.name == current.name)) {
+        added.add(current.name);
+      }
+    }
+
+    return {
+      "removed": removed,
+      "added": added,
+      "modified": modified,
+    };
+  }
 
   Future<void> _checkSyncStatus(String loadoutName) async {
     Map<String, dynamic>? lastSavedData = await CrewLoadoutStorage.loadLoadout(loadoutName);
@@ -133,6 +299,228 @@ class _SettingsState extends State<SettingsView> {
     });
   }
 
+  void _showSyncDifferencesDialog() async {
+    Map<String, dynamic>? lastSavedData = await CrewLoadoutStorage.loadLoadout(selectedLoadout!);
+
+    if (lastSavedData == null) {
+      return;
+    }
+
+    // Extract saved and current data
+    List<CrewMember> savedCrew = (lastSavedData["crew"]["crewMembers"] as List).map((json) => CrewMember.fromJson(json)).toList();
+    List<CrewMember> currentCrew = crew.crewMembers;
+
+    List<Gear> savedGear = (lastSavedData["crew"]["gear"] as List).map((json) => Gear.fromJson(json)).toList();
+    List<Gear> currentGear = crew.gear;
+
+    List<Gear> savedTools = (lastSavedData["crew"]["personalTools"] as List).map((json) => Gear.fromJson(json)).toList();
+    List<Gear> currentTools = crew.personalTools;
+
+    List<TripPreference> savedTripPreferences = (lastSavedData["savedPreferences"]["tripPreferences"] as List).map((json) => TripPreference.fromJson(json)).toList();
+    List<TripPreference> currentTripPreferences = savedPreferences.tripPreferences;
+
+    // Compare Differences
+    Map<String, List<String>> crewChanges = _getCrewMemberDifferences(currentCrew, savedCrew);
+    Map<String, List<String>> gearChanges = _getGearDifferences(currentGear, savedGear);
+    Map<String, List<String>> toolChanges = _getToolDifferences(currentTools, savedTools);
+
+    // Compare Trip Preferences
+    List<String> missingPreferences =
+        savedTripPreferences.where((saved) => !currentTripPreferences.any((current) => current.tripPreferenceName == saved.tripPreferenceName)).map((p) => p.tripPreferenceName).toList();
+
+    List<String> newPreferences =
+        currentTripPreferences.where((current) => !savedTripPreferences.any((saved) => saved.tripPreferenceName == current.tripPreferenceName)).map((p) => p.tripPreferenceName).toList();
+
+    // Detect modified trip preferences (without specifics)
+    List<String> modifiedPreferences = savedTripPreferences
+        .where((saved) => currentTripPreferences.any((current) => current.tripPreferenceName == saved.tripPreferenceName && !_areTripPreferencesEqual(current, saved)))
+        .map((p) => p.tripPreferenceName)
+        .toList();
+    // Display differences in a dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColors.textFieldColor2,
+          title: Text(
+            'Loadout Changes',
+            style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (crewChanges["removed"]!.isNotEmpty || crewChanges["added"]!.isNotEmpty || crewChanges["modified"]!.isNotEmpty) ...[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.people, color: AppColors.textColorPrimary), // Crew icon
+                      SizedBox(width: 5),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Crew Members", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16, fontWeight: FontWeight.bold)),
+                            if (crewChanges["removed"]!.isNotEmpty) ...[
+                              Text("Removed", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                              for (var name in crewChanges["removed"]!) Text('- $name', style: TextStyle(color: AppColors.textColorPrimary)),
+                              SizedBox(height: 5),
+                            ],
+                            if (crewChanges["added"]!.isNotEmpty) ...[
+                              Text("Added", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                              for (var name in crewChanges["added"]!) Text('- $name', style: TextStyle(color: AppColors.textColorPrimary)),
+                              SizedBox(height: 5),
+                            ],
+                            if (crewChanges["modified"]!.isNotEmpty) ...[
+                              Text("Modified", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: crewChanges["modified"]!.map((change) {
+                                  return Padding(
+                                    padding: EdgeInsets.only(top: AppData.padding8), // Space after each entry
+                                    child: Text(change, style: TextStyle(color: AppColors.textColorPrimary)),
+                                  );
+                                }).toList(),
+                              ),
+                              SizedBox(height: 5),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (gearChanges.isNotEmpty || toolChanges.isNotEmpty || missingPreferences.isNotEmpty || newPreferences.isNotEmpty || modifiedPreferences.isNotEmpty)
+                    Divider(color: AppColors.textColorPrimary),
+                ],
+                if (gearChanges["removed"]!.isNotEmpty || gearChanges["added"]!.isNotEmpty || gearChanges["modified"]!.isNotEmpty) ...[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.work_outline, color: Colors.orange), // Gear icon
+                      SizedBox(width: 5),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Gear", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16, fontWeight: FontWeight.bold)),
+                            if (gearChanges["removed"]!.isNotEmpty) ...[
+                              Text("Removed", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                              for (var name in gearChanges["removed"]!) Text('- $name', style: TextStyle(color: AppColors.textColorPrimary)),
+                              SizedBox(height: 5),
+                            ],
+                            if (gearChanges["added"]!.isNotEmpty) ...[
+                              Text("Added", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                              for (var name in gearChanges["added"]!) Text('- $name', style: TextStyle(color: AppColors.textColorPrimary)),
+                              SizedBox(height: 5),
+                            ],
+                            if (gearChanges["modified"]!.isNotEmpty) ...[
+                              Text("Modified", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: gearChanges["modified"]!.map((change) {
+                                  return Padding(
+                                    padding: EdgeInsets.only(top: AppData.padding8), // Space after each entry
+                                    child: Text(change, style: TextStyle(color: AppColors.textColorPrimary)),
+                                  );
+                                }).toList(),
+                              ),
+                              SizedBox(height: 5),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Divider(color: AppColors.textColorPrimary),
+                ],
+                if (toolChanges["removed"]!.isNotEmpty || toolChanges["added"]!.isNotEmpty || toolChanges["modified"]!.isNotEmpty) ...[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.handyman_outlined, color: Colors.blue), // Tool icon
+                      SizedBox(width: 5),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Tools", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16, fontWeight: FontWeight.bold)),
+                            if (toolChanges["removed"]!.isNotEmpty) ...[
+                              Text("Removed", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                              for (var name in toolChanges["removed"]!) Text('- $name', style: TextStyle(color: AppColors.textColorPrimary)),
+                              SizedBox(height: 5),
+                            ],
+                            if (toolChanges["added"]!.isNotEmpty) ...[
+                              Text("Added", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                              for (var name in toolChanges["added"]!) Text('- $name', style: TextStyle(color: AppColors.textColorPrimary)),
+                              SizedBox(height: 5),
+                            ],
+                            if (toolChanges["modified"]!.isNotEmpty) ...[
+                              Text("Modified", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: toolChanges["modified"]!.map((change) {
+                                  return Padding(
+                                    padding: EdgeInsets.only(top: AppData.padding8), // Space after each entry
+                                    child: Text(change, style: TextStyle(color: AppColors.textColorPrimary)),
+                                  );
+                                }).toList(),
+                              ),
+                              SizedBox(height: 5),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Divider(color: AppColors.textColorPrimary),
+                ],
+                if (missingPreferences.isNotEmpty || newPreferences.isNotEmpty || modifiedPreferences.isNotEmpty) ...[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(FontAwesomeIcons.sliders, color: Colors.purple), // Preferences icon
+                      SizedBox(width: 8), // Space between icon and text
+                      Expanded(
+                        // Ensures Column takes up the correct space
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start, // Aligns text to the left
+                          children: [
+                            Text("Trip Preferences", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16, fontWeight: FontWeight.bold)),
+                            if (missingPreferences.isNotEmpty) ...[
+                              Text("Removed", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                              Text(missingPreferences.map((p) => "- $p").join("\n"), style: TextStyle(color: AppColors.textColorPrimary)),
+                              SizedBox(height: 5), // Adds spacing between sections
+                            ],
+                            if (newPreferences.isNotEmpty) ...[
+                              Text("Added", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                              Text(newPreferences.map((p) => "- $p").join("\n"), style: TextStyle(color: AppColors.textColorPrimary)),
+                              SizedBox(height: 5),
+                            ],
+                            if (modifiedPreferences.isNotEmpty) ...[
+                              Text("Modified", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                              Text(modifiedPreferences.map((p) => "- $p").join("\n"), style: TextStyle(color: AppColors.textColorPrimary)),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Close", style: TextStyle(color: AppColors.textColorPrimary)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
 // Helper function to load last saved timestamp
   Future<void> _loadLastSavedTimestamp(String loadoutName) async {
@@ -266,7 +654,6 @@ class _SettingsState extends State<SettingsView> {
 
       // Import Trip Preferences (SavedPreferences)
       SavedPreferences importedSavedPreferences = SavedPreferences.fromJson(jsonData["savedPreferences"]);
-
 
       updateUI();
       // Clear old data
@@ -639,9 +1026,7 @@ class _SettingsState extends State<SettingsView> {
   }
 
   void _promptNewLoadoutName(String previousLoadout, bool isEmptyCrew, bool isEdit) {
-    TextEditingController nameController = isEdit
-        ? TextEditingController(text: previousLoadout)
-        : TextEditingController();
+    TextEditingController nameController = isEdit ? TextEditingController(text: previousLoadout) : TextEditingController();
     String? errorMessage;
 
     showDialog(
@@ -682,16 +1067,15 @@ class _SettingsState extends State<SettingsView> {
                     if (loadoutName.isNotEmpty) {
                       List<String> existingLoadouts = await CrewLoadoutStorage.getAllLoadoutNames();
                       bool nameExists = existingLoadouts.any(
-                            (existingName) => existingName.toLowerCase() == loadoutName.toLowerCase(),
+                        (existingName) => existingName.toLowerCase() == loadoutName.toLowerCase(),
                       );
 
                       if (nameExists) {
-                        if (loadoutName == previousLoadout){
+                        if (loadoutName == previousLoadout) {
                           setDialogState(() {
                             errorMessage = "Loadout name is unchanged";
                           });
-                        }
-                        else {
+                        } else {
                           setDialogState(() {
                             errorMessage = "Loadout name already exists";
                           });
@@ -745,27 +1129,26 @@ class _SettingsState extends State<SettingsView> {
   }
 
   Future<void> _saveNewLoadout(String loadoutName, bool isEmptyCrew) async {
-
     String timestamp = DateFormat('EEE, dd MMM yy, h:mm a').format(DateTime.now());
 
     Map<String, dynamic> loadoutData = isEmptyCrew
         ? {
-      "crew": {
-        "crewMembers": [], // Empty list instead of null
-        "gear": [],
-        "personalTools": [],
-        "totalCrewWeight": 0.0
-      },
-      "savedPreferences": {
-        "tripPreferences": [] // Empty trip preferences list
-      },
-      "lastSaved": timestamp,
-    }
+            "crew": {
+              "crewMembers": [], // Empty list instead of null
+              "gear": [],
+              "personalTools": [],
+              "totalCrewWeight": 0.0
+            },
+            "savedPreferences": {
+              "tripPreferences": [] // Empty trip preferences list
+            },
+            "lastSaved": timestamp,
+          }
         : {
-      "crew": crew.toJson(),
-      "savedPreferences": savedPreferences.toJson(),
-      "lastSaved": timestamp,
-    };
+            "crew": crew.toJson(),
+            "savedPreferences": savedPreferences.toJson(),
+            "lastSaved": timestamp,
+          };
 
     await CrewLoadoutStorage.saveLoadout(loadoutName, loadoutData);
 
@@ -778,7 +1161,6 @@ class _SettingsState extends State<SettingsView> {
       selectedLoadout = loadoutName; // Set it as the selected option
       lastSavedTimestamp = timestamp; // UI timestamp
     });
-
 
     // Check if it's an empty loadout
     if (isEmptyCrew) {
@@ -826,21 +1208,21 @@ class _SettingsState extends State<SettingsView> {
     await _checkSyncStatus(loadoutName);
 
     ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Center(
-            child: Text(
-              'Loadout Updated!',
-              // Maybe change look
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+      SnackBar(
+        content: Center(
+          child: Text(
+            'Loadout Updated!',
+            // Maybe change look
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          duration: Duration(seconds: 1),
-          backgroundColor: Colors.green,
         ),
+        duration: Duration(seconds: 1),
+        backgroundColor: Colors.green,
+      ),
     );
   }
 
@@ -876,9 +1258,9 @@ class _SettingsState extends State<SettingsView> {
         ),
         duration: Duration(seconds: 1),
         backgroundColor: Colors.red,
-      ),    );
+      ),
+    );
   }
-
 
   Future<void> _applyLoadout(String loadoutName, Map<String, dynamic> loadoutData) async {
     try {
@@ -933,8 +1315,6 @@ class _SettingsState extends State<SettingsView> {
       setState(() {
         selectedLoadout = loadoutName;
       });
-
-
     } catch (e) {
       showErrorDialog("Error loading loadout: $e");
     }
@@ -952,9 +1332,7 @@ class _SettingsState extends State<SettingsView> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('last_selected_loadout', loadoutName); // Save the selection persistently
 
-
     await _applyLoadout(loadoutName, loadoutData);
-
   }
 
   @override
@@ -1019,8 +1397,6 @@ class _SettingsState extends State<SettingsView> {
               padding: const EdgeInsets.all(8.0),
               child: ListView(
                 children: [
-
-
                   // Help Title
                   ListTile(
                     leading: Icon(Icons.help_outline, color: Colors.white),
@@ -1408,70 +1784,67 @@ class _SettingsState extends State<SettingsView> {
                                 ),
                                 child: DropdownButtonHideUnderline(
                                   child: DropdownButton<String>(
-                                    dropdownColor: AppColors.textFieldColor2,
-                                    value: selectedLoadout,
-                                    hint: Text(
-                                      'Select a Loadout',
-                                      style: TextStyle(color: AppColors.textColorPrimary),
-                                    ),
-                                    style: TextStyle(
-                                      color: AppColors.textColorPrimary,
-                                      fontSize: AppData.text16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    iconEnabledColor: AppColors.textColorPrimary,
-                                    isExpanded: true,
-                                    // Ensures the dropdown fills available space
-                                    items: [
-                                      ...loadoutNames.map((String loadout) {
-                                        return DropdownMenuItem<String>(
-                                          value: loadout,
-                                          child: GestureDetector(
-                                            onLongPress: () {
-                                              _promptNewLoadoutName(loadout, false, true); // Open rename dialog
-                                            },
-
-                                            child: Container(
-                                              width: double.infinity,
-                                                child: Text(loadout, style: TextStyle(color: AppColors.textColorPrimary))),
+                                      dropdownColor: AppColors.textFieldColor2,
+                                      value: selectedLoadout,
+                                      hint: Text(
+                                        'Select a Loadout',
+                                        style: TextStyle(color: AppColors.textColorPrimary),
+                                      ),
+                                      style: TextStyle(
+                                        color: AppColors.textColorPrimary,
+                                        fontSize: AppData.text16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      iconEnabledColor: AppColors.textColorPrimary,
+                                      isExpanded: true,
+                                      // Ensures the dropdown fills available space
+                                      items: [
+                                        ...loadoutNames.map((String loadout) {
+                                          return DropdownMenuItem<String>(
+                                            value: loadout,
+                                            child: GestureDetector(
+                                              onLongPress: () {
+                                                _promptNewLoadoutName(loadout, false, true); // Open rename dialog
+                                              },
+                                              child: Container(width: double.infinity, child: Text(loadout, style: TextStyle(color: AppColors.textColorPrimary))),
+                                            ),
+                                          );
+                                        }),
+                                        // **Reset to Last Saved (Only appears if out of sync)**
+                                        if (isOutOfSync)
+                                          DropdownMenuItem<String>(
+                                            value: 'Reset Last',
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.refresh, color: Colors.orange), // Reset icon
+                                                SizedBox(width: 8),
+                                                Text('Reset to Last Saved', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.normal)),
+                                              ],
+                                            ),
                                           ),
-                                        );
-                                      }),
-                                      // **Reset to Last Saved (Only appears if out of sync)**
-                                      if (isOutOfSync)
+                                        // Save Current Loadout Option
                                         DropdownMenuItem<String>(
-                                          value: 'Reset Last',
+                                          value: 'Save Current',
                                           child: Row(
                                             children: [
-                                              Icon(Icons.refresh, color: Colors.orange), // Reset icon
-                                              SizedBox(width: 8),
-                                              Text('Reset to Last Saved', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.normal)),
+                                              Icon(Icons.save_outlined, color: Colors.green), // Save icon
+                                              SizedBox(width: 8), // Space between icon and text
+                                              Text('Save New', style: TextStyle(color: Colors.green, fontWeight: FontWeight.normal)),
                                             ],
                                           ),
                                         ),
-                                      // Save Current Loadout Option
-                                      DropdownMenuItem<String>(
-                                        value: 'Save Current',
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.save_outlined, color: Colors.green), // Save icon
-                                            SizedBox(width: 8), // Space between icon and text
-                                            Text('Save New', style: TextStyle(color: Colors.green, fontWeight: FontWeight.normal)),
-                                          ],
+                                        // Save Empty Crew (Start Fresh)
+                                        DropdownMenuItem<String>(
+                                          value: 'Start Empty',
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.add, color: Colors.blue), // Fresh start icon
+                                              SizedBox(width: 8),
+                                              Text('Start Empty Crew', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.normal)),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      // Save Empty Crew (Start Fresh)
-                                      DropdownMenuItem<String>(
-                                        value: 'Start Empty',
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.add, color: Colors.blue), // Fresh start icon
-                                            SizedBox(width: 8),
-                                            Text('Start Empty Crew', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.normal)),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                      ],
                                       onChanged: (String? newValue) async {
                                         String? previousLoadout = selectedLoadout;
 
@@ -1540,7 +1913,7 @@ class _SettingsState extends State<SettingsView> {
                                                   ),
                                                   content: Text(
                                                     'Saving a new loadout will erase any recent changes made to your current crew loadout.'
-                                                        'This action is irreversible. Proceed?',
+                                                    'This action is irreversible. Proceed?',
                                                     style: TextStyle(color: AppColors.textColorPrimary),
                                                   ),
                                                   actions: [
@@ -1568,18 +1941,17 @@ class _SettingsState extends State<SettingsView> {
                                             );
 
                                             // If the user cancels, restore the previous selection
-                                            if (confirmed == false || confirmed == null ) {
+                                            if (confirmed == false || confirmed == null) {
                                               setState(() {
                                                 selectedLoadout = previousLoadout;
                                               });
                                               return;
                                             }
-
                                           }
                                           _promptNewLoadoutName(previousLoadout ?? "New Loadout", false, false);
                                           return;
                                         }
-                                        if (newValue == 'Start Empty'){
+                                        if (newValue == 'Start Empty') {
                                           if (isOutOfSync) {
                                             // Ask for confirmation before switching
                                             bool? confirmed = await showDialog(
@@ -1593,7 +1965,7 @@ class _SettingsState extends State<SettingsView> {
                                                   ),
                                                   content: Text(
                                                     'Saving a new loadout will erase any recent changes made to your current crew loadout.'
-                                                        'This action is irreversible. Proceed?',
+                                                    'This action is irreversible. Proceed?',
                                                     style: TextStyle(color: AppColors.textColorPrimary),
                                                   ),
                                                   actions: [
@@ -1621,13 +1993,12 @@ class _SettingsState extends State<SettingsView> {
                                             );
 
                                             // If the user cancels, restore the previous selection
-                                            if (confirmed == false || confirmed == null ) {
+                                            if (confirmed == false || confirmed == null) {
                                               setState(() {
                                                 selectedLoadout = previousLoadout;
                                               });
                                               return;
                                             }
-
                                           }
                                           // Pass true for isEmptyCrew -> Creates empty crew loadout
                                           _promptNewLoadoutName(previousLoadout ?? "New Loadout", true, false);
@@ -1645,14 +2016,13 @@ class _SettingsState extends State<SettingsView> {
                                             builder: (BuildContext context) {
                                               return AlertDialog(
                                                 backgroundColor: AppColors.textFieldColor2,
-
                                                 title: Text(
                                                   'Confirm Switch',
                                                   style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                                                 ),
                                                 content: Text(
                                                   'Switching to the loadout, $newValue, will erase any recent changes made to your current crew loadout.'
-                                                      'This action is irreversible. Proceed?',
+                                                  'This action is irreversible. Proceed?',
                                                   style: TextStyle(color: AppColors.textColorPrimary),
                                                 ),
                                                 actions: [
@@ -1680,7 +2050,7 @@ class _SettingsState extends State<SettingsView> {
                                           );
 
                                           // If the user cancels, restore the previous selection
-                                          if (confirmed == false || confirmed == null ) {
+                                          if (confirmed == false || confirmed == null) {
                                             setState(() {
                                               selectedLoadout = previousLoadout;
                                             });
@@ -1700,7 +2070,7 @@ class _SettingsState extends State<SettingsView> {
                                                 ),
                                                 content: Text(
                                                   'Switching to the loadout, $newValue, will erase your current crew data which is not saved to any loadouts.'
-                                                      'This action is irreversible. Proceed?',
+                                                  'This action is irreversible. Proceed?',
                                                   style: TextStyle(color: AppColors.textColorPrimary),
                                                 ),
                                                 actions: [
@@ -1728,7 +2098,7 @@ class _SettingsState extends State<SettingsView> {
                                           );
 
                                           // If the user cancels, restore the previous selection
-                                          if (confirmed == false || confirmed == null ) {
+                                          if (confirmed == false || confirmed == null) {
                                             setState(() {
                                               selectedLoadout = previousLoadout;
                                             });
@@ -1742,15 +2112,12 @@ class _SettingsState extends State<SettingsView> {
                                         setState(() {
                                           selectedLoadout = newValue;
                                         });
-                                      }
-
-                                  ),
+                                      }),
                                 ),
                               ),
                             ),
+
                             SizedBox(width: 10), // Space between dropdown and buttons
-
-
 
                             // Sync Button
                             Tooltip(
@@ -1763,129 +2130,143 @@ class _SettingsState extends State<SettingsView> {
                                 ),
                                 onPressed: (selectedLoadout != null && isOutOfSync)
                                     ? () async {
-                                  bool? confirmed = await showDialog(
-                                    context: context,
-                                    barrierDismissible: true, // Allows tapping outside to dismiss
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        backgroundColor: AppColors.textFieldColor2,
-                                        title: Text(
-                                          'Confirm Update',
-                                          style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
-                                        ),
-                                        content: Text(
-                                          'Updating this loadout will overwrite all previously saved crew data (Crew Members, Gear, Trip Preferences) '
-                                              'from $lastSavedTimestamp with your current crew data. This action is irreversible. Proceed?',
-                                          style: TextStyle(color: AppColors.textColorPrimary),
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop(false); // Return false to cancel
-                                            },
-                                            child: Text(
-                                              'Cancel',
-                                              style: TextStyle(color: AppColors.cancelButton),
-                                            ),
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop(true); // Return true to confirm
-                                            },
-                                            child: Text(
-                                              'Confirm',
-                                              style: TextStyle(color: AppColors.saveButtonAllowableWeight),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
+                                        bool? confirmed = await showDialog(
+                                          context: context,
+                                          barrierDismissible: true, // Allows tapping outside to dismiss
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              backgroundColor: AppColors.textFieldColor2,
+                                              title: Text(
+                                                'Confirm Update',
+                                                style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                              ),
+                                              content: Text(
+                                                'Updating this loadout will overwrite all previously saved crew data (Crew Members, Gear, Trip Preferences) '
+                                                'from $lastSavedTimestamp with your current crew data. This action is irreversible. Proceed?',
+                                                style: TextStyle(color: AppColors.textColorPrimary),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop(false); // Return false to cancel
+                                                  },
+                                                  child: Text(
+                                                    'Cancel',
+                                                    style: TextStyle(color: AppColors.cancelButton),
+                                                  ),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop(true); // Return true to confirm
+                                                  },
+                                                  child: Text(
+                                                    'Confirm',
+                                                    style: TextStyle(color: AppColors.saveButtonAllowableWeight),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
 
-                                  // If the user cancels (taps outside or presses cancel), do nothing
-                                  if (confirmed == null || !confirmed) {
-                                    return;
-                                  }
+                                        // If the user cancels (taps outside or presses cancel), do nothing
+                                        if (confirmed == null || !confirmed) {
+                                          return;
+                                        }
 
-                                  // If confirmed, proceed with updating the loadout
-                                  await _updateCurrentLoadout(selectedLoadout!);
-                                }
+                                        // If confirmed, proceed with updating the loadout
+                                        await _updateCurrentLoadout(selectedLoadout!);
+                                      }
                                     : null, // Button is disabled if loadout is null or already in sync
                               ),
                             ),
-
                           ],
                         ),
-
                         if (selectedLoadout != null && selectedLoadout!.isNotEmpty)
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Icon(
-                                !isOutOfSync ? Icons.check: Icons.sync_disabled_outlined, // Info icon
-                                color: !isOutOfSync ? Colors.green : Colors.red,
-                                size: 22, // Adjust size if needed
-                              ),
-                              Text(
-                                ' Last Updated: $lastSavedTimestamp',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: isOutOfSync ? Colors.red : Colors.green.withOpacity(0.8),
-                                  fontStyle: FontStyle.italic,
-                                  fontWeight: isOutOfSync ? FontWeight.bold : FontWeight.normal,
+                              GestureDetector(
+                                  onTap: () {
+                                  if (isOutOfSync) {
+                                    _showSyncDifferencesDialog();
+                                  }
+                                },
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      !isOutOfSync ? Icons.check : Icons.sync_disabled_outlined, // Info icon
+                                      color: !isOutOfSync ? Colors.green : Colors.red,
+                                      size: AppData.text22, // Adjust size if needed
+                                    ),
+                                    Text(
+                                      ' Last Updated: $lastSavedTimestamp ',
+                                      style: TextStyle(
+                                        fontSize: AppData.text14,
+                                        color: isOutOfSync ? Colors.red : Colors.green.withOpacity(0.8),
+                                        fontStyle: FontStyle.italic,
+                                        fontWeight: isOutOfSync ? FontWeight.bold : FontWeight.normal,
+                                      ),
+                                    ),
+                                    if (isOutOfSync)
+                                      Icon(
+                                        Icons.info_outline, // Info icon
+                                        color: Colors.red,
+                                        size: AppData.text22, // Adjust size if needed
+                                      ),
+                                  ],
                                 ),
                               ),
+                              Spacer(),
                               // Delete Button
                               IconButton(
                                 icon: Icon(Icons.delete, color: selectedLoadout != null ? Colors.red : Colors.grey, size: AppData.text18),
                                 onPressed: selectedLoadout != null && selectedLoadout != 'Save Current'
-                                    ? () =>
-                                {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        backgroundColor: AppColors.textFieldColor2,
-                                        title: Text(
-                                          'Confirm Deletion',
-                                          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                        ),
-                                        content: Text(
-                                          'Are you sure you want to delete this loadout?',
-                                          style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop(); // Close the dialog without deleting
+                                    ? () => {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                backgroundColor: AppColors.textFieldColor2,
+                                                title: Text(
+                                                  'Confirm Deletion',
+                                                  style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                                ),
+                                                content: Text(
+                                                  'Are you sure you want to delete this loadout?',
+                                                  style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop(); // Close the dialog without deleting
+                                                    },
+                                                    child: Text(
+                                                      'Cancel',
+                                                      style: TextStyle(color: AppColors.textColorPrimary),
+                                                    ),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      // Perform deletion
+                                                      _deleteLoadout(selectedLoadout!);
+                                                      // Close the dialogs
+                                                      Navigator.of(context).pop(); // Close confirmation dialog
+                                                    },
+                                                    child: const Text(
+                                                      'Delete',
+                                                      style: TextStyle(color: Colors.red),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
                                             },
-                                            child: Text(
-                                              'Cancel',
-                                              style: TextStyle(color: AppColors.textColorPrimary),
-                                            ),
                                           ),
-                                          TextButton(
-                                            onPressed: () {
-                                              // Perform deletion
-                                              _deleteLoadout(selectedLoadout!);
-                                              // Close the dialogs
-                                              Navigator.of(context).pop(); // Close confirmation dialog
-                                            },
-                                            child: const Text(
-                                              'Delete',
-                                              style: TextStyle(color: Colors.red),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                }
+                                        }
                                     : null,
                               ),
                             ],
                           ),
-
                       ],
                     ),
                   ),
@@ -1908,8 +2289,6 @@ class _SettingsState extends State<SettingsView> {
                       ),
                     ],
                   ),
-
-
                 ],
               ),
             ),

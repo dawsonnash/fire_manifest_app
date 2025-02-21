@@ -235,7 +235,6 @@ class _EditCrewState extends State<EditCrew> {
                               crossAxisAlignment: CrossAxisAlignment.start, // Ensures both elements align from the top
                               mainAxisAlignment: MainAxisAlignment.spaceBetween, // Spread elements apart
                               children: [
-                                if (lastUsedLoadout != null)
                                   Expanded(
                                     flex: 2, // Allocate space for loadout text
                                     child: Align(
@@ -245,7 +244,7 @@ class _EditCrewState extends State<EditCrew> {
                                           maxWidth: screenWidth * 0.5, // Ensures it doesn’t take too much space
                                         ),
                                         child: Text(
-                                          '$lastUsedLoadout',
+                                         lastUsedLoadout != null ? '$lastUsedLoadout' : '',
                                           style: subHeaderTextStyle,
                                           textAlign: TextAlign.left,
                                           maxLines: 2, // Allows wrapping up to two lines
@@ -322,7 +321,7 @@ class _EditCrewState extends State<EditCrew> {
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 40),
+                                  const SizedBox(height: 30),
                                   GestureDetector(
                                     onTap: () async {
                                       await Navigator.push(
@@ -394,7 +393,7 @@ class _EditCrewState extends State<EditCrew> {
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 40),
+                                  const SizedBox(height: 30),
                                   GestureDetector(
                                     onTap: () async {
                                       await Navigator.push(

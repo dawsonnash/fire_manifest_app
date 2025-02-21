@@ -565,7 +565,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
   }
 // Error message setup
   if (crewMembersCopy.isNotEmpty || gearCopy.isNotEmpty || duplicateCrew.isNotEmpty || duplicateGear.isNotEmpty) {
-    String errorMessage = "Not all crew members or gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable.";
+    String errorMessage = isExternalManifest ? "Not all gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable." : "Not all crew members or gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable.";
 
     if (duplicateCrew.isNotEmpty || duplicateGear.isNotEmpty) {
       errorMessage += "\nAdditionally, duplicate items were detected.";
