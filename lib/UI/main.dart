@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:fire_app/Data/load_accoutrement_manager.dart';
 import 'package:fire_app/UI/05_create_new_manifest.dart';
 import 'package:fire_app/UI/06_saved_trips.dart';
 import 'package:fire_app/UI/settings.dart';
@@ -50,12 +51,15 @@ void main() async {
   await Hive.openBox<Trip>('tripBox');
   await Hive.openBox<TripPreference>('tripPreferenceBox');
   await Hive.openBox<Gear>('personalToolsBox');
-  await Hive.openBox<Gear>('loadAccoutrementBox');
+  await Hive.openBox<LoadAccoutrement>('loadAccoutrementBox');
+  await Hive.openBox('settingsBox'); // Box to track first launch
 
   // Load data from Hive
   await crew.loadCrewDataFromHive();
   await savedPreferences.loadPreferencesFromHive();
   await savedTrips.loadTripDataFromHive();
+  await loadAccoutrementManager.loadLoadAccoutrementsFromHive();
+
 
   // Test data for user testing
   // if (crew.crewMembers.isEmpty && crew.gear.isEmpty) {
@@ -72,6 +76,7 @@ void main() async {
   AppColors.enableBackgroundImage = await ThemePreferences.getBackgroundImagePreference();
   AppData.crewName = await ThemePreferences.getCrewName(); // Initialize AppData.crewName
   AppData.userName = await ThemePreferences.getUserName();
+  AppData.safetyBuffer = await ThemePreferences.getSafetyBuffer();
 
   // start app
   runApp(MyApp(showDisclaimer: !agreedToTerms));
@@ -122,12 +127,12 @@ class _MyHomePageState extends State<MyHomePage> {
           enableBackgroundImage: AppColors.enableBackgroundImage,
           crewName: AppData.crewName,
           userName: AppData.userName,
+          safetyBuffer: AppData.safetyBuffer,
           onThemeChanged: _toggleTheme,
           onBackgroundImageChange: _toggleBackgroundImage,
           onCrewNameChanged: _changeCrewName,
           onUserNameChanged: _changeUserName,
-
-
+          onSafetyBufferChange: _changeSafetyBuffer,
         ),
       ];
 
@@ -150,7 +155,6 @@ class _MyHomePageState extends State<MyHomePage> {
     await ThemePreferences.setBackgroundImagePreference(enableBackgroundImage);
   }
   void _changeCrewName(String crewName) async {
-    print("🚀 Updating Crew Name: $crewName");
 
     setState(() {
       AppData.crewName = crewName;
@@ -159,7 +163,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // Verify if it's saved correctly
     String savedCrewName = await ThemePreferences.getCrewName();
-    print("🔍 Saved Crew Name in SharedPreferences: $savedCrewName");
 
   }
   void _changeUserName(String userName) async {
@@ -167,6 +170,12 @@ class _MyHomePageState extends State<MyHomePage> {
       AppData.userName = userName;
     });
     await ThemePreferences.setUserName(userName);
+  }
+  void _changeSafetyBuffer(int safetyBuffer) async {
+    setState(() {
+      AppData.safetyBuffer = safetyBuffer;
+    });
+    await ThemePreferences.setSafetyBuffer(safetyBuffer);
   }
   void _onItemTapped(int index) {
     setState(() {

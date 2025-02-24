@@ -31,19 +31,24 @@ class SettingsView extends StatefulWidget {
   final Function(bool) onBackgroundImageChange;
   final String crewName;
   final String userName;
+  final int safetyBuffer;
   final Function(String) onCrewNameChanged;
   final Function(String) onUserNameChanged;
+  final Function(int) onSafetyBufferChange;
 
-  const SettingsView(
-      {super.key,
-      required this.isDarkMode,
-      required this.onThemeChanged,
-      required this.enableBackgroundImage,
-      required this.onBackgroundImageChange,
-      required this.crewName,
-      required this.userName,
-      required this.onCrewNameChanged,
-      required this.onUserNameChanged});
+  const SettingsView({
+    super.key,
+    required this.isDarkMode,
+    required this.onThemeChanged,
+    required this.enableBackgroundImage,
+    required this.onBackgroundImageChange,
+    required this.crewName,
+    required this.userName,
+    required this.safetyBuffer,
+    required this.onCrewNameChanged,
+    required this.onUserNameChanged,
+    required this.onSafetyBufferChange,
+  });
 
   @override
   State<SettingsView> createState() => _SettingsState();
@@ -54,6 +59,7 @@ class _SettingsState extends State<SettingsView> {
   late bool enableBackgroundImage;
   late TextEditingController crewNameController;
   late TextEditingController userNameController;
+  late TextEditingController safetyBufferController;
   List<String> loadoutNames = [];
   String? selectedLoadout;
   String lastSavedTimestamp = "N/A"; // Default value
@@ -66,6 +72,7 @@ class _SettingsState extends State<SettingsView> {
     enableBackgroundImage = widget.enableBackgroundImage;
     crewNameController = TextEditingController(text: widget.crewName); // Initialize with the current crew name
     userNameController = TextEditingController(text: widget.userName); // Initialize with the current user name
+    safetyBufferController = TextEditingController(text: widget.safetyBuffer.toString());
 
     _loadLoadoutNames().then((_) {
       if (selectedLoadout != null) {
@@ -78,6 +85,7 @@ class _SettingsState extends State<SettingsView> {
   void dispose() {
     crewNameController.dispose(); // Dispose the controller to free resources
     userNameController.dispose(); // Dispose the controller to free resources
+    safetyBufferController.dispose();
     super.dispose();
   }
 
@@ -1707,7 +1715,10 @@ class _SettingsState extends State<SettingsView> {
                                 ExpansionTile(
                                   title: Text(
                                     'Safety Buffer',
-                                    style: TextStyle(color: Colors.white, fontSize: 18,),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                    ),
                                   ),
                                   trailing: Icon(
                                     Icons.keyboard_arrow_down,
@@ -1728,15 +1739,18 @@ class _SettingsState extends State<SettingsView> {
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(horizontal: 8),
                                           child: TextField(
-                                           // controller: safetyBufferController,
-                                            style: TextStyle(color: Colors.white, fontSize: 18),
+                                            controller: safetyBufferController,
+                                            // Pre-fill with current user name
+                                            style: const TextStyle(color: Colors.white, fontSize: 18),
+                                            keyboardType: TextInputType.number,
                                             inputFormatters: [
-                                              LengthLimitingTextInputFormatter(30),
+                                              LengthLimitingTextInputFormatter(3),
+                                              FilteringTextInputFormatter.digitsOnly,
                                             ],
                                             decoration: InputDecoration(
                                               hintText: 'Enter Safety Buffer',
-                                              hintStyle: TextStyle(color: Colors.white54),
-                                              enabledBorder: UnderlineInputBorder(
+                                              hintStyle: const TextStyle(color: Colors.white54),
+                                              enabledBorder: const UnderlineInputBorder(
                                                 borderSide: BorderSide(color: Colors.white54),
                                               ),
                                               focusedBorder: UnderlineInputBorder(
@@ -1745,11 +1759,12 @@ class _SettingsState extends State<SettingsView> {
                                             ),
                                             onSubmitted: (value) {
                                               setState(() {
-                                                if (value.trim().isNotEmpty) {
-                                                 // widget.onSafetyBufferChange(value.trim());
+                                                int? parsedValue = int.tryParse(value.trim());
+                                                if (parsedValue != null) {
+                                                  widget.onSafetyBufferChange(parsedValue);
+                                                  ThemePreferences.setSafetyBuffer(parsedValue);
                                                 }
                                               });
-                                              // ThemePreferences.setSafetyBuffer(value.trim());
                                             },
                                           ),
                                         ),
@@ -1764,7 +1779,6 @@ class _SettingsState extends State<SettingsView> {
                                   child: GestureDetector(
                                     onTap: () {
                                       // Bottom modal here like personal tools
-
                                     },
                                     child: Row(
                                       children: [
@@ -1791,8 +1805,9 @@ class _SettingsState extends State<SettingsView> {
                                                           "Load Accoutrements Info",
                                                           style: TextStyle(color: AppColors.textColorPrimary),
                                                         ),
-                                                        content:
-                                                        Text("These are items that are included in each external cargo manifest (per net/sling load). These items are necessary for sling operations, e.g., cargo net, lead line, swivel. They are automatically included into the weight considerations when you make an external trip.", style: TextStyle(color: AppColors.textColorPrimary)),
+                                                        content: Text(
+                                                            "These are items that are included in each external cargo manifest (per net/sling load). These items are necessary for sling operations, e.g., cargo net, lead line, swivel. They are automatically included into the weight considerations when you make an external trip.",
+                                                            style: TextStyle(color: AppColors.textColorPrimary)),
                                                         actions: [
                                                           TextButton(
                                                             onPressed: () {
@@ -1809,7 +1824,6 @@ class _SettingsState extends State<SettingsView> {
                                                   );
                                                 },
                                               ),
-
                                             ],
                                           ),
                                         ),
@@ -1819,7 +1833,6 @@ class _SettingsState extends State<SettingsView> {
                                 ),
                               ],
                             ),
-
                           ],
                         ),
                       ],
@@ -2260,7 +2273,7 @@ class _SettingsState extends State<SettingsView> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               GestureDetector(
-                                  onTap: () {
+                                onTap: () {
                                   if (isOutOfSync) {
                                     _showSyncDifferencesDialog();
                                   }
@@ -2393,10 +2406,10 @@ class _SettingsState extends State<SettingsView> {
                                     content: SingleChildScrollView(
                                       child: Text(
                                         'The calculations provided by this app are intended for informational purposes only. '
-                                            'While every effort has been made to ensure accuracy, users must independently verify and validate '
-                                            'all data before relying on it for operational or decision-making purposes. The developers assume no '
-                                            'liability for errors, omissions, or any outcomes resulting from the use of this app. By continuing, '
-                                            'you acknowledge and accept full responsibility for reviewing and confirming all calculations.',
+                                        'While every effort has been made to ensure accuracy, users must independently verify and validate '
+                                        'all data before relying on it for operational or decision-making purposes. The developers assume no '
+                                        'liability for errors, omissions, or any outcomes resulting from the use of this app. By continuing, '
+                                        'you acknowledge and accept full responsibility for reviewing and confirming all calculations.',
                                         style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
                                       ),
                                     ),
@@ -2424,7 +2437,6 @@ class _SettingsState extends State<SettingsView> {
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),

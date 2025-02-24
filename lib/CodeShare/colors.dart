@@ -35,8 +35,10 @@ class AppColors {
 
 class AppData {
   // Crew & User Data
-  static String crewName = 'Crew Name';
+  static String crewName = '';
   static String userName = '';
+  static int safetyBuffer = 0;
+
 
   // Standardized Spacing & Max Constraints to be phased out
   static double inputFieldMax = 450;
@@ -140,6 +142,7 @@ class ThemePreferences {
   static const _backgroundImageKey = 'enableBackgroundImage';
   static const _crewNameKey = 'crewName';
   static const _userNameKey = 'userName';
+  static const _safetyBufferKey = 'safetyBuffer';
 
   static Future<bool> getTheme() async {
     final prefs = await SharedPreferences.getInstance();
@@ -163,7 +166,7 @@ class ThemePreferences {
 
   static Future<String> getCrewName() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_crewNameKey) ?? '';
+    return prefs.getString(_crewNameKey) ?? 'Crew Name Here';
   }
 
   static Future<void> setCrewName(String crewName) async {
@@ -179,6 +182,16 @@ class ThemePreferences {
   static Future<void> setUserName(String userName) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(_userNameKey, userName);
+  }
+
+  static Future<int> getSafetyBuffer() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_safetyBufferKey) ?? 0;
+  }
+
+  static Future<void> setSafetyBuffer(int safetyBuffer) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_safetyBufferKey, safetyBuffer);
   }
 }
 

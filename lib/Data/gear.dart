@@ -93,7 +93,7 @@ final List<Map<String, dynamic>> irpgItems = [
   {'name': 'Drip torch (full)', 'weight': 15, 'hazmat': true},
   {'name': 'Fusee (1 case)', 'weight': 36, 'hazmat': true},
   {'name': 'Hand tool', 'weight': 8, 'hazmat': false},
-  {'name': 'Lead line (12’) ', 'weight': 10, 'hazmat': false},
+  {'name': 'Lead line (12’)', 'weight': 10, 'hazmat': false},
   {'name': 'Long line (50’)', 'weight': 30, 'hazmat': false},
   {'name': 'Swivel', 'weight': 5, 'hazmat': false},
   {'name': 'Chainsaw', 'weight': 25, 'hazmat': true},

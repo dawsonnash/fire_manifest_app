@@ -145,7 +145,7 @@ class _QuickManifestState extends State<QuickManifest> {
   final TextEditingController tripNameController = TextEditingController();
   final TextEditingController allowableController = TextEditingController();
   final TextEditingController availableSeatsController = TextEditingController();
-  final TextEditingController safetyBufferController = TextEditingController(text: '0');
+  late TextEditingController safetyBufferController = TextEditingController(text: '0');
 
   final TextEditingController keyboardController = TextEditingController();
   double _sliderValue = 1000;
@@ -167,7 +167,8 @@ class _QuickManifestState extends State<QuickManifest> {
     tripNameController.addListener(_checkInput);
     allowableController.addListener(_checkInput);
     availableSeatsController.addListener(_checkInput);
-    safetyBufferController.addListener(_checkInput);
+    // Initialize safetyBufferController with AppData.safetyBuffer
+    safetyBufferController = TextEditingController(text: AppData.safetyBuffer.toString());
 
     // Initialize allowableController with the default slider value
     allowableController.text = _sliderValue.toStringAsFixed(0);
