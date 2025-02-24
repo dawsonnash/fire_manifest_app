@@ -116,19 +116,32 @@ class _SettingsState extends State<SettingsView> {
   }
 
   bool _areTripPreferencesEqual(TripPreference a, TripPreference b) {
-    // Compare positional and gear preferences as JSON (ignores ordering issues)
-    String aJson = jsonEncode({
-      "positionalPreferences": a.positionalPreferences.map((pp) => pp.toJson()).toList(),
-      "gearPreferences": a.gearPreferences.map((gp) => gp.toJson()).toList(),
-    });
+    // Extract unique crew member names from positional preferences (handles lists & individuals)
+    Set<String> aCrewNames = a.positionalPreferences
+        .expand((pp) => pp.crewMembersDynamic.expand((cm) => cm is CrewMember
+        ? [cm.name]  // Individual crew member
+        : (cm as List<CrewMember>).map((m) => m.name)))  // List of crew members
+        .toSet();
 
-    String bJson = jsonEncode({
-      "positionalPreferences": b.positionalPreferences.map((pp) => pp.toJson()).toList(),
-      "gearPreferences": b.gearPreferences.map((gp) => gp.toJson()).toList(),
-    });
+    Set<String> bCrewNames = b.positionalPreferences
+        .expand((pp) => pp.crewMembersDynamic.expand((cm) => cm is CrewMember
+        ? [cm.name]
+        : (cm as List<CrewMember>).map((m) => m.name)))
+        .toSet();
 
-    return aJson == bJson;
+    // Extract unique gear names from gear preferences
+    Set<String> aGearNames = a.gearPreferences
+        .expand((gp) => gp.gear.map((g) => g.name))
+        .toSet();
+
+    Set<String> bGearNames = b.gearPreferences
+        .expand((gp) => gp.gear.map((g) => g.name))
+        .toSet();
+
+    // **Compare only presence of crew names and gear names** (ignoring any attribute changes)
+    return setEquals(aCrewNames, bCrewNames) && setEquals(aGearNames, bGearNames);
   }
+
 
   Map<String, List<String>> _getCrewMemberDifferences(List<CrewMember> currentList, List<CrewMember> savedList) {
     List<String> removed = [];
