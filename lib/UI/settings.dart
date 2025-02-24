@@ -1761,7 +1761,7 @@ class _SettingsState extends State<SettingsView> {
                                               FilteringTextInputFormatter.digitsOnly,
                                             ],
                                             decoration: InputDecoration(
-                                              hintText: 'Enter Safety Buffer',
+                                              hintText: 'Enter Safety Buffer (lbs)',
                                               hintStyle: const TextStyle(color: Colors.white54),
                                               enabledBorder: const UnderlineInputBorder(
                                                 borderSide: BorderSide(color: Colors.white54),
@@ -1787,63 +1787,63 @@ class _SettingsState extends State<SettingsView> {
                                 ),
 
                                 // Load Accoutrements Styled Like a Header (Aligned with Safety Buffer)
-                                Padding(
-                                  padding: EdgeInsets.only(left: 16, top: 8, bottom: 8), // Adjust left padding to match ExpansionTile
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      // Bottom modal here like personal tools
-                                    },
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                'Load Accoutrements ',
-                                                style: TextStyle(color: Colors.white, fontSize: 18),
-                                              ),
-                                              IconButton(
-                                                icon: Icon(
-                                                  Icons.info_outline, // Info icon
-                                                  color: Colors.white,
-                                                  size: 22, // Adjust size if needed
-                                                ),
-                                                onPressed: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (BuildContext context) {
-                                                      return AlertDialog(
-                                                        backgroundColor: AppColors.textFieldColor2,
-                                                        title: Text(
-                                                          "Load Accoutrements Info",
-                                                          style: TextStyle(color: AppColors.textColorPrimary),
-                                                        ),
-                                                        content: Text(
-                                                            "These are items that are included in each external cargo manifest (per net/sling load). These items are necessary for sling operations, e.g., cargo net, lead line, swivel. They are automatically included into the weight considerations when you make an external trip.",
-                                                            style: TextStyle(color: AppColors.textColorPrimary)),
-                                                        actions: [
-                                                          TextButton(
-                                                            onPressed: () {
-                                                              Navigator.of(context).pop(); // Close the dialog
-                                                            },
-                                                            child: Text(
-                                                              "OK",
-                                                              style: TextStyle(color: AppColors.textColorPrimary),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      );
-                                                    },
-                                                  );
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                                // Padding(
+                                //   padding: EdgeInsets.only(left: 16, top: 8, bottom: 8), // Adjust left padding to match ExpansionTile
+                                //   child: GestureDetector(
+                                //     onTap: () {
+                                //       // Bottom modal here like personal tools
+                                //     },
+                                //     child: Row(
+                                //       children: [
+                                //         Expanded(
+                                //           child: Row(
+                                //             children: [
+                                //               Text(
+                                //                 'Load Accoutrements ',
+                                //                 style: TextStyle(color: Colors.white, fontSize: 18),
+                                //               ),
+                                //               IconButton(
+                                //                 icon: Icon(
+                                //                   Icons.info_outline, // Info icon
+                                //                   color: Colors.white,
+                                //                   size: 22, // Adjust size if needed
+                                //                 ),
+                                //                 onPressed: () {
+                                //                   showDialog(
+                                //                     context: context,
+                                //                     builder: (BuildContext context) {
+                                //                       return AlertDialog(
+                                //                         backgroundColor: AppColors.textFieldColor2,
+                                //                         title: Text(
+                                //                           "Load Accoutrements Info",
+                                //                           style: TextStyle(color: AppColors.textColorPrimary),
+                                //                         ),
+                                //                         content: Text(
+                                //                             "These are items that are included in each external cargo manifest (per net/sling load). These items are necessary for sling operations, e.g., cargo net, lead line, swivel. They are automatically included into the weight considerations when you make an external trip.",
+                                //                             style: TextStyle(color: AppColors.textColorPrimary)),
+                                //                         actions: [
+                                //                           TextButton(
+                                //                             onPressed: () {
+                                //                               Navigator.of(context).pop(); // Close the dialog
+                                //                             },
+                                //                             child: Text(
+                                //                               "OK",
+                                //                               style: TextStyle(color: AppColors.textColorPrimary),
+                                //                             ),
+                                //                           ),
+                                //                         ],
+                                //                       );
+                                //                     },
+                                //                   );
+                                //                 },
+                                //               ),
+                                //             ],
+                                //           ),
+                                //         ),
+                                //       ],
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ],

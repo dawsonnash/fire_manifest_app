@@ -52,7 +52,6 @@ void main() async {
   await Hive.openBox<TripPreference>('tripPreferenceBox');
   await Hive.openBox<Gear>('personalToolsBox');
   await Hive.openBox<LoadAccoutrement>('loadAccoutrementBox');
-  await Hive.openBox('settingsBox'); // Box to track first launch
 
   // Load data from Hive
   await crew.loadCrewDataFromHive();

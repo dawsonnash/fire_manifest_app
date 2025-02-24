@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:fire_app/Algorithms/external_load_calculator.dart';
 import 'package:fire_app/CodeShare/colors.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/cupertino.dart';
@@ -147,6 +148,17 @@ class _QuickManifestState extends State<QuickManifest> {
   final TextEditingController availableSeatsController = TextEditingController();
   late TextEditingController safetyBufferController = TextEditingController(text: '0');
 
+  // Controllers for load hardware input fields
+  final TextEditingController net12x12QuantityController = TextEditingController();
+  final TextEditingController net12x12WeightController = TextEditingController();
+  final TextEditingController net20x20QuantityController = TextEditingController();
+  final TextEditingController net20x20WeightController = TextEditingController();
+  final TextEditingController swivelQuantityController = TextEditingController();
+  final TextEditingController swivelWeightController = TextEditingController();
+  final TextEditingController leadLineQuantityController = TextEditingController();
+  final TextEditingController leadLineWeightController = TextEditingController();
+
+
   final TextEditingController keyboardController = TextEditingController();
   double _sliderValue = 1000;
 
@@ -167,11 +179,28 @@ class _QuickManifestState extends State<QuickManifest> {
     tripNameController.addListener(_checkInput);
     allowableController.addListener(_checkInput);
     availableSeatsController.addListener(_checkInput);
-    // Initialize safetyBufferController with AppData.safetyBuffer
     safetyBufferController = TextEditingController(text: AppData.safetyBuffer.toString());
-
-    // Initialize allowableController with the default slider value
     allowableController.text = _sliderValue.toStringAsFixed(0);
+
+    // Initialize load hardware with default values
+    net12x12QuantityController.text = '0';
+    net12x12WeightController.text = '20';
+    net20x20QuantityController.text = '0';
+    net20x20WeightController.text = '45';
+    swivelQuantityController.text = '0';
+    swivelWeightController.text = '5';
+    leadLineQuantityController.text = '0';
+    leadLineWeightController.text = '10';
+
+    // Add Listeners (if needed)
+    // net12x12QuantityController.addListener();
+    // net12x12WeightController.addListener();
+    // net20x20QuantityController.addListener();
+    // net20x20WeightController.addListener();
+    // swivelQuantityController.addListener();
+    // swivelWeightController.addListener();
+    // leadLineQuantityController.addListener();
+    // leadLineWeightController.addListener();
 
     loadItems();
 
@@ -1027,6 +1056,126 @@ class _QuickManifestState extends State<QuickManifest> {
     );
   }
 
+  void _showLoadAccoutrementSelectionDialog() async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, dialogSetState) {
+            return AlertDialog(
+              backgroundColor: AppColors.textFieldColor2,
+              title: Text(
+                'Select Load Accoutrements',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text20, color: AppColors.textColorPrimary),
+              ),
+              contentPadding: EdgeInsets.all(AppData.padding10),
+              content: ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _buildLoadAccoutrementRow(dialogSetState, "Cargo Net (12'x12') ", net12x12QuantityController, net12x12WeightController),
+                      SizedBox(height: 8),
+                      _buildLoadAccoutrementRow(dialogSetState, "Cargo Net (20'x20') ", net20x20QuantityController, net20x20WeightController),
+                      SizedBox(height: 8),
+                      _buildLoadAccoutrementRow(dialogSetState, "Swivel", swivelQuantityController, swivelWeightController),
+                      SizedBox(height: 8),
+                      _buildLoadAccoutrementRow(dialogSetState, "Lead Line (12')", leadLineQuantityController, leadLineWeightController),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close dialog
+                  },
+                  child: Text('Select', style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildLoadAccoutrementRow(
+      StateSetter dialogSetState,
+      String label,
+      TextEditingController quantityController,
+      TextEditingController weightController,
+      ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          flex: 2,
+          child: Text(
+            label,
+            style: TextStyle(fontSize: AppData.text16, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: DropdownButtonFormField<int>(
+            dropdownColor: AppColors.textFieldColor2,
+            value: int.tryParse(quantityController.text) ?? 0,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColors.borderPrimary), // Default border
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColors.primaryColor, width: 2.0), // Selected border
+              ),
+              contentPadding: EdgeInsets.all(4),
+            ),
+            items: List.generate(11, (index) => index).map((int value) {
+              return DropdownMenuItem<int>(
+                value: value,
+                child: Text(value.toString(), style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary)),
+              );
+            }).toList(),
+            onChanged: (int? newValue) {
+              if (newValue != null) {
+                dialogSetState(() {
+                  quantityController.text = newValue.toString();
+                });
+              }
+            },
+          ),
+        ),
+        SizedBox(width: 8),
+        Expanded(
+          flex: 1,
+          child: TextField(
+            controller: weightController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: InputDecoration(
+              labelText: 'lbs',
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColors.borderPrimary), // Default border
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColors.primaryColor, width: 2.0), // Selected border
+              ),
+              contentPadding: EdgeInsets.all(4),
+            ),
+            style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+          ),
+        ),
+      ],
+    );
+  }
+
   // Track the last input source
   bool lastInputFromSlider = true;
 
@@ -1303,10 +1452,27 @@ class _QuickManifestState extends State<QuickManifest> {
     savedTrips.addTrip(newTrip);
 
     // Load Calculation with animation
-    startCalculation(context, isExternalManifest, newTrip, selectedTripPreference, safetyBuffer);
+    // Current testing: for internal only, to be used eventually by external
+    if (!isExternalManifest) {
+      startCalculation(context, isExternalManifest, newTrip, selectedTripPreference, safetyBuffer);
+    }
+    else{
+      // Testing only -> fast version no animation for external manifesting
+      externalLoadCalculator(context, newTrip, selectedTripPreference, safetyBuffer);
+    }
 
     // Load Calculation without animation
     // loadCalculator(context, newTrip, selectedTripPreference);
+
+    // Reset all load hardware controllers
+    net12x12QuantityController.text = '0';
+    net12x12WeightController.text = '20';
+    net20x20QuantityController.text = '0';
+    net20x20WeightController.text = '45';
+    swivelQuantityController.text = '0';
+    swivelWeightController.text = '5';
+    leadLineQuantityController.text = '0';
+    leadLineWeightController.text = '10';
 
     // Clear the text fields (reset them to empty), so we can add more trips
     tripNameController.text = '';
@@ -1592,11 +1758,12 @@ class _QuickManifestState extends State<QuickManifest> {
                                 ),
                               ),
                             )),
+
                       SizedBox(height: AppData.spacingStandard),
 
                       // Select All/Some Crew
                       Padding(
-                        padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16, top: 0.0, bottom: AppData.padding5),
+                        padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
                         child: Container(
                           width: AppData.inputFieldWidth,
                           padding: EdgeInsets.symmetric(vertical: AppData.padding8),
@@ -1694,6 +1861,54 @@ class _QuickManifestState extends State<QuickManifest> {
                           ),
                         ),
                       ),
+
+                      if (isExternalManifest)
+                        SizedBox(height: AppData.spacingStandard),
+
+                      // Select Load Accoutrements
+                      if (isExternalManifest)
+                        Padding(
+                          padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
+                          child: Container(
+                            width: AppData.inputFieldWidth,
+                            padding: EdgeInsets.symmetric(vertical: AppData.padding8),
+                            decoration: BoxDecoration(
+                              color: AppColors.textFieldColor,
+                              borderRadius: BorderRadius.circular(4.0),
+                              border: Border.all(color: AppColors.borderPrimary, width: 2.0),
+                            ),
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: EdgeInsets.only(left: AppData.padding16),
+                              child: Row(
+                                children: [
+
+                                  Text(
+                                    'Select Load Accoutrements',
+                                    style: TextStyle(
+                                      fontSize: AppData.text18,
+                                      color: AppColors.textColorPrimary,
+                                    ),
+                                  ),
+
+                                  const Spacer(),
+                                  // List icon
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.keyboard_arrow_down_sharp,
+                                      color: AppColors.textColorPrimary,
+                                      size: AppData.text32,
+                                    ),
+                                    onPressed: () {
+                                      _showLoadAccoutrementSelectionDialog();
+                                      setState(() {});
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
 
                       SizedBox(height: AppData.spacingStandard),
 
