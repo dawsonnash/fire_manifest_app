@@ -1,3 +1,4 @@
+import 'package:fire_app/Data/load_accoutrements.dart';
 import 'package:fire_app/Data/positional_preferences.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +14,7 @@ import '../Data/gear.dart';
 import '../Data/trip_preferences.dart';
 
 // TripPreference based sorting algorithm
-Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference, int safetyBuffer) async {
+Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference, int safetyBuffer, LoadAccoutrement cargoNet12x12, LoadAccoutrement cargoNet20x20, LoadAccoutrement swivel, LoadAccoutrement leadLine) async {
 
   int maxLoadWeight = trip.allowable - safetyBuffer;
 

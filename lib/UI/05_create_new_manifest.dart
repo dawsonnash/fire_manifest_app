@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:fire_app/Algorithms/external_load_calculator.dart';
 import 'package:fire_app/CodeShare/colors.dart';
+import 'package:fire_app/Data/load_accoutrements.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -1323,7 +1324,8 @@ class _QuickManifestState extends State<QuickManifest> {
         return;
       }
     }
-    // If external manifesting, gear must exist, and  safety buffer cannot be lower than allowable
+    // External manifesting error checks -> need to include load accoutrement checks here
+    // Logic: If external manifesting, gear must exist, and  safety buffer cannot be lower than allowable
     if (isExternalManifest) {
       Gear? heaviestGearItem;
       num maxGearWeight = 0;
@@ -1448,6 +1450,7 @@ class _QuickManifestState extends State<QuickManifest> {
         return;
       }
     }
+
     // Add the new trip to the global crew object
     savedTrips.addTrip(newTrip);
 
@@ -1457,8 +1460,43 @@ class _QuickManifestState extends State<QuickManifest> {
       startCalculation(context, isExternalManifest, newTrip, selectedTripPreference, safetyBuffer);
     }
     else{
+      // Create Load Accoutrement objecets to pass
+
+      LoadAccoutrement cargoNet12x12 = LoadAccoutrement(
+        name: "Cargo Net (12'x12')",
+        quantity: int.parse(net12x12QuantityController.text),
+        weight: int.parse(net12x12WeightController.text),
+      );
+
+      LoadAccoutrement cargoNet20x20 = LoadAccoutrement(
+        name: "Cargo Net (20'x20')",
+        quantity: int.parse(net20x20QuantityController.text),
+        weight: int.parse(net20x20WeightController.text),
+      );
+
+      LoadAccoutrement swivel = LoadAccoutrement(
+        name: "Swivel",
+        quantity: int.parse(swivelQuantityController.text),
+        weight: int.parse(swivelWeightController.text),
+      );
+
+      LoadAccoutrement leadLine = LoadAccoutrement(
+        name: "Lead Line (12')",
+        quantity: int.parse(leadLineQuantityController.text),
+        weight: int.parse(leadLineWeightController.text),
+      );
+
       // Testing only -> fast version no animation for external manifesting
-      externalLoadCalculator(context, newTrip, selectedTripPreference, safetyBuffer);
+      externalLoadCalculator(
+          context,
+          newTrip,
+          selectedTripPreference,
+          safetyBuffer,
+          cargoNet12x12,
+          cargoNet20x20,
+          swivel,
+          leadLine
+      );
     }
 
     // Load Calculation without animation

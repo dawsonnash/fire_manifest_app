@@ -9,17 +9,24 @@ class LoadAccoutrement extends HiveObject {
   @HiveField(1)
   int weight;
 
+  @HiveField(2)
+  int quantity;
+
   // Constructor to generate a UUID automatically
   LoadAccoutrement({
     required this.name,
     required this.weight,
+    required this.quantity,
+
   });
 
   // Function to create a copy of the Gear object with updated attributes
-  LoadAccoutrement copyWith({String? name, int? weight}) {
+  LoadAccoutrement copyWith({String? name, int? weight, int? quantity}) {
     return LoadAccoutrement(
       name: name ?? this.name,
       weight: weight ?? this.weight,
+      quantity: quantity ?? this.quantity,
+
     );
   }
 
@@ -28,6 +35,8 @@ class LoadAccoutrement extends HiveObject {
     return {
       "name": name,
       "weight": weight,
+      "quantity": quantity,
+
     };
   }
 
@@ -36,6 +45,8 @@ class LoadAccoutrement extends HiveObject {
     return LoadAccoutrement(
       name: json["name"],
       weight: json["weight"],
+      quantity: json["quantity"],
+
     );
   }
 }

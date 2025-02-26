@@ -19,17 +19,20 @@ class LoadAccoutrementAdapter extends TypeAdapter<LoadAccoutrement> {
     return LoadAccoutrement(
       name: fields[0] as String,
       weight: fields[1] as int,
+      quantity: fields[2] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, LoadAccoutrement obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
-      ..write(obj.weight);
+      ..write(obj.weight)
+      ..writeByte(2)
+      ..write(obj.quantity);
   }
 
   @override
