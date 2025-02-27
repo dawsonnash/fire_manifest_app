@@ -29,6 +29,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
       gearCopy.add(Gear(name: gear.name, weight: gear.weight, quantity: 1,  isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat));
     }
   }
+
   // Initialize all Loads
   List<Load> loads = List.generate(
       numLoads,
@@ -145,9 +146,9 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
   // Filling in the remainder of crew members and gear
   int loadIndex = 0; // To track current load index
 
-  bool noMoreCrewCanBeAdded = false;
   bool noMoreGearCanBeAdded = false;
 
+  // Distribute Gear across loads
   while (
       (gearCopy.isNotEmpty && !noMoreGearCanBeAdded)) {
     Load currentLoad = loads[loadIndex];
@@ -176,7 +177,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
     loadIndex = (loadIndex + 1) % loads.length;
   }
 
-  // Ensure all identical gear items are combined within each load, but only if they are BOTH personal tools or BOTH regular gear
+  // Combine identical gear items within each load
   for (var load in loads) {
     List<Gear> consolidatedGear = [];
 
@@ -200,7 +201,6 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
 
     load.loadGear = consolidatedGear;
   }
-
 
   // Sort load contents: crew first, then personal tools, then general gear
   for (var load in loads) {
@@ -228,13 +228,13 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
 // Find duplicate gear
   Set<String> gearNames = {}; // Store unique gear names
   List<String> duplicateGear = [];
-
   for (var item in crew.gear) {
     if (!gearNames.add(item.name)) {
       duplicateGear.add(item.name); // Add to duplicate list if already exists
     }
   }
-// Error message setup
+
+// Error messaging: gear didn't get allocated or there were duplicates
   if ( gearCopy.isNotEmpty || duplicateGear.isNotEmpty) {
     String errorMessage =  "Not all gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable.";
 
