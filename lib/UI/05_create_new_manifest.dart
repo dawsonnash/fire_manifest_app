@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui';
 import 'package:fire_app/Algorithms/external_load_calculator.dart';
 import 'package:fire_app/CodeShare/colors.dart';
@@ -1187,12 +1186,10 @@ class _QuickManifestState extends State<QuickManifest> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-
         return StatefulBuilder(
           builder: (context, dialogSetState) {
             return AlertDialog(
               backgroundColor: AppColors.textFieldColor2,
-
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1211,6 +1208,7 @@ class _QuickManifestState extends State<QuickManifest> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                        // Minimum Requirements Box
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1225,15 +1223,16 @@ class _QuickManifestState extends State<QuickManifest> {
                               ),
                               Text(
                                 '• $minimumNets net${minimumNets > 1 ? 's' : ''}, '
-                                    '$minimumLeadLines lead line${minimumLeadLines > 1 ? 's' : ''}, '
-                                    '$minimumSwivels swivel${minimumSwivels > 1 ? 's' : ''}',
+                                '$minimumLeadLines lead line${minimumLeadLines > 1 ? 's' : ''}, '
+                                '$minimumSwivels swivel${minimumSwivels > 1 ? 's' : ''}',
                                 style: TextStyle(fontSize: AppData.text12, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary),
                               ),
-
                             ],
                           ),
                         ),
-                        SizedBox(width: AppData.sizedBox10),
+                        SizedBox(width: AppData.sizedBox16),
+
+                        // Min Requirement Info Box
                         IconButton(
                           icon: Icon(Icons.info_outline, color: AppColors.textColorPrimary),
                           onPressed: () {
@@ -1246,7 +1245,8 @@ class _QuickManifestState extends State<QuickManifest> {
                                     borderRadius: BorderRadius.circular(6),
                                     side: BorderSide(color: AppColors.primaryColor, width: 1.5), // Outline border
                                   ),
-                                  contentPadding: EdgeInsets.all(AppData.padding16), // Ensures uniform padding
+                                  contentPadding: EdgeInsets.all(AppData.padding16),
+                                  // Ensures uniform padding
                                   content: SingleChildScrollView(
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
@@ -1256,7 +1256,9 @@ class _QuickManifestState extends State<QuickManifest> {
                                           "Minimum Requirements Factors:",
                                           style: TextStyle(fontSize: AppData.text22, color: AppColors.textColorPrimary),
                                         ),
-                                        Divider(color: AppColors.textColorPrimary,),
+                                        Divider(
+                                          color: AppColors.textColorPrimary,
+                                        ),
                                         SizedBox(height: 8),
                                         Text(
                                           "• $totalGearWeightWithHardware lb total weight, to include:",
@@ -1287,16 +1289,15 @@ class _QuickManifestState extends State<QuickManifest> {
                                           "  (allowable - safety buffer)\n",
                                           style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
                                         ),
-
                                         Text(
                                           "$totalGearWeightWithHardware lbs / $maxLoadWeight lbs = ${(totalGearWeightWithHardware / maxLoadWeight).toStringAsFixed(3)} = $updatedNumLoads load${updatedNumLoads > 1 ? 's' : ''}",
                                           style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                         ),
-
                                       ],
                                     ),
                                   ),
-                                  actionsPadding: EdgeInsets.symmetric(horizontal: AppData.padding8, vertical: AppData.padding8), // Adds spacing around button
+                                  actionsPadding: EdgeInsets.symmetric(horizontal: AppData.padding8, vertical: AppData.padding8),
+                                  // Adds spacing around button
                                   actions: [
                                     Align(
                                       alignment: Alignment.centerRight, // Ensures button alignment
@@ -1314,6 +1315,14 @@ class _QuickManifestState extends State<QuickManifest> {
                       ],
                     ),
                   ),
+                  // Display daisy chaining notification
+                  if (leadLineValue > updatedNumLoads) SizedBox(height: AppData.sizedBox10),
+
+                  if (leadLineValue > updatedNumLoads)
+                    Text(
+                      '* Nets will be daisy-chained',
+                      style: TextStyle(fontSize: AppData.text12, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary),
+                    ),
                 ],
               ),
               contentPadding: EdgeInsets.all(AppData.padding10),
@@ -1452,8 +1461,6 @@ class _QuickManifestState extends State<QuickManifest> {
                               onChanged: (value) {
                                 int newWeight = int.tryParse(value) ?? 0; // Convert input to integer
                                 dialogSetState(() {
-
-
                                   int previousNumLoads = updatedNumLoads;
 
                                   // Update number of loads dynamically if need be, as well as minimum hardware required
@@ -1585,8 +1592,6 @@ class _QuickManifestState extends State<QuickManifest> {
                                     leadLineValue = newLeadLineMin;
                                     leadLineMin = newLeadLineMin;
 
-
-
                                     int previousNumLoads = updatedNumLoads;
 
                                     // Update number of loads dynamically if need be, as well as minimum hardware required
@@ -1658,8 +1663,6 @@ class _QuickManifestState extends State<QuickManifest> {
                               onChanged: (value) {
                                 int newWeight = int.tryParse(value) ?? 0; // Convert input to integer
                                 dialogSetState(() {
-
-
                                   int previousNumLoads = updatedNumLoads;
 
                                   // Update number of loads dynamically if need be, as well as minimum hardware required
@@ -1748,7 +1751,8 @@ class _QuickManifestState extends State<QuickManifest> {
                             flex: 1,
                             child: DropdownButtonFormField<int>(
                               dropdownColor: AppColors.textFieldColor2,
-                              value: leadLineValue, // Dynamically updates with nets
+                              value: leadLineValue,
+                              // Dynamically updates with nets
 
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.borderPrimary)),
@@ -1757,7 +1761,8 @@ class _QuickManifestState extends State<QuickManifest> {
                                 ),
                                 contentPadding: EdgeInsets.all(4),
                               ),
-                              icon: SizedBox.shrink(), // Removes dropdown arrow
+                              icon: SizedBox.shrink(),
+                              // Removes dropdown arrow
 
                               items: [
                                 DropdownMenuItem<int>(
@@ -1772,7 +1777,6 @@ class _QuickManifestState extends State<QuickManifest> {
                               onChanged: null, // Disables manual selection
                             ),
                           ),
-
                           SizedBox(width: 8),
                           Expanded(
                             flex: 1,
@@ -1790,8 +1794,6 @@ class _QuickManifestState extends State<QuickManifest> {
                               onChanged: (value) {
                                 int newWeight = int.tryParse(value) ?? 0; // Convert input to integer
                                 dialogSetState(() {
-
-
                                   int previousNumLoads = updatedNumLoads;
 
                                   // Update number of loads dynamically if need be, as well as minimum hardware required
@@ -1879,8 +1881,8 @@ class _QuickManifestState extends State<QuickManifest> {
                             flex: 1,
                             child: DropdownButtonFormField<int>(
                               dropdownColor: AppColors.textFieldColor2,
-                              value: (int.tryParse(swivelQuantityController.text) ?? minimumSwivels)
-                                  .clamp(minimumSwivels, maxSwivels), // Max is now dynamic
+                              value: (int.tryParse(swivelQuantityController.text) ?? minimumSwivels).clamp(minimumSwivels, maxSwivels),
+                              // Max is now dynamic
 
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.borderPrimary)),
@@ -1990,8 +1992,6 @@ class _QuickManifestState extends State<QuickManifest> {
                               onChanged: (value) {
                                 int newWeight = int.tryParse(value) ?? 0; // Convert input to integer
                                 dialogSetState(() {
-
-
                                   int previousNumLoads = updatedNumLoads;
 
                                   // Update number of loads dynamically if need be, as well as minimum hardware required

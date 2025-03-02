@@ -37,25 +37,6 @@ class Trip extends HiveObject {
     save();
   }
 
-  // For LogCat testing purposes
-  void printLoadDetails() {
-    if (loads.isEmpty) {
-      print('No loads available for this trip.');
-      return;
-    }
-    // Print out Trip info
-    for (var load in loads) {
-      print('Load Number: ${load.loadNumber}, Weight: ${load.weight}');
-      print('--------------------------------');
-
-      for (var member in load.loadPersonnel) {
-        print('Name: ${member.name}, FlightWeight: ${member.flightWeight}');
-      }
-      for (var gear in load.loadGear) {
-        print('Name: ${gear.name}, Weight: ${gear.weight}');
-      }
-    }
-  }
   // Function to calculate total crew weight and update `totalCrewWeight`
   void calculateTotalCrewWeight() {
     int totalWeight = 0;

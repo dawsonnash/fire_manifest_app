@@ -5,6 +5,7 @@ import 'package:fire_app/UI/05_create_new_manifest.dart';
 import 'package:fire_app/UI/06_saved_trips.dart';
 import 'package:fire_app/UI/settings.dart';
 import 'package:flutter/material.dart';
+import '../Data/sling.dart';
 import '01_edit_crew.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../Data/gear.dart';
@@ -36,6 +37,7 @@ void main() async {
   Hive.registerAdapter(CrewMemberAdapter());
   Hive.registerAdapter(CrewMemberListAdapter());
   Hive.registerAdapter(LoadAdapter());
+  Hive.registerAdapter(SlingAdapter());
   Hive.registerAdapter(TripAdapter());
   Hive.registerAdapter(CustomItemAdapter());
   Hive.registerAdapter(TripPreferenceAdapter());
@@ -48,6 +50,7 @@ void main() async {
   await Hive.openBox<CrewMember>('crewmemberBox');
   await Hive.openBox<CrewMemberList>('crewMemberListBox');
   await Hive.openBox<Load>('loadBox');
+  await Hive.openBox<Load>('slingBox');
   await Hive.openBox<Trip>('tripBox');
   await Hive.openBox<TripPreference>('tripPreferenceBox');
   await Hive.openBox<Gear>('personalToolsBox');

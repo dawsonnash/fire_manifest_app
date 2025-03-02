@@ -13,13 +13,33 @@ import '../Data/crewmember.dart';
 import '../Data/gear.dart';
 import '../Data/trip_preferences.dart';
 
-// TripPreference based sorting algorithm
-Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference, int safetyBuffer, LoadAccoutrement cargoNet12x12, LoadAccoutrement cargoNet20x20, LoadAccoutrement swivel, LoadAccoutrement leadLine) async {
+Future<void> externalLoadCalculator(
+    BuildContext context,
+    Trip trip, TripPreference?
+    tripPreference,
+    int safetyBuffer,
+    LoadAccoutrement cargoNet12x12,
+    LoadAccoutrement cargoNet20x20,
+    LoadAccoutrement swivel,
+    LoadAccoutrement leadLine) async {
 
+  // Get max load weight
   int maxLoadWeight = trip.allowable - safetyBuffer;
 
+  // Get Total Gear Weight
+  int totalGearWeight = trip.totalCrewWeight ?? 0;
+
+  // Calculate Total Accoutrement Weight
+  int totalAccoutrementWeight = (cargoNet12x12.quantity * cargoNet12x12.weight) +
+      (cargoNet20x20.quantity * cargoNet20x20.weight) +
+      (swivel.quantity * swivel.weight) +
+      (leadLine.quantity * leadLine.weight);
+
+  // Calculate Total Weight (Gear + Accoutrements)
+  int totalWeight = totalGearWeight + totalAccoutrementWeight;
+
   // Get  number of loads based on allowable
-  int numLoads = (trip.totalCrewWeight! / maxLoadWeight).ceil();
+  int numLoads = (totalWeight / maxLoadWeight).ceil();
 
   // This treats quantities as individual items
   var gearCopy = <Gear>[];
