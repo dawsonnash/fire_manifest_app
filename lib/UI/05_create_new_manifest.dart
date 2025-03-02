@@ -1154,7 +1154,7 @@ class _QuickManifestState extends State<QuickManifest> {
 
     // Now determine minimum hardware required
     int minimumNets = updatedNumLoads; // At least equal to number of loads
-    int minimumSwivels = updatedNumLoads; // Must be at least 1 swivel
+    int minimumSwivels = updatedNumLoads; // Must be at least 1 swivel per load
     int minimumLeadLines = updatedNumLoads; // At least 1 long line per net
 
     // **Stateful quantities tracking hardware**
@@ -1163,6 +1163,7 @@ class _QuickManifestState extends State<QuickManifest> {
     int leadLineValue = net12x12Value;
     int totalNets = net12x12Value + net20x20Value; // Calculate total nets
     int leadLineMin = totalNets.clamp(updatedNumLoads, 20);
+    int maxSwivels = totalNets;
 
     // **Ensure Quantity Controllers Start with Correct Values**
     net12x12QuantityController.text = net12x12Value.toString();
@@ -1233,71 +1234,82 @@ class _QuickManifestState extends State<QuickManifest> {
                           ),
                         ),
                         SizedBox(width: AppData.sizedBox10),
-                        Tooltip(
-                          decoration: BoxDecoration(
-                            color: AppColors.textFieldColor2,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: AppColors.primaryColor, width: 1.5), // Outline border
-                          ),
-                          padding: EdgeInsets.all(AppData.padding8),
-                          margin: EdgeInsets.only(left: AppData.padding8),
-                          waitDuration: Duration(milliseconds: 100),
-                          // Delay before showing
-                          showDuration: Duration(seconds: 20),
-                          // Tooltip disappears after 3 seconds
-                          preferBelow: false,
-                          richMessage: WidgetSpan(
-                            child: ConstrainedBox(
-                                constraints: BoxConstraints(maxWidth: AppData.miniSelectionDialogWidth), // Set max width
-                                child: RichText(
-                                  textAlign: TextAlign.start,
-                                  text: TextSpan(
-                                    style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
-                                    children: [
-                                      TextSpan(text: "Minimum loads and required accoutrements calculated based on:\n\n"),
-                                      TextSpan(
-                                        text: "• $maxLoadWeight lb max load weight",
-                                        style: TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                      TextSpan(text: "\n  (allowable - safety buffer)\n\n"),
-                                      TextSpan(
-                                        text: "• $totalGearWeightWithHardware lb total weight, to include:",
-                                        style: TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                      TextSpan(text: "\n"),
-
-                                      // Bullet Point 1 - Indented
-                                      WidgetSpan(
-                                        alignment: PlaceholderAlignment.baseline,
-                                        baseline: TextBaseline.alphabetic,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(left: 16.0), // Indent bullet point
+                        IconButton(
+                          icon: Icon(Icons.info_outline, color: AppColors.textColorPrimary),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  backgroundColor: AppColors.textFieldColor2,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(6),
+                                    side: BorderSide(color: AppColors.primaryColor, width: 1.5), // Outline border
+                                  ),
+                                  contentPadding: EdgeInsets.all(AppData.padding16), // Ensures uniform padding
+                                  content: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Minimum Requirements Factors:",
+                                          style: TextStyle(fontSize: AppData.text22, color: AppColors.textColorPrimary),
+                                        ),
+                                        Divider(color: AppColors.textColorPrimary,),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          "• $totalGearWeightWithHardware lb total weight, to include:",
+                                          style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 16),
                                           child: Text(
                                             "- $totalGearWeight lb gear weight",
                                             style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
                                           ),
                                         ),
-                                      ),
-                                      TextSpan(text: "\n"),
-
-                                      // Bullet Point 2 - Indented
-                                      WidgetSpan(
-                                        alignment: PlaceholderAlignment.baseline,
-                                        baseline: TextBaseline.alphabetic,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(left: 16.0), // Indent bullet point
+                                        SizedBox(height: 4),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 16),
                                           child: Text(
-                                            "- $totalHardwareWeight lbs for ${int.parse(net20x20QuantityController.text) + int.parse(net12x12QuantityController.text)} net, ${int.parse(leadLineQuantityController.text)} lead line, and ${int.parse(swivelQuantityController.text)} swivel",
+                                            "- $totalHardwareWeight lbs for ${int.parse(net20x20QuantityController.text) + int.parse(net12x12QuantityController.text)} net, ${int.parse(leadLineQuantityController.text)} lead line, and ${int.parse(swivelQuantityController.text)} swivel\n",
                                             style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
                                           ),
                                         ),
-                                      ),
-                                      TextSpan(text: "\n\nSee Quick Guide for more info."),
-                                    ],
+                                        SizedBox(height: 8),
+                                        Text(
+                                          "• $maxLoadWeight lb max load weight",
+                                          style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                        ),
+                                        Text(
+                                          "  (allowable - safety buffer)\n",
+                                          style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
+                                        ),
+
+                                        Text(
+                                          "$totalGearWeightWithHardware lbs / $maxLoadWeight lbs = ${(totalGearWeightWithHardware / maxLoadWeight).toStringAsFixed(3)} = $updatedNumLoads load${updatedNumLoads > 1 ? 's' : ''}",
+                                          style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                        ),
+
+                                      ],
+                                    ),
                                   ),
-                                )),
-                          ),
-                          child: Icon(Icons.info_outline, color: AppColors.textColorPrimary),
+                                  actionsPadding: EdgeInsets.symmetric(horizontal: AppData.padding8, vertical: AppData.padding8), // Adds spacing around button
+                                  actions: [
+                                    Align(
+                                      alignment: Alignment.centerRight, // Ensures button alignment
+                                      child: TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text("OK", style: TextStyle(color: AppColors.primaryColor)),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -1384,7 +1396,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                       leadLineQuantityController.text = minimumLeadLines.toString();
                                     }
 
-
+                                    maxSwivels = totalNets;
                                     totalHardwareWeight = calculateTotalHardwareWeight();
                                     totalGearWeightWithHardware = totalHardwareWeight + totalGearWeight;
 
@@ -1473,6 +1485,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                     leadLineQuantityController.text = minimumLeadLines.toString();
                                   }
 
+                                  maxSwivels = totalNets;
                                   totalHardwareWeight = calculateTotalHardwareWeight();
                                   totalGearWeightWithHardware = totalHardwareWeight + totalGearWeight;
 
@@ -1514,7 +1527,7 @@ class _QuickManifestState extends State<QuickManifest> {
                       ),
                       SizedBox(height: AppData.sizedBox10),
 
-// Cargo Net (20'x20')
+                      // Cargo Net (20'x20')
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -1589,7 +1602,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                     if ((int.tryParse(leadLineQuantityController.text) ?? 0) < minimumLeadLines) {
                                       leadLineQuantityController.text = minimumLeadLines.toString();
                                     }
-
+                                    maxSwivels = totalNets;
                                     totalHardwareWeight = calculateTotalHardwareWeight();
                                     totalGearWeightWithHardware = totalHardwareWeight + totalGearWeight;
 
@@ -1677,7 +1690,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                   if ((int.parse(leadLineQuantityController.text) ?? 0) < minimumLeadLines) {
                                     leadLineQuantityController.text = minimumLeadLines.toString();
                                   }
-
+                                  maxSwivels = totalNets;
                                   totalHardwareWeight = calculateTotalHardwareWeight();
                                   totalGearWeightWithHardware = totalHardwareWeight + totalGearWeight;
 
@@ -1735,97 +1748,31 @@ class _QuickManifestState extends State<QuickManifest> {
                             flex: 1,
                             child: DropdownButtonFormField<int>(
                               dropdownColor: AppColors.textFieldColor2,
-                              value: leadLineValue,
+                              value: leadLineValue, // Dynamically updates with nets
+
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.borderPrimary)),
-                                focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor, width: 2.0)),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: AppColors.primaryColor, width: 2.0),
+                                ),
                                 contentPadding: EdgeInsets.all(4),
                               ),
-                              items: List.generate(
-                                (20 - leadLineMin) + 1,
-                                    (index) => DropdownMenuItem<int>(
-                                  value: index + leadLineMin, // Start from calculated leadLineMin
+                              icon: SizedBox.shrink(), // Removes dropdown arrow
+
+                              items: [
+                                DropdownMenuItem<int>(
+                                  value: leadLineValue,
                                   child: Text(
-                                    (index + leadLineMin).toString(),
+                                    leadLineValue.toString(),
                                     style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                   ),
                                 ),
-                              ),
-                              onChanged: (int? newValue) {
-                                if (newValue != null) {
-                                  dialogSetState(() {
-                                    leadLineQuantityController.text = newValue.toString();
+                              ],
 
-                                    int previousNumLoads = updatedNumLoads;
-
-                                    // Update number of loads dynamically if need be, as well as minimum hardware required
-                                    updatedNumLoads = calculateUpdatedNumLoads();
-
-                                    minimumNets = updatedNumLoads;
-                                    minimumSwivels = updatedNumLoads;
-                                    minimumLeadLines = updatedNumLoads;
-
-                                    // Update nets number if need be
-                                    int totalNets = net12x12Value + net20x20Value; // Recalculate total nets
-
-                                    // Ensure total nets never drop below minimumNets
-                                    if (totalNets < minimumNets) {
-                                      net12x12Value = (minimumNets - net20x20Value);
-                                      net12x12QuantityController.text = net12x12Value.toString();
-                                    }
-                                    // Update nets if number greateer than lead lines
-                                    if (totalNets > newValue){
-                                      net12x12Value = minimumNets;
-                                      net12x12QuantityController.text = net12x12Value.toString();
-                                      net20x20Value = 0;
-                                      net20x20QuantityController.text = net20x20Value.toString();
-                                    }
-
-                                    if ((int.tryParse(swivelQuantityController.text) ?? 0) < minimumSwivels) {
-                                      swivelQuantityController.text = minimumSwivels.toString();
-                                    }
-                                    if ((int.tryParse(leadLineQuantityController.text) ?? 0) < minimumLeadLines) {
-                                      leadLineQuantityController.text = minimumLeadLines.toString();
-                                    }
-
-                                    totalHardwareWeight = calculateTotalHardwareWeight();
-                                    totalGearWeightWithHardware = totalHardwareWeight + totalGearWeight;
-
-                                    // Show Alert Dialog if the number of loads changes
-                                    if (previousNumLoads != updatedNumLoads) {
-                                      showDialog(
-                                        context: context,
-                                        builder: (alertContext) {
-                                          return AlertDialog(
-                                            backgroundColor: AppColors.textFieldColor2,
-                                            title: Text(
-                                              "Minimum Loads Update!",
-                                              style: TextStyle(fontSize: AppData.text22, color: AppColors.textColorPrimary),
-                                            ),
-                                            content: Text(
-                                              "The number of loads required is now $updatedNumLoads due to quantity/weight changes for nets, lead lines, or swivels.",
-                                              style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(alertContext).pop(); // Close alert
-                                                },
-                                                child: Text(
-                                                  "OK",
-                                                  style: TextStyle(color: AppColors.saveButtonAllowableWeight),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    }
-                                  });
-                                }
-                              },
+                              onChanged: null, // Disables manual selection
                             ),
                           ),
+
                           SizedBox(width: 8),
                           Expanded(
                             flex: 1,
@@ -1875,7 +1822,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                   if ((int.parse(leadLineQuantityController.text) ?? 0) < minimumLeadLines) {
                                     leadLineQuantityController.text = minimumLeadLines.toString();
                                   }
-
+                                  maxSwivels = totalNets;
                                   totalHardwareWeight = calculateTotalHardwareWeight();
                                   totalGearWeightWithHardware = totalHardwareWeight + totalGearWeight;
 
@@ -1932,8 +1879,8 @@ class _QuickManifestState extends State<QuickManifest> {
                             flex: 1,
                             child: DropdownButtonFormField<int>(
                               dropdownColor: AppColors.textFieldColor2,
-                              value: (int.tryParse(swivelQuantityController.text) ?? minimumSwivels).clamp(minimumSwivels, 10),
-                              // Ensures the value is at least minimumSwivels and does not exceed 10
+                              value: (int.tryParse(swivelQuantityController.text) ?? minimumSwivels)
+                                  .clamp(minimumSwivels, maxSwivels), // Max is now dynamic
 
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.borderPrimary)),
@@ -1942,7 +1889,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               ),
 
                               items: List.generate(
-                                (10 - minimumSwivels) + 1, // Ensures the range is from minimumSwivels to 10
+                                (maxSwivels - minimumSwivels) + 1,
                                 (index) => DropdownMenuItem<int>(
                                   value: index + minimumSwivels, // Start from minimumSwivels
                                   child: Text(
@@ -1987,7 +1934,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                     if ((int.parse(leadLineQuantityController.text) ?? 0) < minimumLeadLines) {
                                       leadLineQuantityController.text = minimumLeadLines.toString();
                                     }
-
+                                    maxSwivels = totalNets;
                                     totalHardwareWeight = calculateTotalHardwareWeight();
                                     totalGearWeightWithHardware = totalHardwareWeight + totalGearWeight;
 
@@ -2075,7 +2022,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                   if ((int.parse(leadLineQuantityController.text) ?? 0) < minimumLeadLines) {
                                     leadLineQuantityController.text = minimumLeadLines.toString();
                                   }
-
+                                  maxSwivels = totalNets;
                                   totalHardwareWeight = calculateTotalHardwareWeight();
                                   totalGearWeightWithHardware = totalHardwareWeight + totalGearWeight;
 
