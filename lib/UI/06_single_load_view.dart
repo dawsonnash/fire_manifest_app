@@ -509,12 +509,14 @@ pw.Widget fillFormFieldsPMS245(Load load) {
 class SingleLoadView extends StatefulWidget {
   // This page requires a trip to be passed to it
   final Load load;
+  final bool isExternal;
 
   //final VoidCallback onUpdate;  // Callback for deletion to update previous page
 
   const SingleLoadView({
     super.key,
     required this.load,
+    required this.isExternal
     //required this.onUpdate,
   });
 
@@ -695,7 +697,134 @@ class _SingleLoadViewState extends State<SingleLoadView> {
             child: Column(
               children: [
                 Expanded(
-                  child: ListView.builder(
+                  child:  widget.isExternal
+                      ? ListView.builder(
+                    itemCount: widget.load.slings?.length ?? 0, // Number of slings in this load
+                    itemBuilder: (context, slingIndex) {
+                      final sling = widget.load.slings![slingIndex];
+
+                      return ExpansionTile(
+                        title: Row(
+                          children: [
+                            Text(
+                              'Sling ${sling.slingNumber}',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textColorPrimary,
+                              ),
+                            ),
+                            Text(
+                              ' • ${sling.weight} lbs',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textColorPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        children: [
+                          // Load Accoutrements Section (Displayed First)
+                          if (sling.loadAccoutrements.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: sling.loadAccoutrements.map((accoutrement) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.textFieldColor,
+                                    border: Border(bottom: BorderSide(color: AppColors.textColorPrimary, width: 1)),
+                                  ),
+                                  child: ListTile(
+                                    leading: Icon(Icons.settings, color: AppColors.textColorPrimary,),
+                                    title: Text(
+                                      accoutrement.name,
+                                      style: TextStyle(fontSize: 20, color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                    ),
+                                    subtitle: Text('Weight: ${accoutrement.weight} lbs', style: TextStyle(color: AppColors.textColorPrimary),),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+
+                          // Gear Section
+                          if (sling.loadGear.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: sling.loadGear.map((gearItem) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: gearItem.isPersonalTool
+                                        ? AppColors.toolBlue.withOpacity(0.9)
+                                        : AppColors.gearYellow.withOpacity(0.9),
+                                    border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
+                                  ),
+                                  child: ListTile(
+                                    leading: Icon(Icons.work_outline_outlined),
+                                    title: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  '${gearItem.name} ',
+                                                  style: TextStyle(fontSize: 20, color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                                ),
+                                                if (gearItem.isHazmat)
+                                                  Icon(
+                                                    FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                    color: Colors.red,
+                                                    size: 18,
+                                                  ),
+                                                Text(
+                                                  ' (x${gearItem.quantity})',
+                                                  style: TextStyle(fontSize: 18),
+                                                ),
+                                              ],
+                                            ),
+                                            Text(
+                                              'Weight: ${gearItem.totalGearWeight} lbs',
+                                              style: TextStyle(fontSize: 18),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+
+                          // Custom Items Section
+                          if (sling.customItems.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: sling.customItems.map((customItem) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
+                                  ),
+                                  child: ListTile(
+                                    leading: Icon(Icons.inventory_2_outlined),
+                                    title: Text(
+                                      customItem.name,
+                                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                    ),
+                                    subtitle: Text('Weight: ${customItem.weight} lbs'),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                        ],
+                      );
+                    },
+                  )
+
+                      : ListView.builder(
                     itemCount: widget.load.loadPersonnel.length + widget.load.loadGear.length + widget.load.customItems.length,
                     itemBuilder: (context, index) {
                       int numCrewMembers = widget.load.loadPersonnel.length;
@@ -862,7 +991,8 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                         );
                       }
                     },
-                  ),
+                  )
+
                 ),
               ],
             ),

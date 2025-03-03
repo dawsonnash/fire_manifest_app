@@ -23,6 +23,8 @@ class Trip extends HiveObject {
   List<Gear> gear = [];
   @HiveField(7)
   int? totalCrewWeight;
+  @HiveField(8)
+  bool? isExternal;
 
   //
 
@@ -30,6 +32,7 @@ class Trip extends HiveObject {
     required this.tripName,
     required this.allowable,
     required this.availableSeats,
+    this.isExternal = false, // Default to false
     DateTime? timestamp,}) : timestamp = timestamp ?? DateTime.now(); // Default to current time if not provided;
 
   void addLoad(Trip trip, Load newLoad) {

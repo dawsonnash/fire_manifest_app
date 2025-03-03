@@ -1163,6 +1163,7 @@ class _QuickManifestState extends State<QuickManifest> {
     int totalNets = net12x12Value + net20x20Value; // Calculate total nets
     int leadLineMin = totalNets.clamp(updatedNumLoads, 20);
     int maxSwivels = totalNets;
+    int allowable = int.tryParse(allowableController.text) ?? 0;
 
     // **Ensure Quantity Controllers Start with Correct Values**
     net12x12QuantityController.text = net12x12Value.toString();
@@ -1182,7 +1183,9 @@ class _QuickManifestState extends State<QuickManifest> {
     // **Recalculate numLoads based on included hardware**
     updatedNumLoads = (totalGearWeightWithHardware / maxLoadWeight).ceil();
 
-    await showDialog(
+    int noSafetyBufferMaxNumLoads= (totalGearWeightWithHardware / allowable).ceil();
+
+        await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
@@ -1223,8 +1226,8 @@ class _QuickManifestState extends State<QuickManifest> {
                               ),
                               Text(
                                 '• $minimumNets net${minimumNets > 1 ? 's' : ''}, '
-                                '$minimumLeadLines lead line${minimumLeadLines > 1 ? 's' : ''}, '
-                                '$minimumSwivels swivel${minimumSwivels > 1 ? 's' : ''}',
+                                'lead line${minimumLeadLines > 1 ? 's' : ''}, '
+                                'swivel${minimumSwivels > 1 ? 's' : ''}',
                                 style: TextStyle(fontSize: AppData.text12, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary),
                               ),
                             ],
@@ -1293,6 +1296,16 @@ class _QuickManifestState extends State<QuickManifest> {
                                           "$totalGearWeightWithHardware lbs / $maxLoadWeight lbs = ${(totalGearWeightWithHardware / maxLoadWeight).toStringAsFixed(3)} = $updatedNumLoads load${updatedNumLoads > 1 ? 's' : ''}",
                                           style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                         ),
+                                        // Conditional message when margin is ≤ 0.2 and safetyBuffer > 0
+                                        if (int.parse(safetyBufferController.text) > 0 && (updatedNumLoads - (totalGearWeightWithHardware / maxLoadWeight)) >= 0.9)
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 4.0),
+                                            child: Text(
+                                              "* Reducing the safety buffer may result in fewer loads.",
+                                              style: TextStyle(fontSize: AppData.text12, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary),
+                                            ),
+                                          ),
+
                                       ],
                                     ),
                                   ),
@@ -2174,7 +2187,14 @@ class _QuickManifestState extends State<QuickManifest> {
     final int safetyBuffer = int.parse(safetyBufferController.text);
 
     // Creating a new Trip object
-    Trip newTrip = Trip(tripName: tripNameCapitalized, allowable: allowable, availableSeats: availableSeats);
+    Trip newTrip;
+    if (isExternalManifest) {
+       newTrip = Trip(tripName: tripNameCapitalized, allowable: allowable, availableSeats: availableSeats, isExternal: true);
+    }
+    else{
+       newTrip = Trip(tripName: tripNameCapitalized, allowable: allowable, availableSeats: availableSeats);
+    }
+
 
     // Deep copy crewMembers and gear into the new Trip
     if (isExternalManifest) {

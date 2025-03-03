@@ -1,3 +1,4 @@
+import 'package:fire_app/Data/load_accoutrements.dart';
 import 'package:fire_app/Data/sling.dart';
 import 'package:hive/hive.dart';
 
@@ -22,6 +23,8 @@ class Load extends HiveObject{
   List<CustomItem> customItems = [];
   @HiveField(5) // New optional field for Sling
   List<Sling>? slings; // Nullable
+  @HiveField(6)
+  List<LoadAccoutrement>? loadAccoutrements = [];
 
   Load({required this.loadNumber,
     required this.weight,
@@ -29,6 +32,8 @@ class Load extends HiveObject{
     required this.loadGear,
     this.customItems = const [],
     this.slings, // Default is null (optional)
+    this.loadAccoutrements, // Default is null (optional)
+
   });
   void addSling(Load load, Sling newSling) {
     load.slings?.add(newSling);

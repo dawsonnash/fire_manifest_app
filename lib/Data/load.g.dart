@@ -23,13 +23,14 @@ class LoadAdapter extends TypeAdapter<Load> {
       loadGear: (fields[3] as List).cast<Gear>(),
       customItems: (fields[4] as List).cast<CustomItem>(),
       slings: (fields[5] as List?)?.cast<Sling>(),
+      loadAccoutrements: (fields[6] as List?)?.cast<LoadAccoutrement>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Load obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.loadNumber)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class LoadAdapter extends TypeAdapter<Load> {
       ..writeByte(4)
       ..write(obj.customItems)
       ..writeByte(5)
-      ..write(obj.slings);
+      ..write(obj.slings)
+      ..writeByte(6)
+      ..write(obj.loadAccoutrements);
   }
 
   @override

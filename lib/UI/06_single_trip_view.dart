@@ -401,6 +401,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                 MaterialPageRoute(
                                   builder: (context) => SingleLoadView(
                                     load: load,
+                                    isExternal: widget.trip.isExternal!,
                                   ),
                                 ),
                               );
