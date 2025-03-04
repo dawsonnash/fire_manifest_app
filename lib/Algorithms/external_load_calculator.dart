@@ -16,20 +16,16 @@ import '../Data/trip_preferences.dart';
 
 Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference, int safetyBuffer, LoadAccoutrement cargoNet12x12, LoadAccoutrement cargoNet20x20,
     LoadAccoutrement swivel, LoadAccoutrement leadLine) async {
-
-  int maxLoadWeight = trip.allowable - safetyBuffer;  // Get max load weight
-
+  /// Algo Variables
+  int maxLoadWeight = trip.allowable - safetyBuffer; // Get max load weight
   int totalGearWeight = trip.totalCrewWeight ?? 0;
-
   int totalAccoutrementWeight =
       (cargoNet12x12.quantity * cargoNet12x12.weight) + (cargoNet20x20.quantity * cargoNet20x20.weight) + (swivel.quantity * swivel.weight) + (leadLine.quantity * leadLine.weight);
-
-  int totalWeight = totalGearWeight + totalAccoutrementWeight;  // Calculate Total Weight (Gear + Accoutrements)
-
-  int numLoads = (totalWeight / maxLoadWeight).ceil();    // Get  number of loads based on allowable
+  int totalWeight = totalGearWeight + totalAccoutrementWeight; // Calculate Total Weight (Gear + Accoutrements)
+  int numLoads = (totalWeight / maxLoadWeight).ceil(); // Get  number of loads based on allowable
   int totalNets = cargoNet12x12.quantity + cargoNet20x20.quantity;
 
-  // This treats quantities as individual items
+  /// Gear array (Deep Copy) ~ Quantities treated as individual items
   var gearCopy = <Gear>[];
   for (var gear in trip.gear) {
     for (int i = 0; i < gear.quantity; i++) {
@@ -38,20 +34,35 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
     }
   }
 
-// Initialize all Loads
+  var gearCopyHazmat = <Gear>[];
+  var gearCopyNonHazmat = <Gear>[];
+  for (var gear in trip.gear) {
+    for (int i = 0; i < gear.quantity; i++) {
+      // Create copy of gear item for each quantity
+      if (gear.isHazmat) {
+        gearCopyHazmat.add(Gear(name: gear.name, weight: gear.weight, quantity: 1, isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat));
+      } else {
+        gearCopyNonHazmat.add(Gear(name: gear.name, weight: gear.weight, quantity: 1, isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat));
+      }
+    }
+  }
+
+  /// Load and Sling Initialization / Swivel, Leadline Distribution
   List<Load> loads = List.generate(
     numLoads,
-        (index) => Load(
+    (index) => Load(
       loadNumber: index + 1,
-      weight: 0, // Adjusted if missing swivels
+      weight: 0,
+      // Adjusted if missing swivels
       loadPersonnel: [],
       loadGear: [],
-      slings: [], // Ensure slings list is initialized
+      slings: [],
+      // Ensure slings list is initialized
       loadAccoutrements: [], // Ensure list is initialized
     ),
   );
 
-// Initialize Slings and distribute cyclically
+  // Initialize Slings and distribute cyclically
   int netIndex = 0; // Tracks assigned nets
   int loadIndex = 0; // Cycles through loads
 
@@ -90,14 +101,10 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
     // Move to the next load cyclically
     loadSwivelIndex = (loadSwivelIndex + 1) % numLoads;
   }
-
-// After all swivels are placed, check each load if there's not enough swivels for each net
+  // After all swivels are placed, check each load if there's not enough swivels for each net
   for (var load in loads) {
     int slingCount = load.slings?.length ?? 0;
-    int swivelCount = load.loadAccoutrements
-        ?.where((acc) => acc.name == "Swivel")
-        .length ??
-        0;
+    int swivelCount = load.loadAccoutrements?.where((acc) => acc.name == "Swivel").length ?? 0;
 
     if (slingCount > swivelCount) {
       // If there are more slings than swivels, subtract the missing swivel weight from the load
@@ -106,9 +113,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
       load.weight -= missingSwivelWeight; // Reduce total load weight
     } else if (slingCount == swivelCount) {
       // If each sling should get exactly one swivel, move them from load to sling level
-      List<LoadAccoutrement> swivelsToDistribute = load.loadAccoutrements!
-          .where((acc) => acc.name == "Swivel")
-          .toList();
+      List<LoadAccoutrement> swivelsToDistribute = load.loadAccoutrements!.where((acc) => acc.name == "Swivel").toList();
 
       for (int i = 0; i < slingCount; i++) {
         // Add the swivel to the sling
@@ -144,26 +149,30 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
     }
   }
 
+  /// Net Distribution
 // Create a list of all nets (20x20 first, then 12x12)
   List<LoadAccoutrement> nets = [
-    ...List.generate(cargoNet20x20.quantity, (index) => LoadAccoutrement(
-      name: "Cargo Net (20'x20')",
-      weight: cargoNet20x20.weight,
-      quantity: 1,
-    )),
-    ...List.generate(cargoNet12x12.quantity, (index) => LoadAccoutrement(
-      name: "Cargo Net (12'x12')",
-      weight: cargoNet12x12.weight,
-      quantity: 1,
-    )),
+    ...List.generate(
+        cargoNet20x20.quantity,
+        (index) => LoadAccoutrement(
+              name: "Cargo Net (20'x20')",
+              weight: cargoNet20x20.weight,
+              quantity: 1,
+            )),
+    ...List.generate(
+        cargoNet12x12.quantity,
+        (index) => LoadAccoutrement(
+              name: "Cargo Net (12'x12')",
+              weight: cargoNet12x12.weight,
+              quantity: 1,
+            )),
   ];
-
   netIndex = 0; // Track how many nets have been placed
   int maxSlingCount = loads.map((load) => load.slings?.length ?? 0).reduce((a, b) => a > b ? a : b); // Find the load with the most slings
-
-// Cyclically distribute nets across loads and slings
+  // Cyclically distribute nets across loads and slings
   for (int slingRound = 0; slingRound < maxSlingCount; slingRound++) {
-    for (int loadIndex = loads.length - 1; loadIndex >= 0; loadIndex--) { // Start from last load, move backward
+    for (int loadIndex = loads.length - 1; loadIndex >= 0; loadIndex--) {
+      // Start from last load, move backward
       Load currentLoad = loads[loadIndex];
 
       if (currentLoad.slings != null && slingRound < currentLoad.slings!.length) {
@@ -188,75 +197,330 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
   }
 
 
-// Print each load's weight after adjustments
-  print("________________________________________________________");
+  /// Distributing remaining GEAR
+  List<Load> loadsWithSingle12x12 = [];
+  List<Load> loadsWithAny12x12 = [];
+  List<Load> remainingLoads = [];
 
+// Categorize loads based on 12x12 net presence
   for (var load in loads) {
-    print("Load# ${load.loadNumber}: Weight = ${load.weight} lbs");
+    int num12x12Nets = load.slings?.where((sling) =>
+        sling.loadAccoutrements.any((acc) => acc.name == "12x12 Net")).length ?? 0;
+
+    if (num12x12Nets == 1) {
+      loadsWithSingle12x12.add(load);
+    } else if (num12x12Nets > 1) {
+      loadsWithAny12x12.add(load);
+    } else {
+      remainingLoads.add(load);
+    }
   }
-  // Filling in the remainder of gear
-  loadIndex = 0; // To track current load index
 
-  bool noMoreGearCanBeAdded = false;
+// Prioritize loads in the correct order
+  List<Load> prioritizedLoadOrder = [
+    ...loadsWithSingle12x12,
+    ...loadsWithAny12x12,
+    ...remainingLoads
+  ];
 
-  // Distribute Gear across loads
-  while ((gearCopy.isNotEmpty && !noMoreGearCanBeAdded)) {
+  // Distribute Hazmat Gear: Fill one load completely before moving to the next
+
+  // Step 1: Find slings with highest-priority nets for Hazmat gear placement
+  List<Sling> prioritizedSlings = [];
+
+// First, add slings with a single 12x12 net
+  for (var load in prioritizedLoadOrder) {
+    for (var sling in load.slings ?? []) {
+      int num12x12Nets = sling.loadAccoutrements.where((acc) => acc.name == "12x12 Net").length;
+      if (num12x12Nets == 1) {
+        prioritizedSlings.add(sling);
+      }
+    }
+  }
+
+// Next, add slings with any 12x12 net (not just single ones)
+  for (var load in prioritizedLoadOrder) {
+    for (var sling in load.slings ?? []) {
+      int num12x12Nets = sling.loadAccoutrements.where((acc) => acc.name == "12x12 Net").length;
+      if (num12x12Nets > 1 && !prioritizedSlings.contains(sling)) {
+        prioritizedSlings.add(sling);
+      }
+    }
+  }
+
+// Finally, add any remaining slings
+  for (var load in prioritizedLoadOrder) {
+    for (var sling in load.slings ?? []) {
+      if (!prioritizedSlings.contains(sling)) {
+        prioritizedSlings.add(sling);
+      }
+    }
+  }
+
+  // Step 2: Distribute Hazmat Gear Using Prioritized Sling Order
+  int hazmatGearIndex = 0;
+  for (var sling in prioritizedSlings) {
+    while (hazmatGearIndex < gearCopyHazmat.length &&
+        sling.weight + gearCopyHazmat[hazmatGearIndex].weight <= maxLoadWeight) {
+      // Add hazmat gear to the sling
+      sling.loadGear.add(gearCopyHazmat[hazmatGearIndex]);
+      sling.weight += gearCopyHazmat[hazmatGearIndex].weight;
+
+      // Find the parent load and update its weight
+      Load parentLoad = prioritizedLoadOrder.firstWhere((load) => load.slings?.contains(sling) ?? false);
+      parentLoad.weight += gearCopyHazmat[hazmatGearIndex].weight;
+
+      // Move to the next piece of hazmat gear
+      hazmatGearIndex++;
+    }
+
+    // If this sling is full, move to the next one in the prioritization order
+    if (hazmatGearIndex >= gearCopyHazmat.length) break;
+  }
+
+// Step 3: Distribute Non-Hazmat Gear (Starting from the Last Load, Avoiding Hazmat Loads)
+  int gearIndex = 0;
+  loadIndex = loads.length - 1; // Start from the last load
+
+// First, attempt to distribute gear only in non-hazmat slings
+  while (gearIndex < gearCopyNonHazmat.length) {
     Load currentLoad = loads[loadIndex];
-    num currentLoadWeight = currentLoad.weight;
-
+    int slingIndex = 0;
     bool itemAdded = false;
 
-    // Add gear if space allows
-    if (!itemAdded && gearCopy.isNotEmpty && currentLoadWeight + gearCopy.first.weight <= maxLoadWeight) {
-      currentLoadWeight += gearCopy.first.weight;
-      currentLoad.loadGear.add(gearCopy.first);
-      gearCopy.removeAt(0);
-      itemAdded = true;
-    } else if (gearCopy.isNotEmpty && loads.every((load) => load.weight + gearCopy.first.weight > maxLoadWeight)) {
-      noMoreGearCanBeAdded = true; // No more gear can be added to any load
-    }
+    // **Check if there are any 20x20 slings that still have space**
+    bool anyTwentyByTwentyHasSpace = currentLoad.slings!.any((sling) =>
+    sling.loadAccoutrements.any((acc) => acc.name == "20x20 Net") &&
+        sling.weight + gearCopyNonHazmat[gearIndex].weight <= maxLoadWeight);
 
-    // Update load weight
-    currentLoad.weight = currentLoadWeight.toInt();
+    while (slingIndex < (currentLoad.slings?.length ?? 0)) {
+      Sling selectedSling = currentLoad.slings![slingIndex];
 
-    // Move to the next load in a cyclic manner
-    loadIndex = (loadIndex + 1) % loads.length;
-  }
-
-  // Combine identical gear items within each load
-  for (var load in loads) {
-    List<Gear> consolidatedGear = [];
-
-    for (var gear in load.loadGear) {
-      var existingGear = consolidatedGear.firstWhere(
-        (item) => item.name == gear.name && item.isPersonalTool == gear.isPersonalTool,
-        orElse: () => Gear(
-          name: gear.name,
-          weight: gear.weight,
-          quantity: 0,
-          isPersonalTool: gear.isPersonalTool,
-          // Keep the personal tool flag
-          isHazmat: gear.isHazmat,
-        ),
-      );
-
-      if (existingGear.quantity == 0) {
-        consolidatedGear.add(existingGear);
+      // **Skip hazmat slings unless no other option is available**
+      bool isHazmatSling = selectedSling.loadGear.any((gear) => gear.isHazmat);
+      if (isHazmatSling) {
+        slingIndex++;
+        continue; // Skip hazmat slings
       }
-      existingGear.quantity += gear.quantity;
+
+      // **Prioritize 20x20 Nets First**
+      bool isTwentyByTwenty = selectedSling.loadAccoutrements.any((acc) => acc.name == "20x20 Net");
+      bool isTwelveByTwelve = selectedSling.loadAccoutrements.any((acc) => acc.name == "12x12 Net");
+
+      // **If a 20x20 net still has space, skip 12x12 nets**
+      if (!isTwentyByTwenty && anyTwentyByTwentyHasSpace) {
+        slingIndex++;
+        continue;
+      }
+
+      // **Try adding gear (prioritizing 20x20 first)**
+      if (gearIndex < gearCopyNonHazmat.length &&
+          selectedSling.weight + gearCopyNonHazmat[gearIndex].weight <= maxLoadWeight) {
+        selectedSling.loadGear.add(gearCopyNonHazmat[gearIndex]);
+        selectedSling.weight += gearCopyNonHazmat[gearIndex].weight;
+        currentLoad.weight += gearCopyNonHazmat[gearIndex].weight;
+        gearIndex++;
+        itemAdded = true;
+      }
+
+      // Move to the next sling in the same load
+      slingIndex++;
+
+      // If all slings in the load have been checked, move to the next load
+      if (slingIndex >= (currentLoad.slings?.length ?? 0)) {
+        break;
+      }
     }
 
-    load.loadGear = consolidatedGear;
+    // **If all 20x20 slings are full, distribute into 12x12 slings *cyclically***
+    if (!anyTwentyByTwentyHasSpace) {
+      int cyclicSlingIndex = 0; // Start cyclic distribution
+      int numSlings = currentLoad.slings?.length ?? 1;
+      bool distributedTo12x12 = false; // Tracks if gear was placed
+
+      do {
+        Sling selectedSling = currentLoad.slings![cyclicSlingIndex];
+
+        // **Ensure it's a 12x12 net and not a hazmat sling**
+        if (selectedSling.loadAccoutrements.any((acc) => acc.name == "12x12 Net") &&
+            !selectedSling.loadGear.any((gear) => gear.isHazmat)) {
+
+          if (gearIndex < gearCopyNonHazmat.length &&
+              selectedSling.weight + gearCopyNonHazmat[gearIndex].weight <= maxLoadWeight) {
+            // **Add gear to the sling**
+            selectedSling.loadGear.add(gearCopyNonHazmat[gearIndex]);
+            selectedSling.weight += gearCopyNonHazmat[gearIndex].weight;
+            currentLoad.weight += gearCopyNonHazmat[gearIndex].weight;
+            gearIndex++;
+            itemAdded = true;
+            distributedTo12x12 = true;
+          }
+        }
+
+        // **Move cyclically to the next sling**
+        cyclicSlingIndex = (cyclicSlingIndex + 1) % numSlings;
+
+      } while (cyclicSlingIndex != 0 && gearIndex < gearCopyNonHazmat.length && distributedTo12x12);
+    }
+
+    // **Check if gear placement is still possible**
+    bool canPlaceMoreGear = gearIndex < gearCopyNonHazmat.length &&
+        loads.any((load) => load.slings!.any((sling) =>
+        sling.weight + gearCopyNonHazmat[gearIndex].weight <= maxLoadWeight &&
+            !sling.loadGear.any((gear) => gear.isHazmat)));
+
+    // **Exit loop if no more gear can be placed**
+    if (!itemAdded && !canPlaceMoreGear) {
+      break;
+    }
+
+    // **Move cyclically **backwards** to the next load**
+    loadIndex = (loadIndex - 1 + loads.length) % loads.length;
   }
 
-  // Sort load contents: crew first, then personal tools, then general gear
+// If gear is still remaining, start using hazmat slings as a last resort
+  if (gearIndex < gearCopyNonHazmat.length) {
+    loadIndex = loads.length - 1; // Restart at the last load
+
+    while (gearIndex < gearCopyNonHazmat.length) {
+      Load currentLoad = loads[loadIndex];
+      int slingIndex = 0;
+      bool placedGear = false;
+
+      while (slingIndex < (currentLoad.slings?.length ?? 0)) {
+        Sling selectedSling = currentLoad.slings![slingIndex];
+
+        // Now, allow placement into hazmat slings if needed
+        if (selectedSling.weight + gearCopyNonHazmat[gearIndex].weight <= maxLoadWeight) {
+          // Add gear to the sling
+          selectedSling.loadGear.add(gearCopyNonHazmat[gearIndex]);
+          selectedSling.weight += gearCopyNonHazmat[gearIndex].weight;
+          currentLoad.weight += gearCopyNonHazmat[gearIndex].weight;
+
+          gearIndex++; // Move to next gear item
+          placedGear = true;
+        }
+
+        // Move to the next sling in the same load
+        slingIndex++;
+
+        // If all slings in the load have been checked, move to the next load
+        if (slingIndex >= (currentLoad.slings?.length ?? 0)) {
+          break;
+        }
+      }
+
+      // **Move cyclically **backwards** to the next load**
+      loadIndex = (loadIndex - 1 + loads.length) % loads.length;
+
+      // **Break if no gear was placed this round (prevents infinite looping)**
+      if (!placedGear) break;
+    }
+  }
+
+
+  /// Redistribute Swivels in Daisy-Chained Loads
   for (var load in loads) {
-    // Sort the loadGear list
-    load.loadGear.sort((a, b) {
-      if (a.isPersonalTool && !b.isPersonalTool) return -1; // Personal tools come first
-      if (!a.isPersonalTool && b.isPersonalTool) return 1; // General gear comes after personal tools
-      return a.name.compareTo(b.name); // Otherwise, sort alphabetically by name
-    });
+    if ((load.slings?.length ?? 0) > 1) { // Only process loads with more than one sling (daisy-chained)
+      // Get available swivels in the load accoutrements
+      int availableSwivels = load.loadAccoutrements
+          ?.where((acc) => acc.name == "Swivel")
+          .fold(0, (sum, acc) => sum! + acc.quantity) ?? 0;
+
+      if (availableSwivels > 0) {
+        // Sort slings by current weight (lightest first)
+        List<Sling> sortedSlings = [...?load.slings]
+          ..sort((a, b) => a.weight.compareTo(b.weight));
+
+        int swivelIndex = 0;
+        while (swivelIndex < availableSwivels) {
+          // Cycle through slings from lightest to heaviest
+          for (var sling in sortedSlings) {
+            if (swivelIndex >= availableSwivels) break; // Stop if all swivels are placed
+
+            // Create a new Swivel LoadAccoutrement object and add it to the sling
+            LoadAccoutrement swivelAcc = LoadAccoutrement(
+              name: "Swivel",
+              weight: swivel.weight,
+              quantity: 1,
+            );
+            sling.loadAccoutrements.add(swivelAcc);
+            sling.weight += swivel.weight; // Update sling weight
+
+            // Move to the next swivel
+            swivelIndex++;
+          }
+        }
+
+        // Remove all swivels from the load-level storage
+        load.loadAccoutrements?.removeWhere((acc) => acc.name == "Swivel");
+      }
+    }
+  }
+
+
+  /// Consolidate identical gear items within each sling of every load
+  for (var load in loads) {
+    for (var sling in load.slings ?? []) {
+      List<Gear> consolidatedGear = [];
+
+      for (var gear in sling.loadGear) {
+        var existingGear = consolidatedGear.firstWhere(
+              (item) => item.name == gear.name && item.isPersonalTool == gear.isPersonalTool,
+          orElse: () {
+            var newGear = Gear(
+              name: gear.name,
+              weight: gear.weight,
+              quantity: 0, // Ensure initialized as an integer
+              isPersonalTool: gear.isPersonalTool,
+              isHazmat: gear.isHazmat,
+            );
+            consolidatedGear.add(newGear);
+            return newGear;
+          },
+        );
+
+        // Ensure quantity is treated as an integer
+        existingGear.quantity = (existingGear.quantity + gear.quantity).toInt();
+      }
+
+      // Replace the sling's gear list with the consolidated list
+      sling.loadGear = consolidatedGear;
+    }
+  }
+
+  /// Sort slings
+  for (var load in loads) {
+    if (load.slings == null) continue; // Ensure slings list exists
+
+    for (var sling in load.slings!) {
+      // Ensure loadAccoutrements is initialized before sorting
+      if (sling.loadAccoutrements.isNotEmpty) {
+        sling.loadAccoutrements.sort((a, b) {
+          bool isNetA = a.name.toLowerCase().contains("net");
+          bool isNetB = b.name.toLowerCase().contains("net");
+          if (isNetA && !isNetB) return -1; // Nets first
+          if (!isNetA && isNetB) return 1;
+
+          bool isLeadLineA = a.name.toLowerCase().contains("lead line");
+          bool isLeadLineB = b.name.toLowerCase().contains("lead line");
+          if (isLeadLineA && !isLeadLineB) return -1; // Lead Line second
+          if (!isLeadLineA && isLeadLineB) return 1;
+
+          bool isSwivelA = a.name.toLowerCase().contains("swivel");
+          bool isSwivelB = b.name.toLowerCase().contains("swivel");
+          if (isSwivelA && !isSwivelB) return -1; // Swivel third
+          if (!isSwivelA && isSwivelB) return 1;
+
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase()); // Default alphabetical
+        });
+      }
+
+      // Ensure loadGear is initialized before sorting
+      if (sling.loadGear.isNotEmpty) {
+        sling.loadGear.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      }
+    }
   }
 
   loads.removeWhere((load) => load.weight == 0); // Remove loads with zero weight
@@ -265,22 +529,74 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
     loads[i].loadNumber = i + 1; // Reassign sequential load numbers starting from 1
   }
 
-  // Ensure the trip object reflects the updated loads
+  /// Get final weights for slings and loads
+  for (var load in loads) {
+    int newLoadWeight = 0; // Reset load weight
+
+    if (load.slings != null) { // Check if slings exist before looping
+      for (var sling in load.slings!) {
+        int newSlingWeight = 0; // Initialize as non-nullable int
+
+        // Sum all Load Accoutrements
+        for (var acc in sling.loadAccoutrements) {
+          newSlingWeight += (acc.weight * acc.quantity);
+        }
+
+        // Sum all Gear
+        for (var gear in sling.loadGear) {
+          newSlingWeight += (gear.weight * gear.quantity);
+        }
+
+        // Sum all Custom Items
+        for (var item in sling.customItems) {
+          newSlingWeight += item.weight;
+        }
+
+        // Ensure the weight is properly updated
+        sling.weight = newSlingWeight;
+
+        // Add the sling weight to the total load weight
+        newLoadWeight += newSlingWeight;
+      }
+    }
+
+    // Ensure the total load weight is updated
+    load.weight = newLoadWeight;
+  }
+
+
+  /// ADD TO TRIP OBJECT
   for (var load in loads) {
     trip.addLoad(trip, load);
   }
 
-// Find duplicate gear
-  Set<String> gearNames = {}; // Store unique gear names
+
+  /// Error checking
+// Track placed gear by name
+  Set<String> placedGearNames = {};
   List<String> duplicateGear = [];
-  for (var item in crew.gear) {
-    if (!gearNames.add(item.name)) {
-      duplicateGear.add(item.name); // Add to duplicate list if already exists
+  List<String> unallocatedGear = [];
+
+// Iterate over all slings in all loads to find placed gear
+  for (var load in loads) {
+    for (var sling in load.slings ?? []) {
+      for (var gear in sling.loadGear) {
+        if (!placedGearNames.add(gear.name)) {
+          duplicateGear.add(gear.name); // If already placed, it's a duplicate
+        }
+      }
+    }
+  }
+
+// Compare trip.gear against placed gear to find unallocated items
+  for (var gear in trip.gear) {
+    if (!placedGearNames.contains(gear.name)) {
+      unallocatedGear.add(gear.name);
     }
   }
 
 // Error messaging: gear didn't get allocated or there were duplicates
-  if (gearCopy.isNotEmpty || duplicateGear.isNotEmpty) {
+  if (unallocatedGear.isNotEmpty || duplicateGear.isNotEmpty) {
     String errorMessage = "Not all gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable.";
 
     if (duplicateGear.isNotEmpty) {
@@ -303,20 +619,20 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
             children: [
               Text("$errorMessage\n", style: TextStyle(color: AppColors.textColorPrimary)),
 
-              if (gearCopy.isNotEmpty) const SizedBox(height: 8), // Add spacing
+              if (unallocatedGear.isNotEmpty) const SizedBox(height: 8), // Add spacing
 
-              if (gearCopy.isNotEmpty)
+              if (unallocatedGear.isNotEmpty)
                 RichText(
                   text: TextSpan(
-                    text: "Remaining gear items:\n",
+                    text: "Remaining **unallocated** gear items:\n",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textColorPrimary,
+                      color: Colors.orange, // Highlight unallocated gear
                       fontSize: 16,
                     ),
                     children: [
                       TextSpan(
-                        text: gearCopy.map((item) => item.name).join(', '),
+                        text: unallocatedGear.join(', '),
                         style: TextStyle(
                           fontWeight: FontWeight.normal,
                           color: AppColors.textColorPrimary,
@@ -370,57 +686,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
     (Route<dynamic> route) => false, // This clears all the previous routes
   );
 }
-// Function to calculate the total weight of a Load
-int calculateLoadWeight(Load load) {
-  int totalWeight = 0;
 
-  // Sum all Load Accoutrements (if not null)
-  load.loadAccoutrements?.forEach((acc) {
-    totalWeight += (acc.weight ?? 0) * (acc.quantity ?? 1);
-  });
-
-  // Sum all Gear (if not null)
-  for (var gear in load.loadGear) {
-    totalWeight += (gear.weight ?? 0) * (gear.quantity ?? 1);
-  }
-
-  // Sum all Custom Items (if not null)
-  for (var item in load.customItems) {
-    totalWeight += item.weight ?? 0;
-  }
-
-  // Sum all Sling Weights (if any slings exist)
-  load.slings?.forEach((sling) {
-    totalWeight += calculateSlingWeight(sling);
-  });
-
-  return totalWeight;
-}
-
-// Function to calculate the total weight of a Sling
-int calculateSlingWeight(Sling sling) {
-  int totalWeight = 0;
-
-  // Add the base weight of the sling
-  totalWeight += sling.weight;
-
-  // Sum all Load Accoutrements
-  for (var acc in sling.loadAccoutrements) {
-    totalWeight += acc.weight * acc.quantity;
-  }
-
-  // Sum all Gear
-  for (var gear in sling.loadGear) {
-    totalWeight += gear.weight * gear.quantity;
-  }
-
-  // Sum all Custom Items
-  for (var item in sling.customItems) {
-    totalWeight += item.weight;
-  }
-
-  return totalWeight;
-}
 
 TripPreference cleanTripPreference(TripPreference originalPreference, Trip trip) {
   // Create a deep copy of the original TripPreference
@@ -573,3 +839,5 @@ TripPreference cleanTripPreference(TripPreference originalPreference, Trip trip)
 // }
 // }
 // }
+
+

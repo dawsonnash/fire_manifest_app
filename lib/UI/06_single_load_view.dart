@@ -771,7 +771,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                               children: [
                                                 Text(
                                                   '${gearItem.name} ',
-                                                  style: TextStyle(fontSize: 20, color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                                  style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
                                                 ),
                                                 if (gearItem.isHazmat)
                                                   Icon(
