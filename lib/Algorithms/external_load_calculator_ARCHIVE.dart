@@ -50,7 +50,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
   /// Load and Sling Initialization / Swivel, Leadline Distribution
   List<Load> loads = List.generate(
     numLoads,
-    (index) => Load(
+        (index) => Load(
       loadNumber: index + 1,
       weight: 0,
       // Adjusted if missing swivels
@@ -154,18 +154,18 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
   List<LoadAccoutrement> nets = [
     ...List.generate(
         cargoNet20x20.quantity,
-        (index) => LoadAccoutrement(
-              name: "Cargo Net (20'x20')",
-              weight: cargoNet20x20.weight,
-              quantity: 1,
-            )),
+            (index) => LoadAccoutrement(
+          name: "Cargo Net (20'x20')",
+          weight: cargoNet20x20.weight,
+          quantity: 1,
+        )),
     ...List.generate(
         cargoNet12x12.quantity,
-        (index) => LoadAccoutrement(
-              name: "Cargo Net (12'x12')",
-              weight: cargoNet12x12.weight,
-              quantity: 1,
-            )),
+            (index) => LoadAccoutrement(
+          name: "Cargo Net (12'x12')",
+          weight: cargoNet12x12.weight,
+          quantity: 1,
+        )),
   ];
   netIndex = 0; // Track how many nets have been placed
   int maxSlingCount = loads.map((load) => load.slings?.length ?? 0).reduce((a, b) => a > b ? a : b); // Find the load with the most slings
@@ -868,7 +868,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
     MaterialPageRoute(
       builder: (context) => MyHomePage(),
     ),
-    (Route<dynamic> route) => false, // This clears all the previous routes
+        (Route<dynamic> route) => false, // This clears all the previous routes
   );
 }
 
@@ -884,17 +884,17 @@ TripPreference cleanTripPreference(TripPreference originalPreference, Trip trip)
     // Filter crew members based on trip.crewMembers
     var validCrewMembersDynamic = posPref.crewMembersDynamic
         .map((crewDynamic) {
-          if (crewDynamic is CrewMember) {
-            // Check if the crew member exists in the trip
-            return trip.crewMembers.any((member) => member.name == crewDynamic.name) ? crewDynamic : null;
-          } else if (crewDynamic is List<CrewMember>) {
-            // Filter the group to include only members that exist in the trip
-            var validGroup = crewDynamic.where((member) => trip.crewMembers.any((tripMember) => tripMember.name == member.name)).toList();
+      if (crewDynamic is CrewMember) {
+        // Check if the crew member exists in the trip
+        return trip.crewMembers.any((member) => member.name == crewDynamic.name) ? crewDynamic : null;
+      } else if (crewDynamic is List<CrewMember>) {
+        // Filter the group to include only members that exist in the trip
+        var validGroup = crewDynamic.where((member) => trip.crewMembers.any((tripMember) => tripMember.name == member.name)).toList();
 
-            return validGroup.isNotEmpty ? validGroup : null;
-          }
-          return null;
-        })
+        return validGroup.isNotEmpty ? validGroup : null;
+      }
+      return null;
+    })
         .where((item) => item != null)
         .toList(); // Remove null entries
 
