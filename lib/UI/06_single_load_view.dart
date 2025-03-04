@@ -722,6 +722,14 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                 color: AppColors.textColorPrimary,
                               ),
                             ),
+                            Text(
+                              ' • ${sling.loadGear.fold(0, (sum, gear) => sum + gear.quantity)} items',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textColorPrimary,
+                              ),
+                            ),
                           ],
                         ),
                         children: [

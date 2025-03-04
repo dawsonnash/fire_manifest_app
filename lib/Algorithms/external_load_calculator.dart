@@ -195,8 +195,6 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
       }
     }
   }
-
-
   /// Distributing remaining GEAR
   List<Load> loadsWithSingle12x12 = [];
   List<Load> loadsWithAny12x12 = [];
@@ -205,7 +203,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
 // Categorize loads based on 12x12 net presence
   for (var load in loads) {
     int num12x12Nets = load.slings?.where((sling) =>
-        sling.loadAccoutrements.any((acc) => acc.name == "12x12 Net")).length ?? 0;
+        sling.loadAccoutrements.any((acc) => acc.name == "Cargo Net (12'x12')")).length ?? 0;
 
     if (num12x12Nets == 1) {
       loadsWithSingle12x12.add(load);
@@ -231,7 +229,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
 // First, add slings with a single 12x12 net
   for (var load in prioritizedLoadOrder) {
     for (var sling in load.slings ?? []) {
-      int num12x12Nets = sling.loadAccoutrements.where((acc) => acc.name == "12x12 Net").length;
+      int num12x12Nets = sling.loadAccoutrements.where((acc) => acc.name == "Cargo Net (12'x12')").length;
       if (num12x12Nets == 1) {
         prioritizedSlings.add(sling);
       }
@@ -241,7 +239,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
 // Next, add slings with any 12x12 net (not just single ones)
   for (var load in prioritizedLoadOrder) {
     for (var sling in load.slings ?? []) {
-      int num12x12Nets = sling.loadAccoutrements.where((acc) => acc.name == "12x12 Net").length;
+      int num12x12Nets = sling.loadAccoutrements.where((acc) => acc.name == "Cargo Net (12'x12')").length;
       if (num12x12Nets > 1 && !prioritizedSlings.contains(sling)) {
         prioritizedSlings.add(sling);
       }
@@ -257,7 +255,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
     }
   }
 
-  // Step 2: Distribute Hazmat Gear Using Prioritized Sling Order
+  // Distribute Hazmat Gear Using Prioritized Sling Order
   int hazmatGearIndex = 0;
   for (var sling in prioritizedSlings) {
     while (hazmatGearIndex < gearCopyHazmat.length &&
@@ -278,20 +276,21 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
     if (hazmatGearIndex >= gearCopyHazmat.length) break;
   }
 
-// Step 3: Distribute Non-Hazmat Gear (Starting from the Last Load, Avoiding Hazmat Loads)
+  // Attempt 1: Distribute Gear in Non-Hazmat Slings First. Prioritize 20x20s
   int gearIndex = 0;
   loadIndex = loads.length - 1; // Start from the last load
-
-// First, attempt to distribute gear only in non-hazmat slings
   while (gearIndex < gearCopyNonHazmat.length) {
     Load currentLoad = loads[loadIndex];
     int slingIndex = 0;
     bool itemAdded = false;
 
     // **Check if there are any 20x20 slings that still have space**
-    bool anyTwentyByTwentyHasSpace = currentLoad.slings!.any((sling) =>
-    sling.loadAccoutrements.any((acc) => acc.name == "20x20 Net") &&
-        sling.weight + gearCopyNonHazmat[gearIndex].weight <= maxLoadWeight);
+    bool anyTwentyByTwentyHasSpace = loads.any((load) =>
+        load.slings!.any((sling) =>
+        sling.loadAccoutrements.any((acc) => acc.name == "Cargo Net (20'x20')") &&
+            sling.weight + gearCopyNonHazmat[gearIndex].weight <= maxLoadWeight
+        )
+    );
 
     while (slingIndex < (currentLoad.slings?.length ?? 0)) {
       Sling selectedSling = currentLoad.slings![slingIndex];
@@ -304,8 +303,8 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
       }
 
       // **Prioritize 20x20 Nets First**
-      bool isTwentyByTwenty = selectedSling.loadAccoutrements.any((acc) => acc.name == "20x20 Net");
-      bool isTwelveByTwelve = selectedSling.loadAccoutrements.any((acc) => acc.name == "12x12 Net");
+      bool isTwentyByTwenty = selectedSling.loadAccoutrements.any((acc) => acc.name == "Cargo Net (20'x20')");
+      bool isTwelveByTwelve = selectedSling.loadAccoutrements.any((acc) => acc.name == "Cargo Net (12'x12')");
 
       // **If a 20x20 net still has space, skip 12x12 nets**
       if (!isTwentyByTwenty && anyTwentyByTwentyHasSpace) {
@@ -342,7 +341,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
         Sling selectedSling = currentLoad.slings![cyclicSlingIndex];
 
         // **Ensure it's a 12x12 net and not a hazmat sling**
-        if (selectedSling.loadAccoutrements.any((acc) => acc.name == "12x12 Net") &&
+        if (selectedSling.loadAccoutrements.any((acc) => acc.name == "Cargo Net (12'x12')") &&
             !selectedSling.loadGear.any((gear) => gear.isHazmat)) {
 
           if (gearIndex < gearCopyNonHazmat.length &&
@@ -378,7 +377,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
     loadIndex = (loadIndex - 1 + loads.length) % loads.length;
   }
 
-// If gear is still remaining, start using hazmat slings as a last resort
+  // Use hazmat slings as a last resort
   if (gearIndex < gearCopyNonHazmat.length) {
     loadIndex = loads.length - 1; // Restart at the last load
 
@@ -418,8 +417,115 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
     }
   }
 
+  /// REDISTRIBUTION Step 1: Transfer 20x20 items to 12x12s if over volume constraints
+  int gearRatio20x20 = 25; // 25 items in 20x20 per 9 in 12x12, i.e, 20x20s can fit a lot more items
+  int gearRatio12x12 = 9;  // 9 items in 12x12 per 25 in 20x20
 
-  /// Redistribute Swivels in Daisy-Chained Loads
+  for (var load in loads) {
+    List<Sling> twentyByTwentySlings = [];
+    List<Sling> twelveByTwelveSlings = [];
+
+    num totalGearQuantity = 0;
+
+    // **Sort slings by type and count total gear**
+    for (var sling in load.slings ?? []) {
+      if (sling.loadAccoutrements.any((acc) => acc.name == "Cargo Net (20'x20')")) {
+        twentyByTwentySlings.add(sling);
+      } else if (sling.loadAccoutrements.any((acc) => acc.name == "Cargo Net (12'x12')")) {
+        twelveByTwelveSlings.add(sling);
+      }
+      totalGearQuantity += sling.loadGear.fold(0, (sum, gear) => sum + gear.quantity);
+    }
+
+    // **Skip redistribution if only one type of net exists**
+    if (twentyByTwentySlings.isEmpty || twelveByTwelveSlings.isEmpty) {
+      continue;
+    }
+
+    // **Calculate total expected ratio based on number of slings**
+    int totalRatio20x20 = gearRatio20x20 * twentyByTwentySlings.length;
+    int totalRatio12x12 = gearRatio12x12 * twelveByTwelveSlings.length;
+
+    // **Compute expected gear distribution based on scaled ratio**
+    int targetTwentyByTwentyQuantity = ((totalRatio20x20 / (totalRatio20x20 + totalRatio12x12)) * totalGearQuantity).round();
+    num targetTwelveByTwelveQuantity = totalGearQuantity - targetTwentyByTwentyQuantity;
+
+
+    // **Current state of slings**
+    int currentTwentyByTwentyQuantity = twentyByTwentySlings.fold(
+        0, (sum, sling) => sum + sling.loadGear.fold(0, (gearSum, gear) => gearSum + gear.quantity));
+
+    int excessGear = currentTwentyByTwentyQuantity - targetTwentyByTwentyQuantity;
+
+    if (excessGear > 0) {
+      List<Gear> gearToMove = [];
+
+      // **Extract excess gear from 20x20 slings**
+      for (var sling in twentyByTwentySlings) {
+        List<Gear> newGearList = [];
+
+        for (var gear in sling.loadGear) {
+          if (excessGear <= 0) {
+            newGearList.add(gear);
+            continue;
+          }
+
+          int amountToMove = (gear.quantity < excessGear) ? gear.quantity : excessGear;
+          excessGear -= amountToMove;
+
+          gearToMove.add(Gear(
+            name: gear.name,
+            weight: gear.weight,
+            quantity: amountToMove,
+            isPersonalTool: gear.isPersonalTool,
+            isHazmat: gear.isHazmat,
+          ));
+
+          // Reduce quantity in 20x20 sling
+          if (gear.quantity > amountToMove) {
+            newGearList.add(Gear(
+              name: gear.name,
+              weight: gear.weight,
+              quantity: gear.quantity - amountToMove,
+              isPersonalTool: gear.isPersonalTool,
+              isHazmat: gear.isHazmat,
+            ));
+          }
+
+          sling.weight -= amountToMove * gear.weight;
+          load.weight -= amountToMove * gear.weight;
+        }
+        sling.loadGear = newGearList;
+      }
+
+      // **Evenly distribute moved gear across 12x12 slings**
+      int cycleIndex = 0;
+      for (var gear in gearToMove) {
+        while (gear.quantity > 0) {
+          Sling targetSling = twelveByTwelveSlings[cycleIndex];
+
+          int moveAmount = (gear.quantity > 0) ? 1 : 0;
+          gear.quantity -= moveAmount;
+
+          var existingGear = targetSling.loadGear.firstWhere(
+                  (g) => g.name == gear.name && g.isPersonalTool == gear.isPersonalTool,
+              orElse: () => Gear(name: gear.name, weight: gear.weight, quantity: 0, isPersonalTool: gear.isPersonalTool, isHazmat: gear.isHazmat));
+
+          if (existingGear.quantity == 0) {
+            targetSling.loadGear.add(existingGear);
+          }
+
+          existingGear.quantity += moveAmount;
+          targetSling.weight += moveAmount * gear.weight;
+          load.weight += moveAmount * gear.weight;
+
+          cycleIndex = (cycleIndex + 1) % twelveByTwelveSlings.length;
+        }
+      }
+    }
+  }
+
+  /// SWIVELS: Step Swivels in Daisy-Chained Loads
   for (var load in loads) {
     if ((load.slings?.length ?? 0) > 1) { // Only process loads with more than one sling (daisy-chained)
       // Get available swivels in the load accoutrements
@@ -457,7 +563,6 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
       }
     }
   }
-
 
   /// Consolidate identical gear items within each sling of every load
   for (var load in loads) {
@@ -572,112 +677,112 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
 
 
   /// Error checking
-// Track placed gear by name
-  Set<String> placedGearNames = {};
-  List<String> duplicateGear = [];
-  List<String> unallocatedGear = [];
-
-// Iterate over all slings in all loads to find placed gear
-  for (var load in loads) {
-    for (var sling in load.slings ?? []) {
-      for (var gear in sling.loadGear) {
-        if (!placedGearNames.add(gear.name)) {
-          duplicateGear.add(gear.name); // If already placed, it's a duplicate
-        }
-      }
-    }
-  }
-
-// Compare trip.gear against placed gear to find unallocated items
-  for (var gear in trip.gear) {
-    if (!placedGearNames.contains(gear.name)) {
-      unallocatedGear.add(gear.name);
-    }
-  }
-
-// Error messaging: gear didn't get allocated or there were duplicates
-  if (unallocatedGear.isNotEmpty || duplicateGear.isNotEmpty) {
-    String errorMessage = "Not all gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable.";
-
-    if (duplicateGear.isNotEmpty) {
-      errorMessage += "\nAdditionally, duplicate items were detected.";
-    }
-
-    // Show error dialog
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: AppColors.textFieldColor2,
-          title: Text(
-            "Load Calculation Error",
-            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("$errorMessage\n", style: TextStyle(color: AppColors.textColorPrimary)),
-
-              if (unallocatedGear.isNotEmpty) const SizedBox(height: 8), // Add spacing
-
-              if (unallocatedGear.isNotEmpty)
-                RichText(
-                  text: TextSpan(
-                    text: "Remaining **unallocated** gear items:\n",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange, // Highlight unallocated gear
-                      fontSize: 16,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: unallocatedGear.join(', '),
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          color: AppColors.textColorPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-              if (duplicateGear.isNotEmpty) const SizedBox(height: 8), // Add spacing
-
-              if (duplicateGear.isNotEmpty)
-                RichText(
-                  text: TextSpan(
-                    text: "Duplicate gear items detected:\n",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red, // Highlight duplicates
-                      fontSize: 16,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: duplicateGear.join(', '),
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          color: AppColors.textColorPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: Text("OK", style: TextStyle(color: AppColors.textColorPrimary)),
-            ),
-          ],
-        );
-      },
-    );
-  }
+// // Track placed gear by name
+//   Set<String> placedGearNames = {};
+//   List<String> duplicateGear = [];
+//   List<String> unallocatedGear = [];
+//
+// // Iterate over all slings in all loads to find placed gear
+//   for (var load in loads) {
+//     for (var sling in load.slings ?? []) {
+//       for (var gear in sling.loadGear) {
+//         if (!placedGearNames.add(gear.name)) {
+//           duplicateGear.add(gear.name); // If already placed, it's a duplicate
+//         }
+//       }
+//     }
+//   }
+//
+// // Compare trip.gear against placed gear to find unallocated items
+//   for (var gear in trip.gear) {
+//     if (!placedGearNames.contains(gear.name)) {
+//       unallocatedGear.add(gear.name);
+//     }
+//   }
+//
+// // Error messaging: gear didn't get allocated or there were duplicates
+//   if (unallocatedGear.isNotEmpty || duplicateGear.isNotEmpty) {
+//     String errorMessage = "Not all gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable.";
+//
+//     if (duplicateGear.isNotEmpty) {
+//       errorMessage += "\nAdditionally, duplicate items were detected.";
+//     }
+//
+//     // Show error dialog
+//     await showDialog(
+//       context: context,
+//       builder: (BuildContext context) {
+//         return AlertDialog(
+//           backgroundColor: AppColors.textFieldColor2,
+//           title: Text(
+//             "Load Calculation Error",
+//             style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+//           ),
+//           content: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               Text("$errorMessage\n", style: TextStyle(color: AppColors.textColorPrimary)),
+//
+//               if (unallocatedGear.isNotEmpty) const SizedBox(height: 8), // Add spacing
+//
+//               if (unallocatedGear.isNotEmpty)
+//                 RichText(
+//                   text: TextSpan(
+//                     text: "Remaining **unallocated** gear items:\n",
+//                     style: TextStyle(
+//                       fontWeight: FontWeight.bold,
+//                       color: Colors.orange, // Highlight unallocated gear
+//                       fontSize: 16,
+//                     ),
+//                     children: [
+//                       TextSpan(
+//                         text: unallocatedGear.join(', '),
+//                         style: TextStyle(
+//                           fontWeight: FontWeight.normal,
+//                           color: AppColors.textColorPrimary,
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//
+//               if (duplicateGear.isNotEmpty) const SizedBox(height: 8), // Add spacing
+//
+//               if (duplicateGear.isNotEmpty)
+//                 RichText(
+//                   text: TextSpan(
+//                     text: "Duplicate gear items detected:\n",
+//                     style: TextStyle(
+//                       fontWeight: FontWeight.bold,
+//                       color: Colors.red, // Highlight duplicates
+//                       fontSize: 16,
+//                     ),
+//                     children: [
+//                       TextSpan(
+//                         text: duplicateGear.join(', '),
+//                         style: TextStyle(
+//                           fontWeight: FontWeight.normal,
+//                           color: AppColors.textColorPrimary,
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//             ],
+//           ),
+//           actions: [
+//             TextButton(
+//               onPressed: () {
+//                 Navigator.of(context).pop(); // Close the dialog
+//               },
+//               child: Text("OK", style: TextStyle(color: AppColors.textColorPrimary)),
+//             ),
+//           ],
+//         );
+//       },
+//     );
+//   }
 
   Navigator.of(context).pushAndRemoveUntil(
     MaterialPageRoute(
