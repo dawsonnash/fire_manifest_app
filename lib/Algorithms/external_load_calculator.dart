@@ -279,7 +279,42 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
   }
 
   /// DISTRIBUTION STEP 2: PRIORITIZE 20x20s, Distribute Gear in Non-Hazmat Slings First.
-  gearCopyNonHazmat.sort((a, b) => b.quantity.compareTo(a.quantity)); // Sort by highest quantity first
+  // **Step 1: Consolidate identical gear items before sorting**
+  Map<String, Gear> consolidatedGear = {};
+
+// Iterate through gearCopyNonHazmat to sum up quantities
+  for (var gear in gearCopyNonHazmat) {
+    String gearKey = "${gear.name}-${gear.weight}-${gear.isPersonalTool}-${gear.isHazmat}"; // Unique key
+    if (consolidatedGear.containsKey(gearKey)) {
+      consolidatedGear[gearKey]!.quantity += 1; // Increment total quantity
+    } else {
+      consolidatedGear[gearKey] = Gear(
+        name: gear.name,
+        weight: gear.weight,
+        quantity: 1, // Start with this instance
+        isPersonalTool: gear.isPersonalTool,
+        isHazmat: gear.isHazmat,
+      );
+    }
+  }
+
+// **Step 2: Sort consolidated gear items by total weight (quantity * weight)**
+  List<Gear> sortedGear = consolidatedGear.values.toList()
+    ..sort((a, b) => (b.quantity * b.weight).compareTo(a.quantity * a.weight)); // Highest total weight first
+
+// **Step 3: Expand back into individual instances**
+  gearCopyNonHazmat = [];
+  for (var gear in sortedGear) {
+    for (int i = 0; i < gear.quantity; i++) {
+      gearCopyNonHazmat.add(Gear(
+        name: gear.name,
+        weight: gear.weight,
+        quantity: 1, // Restore single instances
+        isPersonalTool: gear.isPersonalTool,
+        isHazmat: gear.isHazmat,
+      ));
+    }
+  }
   int gearIndex = 0;
   loadIndex = loads.length - 1; // Start from the last load
   bool allowHazmatPlacement = false; // Flag to enable hazmat slings if needed
@@ -534,10 +569,10 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
         });
       }
 
-      // Ensure loadGear is initialized before sorting
-      if (sling.loadGear.isNotEmpty) {
-        sling.loadGear.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-      }
+      // // Ensure loadGear is initialized before sorting
+      // if (sling.loadGear.isNotEmpty) {
+      //   sling.loadGear.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      // }
     }
   }
 
