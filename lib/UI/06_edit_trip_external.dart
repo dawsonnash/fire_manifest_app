@@ -11,6 +11,7 @@ import '../Data/sling.dart';
 import '../Data/trip.dart';
 import '../Data/load.dart';
 import '../Data/customItem.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 // Double integers when calculating quantity dont always work out. a 45 lb QB can become 44
 // Update: Maybe fixed?
@@ -990,180 +991,175 @@ class _EditTripExternalState extends State<EditTripExternal> {
                       itemBuilder: (context, loadIndex) {
                         bool isExpanded = _isExpanded[loadIndex];
 
-                        return Container(
-                          key: ValueKey(loadIndex),
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(10),
-
+                        return Dismissible(
+                          key: ValueKey(loads[loadIndex]), // Unique key per load
+                          direction: DismissDirection.endToStart, // Swipe left to delete
+                          background: Container(
+                            color: Colors.red,
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Icon(Icons.delete, color: Colors.white),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Header Section
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _isExpanded[loadIndex] = !_isExpanded[loadIndex];
-                                  });
-                                },
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
-                                            ? Colors.black // Warning color
-                                            : AppColors.fireColor, // Normal color
-                                        borderRadius:
-                                        isExpanded
-                                          ? const BorderRadius.vertical(
-                                          top: Radius.circular(10),
-                                          bottom: Radius.circular(0),
-                                        )
-                                        :const BorderRadius.vertical(
-                                          top: Radius.circular(10),
-                                          bottom: Radius.circular(10),
-                                        ),
-                                        border: Border.all(
-                                          color: Colors.black, // Black outline
-                                          width: 0.5, // Adjust thickness as needed
-                                        ),
+                          confirmDismiss: (direction) async {
+                            return await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  backgroundColor: AppColors.textFieldColor2,
+                                  title: Text(
+                                    "Confirm Deletion",
+                                    style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                  ),
+                                  content: Text(
+                                    "Are you sure you want to delete Load #${loadIndex + 1}?",
+                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(false); // Cancel deletion
+                                      },
+                                      child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true); // Confirm deletion
+                                      },
+                                      child: Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          onDismissed: (direction) {
+                            setState(() {
+                              var deletedLoad = loads.removeAt(loadIndex);
+
+                              // Restore all slings & items from the deleted load back to inventory
+                              for (var sling in deletedLoad.slings ?? []) {
+                                for (var item in sling.loadGear) {
+                                  var existingGear = gearList.firstWhere(
+                                        (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
+                                    orElse: () => Gear(
+                                      name: item.name,
+                                      quantity: 0,
+                                      weight: item.weight,
+                                      isPersonalTool: item.isPersonalTool,
+                                      isHazmat: item.isHazmat,
+                                    ),
+                                  );
+
+                                  existingGear.quantity += (item.quantity as int);
+                                  if (!gearList.contains(existingGear)) {
+                                    gearList.add(existingGear);
+                                  }
+                                }
+                              }
+
+                              // Remove expansion state
+                              if (_isExpanded.length > loadIndex) _isExpanded.removeAt(loadIndex);
+                              if (_isSlingExpanded.length > loadIndex) _isSlingExpanded.removeAt(loadIndex);
+                            });
+                          },
+                          child: Container(
+                            key: ValueKey(loadIndex),
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Header Section
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _isExpanded[loadIndex] = !_isExpanded[loadIndex];
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
+                                          ? Colors.black // Warning color
+                                          : AppColors.fireColor, // Normal color
+                                      borderRadius:
+                                    const BorderRadius.all(
+                                        Radius.circular(10),
                                       ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                'LOAD #${loadIndex + 1}',
-                                                style: TextStyle(
-                                                  color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
-                                                      ? Colors.white // Warning color
-                                                      : Colors.black,
-                                                  fontSize: 22,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Column(
-                                            children: [
-                                              Container(
-                                                padding: const EdgeInsets.only(left: 4.0, right: 4.0),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.transparent,
-                                                  // Background color
-                                                  borderRadius: BorderRadius.circular(10), // Rounded corners
-                                                ),
-                                                height: 30,
-                                                child: Row(
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          '${calculateAvailableWeight(loads[loadIndex])} lbs',
-                                                          style: TextStyle(
-                                                            fontSize: 20,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
-                                                                ? Colors.white // Warning color
-                                                                : Colors.black,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          // Expansion Icon
-                                          Icon(
-                                            isExpanded ? Icons.expand_less : Icons.expand_more,
-                                            color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
-                                                ? Colors.white // Warning color
-                                                : Colors.black,
-                                            size: 36,
-                                          ),
-                                        ],
+                                      border: Border.all(
+                                        color: Colors.black, // Black outline
+                                        width: 0.5, // Adjust thickness as needed
                                       ),
                                     ),
-                                    if  (isExpanded)
-                                      Align(
-                                        alignment: Alignment.center,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              // Ensure slings list is initialized
-                                              loads[loadIndex].slings ??= [];
-
-                                              // Add new sling
-                                              loads[loadIndex].slings!.add(
-                                                Sling(
-                                                  slingNumber: loads[loadIndex].slings!.length + 1,
-                                                  weight: 0,
-                                                  loadAccoutrements: [],
-                                                  loadGear: [],
-                                                  customItems: [],
-                                                ),
-                                              );
-
-                                              // Ensure _isSlingExpanded list exists for this load and update it
-                                              while (_isSlingExpanded.length <= loadIndex) {
-                                                _isSlingExpanded.add([]); // Fill missing entries
-                                              }
-
-                                              _isSlingExpanded[loadIndex].add(true); // Default to expanded state
-                                            });
-                                          },
-                                          child: Container(
-                                            width: double.infinity,
-                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                            decoration: BoxDecoration(
-                                              color: Colors.green.withValues(alpha: 0.9),
-                                              borderRadius: const BorderRadius.only(
-                                                bottomLeft: Radius.circular(8),
-                                                bottomRight: Radius.circular(8),
-                                              ),
-                                              border: Border.all(
-                                                color: Colors.black, // Black outline
-                                                width: 0.5, // Adjust thickness as needed
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black.withOpacity(0.2),
-                                                  blurRadius: 5,
-                                                  offset: const Offset(0, 3),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Align(
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                ' + Add Sling',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'LOAD #${loadIndex + 1}',
+                                              style: TextStyle(
+                                                color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
+                                                    ? Colors.white // Warning color
+                                                    : Colors.black,
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                      ),
-
-                                  ],
+                                        Column(
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.only(left: 4.0, right: 4.0),
+                                              decoration: BoxDecoration(
+                                                color: Colors.transparent,
+                                                // Background color
+                                                borderRadius: BorderRadius.circular(10), // Rounded corners
+                                              ),
+                                              height: 30,
+                                              child: Row(
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        '${calculateAvailableWeight(loads[loadIndex])} lbs',
+                                                        style: TextStyle(
+                                                          fontSize: 20,
+                                                          fontWeight: FontWeight.bold,
+                                                          color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
+                                                              ? Colors.white // Warning color
+                                                              : Colors.black,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        // Expansion Icon
+                                        Icon(
+                                          isExpanded ? Icons.expand_less : Icons.expand_more,
+                                          color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
+                                              ? Colors.white // Warning color
+                                              : Colors.black,
+                                          size: 36,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                              ),
 
-                              // Body Section with Add Item Button
-                              if (isExpanded)
-                                Padding(
-                                  padding: const EdgeInsets.all(0.0),
-                                  child: Column(
+                                // Body Section with Add Item Button
+                                if (isExpanded)
+                                  Column(
                                     children: [
                                       // **Display slings within the load**
                                       for (var slingIndex = 0; slingIndex < (loads[loadIndex].slings?.length ?? 0); slingIndex++)
@@ -1218,11 +1214,32 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                           },
                                           onDismissed: (direction) {
                                             setState(() {
-                                              // Remove the sling from the load
-                                              loads[loadIndex].slings!.removeAt(slingIndex);
+                                              // Store the sling before removing it
+                                              var deletedSling = loads[loadIndex].slings!.removeAt(slingIndex);
 
-                                              // Also remove the corresponding expansion state
-                                              _isSlingExpanded[loadIndex].removeAt(slingIndex);
+                                              // Restore all items from the deleted sling back to inventory
+                                              for (var item in deletedSling.loadGear) {
+                                                var existingGear = gearList.firstWhere(
+                                                      (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
+                                                  orElse: () => Gear(
+                                                      name: item.name,
+                                                      quantity: 0,
+                                                      weight: item.weight,
+                                                      isPersonalTool: item.isPersonalTool,
+                                                      isHazmat: item.isHazmat),
+                                                );
+
+                                                existingGear.quantity += item.quantity;
+
+                                                if (!gearList.contains(existingGear)) {
+                                                  gearList.add(existingGear);
+                                                }
+                                              }
+
+                                              // Remove expansion state
+                                              if (_isSlingExpanded.length > loadIndex && _isSlingExpanded[loadIndex].length > slingIndex) {
+                                                _isSlingExpanded[loadIndex].removeAt(slingIndex);
+                                              }
                                             });
                                           },
                                           child: Padding(
@@ -1510,16 +1527,70 @@ class _EditTripExternalState extends State<EditTripExternal> {
 
                                     ],
                                   ),
-                                ),
-                            ],
+
+                                if  (isExpanded)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            // Ensure slings list is initialized
+                                            loads[loadIndex].slings ??= [];
+
+                                            // Add new sling
+                                            loads[loadIndex].slings!.add(
+                                              Sling(
+                                                slingNumber: loads[loadIndex].slings!.length + 1,
+                                                weight: 0,
+                                                loadAccoutrements: [],
+                                                loadGear: [],
+                                                customItems: [],
+                                              ),
+                                            );
+
+                                            // Ensure _isSlingExpanded list exists for this load and update it
+                                            while (_isSlingExpanded.length <= loadIndex) {
+                                              _isSlingExpanded.add([]); // Fill missing entries
+                                            }
+
+                                            _isSlingExpanded[loadIndex].add(true); // Default to expanded state
+                                          });
+                                        },
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                                          children: [
+                                            Icon(
+                                              FontAwesomeIcons.circlePlus,
+                                              color: Colors.green,
+                                            ),
+                                            SizedBox(width: 8), // Space between the icon and the text
+                                            Text(
+                                              'Add Sling',
+                                              textAlign: TextAlign.center,
+                                              softWrap: true,
+                                              style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.textColorPrimary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                              ],
+                            ),
                           ),
                         );
                       },
                     ),
                   ),
-                  // Add Load Button
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
+                    padding: const EdgeInsets.only(top: 4.0, bottom: 8.0, left: 12.0, right: 12.0),
                     child: Center(
                       child: GestureDetector(
                         onTap: () {
@@ -1539,24 +1610,25 @@ class _EditTripExternalState extends State<EditTripExternal> {
                             _isSlingExpanded.add([]); // Start with an empty sling expansion list
                           });
                         },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.fireColor.withOpacity(0.9), // Adjust transparency
-                            border: Border.all(
-                              color: Colors.black, // Black outline
-                              width: 0.5, // Adjust thickness
+                        child:  Row(
+                          mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                          children: [
+                            Icon(
+                              FontAwesomeIcons.circlePlus,
+                              color: AppColors.primaryColor,
                             ),
-                            borderRadius: BorderRadius.circular(20), // Rounded corners
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          child: Text(
-                            ' + Add Load',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: AppColors.textColorSecondary,
-                              fontWeight: FontWeight.bold,
+                            SizedBox(width: 8), // Space between the icon and the text
+                            Text(
+                              'Add Load',
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textColorPrimary,
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                     ),
