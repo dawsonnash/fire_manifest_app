@@ -1,19 +1,20 @@
 import 'dart:ui';
-import 'package:fire_app/06_single_load_view.dart';
+import 'package:fire_app/UI/06_edit_trip_external.dart';
+import 'package:fire_app/UI/06_single_load_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
-import '../Data/trip.dart';
+import '../../Data/trip.dart';
 
 // For exporting to pdf
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import '06_edit_trip.dart';
-import 'CodeShare/colors.dart';
-import 'Data/gear.dart';
-import 'Data/load.dart';
+import '../UI/06_edit_trip.dart';
+import '../CodeShare/colors.dart';
+import '../Data/gear.dart';
+import '../Data/load.dart';
 
 // Generates PDF
 Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {
@@ -41,7 +42,6 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, String? helico
 
   // Iterate through each load in the trip
   for (var load in trip.loads) {
-
     // Combine all items from the load
     final allItems = [
       ...load.loadPersonnel,
@@ -56,7 +56,7 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, String? helico
     int totalPages = calculatePagesNeeded(allItems.length, numHaz);
 
     // Paginate items if `of252`
-    final paginatedItems = manifestForm == 'of252' ? paginateItems(allItems, totalPages): [allItems];
+    final paginatedItems = manifestForm == 'of252' ? paginateItems(allItems, totalPages) : [allItems];
 
     // Generate pages based on pagination
     for (int i = 0; i < paginatedItems.length; i++) {
@@ -273,7 +273,11 @@ class _SingleTripViewState extends State<SingleTripView> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => EditTrip(
+                                  builder: (context) => widget.trip.isExternal!
+                                ? EditTripExternal(
+                                    trip: widget.trip,
+                                  )
+                                  : EditTrip(
                                         trip: widget.trip,
                                       )),
                             );
@@ -401,6 +405,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                 MaterialPageRoute(
                                   builder: (context) => SingleLoadView(
                                     load: load,
+                                    isExternal: widget.trip.isExternal!,
                                   ),
                                 ),
                               );
@@ -474,8 +479,8 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
   void initState() {
     super.initState();
     _manifestPreparerController.text = AppData.userName ?? ''; // Default to empty if null
-
   }
+
   @override
   void dispose() {
     _helicopterNumController.dispose();

@@ -1,13 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
-import 'package:fire_app/04_add_load_preference.dart';
+import 'package:fire_app/UI/04_add_load_preference.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'CodeShare/colors.dart';
-import 'Data/crew.dart';
-import 'Data/crewmember.dart';
-import 'Data/positional_preferences.dart';
-import 'Data/trip_preferences.dart';
+import '../CodeShare/colors.dart';
+import '../Data/crew.dart';
+import '../Data/crewmember.dart';
+import '../Data/positional_preferences.dart';
+import '../Data/trip_preferences.dart';
 
 class AddTripPreference extends StatefulWidget {
   final VoidCallback onUpdate; // Callback to update previous page

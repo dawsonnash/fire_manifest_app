@@ -1,25 +1,28 @@
 import 'dart:ui';
 
-import 'package:fire_app/05_create_new_manifest.dart';
-import 'package:fire_app/06_saved_trips.dart';
-import 'package:fire_app/settings.dart';
+import 'package:fire_app/Data/load_accoutrement_manager.dart';
+import 'package:fire_app/UI/05_create_new_manifest.dart';
+import 'package:fire_app/UI/06_saved_trips.dart';
+import 'package:fire_app/UI/settings.dart';
 import 'package:flutter/material.dart';
-import '../01_edit_crew.dart';
+import '../Data/sling.dart';
+import '01_edit_crew.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import '../Data/gear.dart';
-import '../Data/crewmember.dart';
-import 'Data/crew.dart';
-import 'Data/customItem.dart';
-import 'Data/load.dart';
-import 'Data/trip.dart';
-import 'Data/trip_preferences.dart';
-import 'Data/positional_preferences.dart';
-import 'Data/gear_preferences.dart';
-import 'Data/saved_preferences.dart';
-import 'Data/crewMemberList.dart';
+import '../../Data/gear.dart';
+import '../../Data/crewmember.dart';
+import '../Data/crew.dart';
+import '../Data/customItem.dart';
+import '../Data/load.dart';
+import '../Data/trip.dart';
+import '../Data/trip_preferences.dart';
+import '../Data/positional_preferences.dart';
+import '../Data/gear_preferences.dart';
+import '../Data/saved_preferences.dart';
+import '../Data/crewMemberList.dart';
+import '../Data/load_accoutrements.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'CodeShare/colors.dart'; // Your colors.dart.dart file
+import '../CodeShare/colors.dart'; // Your colors.dart.dart file
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
@@ -34,25 +37,31 @@ void main() async {
   Hive.registerAdapter(CrewMemberAdapter());
   Hive.registerAdapter(CrewMemberListAdapter());
   Hive.registerAdapter(LoadAdapter());
+  Hive.registerAdapter(SlingAdapter());
   Hive.registerAdapter(TripAdapter());
   Hive.registerAdapter(CustomItemAdapter());
   Hive.registerAdapter(TripPreferenceAdapter());
   Hive.registerAdapter(PositionalPreferenceAdapter());
   Hive.registerAdapter(GearPreferenceAdapter());
+  Hive.registerAdapter(LoadAccoutrementAdapter());
 
   // Open a Hive boxes to store objects
   await Hive.openBox<Gear>('gearBox');
   await Hive.openBox<CrewMember>('crewmemberBox');
   await Hive.openBox<CrewMemberList>('crewMemberListBox');
   await Hive.openBox<Load>('loadBox');
+  await Hive.openBox<Load>('slingBox');
   await Hive.openBox<Trip>('tripBox');
   await Hive.openBox<TripPreference>('tripPreferenceBox');
   await Hive.openBox<Gear>('personalToolsBox');
+  await Hive.openBox<LoadAccoutrement>('loadAccoutrementBox');
 
   // Load data from Hive
   await crew.loadCrewDataFromHive();
   await savedPreferences.loadPreferencesFromHive();
   await savedTrips.loadTripDataFromHive();
+  await loadAccoutrementManager.loadLoadAccoutrementsFromHive();
+
 
   // Test data for user testing
   // if (crew.crewMembers.isEmpty && crew.gear.isEmpty) {
@@ -69,6 +78,7 @@ void main() async {
   AppColors.enableBackgroundImage = await ThemePreferences.getBackgroundImagePreference();
   AppData.crewName = await ThemePreferences.getCrewName(); // Initialize AppData.crewName
   AppData.userName = await ThemePreferences.getUserName();
+  AppData.safetyBuffer = await ThemePreferences.getSafetyBuffer();
 
   // start app
   runApp(MyApp(showDisclaimer: !agreedToTerms));
@@ -119,12 +129,12 @@ class _MyHomePageState extends State<MyHomePage> {
           enableBackgroundImage: AppColors.enableBackgroundImage,
           crewName: AppData.crewName,
           userName: AppData.userName,
+          safetyBuffer: AppData.safetyBuffer,
           onThemeChanged: _toggleTheme,
           onBackgroundImageChange: _toggleBackgroundImage,
           onCrewNameChanged: _changeCrewName,
           onUserNameChanged: _changeUserName,
-
-
+          onSafetyBufferChange: _changeSafetyBuffer,
         ),
       ];
 
@@ -147,7 +157,6 @@ class _MyHomePageState extends State<MyHomePage> {
     await ThemePreferences.setBackgroundImagePreference(enableBackgroundImage);
   }
   void _changeCrewName(String crewName) async {
-    print("🚀 Updating Crew Name: $crewName");
 
     setState(() {
       AppData.crewName = crewName;
@@ -156,7 +165,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // Verify if it's saved correctly
     String savedCrewName = await ThemePreferences.getCrewName();
-    print("🔍 Saved Crew Name in SharedPreferences: $savedCrewName");
 
   }
   void _changeUserName(String userName) async {
@@ -164,6 +172,12 @@ class _MyHomePageState extends State<MyHomePage> {
       AppData.userName = userName;
     });
     await ThemePreferences.setUserName(userName);
+  }
+  void _changeSafetyBuffer(int safetyBuffer) async {
+    setState(() {
+      AppData.safetyBuffer = safetyBuffer;
+    });
+    await ThemePreferences.setSafetyBuffer(safetyBuffer);
   }
   void _onItemTapped(int index) {
     setState(() {

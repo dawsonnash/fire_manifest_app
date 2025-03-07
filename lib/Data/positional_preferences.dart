@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'crewMemberList.dart';
 import 'crewmember.dart';
@@ -57,5 +58,6 @@ class PositionalPreference extends HiveObject
       }).toList(),
     );
   }
+
 
 }

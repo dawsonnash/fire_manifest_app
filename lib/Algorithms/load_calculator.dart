@@ -2,23 +2,23 @@ import 'package:fire_app/Data/positional_preferences.dart';
 import 'package:flutter/material.dart';
 
 import '../CodeShare/colors.dart';
-import '../main.dart';
-import 'crew.dart';
-import 'gear_preferences.dart';
-import 'trip.dart';
+import '../UI/main.dart';
+import '../Data/crew.dart';
+import '../Data/gear_preferences.dart';
+import '../Data/trip.dart';
 import 'dart:math';
-import 'load.dart';
-import 'crewmember.dart';
-import 'gear.dart';
-import 'trip_preferences.dart';
+import '../Data/load.dart';
+import '../Data/crewmember.dart';
+import '../Data/gear.dart';
+import '../Data/trip_preferences.dart';
 
 // TripPreference based sorting algorithm
-Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference) async {
+Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference, bool isExternalManifest, int safetyBuffer) async {
   int availableSeats = trip.availableSeats;
-  int maxLoadWeight = trip.allowable;
+  int maxLoadWeight = isExternalManifest ? trip.allowable - safetyBuffer : trip.allowable; /// Crews have option to add a safety buffer to minimize error
 
   // Get  number of loads based on allowable
-  int numLoadsByAllowable = (trip.totalCrewWeight! / trip.allowable).ceil();
+  int numLoadsByAllowable = (trip.totalCrewWeight! / maxLoadWeight).ceil();
   // Get number of loads based on seats available in the helicopter
   int numLoadsBySeat = (trip.crewMembers.length / trip.availableSeats).ceil();
 
@@ -27,6 +27,9 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
       ? numLoadsByAllowable
       : numLoadsBySeat;
 
+  if (isExternalManifest){
+    numLoads = numLoadsByAllowable;
+  }
   // Create copies of crew and gear
   var crewMembersCopy = trip.crewMembers.map((member) {
     return CrewMember(
@@ -562,7 +565,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
   }
 // Error message setup
   if (crewMembersCopy.isNotEmpty || gearCopy.isNotEmpty || duplicateCrew.isNotEmpty || duplicateGear.isNotEmpty) {
-    String errorMessage = "Not all crew members or gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable.";
+    String errorMessage = isExternalManifest ? "Not all gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable." : "Not all crew members or gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable.";
 
     if (duplicateCrew.isNotEmpty || duplicateGear.isNotEmpty) {
       errorMessage += "\nAdditionally, duplicate items were detected.";

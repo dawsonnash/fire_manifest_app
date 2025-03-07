@@ -26,7 +26,7 @@ class Crew {
       "crewMembers": crewMembers.map((member) => member.toJson()).toList(),
       "gear": gear.map((g) => g.toJson()).toList(),
       "personalTools": personalTools.map((p) => p.toJson()).toList(),
-      "totalCrewWeight": totalCrewWeight,
+      "totalCrewWeight": totalCrewWeight ?? 0.0,
     };
   }
 
@@ -42,7 +42,7 @@ class Crew {
     crew.personalTools = (json["personalTools"] as List)
         .map((p) => Gear.fromJson(p))
         .toList();
-    crew.totalCrewWeight = json["totalCrewWeight"];
+    crew.totalCrewWeight = json["totalCrewWeight"] ?? 0.0;
 
     if (json.containsKey("crewName")) {
       AppData.crewName = json["crewName"];

@@ -22,6 +22,7 @@ class AppColors {
   static Color get saveButtonAllowableWeight => isDarkMode ? Colors.deepOrangeAccent : Colors.blue;
   static Color get toolBlue => isDarkMode ? Colors.blue[200]! : Colors.blue[100]!;
   static Color get gearYellow => isDarkMode ? Colors.orange[200]! : Colors.orange[100]!;
+  static Color get loadAccoutrement => isDarkMode ? Colors.white! : Colors.orange[100]!;
   static Color get quickGuideSection => enableBackgroundImage ? Colors.deepOrangeAccent : Colors.deepOrangeAccent;
   static Color get quickGuideSubsection => enableBackgroundImage ? Colors.grey : Colors.grey;
 
@@ -35,8 +36,10 @@ class AppColors {
 
 class AppData {
   // Crew & User Data
-  static String crewName = 'Crew Name';
+  static String crewName = '';
   static String userName = '';
+  static int safetyBuffer = 0;
+
 
   // Standardized Spacing & Max Constraints to be phased out
   static double inputFieldMax = 450;
@@ -91,7 +94,7 @@ class AppData {
 
   // **Dynamic Heights Based on Screen Height**
   static double get buttonHeight => isLandscape ? (screenHeight * 0.12) : (screenHeight * 0.1);
-  static double get miniSelectionDialogHeight => isLandscape ? (screenHeight * 0.32) : (screenHeight * 0.3);
+  static double get miniSelectionDialogHeight => isLandscape ? (screenHeight * 0.32) : (screenHeight * 0.2);
   static double get quickGuideContentHeight => 45 + quickGuideContentTextSize;
 
   // **Dynamic Spacing
@@ -128,7 +131,7 @@ class AppData {
   static double get tabBarIconSize => 24 * _textScalingFactor * _textOrientationFactor;
   static double get bottomDialogTextSize => 12 * _textScalingFactor * _textOrientationFactor;
   static double get dropDownArrowSize => 14 * _textScalingFactor * _textOrientationFactor;
-  static double get cupertinoPickerItemSize => 16 * _textScalingFactor * _textOrientationFactor;
+  static double get cupertinoPickerItemSize => 24 * _textScalingFactor * _textOrientationFactor;
   static double get miniDialogTitleTextSize => 22 * _textScalingFactor * _textOrientationFactor;
   static double get miniDialogBodyTextSize => 18 * _textScalingFactor * _textOrientationFactor;
   static double get quickGuideContentTextSize => 16 * _textScalingFactor * _textOrientationFactor;
@@ -140,6 +143,7 @@ class ThemePreferences {
   static const _backgroundImageKey = 'enableBackgroundImage';
   static const _crewNameKey = 'crewName';
   static const _userNameKey = 'userName';
+  static const _safetyBufferKey = 'safetyBuffer';
 
   static Future<bool> getTheme() async {
     final prefs = await SharedPreferences.getInstance();
@@ -163,7 +167,7 @@ class ThemePreferences {
 
   static Future<String> getCrewName() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_crewNameKey) ?? '';
+    return prefs.getString(_crewNameKey) ?? 'Crew Name Here';
   }
 
   static Future<void> setCrewName(String crewName) async {
@@ -179,6 +183,16 @@ class ThemePreferences {
   static Future<void> setUserName(String userName) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(_userNameKey, userName);
+  }
+
+  static Future<int> getSafetyBuffer() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_safetyBufferKey) ?? 0;
+  }
+
+  static Future<void> setSafetyBuffer(int safetyBuffer) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_safetyBufferKey, safetyBuffer);
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'gear.dart';
 part 'gear_preferences.g.dart';
@@ -35,4 +36,7 @@ class GearPreference extends HiveObject{
   }
 // If  there are more than 1 items, quantity is disabled in UI.
 // If quantity is 1, then 'Balanced' load option is turned off in UI.
+
+
+
 }

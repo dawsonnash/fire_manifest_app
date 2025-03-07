@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-import 'Data/load_calculator.dart';
-import 'Data/trip.dart';
-import 'Data/trip_preferences.dart';
+import '../Algorithms/load_calculator.dart';
+import '../Data/trip.dart';
+import '../Data/trip_preferences.dart';
 import 'main.dart';
 
 class CalculatingScreen extends StatefulWidget {
@@ -329,8 +329,10 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
 
 Future<void> startCalculation(
     BuildContext context,
+    bool isExternalManifest,
     Trip newTrip,
     TripPreference? selectedTripPreference,
+    int safetyBuffer
     ) async {
   await showDialog(
     context: context,
@@ -339,7 +341,7 @@ Future<void> startCalculation(
   );
 
   try {
-    await loadCalculator(context, newTrip, selectedTripPreference);
+    await loadCalculator(context, newTrip, selectedTripPreference, isExternalManifest, safetyBuffer);
   } finally {
     if (context.mounted && Navigator.canPop(context)) {
       Navigator.pop(context);

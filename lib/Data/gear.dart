@@ -80,6 +80,7 @@ List<Gear> sortGearListAlphabetically(List<Gear> gearList) {
   return gearList;
 }
 
+// Nets, Lead lines and swivels to be dynamic variables adjsuted in settings
 final List<Map<String, dynamic>> irpgItems = [
   {'name': 'Backpack pump (full)', 'weight': 45, 'hazmat': true},
   {'name': 'Cargo net (12’ x 12’)', 'weight': 20, 'hazmat': false},
@@ -92,7 +93,7 @@ final List<Map<String, dynamic>> irpgItems = [
   {'name': 'Drip torch (full)', 'weight': 15, 'hazmat': true},
   {'name': 'Fusee (1 case)', 'weight': 36, 'hazmat': true},
   {'name': 'Hand tool', 'weight': 8, 'hazmat': false},
-  {'name': 'Lead line (12’) ', 'weight': 10, 'hazmat': false},
+  {'name': 'Lead line (12’)', 'weight': 10, 'hazmat': false},
   {'name': 'Long line (50’)', 'weight': 30, 'hazmat': false},
   {'name': 'Swivel', 'weight': 5, 'hazmat': false},
   {'name': 'Chainsaw', 'weight': 25, 'hazmat': true},
