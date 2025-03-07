@@ -392,7 +392,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                           ],
                                         ),
                                         leading: Icon(
-                                          FontAwesomeIcons.helicopter,
+                                        trip.isExternal! ? FontAwesomeIcons.battleNet : FontAwesomeIcons.helicopter,
                                           color: AppColors.primaryColor,
                                         ),
                                       ),
