@@ -16,4 +16,11 @@ class CustomItem extends HiveObject {
     required this.weight,
   });
 
+  // Deep Copy Method
+  CustomItem copy() {
+    return CustomItem(
+      name: name,
+      weight: weight,
+    );
+  }
 }

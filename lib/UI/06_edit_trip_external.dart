@@ -42,7 +42,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
     super.initState();
     gearBox = Hive.box<Gear>('gearBox');
     tripBox = Hive.box<Trip>('tripBox');
-    loads = widget.trip.loads.toList();
+    loads = widget.trip.loads.map((load) => load.copy()).toList();
 
     // Initialize expansion states for loads and slings
     _isExpanded = List.generate(widget.trip.loads.length, (_) => false);
@@ -54,11 +54,16 @@ class _EditTripExternalState extends State<EditTripExternal> {
   // Can make weights user variables later on
   double getAccoutrementWeight(String name) {
     switch (name) {
-      case "Cargo Net (20'x20')": return 45.0;
-      case "Cargo Net (12'x12')": return 20.0;
-      case "Lead Line": return 10.0;
-      case "Swivel": return 5.0;
-      default: return 0.0;
+      case "Cargo Net (20'x20')":
+        return 45.0;
+      case "Cargo Net (12'x12')":
+        return 20.0;
+      case "Lead Line":
+        return 10.0;
+      case "Swivel":
+        return 5.0;
+      default:
+        return 0.0;
     }
   }
 
@@ -93,20 +98,13 @@ class _EditTripExternalState extends State<EditTripExternal> {
     final customItemWeightFocus = FocusNode();
     final customItemQuantityFocus = FocusNode();
 
+    bool isSelectAllCheckedGear = gearList.every((gear) => selectedItems.contains(gear)) && selectedGearQuantities.entries.every((entry) => entry.value == entry.key.quantity);
+
     // Define all possible Load Accoutrements
-    final List<String> allLoadAccoutrements = [
-      "Cargo Net (20'x20')",
-      "Cargo Net (12'x12')",
-      "Lead Line",
-      "Swivel"
-    ];
+    final List<String> allLoadAccoutrements = ["Cargo Net (20'x20')", "Cargo Net (12'x12')", "Lead Line", "Swivel"];
 
     // Get existing accoutrements in **only this specific sling**
-    final List<String> existingSlingAccoutrements = loads[selectedLoadIndex]
-        .slings![selectedSlingIndex]
-        .loadAccoutrements
-        .map((acc) => acc.name)
-        .toList();
+    final List<String> existingSlingAccoutrements = loads[selectedLoadIndex].slings![selectedSlingIndex].loadAccoutrements.map((acc) => acc.name).toList();
 
     // Define net types (so we can check for any net in this sling)
     const List<String> netTypes = ['Cargo Net (20\'x20\')', 'Cargo Net (12\'x12\')'];
@@ -116,7 +114,6 @@ class _EditTripExternalState extends State<EditTripExternal> {
 
     // **Filter available accoutrements for this sling**
     final List<String> availableAccoutrements = allLoadAccoutrements.where((acc) {
-
       if (existingSlingAccoutrements.contains(acc)) return false;
 
       if (netTypes.contains(acc) && netExistsInSling) return false;
@@ -129,6 +126,13 @@ class _EditTripExternalState extends State<EditTripExternal> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, dialogSetState) {
+            void updateSelectAllState() {
+              dialogSetState(() {
+                // Update all Select All Checkboxes
+                isSelectAllCheckedGear = gearList.every((gear) => selectedItems.contains(gear)) && selectedGearQuantities.entries.every((entry) => entry.value == entry.key.quantity);
+              });
+            }
+
             return AlertDialog(
               backgroundColor: AppColors.textFieldColor2,
               title: Text(
@@ -145,7 +149,6 @@ class _EditTripExternalState extends State<EditTripExternal> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-
                         // Load Accoutrement Dropdown
                         ExpansionPanelList(
                           elevation: 8,
@@ -168,12 +171,9 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                 );
                               },
                               body: Column(
-                                children: availableAccoutrements .where((accName) {
+                                children: availableAccoutrements.where((accName) {
                                   // Determine which net (if any) is already selected
-                                  String? selectedNet = selectedItems
-                                      .whereType<LoadAccoutrement>()
-                                      .map((acc) => acc.name)
-                                      .firstWhere((name) => netTypes.contains(name), orElse: () => '');
+                                  String? selectedNet = selectedItems.whereType<LoadAccoutrement>().map((acc) => acc.name).firstWhere((name) => netTypes.contains(name), orElse: () => '');
 
                                   // If a net is selected, hide the *opposite* one
                                   if (selectedNet.isNotEmpty && netTypes.contains(accName) && accName != selectedNet) {
@@ -183,7 +183,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                 }).map((accName) {
                                   return Container(
                                     decoration: BoxDecoration(
-                                      color: AppColors.gearYellow,
+                                      color: AppColors.loadAccoutrementBlueGrey,
                                       borderRadius: BorderRadius.circular(0.0),
                                       boxShadow: [
                                         BoxShadow(
@@ -197,14 +197,9 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                     child: CheckboxListTile(
                                       title: Text(
                                         accName,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                            color: Colors.black
-
-                                        ),
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                                       ),
-                                      value:  selectedItems.any((item) => item is LoadAccoutrement && item.name == accName),
+                                      value: selectedItems.any((item) => item is LoadAccoutrement && item.name == accName),
                                       onChanged: (bool? isChecked) {
                                         dialogSetState(() {
                                           if (isChecked == true) {
@@ -255,144 +250,182 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                 );
                               },
                               body: Column(
-                                children: sortedGearList.map((gear) {
-                                  int remainingQuantity = gear.quantity - (selectedGearQuantities[gear] ?? 0);
-
-                                  return Container(
-                                    //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
-                                    decoration: BoxDecoration(
-                                      color: gear.isPersonalTool
-                                          ? AppColors.toolBlue // Color for personal tools
-                                          : AppColors.gearYellow,
-                                      borderRadius: BorderRadius.circular(0.0),
-                                      // Rounded corners
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.8),
-                                          spreadRadius: 1,
-                                          blurRadius: 5,
-                                          offset: Offset(0, 3), // Shadow position
-                                        ),
-                                      ],
-                                    ),
+                                children: [
+                                  Container(
+                                    color: AppColors.gearYellow,
                                     child: CheckboxListTile(
-                                      title: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: Row(
-                                              children: [
-                                                Flexible(
-                                                  child: Text(
-                                                    gear.name,
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  ' (x$remainingQuantity)  ',
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          if (selectedItems.contains(gear))
-                                            if (selectedItems.contains(gear))
-                                              GestureDetector(
-                                                onTap: () {
-                                                  final int gearQuantity = gear.quantity;
-                                                  if (gearQuantity > 1) {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext context) {
-                                                        return AlertDialog(
-                                                          backgroundColor: AppColors.textFieldColor2,
-                                                          title: Text(
-                                                            'Select Quantity for ${gear.name}',
-                                                            style: TextStyle(color: AppColors.textColorPrimary),
-                                                          ),
-                                                          content: SizedBox(
-                                                            height: 150,
-                                                            child: CupertinoPicker(
-                                                              scrollController: FixedExtentScrollController(
-                                                                initialItem: (selectedGearQuantities[gear] ?? 1) - 1,
-                                                              ),
-                                                              itemExtent: 32.0,
-                                                              onSelectedItemChanged: (int value) {
-                                                                dialogSetState(() {
-                                                                  selectedGearQuantities[gear] = value + 1;
-                                                                });
-                                                              },
-                                                              children: List<Widget>.generate(
-                                                                gear.quantity,
-                                                                // Use the full quantity for selection
-                                                                (int index) {
-                                                                  return Center(
-                                                                    child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
-                                                                  );
-                                                                },
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          actions: [
-                                                            TextButton(
-                                                              onPressed: () {
-                                                                Navigator.of(context).pop();
-                                                              },
-                                                              child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
-                                                            ),
-                                                            TextButton(
-                                                              onPressed: () {
-                                                                // Finalize the selection
-                                                                dialogSetState(() {
-                                                                  int selectedQuantity = selectedGearQuantities[gear] ?? 1;
-                                                                  remainingQuantity = gear.quantity - selectedQuantity;
-                                                                });
-                                                                Navigator.of(context).pop();
-                                                              },
-                                                              child: Text('Confirm', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
-                                                            ),
-                                                          ],
-                                                        );
-                                                      },
-                                                    );
-                                                  }
-                                                },
-                                                child: Row(
-                                                  children: [
-                                                    if (gear.quantity > 1)
-                                                      Text(
-                                                        'Qty: ${selectedGearQuantities[gear] ?? 1}',
-                                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textColorSecondary),
-                                                      ),
-                                                    if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
-                                                  ],
-                                                ),
-                                              ),
-                                        ],
+                                      title: Text(
+                                        'Select All',
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
                                       ),
-                                      value: selectedItems.contains(gear),
+                                      value: isSelectAllCheckedGear,
                                       onChanged: (bool? isChecked) {
                                         dialogSetState(() {
-                                          if (isChecked == true) {
-                                            selectedItems.add(gear);
-                                            selectedGearQuantities[gear] = 1; // Default quantity
+                                          isSelectAllCheckedGear = isChecked ?? false;
+
+                                          if (isSelectAllCheckedGear) {
+                                            selectedItems.addAll(gearList.where((gear) => !selectedItems.contains(gear)));
+
+                                            selectedGearQuantities = {
+                                              for (var gear in gearList) gear: gear.quantity,
+                                            };
                                           } else {
-                                            selectedItems.remove(gear);
-                                            selectedGearQuantities.remove(gear);
+                                            // Remove only gear items, keeping crew members
+                                            selectedItems.removeWhere((item) => item is Gear);
+
+                                            // Reset selected quantities for gear (avoid stale selections)
+                                            selectedGearQuantities.clear();
                                           }
+                                          updateSelectAllState();
                                         });
                                       },
                                     ),
-                                  );
-                                }).toList(),
+                                  ),
+                                  Column(
+                                    children: sortedGearList.map((gear) {
+                                      int remainingQuantity = gear.quantity - (selectedGearQuantities[gear] ?? 0);
+
+                                      return Container(
+                                        //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
+                                        decoration: BoxDecoration(
+                                          color: gear.isPersonalTool
+                                              ? AppColors.toolBlue // Color for personal tools
+                                              : AppColors.gearYellow,
+                                          borderRadius: BorderRadius.circular(0.0),
+                                          // Rounded corners
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.8),
+                                              spreadRadius: 1,
+                                              blurRadius: 5,
+                                              offset: Offset(0, 3), // Shadow position
+                                            ),
+                                          ],
+                                        ),
+                                        child: CheckboxListTile(
+                                          title: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Row(
+                                                  children: [
+                                                    Flexible(
+                                                      child: Text(
+                                                        gear.name,
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      ' (x$remainingQuantity)  ',
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              if (selectedItems.contains(gear))
+                                                if (selectedItems.contains(gear))
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      final int gearQuantity = gear.quantity;
+                                                      if (gearQuantity > 1) {
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext context) {
+                                                            return AlertDialog(
+                                                              backgroundColor: AppColors.textFieldColor2,
+                                                              title: Text(
+                                                                'Select Quantity for ${gear.name}',
+                                                                style: TextStyle(color: AppColors.textColorPrimary),
+                                                              ),
+                                                              content: SizedBox(
+                                                                height: 150,
+                                                                child: CupertinoPicker(
+                                                                  scrollController: FixedExtentScrollController(
+                                                                    initialItem: (selectedGearQuantities[gear] ?? 1) - 1,
+                                                                  ),
+                                                                  itemExtent: 32.0,
+                                                                  onSelectedItemChanged: (int value) {
+                                                                    dialogSetState(() {
+                                                                      selectedGearQuantities[gear] = value + 1;
+                                                                      updateSelectAllState();
+                                                                    });
+                                                                  },
+                                                                  children: List<Widget>.generate(
+                                                                    gear.quantity,
+                                                                    // Use the full quantity for selection
+                                                                    (int index) {
+                                                                      return Center(
+                                                                        child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                      );
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed: () {
+                                                                    Navigator.of(context).pop();
+                                                                  },
+                                                                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                                                ),
+                                                                TextButton(
+                                                                  onPressed: () {
+                                                                    // Finalize the selection
+                                                                    dialogSetState(() {
+                                                                      int selectedQuantity = selectedGearQuantities[gear] ?? 1;
+                                                                      remainingQuantity = gear.quantity - selectedQuantity;
+                                                                      updateSelectAllState();
+                                                                    });
+                                                                    Navigator.of(context).pop();
+                                                                  },
+                                                                  child: Text('Confirm', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
+                                                      }
+                                                    },
+                                                    child: Row(
+                                                      children: [
+                                                        if (gear.quantity > 1)
+                                                          Text(
+                                                            'Qty: ${selectedGearQuantities[gear] ?? 1}',
+                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textColorSecondary),
+                                                          ),
+                                                        if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
+                                                      ],
+                                                    ),
+                                                  ),
+                                            ],
+                                          ),
+                                          value: selectedItems.contains(gear),
+                                          onChanged: (bool? isChecked) {
+                                            dialogSetState(() {
+                                              if (isChecked == true) {
+                                                selectedItems.add(gear);
+                                                selectedGearQuantities[gear] = 1; // Default quantity
+                                                updateSelectAllState();
+                                              } else {
+                                                selectedItems.remove(gear);
+                                                selectedGearQuantities.remove(gear);
+                                                updateSelectAllState();
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -622,15 +655,14 @@ class _EditTripExternalState extends State<EditTripExternal> {
                           if (item.quantity <= 0) {
                             gearList.remove(item);
                           }
-                        }
-                        else if (item is LoadAccoutrement){
+                        } else if (item is LoadAccoutrement) {
                           loads[selectedLoadIndex].slings![selectedSlingIndex].loadAccoutrements.add(
-                            LoadAccoutrement(
-                                name: item.name,
-                                quantity: 1,
-                              weight: item.weight,
-                            ),
-                          );
+                                LoadAccoutrement(
+                                  name: item.name,
+                                  quantity: 1,
+                                  weight: item.weight,
+                                ),
+                              );
                         }
                       }
                     });
@@ -781,10 +813,13 @@ class _EditTripExternalState extends State<EditTripExternal> {
       int index = entry.key;
       Load load = entry.value; // Directly access Load object
 
+      // Recalculate weight for each sling in this load
+      for (var sling in load.slings ?? []) {
+        sling.weight = calculateSlingWeight(sling);
+      }
+
       // Calculate the correct total weight for the load
       int totalWeight = calculateAvailableWeight(load);
-
-      // Assign the calculated weight
       load.weight = totalWeight;
 
       return load;
@@ -987,13 +1022,14 @@ class _EditTripExternalState extends State<EditTripExternal> {
                           _isSlingExpanded.insert(newIndex, slingExpandedState);
                         });
                       },
-
                       itemBuilder: (context, loadIndex) {
                         bool isExpanded = _isExpanded[loadIndex];
 
                         return Dismissible(
-                          key: ValueKey(loads[loadIndex]), // Unique key per load
-                          direction: DismissDirection.endToStart, // Swipe left to delete
+                          key: ValueKey(loads[loadIndex]),
+                          // Unique key per load
+                          direction: DismissDirection.endToStart,
+                          // Swipe left to delete
                           background: Container(
                             color: Colors.red,
                             alignment: Alignment.centerRight,
@@ -1040,7 +1076,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                               for (var sling in deletedLoad.slings ?? []) {
                                 for (var item in sling.loadGear) {
                                   var existingGear = gearList.firstWhere(
-                                        (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
+                                    (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
                                     orElse: () => Gear(
                                       name: item.name,
                                       quantity: 0,
@@ -1068,7 +1104,6 @@ class _EditTripExternalState extends State<EditTripExternal> {
                             decoration: BoxDecoration(
                               color: Colors.transparent,
                               borderRadius: BorderRadius.circular(10),
-
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1086,10 +1121,11 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                       color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
                                           ? Colors.black // Warning color
                                           : AppColors.fireColor, // Normal color
-                                      borderRadius:
-                                    const BorderRadius.all(
-                                        Radius.circular(10),
-                                      ),
+                                      borderRadius: (calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable && isExpanded)
+                                          ? const BorderRadius.vertical(top: Radius.circular(8))
+                                          : const BorderRadius.all(
+                                              Radius.circular(10),
+                                            ),
                                       border: Border.all(
                                         color: Colors.black, // Black outline
                                         width: 0.5, // Adjust thickness as needed
@@ -1161,11 +1197,38 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                 if (isExpanded)
                                   Column(
                                     children: [
+                                      // If overweight
+                                      if (calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 1.0),
+                                          child: Container(
+                                            width: double.infinity,
+                                            padding: const EdgeInsets.symmetric(vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              // Background color
+                                              borderRadius: const BorderRadius.vertical(
+                                                bottom: Radius.circular(8), // Only bottom corners rounded
+                                              ), // Rounded corners
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: const Text(
+                                              'OVERWEIGHT',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       // **Display slings within the load**
                                       for (var slingIndex = 0; slingIndex < (loads[loadIndex].slings?.length ?? 0); slingIndex++)
                                         Dismissible(
-                                          key: ValueKey(loads[loadIndex].slings![slingIndex]), // Unique key
-                                          direction: DismissDirection.endToStart, // Swipe left to delete
+                                          key: ValueKey(loads[loadIndex].slings![slingIndex]),
+                                          // Unique key
+                                          direction: DismissDirection.endToStart,
+                                          // Swipe left to delete
                                           background: Container(
                                             color: Colors.red,
                                             alignment: Alignment.centerRight,
@@ -1183,10 +1246,9 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                     "Confirm Deletion",
                                                     style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
                                                   ),
-                                                  content:  Text(
+                                                  content: Text(
                                                     "Are you sure you want to delete this sling?",
                                                     style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal),
-
                                                   ),
                                                   actions: [
                                                     TextButton(
@@ -1220,13 +1282,8 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                               // Restore all items from the deleted sling back to inventory
                                               for (var item in deletedSling.loadGear) {
                                                 var existingGear = gearList.firstWhere(
-                                                      (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
-                                                  orElse: () => Gear(
-                                                      name: item.name,
-                                                      quantity: 0,
-                                                      weight: item.weight,
-                                                      isPersonalTool: item.isPersonalTool,
-                                                      isHazmat: item.isHazmat),
+                                                  (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
+                                                  orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight, isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat),
                                                 );
 
                                                 existingGear.quantity += item.quantity;
@@ -1315,7 +1372,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                       if (item is Gear) {
                                                                         // No changes needed for Gear removal
                                                                         var existingGear = gearList.firstWhere(
-                                                                              (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
+                                                                          (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
                                                                           orElse: () => Gear(
                                                                               name: item.name,
                                                                               quantity: 0,
@@ -1332,9 +1389,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                           gearList.add(existingGear);
                                                                         }
                                                                         loads[loadIndex].slings![slingIndex].loadGear.remove(item);
-
-                                                                      }
-                                                                      else if (item is CustomItem) {
+                                                                      } else if (item is CustomItem) {
                                                                         loads[loadIndex].slings![slingIndex].customItems.remove(item);
                                                                       } else if (item is LoadAccoutrement) {
                                                                         loads[loadIndex].slings![slingIndex].loadAccoutrements.remove(item);
@@ -1343,7 +1398,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                   },
                                                                   child: Card(
                                                                     elevation: 2,
-                                                                    color: item is LoadAccoutrement ? AppColors.gearYellow : AppColors.gearYellow,
+                                                                    color: item is LoadAccoutrement ? AppColors.loadAccoutrementBlueGrey : AppColors.gearYellow,
                                                                     margin: const EdgeInsets.symmetric(vertical: 0.5),
                                                                     shape: RoundedRectangleBorder(
                                                                       borderRadius: BorderRadius.circular(0.0),
@@ -1364,6 +1419,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                                   fontWeight: FontWeight.bold,
                                                                                 ),
                                                                               ),
+                                                                              if (item is! CustomItem)
                                                                               Text(
                                                                                 (item is Gear || item is LoadAccoutrement) ? 'Quantity: ${(item is Gear) ? item.quantity : 1}' : '',
                                                                                 style: TextStyle(
@@ -1401,7 +1457,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                                                     dropdownColor: AppColors.textFieldColor2,
                                                                                                     items: List.generate(
                                                                                                       item.quantity,
-                                                                                                          (index) => DropdownMenuItem(
+                                                                                                      (index) => DropdownMenuItem(
                                                                                                         value: index + 1,
                                                                                                         child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                                                       ),
@@ -1430,10 +1486,14 @@ class _EditTripExternalState extends State<EditTripExternal> {
 
                                                                                                       // Handle returning the removed quantity to the inventory
                                                                                                       var existingGear = gearList.firstWhere(
-                                                                                                            (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
+                                                                                                        (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
                                                                                                         // Ensure same isPersonalTool status
                                                                                                         orElse: () => Gear(
-                                                                                                            name: item.name, quantity: 0, weight: item.weight, isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat),
+                                                                                                            name: item.name,
+                                                                                                            quantity: 0,
+                                                                                                            weight: item.weight,
+                                                                                                            isPersonalTool: item.isPersonalTool,
+                                                                                                            isHazmat: item.isHazmat),
                                                                                                       );
 
                                                                                                       // Update inventory quantity
@@ -1467,8 +1527,14 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                                     loads[loadIndex].slings![slingIndex].loadGear.remove(item);
 
                                                                                     var existingGear = gearList.firstWhere(
-                                                                                          (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool, // Ensure same isPersonalTool status
-                                                                                      orElse: () => Gear(name: item.name, quantity: 0, weight: item.weight, isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat),
+                                                                                      (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
+                                                                                      // Ensure same isPersonalTool status
+                                                                                      orElse: () => Gear(
+                                                                                          name: item.name,
+                                                                                          quantity: 0,
+                                                                                          weight: item.weight,
+                                                                                          isPersonalTool: item.isPersonalTool,
+                                                                                          isHazmat: item.isHazmat),
                                                                                     );
 
                                                                                     // Update inventory quantity
@@ -1478,8 +1544,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                                       gearList.add(existingGear);
                                                                                     }
                                                                                   }
-                                                                                }
-                                                                               else if (item is CustomItem) {
+                                                                                } else if (item is CustomItem) {
                                                                                   loads[loadIndex].slings![slingIndex].customItems.remove(item);
                                                                                 } else if (item is LoadAccoutrement) {
                                                                                   loads[loadIndex].slings![slingIndex].loadAccoutrements.remove(item);
@@ -1524,11 +1589,11 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                             ),
                                           ),
                                         ),
-
                                     ],
                                   ),
 
-                                if  (isExpanded)
+                                // Add Sling
+                                if (isExpanded)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 8.0),
                                     child: Align(
@@ -1541,14 +1606,14 @@ class _EditTripExternalState extends State<EditTripExternal> {
 
                                             // Add new sling
                                             loads[loadIndex].slings!.add(
-                                              Sling(
-                                                slingNumber: loads[loadIndex].slings!.length + 1,
-                                                weight: 0,
-                                                loadAccoutrements: [],
-                                                loadGear: [],
-                                                customItems: [],
-                                              ),
-                                            );
+                                                  Sling(
+                                                    slingNumber: loads[loadIndex].slings!.length + 1,
+                                                    weight: 0,
+                                                    loadAccoutrements: [],
+                                                    loadGear: [],
+                                                    customItems: [],
+                                                  ),
+                                                );
 
                                             // Ensure _isSlingExpanded list exists for this load and update it
                                             while (_isSlingExpanded.length <= loadIndex) {
@@ -1581,7 +1646,6 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                       ),
                                     ),
                                   ),
-
                               ],
                             ),
                           ),
@@ -1589,6 +1653,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                       },
                     ),
                   ),
+                  // Add Load
                   Padding(
                     padding: const EdgeInsets.only(top: 4.0, bottom: 8.0, left: 12.0, right: 12.0),
                     child: Center(
@@ -1610,7 +1675,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                             _isSlingExpanded.add([]); // Start with an empty sling expansion list
                           });
                         },
-                        child:  Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
                           children: [
                             Icon(
@@ -1632,7 +1697,6 @@ class _EditTripExternalState extends State<EditTripExternal> {
                         ),
                       ),
                     ),
-
                   ),
                 ],
               ),

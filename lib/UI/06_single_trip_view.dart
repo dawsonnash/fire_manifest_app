@@ -139,8 +139,11 @@ class SingleTripView extends StatefulWidget {
 }
 
 class _SingleTripViewState extends State<SingleTripView> {
+  late final bool? isExternal;
+
   @override
   void initState() {
+    isExternal = widget.trip.isExternal;
     super.initState();
     // print('Number of loads: ${widget.trip.loads.length}');
   }
@@ -214,7 +217,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                       },
                                       children: [
                                         Center(child: Text('Helicopter Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
-                                        Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                                        if (!isExternal!) Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
                                       ],
                                     ),
                                   ),
@@ -274,12 +277,12 @@ class _SingleTripViewState extends State<SingleTripView> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => widget.trip.isExternal!
-                                ? EditTripExternal(
-                                    trip: widget.trip,
-                                  )
-                                  : EditTrip(
-                                        trip: widget.trip,
-                                      )),
+                                      ? EditTripExternal(
+                                          trip: widget.trip,
+                                        )
+                                      : EditTrip(
+                                          trip: widget.trip,
+                                        )),
                             );
                           },
                         ),
@@ -441,7 +444,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                   Icon(Icons.arrow_forward_ios,
                                       //Icons.edit,
                                       color: AppColors.textColorPrimary,
-                                      size: 32),
+                                      size: 28),
                                 ],
                               ),
                             ),
