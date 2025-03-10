@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:ui';
+import 'package:fire_app/UI/05_byom_external.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,21 +26,28 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
   final TextEditingController allowableController = TextEditingController();
   final TextEditingController availableSeatsController = TextEditingController();
   final TextEditingController keyboardController = TextEditingController();
+  late TextEditingController safetyBufferController = TextEditingController(text: '0');
+
   double _sliderValue = 1000;
   String? tripNameErrorMessage;
   String? availableSeatsErrorMessage;
+  String? safetyBufferErrorMessage;
 
 
   bool isCalculateButtonEnabled = false; // Controls whether the save button shows
+  bool isExternalManifest = false; // Default to internal manifest (personnel + cargo)
 
   @override
   void initState() {
     super.initState();
 
+    newTrip = Trip(tripName: '', allowable: 0, availableSeats: 0);
+
     // Listeners for TextControllers
     tripNameController.addListener(_updateTrip);
     allowableController.addListener(_updateTrip);
     availableSeatsController.addListener(_updateTrip);
+    safetyBufferController = TextEditingController(text: AppData.safetyBuffer.toString());
 
     // Initialize allowableController with the default slider value
     allowableController.text = _sliderValue.toStringAsFixed(0);
@@ -69,10 +77,16 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
 
       final bool isTripNameValid = tripName.isNotEmpty && isTripNameUnique;
       final isAllowableValid = allowableController.text.isNotEmpty && allowableController.text != '0';
-      final isAvailableSeatsValid = availableSeatsController.text.isNotEmpty && availableSeatsController.text != '0';
+      var isAvailableSeatsValid = availableSeatsController.text.isNotEmpty && availableSeatsController.text != '0';
 
-      // Enable button only if all fields are valid
-      isCalculateButtonEnabled = isTripNameValid && isAllowableValid && isAvailableSeatsValid;
+
+      if (isExternalManifest) {
+        isAvailableSeatsValid = true;
+      }
+      setState(() {
+        // Need to adjust for position as well
+        isCalculateButtonEnabled = isTripNameValid && isAvailableSeatsValid;
+      });
 
       // Update the trip instance if the button is enabled
       if (isCalculateButtonEnabled) {
@@ -83,12 +97,18 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
             .join(' '); // Join the words back with a space
 
         final int allowable = int.parse(allowableController.text);
-        final int availableSeats = int.parse(availableSeatsController.text);
+        // Convert available seats text to integer. Available seats not necessary in External Manifesting
+        final int availableSeats = isExternalManifest ? -1 : int.parse(availableSeatsController.text);
+        final int safetyBuffer = int.parse(safetyBufferController.text);
+
+        // Creating a new Trip object
         newTrip = Trip(
-          tripName: tripNameCapitalized,
-          allowable: allowable,
-          availableSeats: availableSeats,
+            tripName: tripNameCapitalized,
+            allowable: allowable,
+            availableSeats: availableSeats,
+            isExternal: isExternalManifest // This dynamically assigns the correct value
         );
+
       }
     });
   }
@@ -149,6 +169,52 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
 
                       SizedBox(height: 16.0),
 
+                      // Internal/External Manifest toggle
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: AppData.padding16),
+                        child: Container(
+                          width: AppData.inputFieldWidth,
+                          decoration: BoxDecoration(
+                            color: AppColors.textFieldColor,
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: ListTile(
+                            title: Text(
+                              isExternalManifest ? "External" : "Internal",
+                              style: TextStyle(
+                                fontSize: AppData.text18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textColorPrimary,
+                              ),
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min, // Keeps row from expanding
+                              children: [
+                                Icon(
+                                  isExternalManifest ? FontAwesomeIcons.battleNet : FontAwesomeIcons.helicopter,
+                                  color: AppColors.primaryColor,
+                                  size: AppData.text24,
+                                ),
+                                SizedBox(width: 8), // Add spacing between icon and switch
+                                Switch(
+                                  value: isExternalManifest,
+                                  activeColor: AppColors.primaryColor,
+                                  inactiveThumbColor: AppColors.primaryColor,
+                                  inactiveTrackColor: AppColors.textFieldColor,
+                                  onChanged: (bool value) {
+                                    setState(() {
+                                      isExternalManifest = value;
+                                    });
+                                    _updateTrip();
+                                    },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: AppData.spacingStandard),
                       // Enter Trip Name Input Field
                       Padding(
                           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
@@ -216,63 +282,112 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
 
                       SizedBox(height: AppData.spacingStandard),
 
-                      // Enter Available Seats Input Field
-                      Padding(
-                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                          child: Container(
-                            constraints: BoxConstraints(
-                              maxWidth: AppData.inputFieldMax,
-                            ),
-                            child: TextField(
-                              controller: availableSeatsController,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(1),
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              onChanged: (value) {
-                                setState(() {
-                                  // Validate the input and set error message
-                                  if (value == '0') {
-                                    availableSeatsErrorMessage = 'Available seats cannot be 0.';
-                                  } else {
-                                    availableSeatsErrorMessage = null;
-                                  }
-                                });
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Enter # of Available Seats',
-                                errorText: availableSeatsErrorMessage,
-                                labelStyle: TextStyle(
-                                  color: AppColors.textColorPrimary, // Label color when not focused
-                                  fontSize: 18, // Label font size
-                                ),
-                                filled: true,
-                                fillColor: AppColors.textFieldColor,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppColors.borderPrimary,
-                                    // Border color when the TextField is not focused
-                                    width: 2.0, // Border width
+                      // Available Seats input field
+                      if (!isExternalManifest)
+                        Padding(
+                            padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
+                            child: Container(
+                              width: AppData.inputFieldWidth,
+                              child: TextField(
+                                controller: availableSeatsController,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(1),
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    // Validate the input and set error message
+                                    if (value == '0') {
+                                      availableSeatsErrorMessage = 'Available seats cannot be 0.';
+                                    } else {
+                                      availableSeatsErrorMessage = null;
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Enter # of Available Seats',
+                                  labelStyle: TextStyle(
+                                    color: AppColors.textColorPrimary, // Label color when not focused
+                                    fontSize: AppData.text18, // Label font size
                                   ),
-                                  borderRadius: BorderRadius.circular(4.0), // Rounded corners
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppColors.primaryColor,
-                                    // Border color when the TextField is focused
-                                    width: 2.0, // Border width
+                                  errorText: availableSeatsErrorMessage,
+                                  filled: true,
+                                  fillColor: AppColors.textFieldColor,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.borderPrimary,
+                                      // Border color when the TextField is not focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(4.0), // Rounded corners
                                   ),
-                                  borderRadius: BorderRadius.circular(4.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.primaryColor,
+                                      // Border color when the TextField is focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(4.0),
+                                  ),
+                                ),
+                                style: TextStyle(
+                                  color: AppColors.textColorPrimary,
+                                  fontSize: AppData.text24,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              style: TextStyle(
-                                color: AppColors.textColorPrimary,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                            )),
+
+                      // Safety Buffer
+                      if (isExternalManifest)
+                        Padding(
+                            padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
+                            child: Container(
+                              width: AppData.inputFieldWidth,
+                              child: TextField(
+                                controller: safetyBufferController,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(3),
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                onChanged: (value) {
+                                  setState(() {});
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Enter Safety Buffer (lbs)',
+                                  labelStyle: TextStyle(
+                                    color: AppColors.textColorPrimary, // Label color when not focused
+                                    fontSize: AppData.text18, // Label font size
+                                  ),
+                                  errorText: safetyBufferErrorMessage,
+                                  filled: true,
+                                  fillColor: AppColors.textFieldColor,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.borderPrimary,
+                                      // Border color when the TextField is not focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.primaryColor,
+                                      // Border color when the TextField is focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(4.0),
+                                  ),
+                                ),
+                                style: TextStyle(
+                                  color: AppColors.textColorPrimary,
+                                  fontSize: AppData.text24,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          )),
+                            )),
 
                       SizedBox(height: AppData.spacingStandard),
 
@@ -530,11 +645,21 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                         child: ElevatedButton(
                           onPressed: isCalculateButtonEnabled
                               ? () {
+                            _updateTrip();
 
+                            isExternalManifest
+                                ?
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => BuildYourOwnManifest(trip: newTrip),
+                              ),
+                            )
+                                :
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BuildYourOwnManifestExternal(trip: newTrip, safetyBuffer: int.parse(safetyBufferController.text)),
                               ),
                             );
                           }

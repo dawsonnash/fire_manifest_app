@@ -2128,7 +2128,7 @@ class _QuickManifestState extends State<QuickManifest> {
   // Function to check if input is valid and update button state
   void _checkInput() {
     final String tripName = tripNameController.text;
-// Validate trip name existence (case-insensitive)
+  // Validate trip name existence (case-insensitive)
     final bool isTripNameUnique = !savedTrips.savedTrips.any(
       (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
     );
