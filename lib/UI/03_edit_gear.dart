@@ -136,7 +136,7 @@ class _EditGearState extends State<EditGear> {
             ),
             content: Text(
               '$capitalizedGearName also exists as a tool. Any gear that is also a personal tool must be edited within the Tool panel under the Crew tab.',
-              style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
             ),
             actions: [
               TextButton(
@@ -178,7 +178,7 @@ class _EditGearState extends State<EditGear> {
             ),
             content: Text(
               '$capitalizedGearName exists both as a tool and item in your gear inventory. Any gear that is also a personal tool must be edited within the Tool panel under the Crew tab. If you would like to add more to your gear inventory, do so within the Edit Gear panel.',
-              style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
             ),
             actions: [
               TextButton(
@@ -216,7 +216,7 @@ class _EditGearState extends State<EditGear> {
             title: Text('Gear Conflict', style: TextStyle(color: AppColors.textColorPrimary)),
             content: Text(
               '$matchingGearName already exists in your gear inventory. If you would like to add more, edit the item quantity in the Edit Gear panel.',
-              style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
             ),
             actions: [
               TextButton(
@@ -266,7 +266,7 @@ class _EditGearState extends State<EditGear> {
             content: Text(
               'The quantity you are trying to set ($newGearQuantity) is less than the quantity used in an existing gear preference. '
                   'You must first delete the affected gear preference before reducing the quantity. All other fields have been updated.',
-              style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
             ),
             actions: [
               TextButton(
@@ -403,7 +403,7 @@ class _EditGearState extends State<EditGear> {
                                   ),
                                   content: Text(
                                     'This gear data ($oldGearName) and any gear preference data containing it will be erased!',
-                                    style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                    style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                   ),
                                   actions: [
                                     TextButton(
@@ -586,7 +586,7 @@ class _EditGearState extends State<EditGear> {
                               ],
                               decoration: InputDecoration(
                                 labelText: 'Edit weight',
-                                hintText: 'Up to 500 lbs',
+                                hintText: 'Up to 500 lb',
                                 hintStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
                                   fontSize: 20,

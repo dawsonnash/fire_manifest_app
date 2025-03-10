@@ -50,7 +50,7 @@ class Load extends HiveObject{
       loadGear: loadGear.map((gear) => gear.copyWith()).toList(),
       customItems: customItems.map((item) => item.copy()).toList(),
       slings: slings?.map((sling) => sling.copy()).toList(),
-      loadAccoutrements: List.from(loadAccoutrements!),
+      loadAccoutrements: List.from(loadAccoutrements ?? []),
     );
   }
 }

@@ -54,7 +54,7 @@ class _GearViewState extends State<GearView> {
           ),
           content: Text(
             'Are you sure you want to delete these gear items?',
-            style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+            style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
           ),
           actions: [
             TextButton(
@@ -193,7 +193,7 @@ class _GearViewState extends State<GearView> {
                                     ),
                                     content: Text(
                                       'Are you sure you want to delete all gear? All gear and gear preference data will be erased.',
-                                      style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                     ),
                                     actions: [
                                       TextButton(
@@ -408,8 +408,8 @@ class _GearViewState extends State<GearView> {
                                                 ],
                                               ),
                                               Text(
-                                                '${gear.weight} lbs x ${gear.quantity}',
-                                                style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                                '${gear.weight} lb x ${gear.quantity}',
+                                                style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                               ),

@@ -316,7 +316,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                         }).join(', '),
                                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: AppColors.textColorPrimary),
                                       ),
-                                      subtitle: Text("Load Preference: ${loadPreferenceMap[posPref.loadPreference]}", style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary)),
+                                      subtitle: Text("Load Preference: ${loadPreferenceMap[posPref.loadPreference]}", style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary)),
                                       trailing: IconButton(
                                         icon: const Icon(Icons.delete, color: Colors.red),
                                         onPressed: () {
@@ -346,7 +346,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                       gearPref.gear.map((item) => '${item.name} (x${item.quantity})').join(', '),
                                       style:  TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: AppColors.textColorPrimary),
                                     ),
-                                    subtitle: Text("Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}", style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary)),
+                                    subtitle: Text("Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}", style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary)),
                                     trailing: IconButton(
                                       icon: const Icon(Icons.delete, color: Colors.red),
                                       onPressed: () {

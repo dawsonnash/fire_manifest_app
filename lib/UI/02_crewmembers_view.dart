@@ -60,7 +60,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
           ),
           content: Text(
             'Are you sure you want to delete these crew members?',
-            style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+            style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
           ),
           actions: [
             TextButton(
@@ -195,7 +195,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                     ),
                                     content: Text(
                                       'Are you sure you want to delete all crew members?',
-                                      style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                     ),
                                     actions: [
                                       TextButton(
@@ -374,7 +374,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                '${crewMember.name}, ${crewMember.flightWeight} lbs',
+                                                '${crewMember.name}, ${crewMember.flightWeight} lb',
                                                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                               ),
                                               Row(

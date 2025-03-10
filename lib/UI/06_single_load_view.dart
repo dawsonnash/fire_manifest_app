@@ -213,7 +213,7 @@ pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dyn
         left: xOffset + 442, // Right-side placement for weights
         top: adjustedPosition,
         child: pw.Text(
-          "${hazmatItems[i].totalGearWeight} lbs",
+          "${hazmatItems[i].totalGearWeight} lb",
           style: pw.TextStyle(fontSize: fontSizeOF252),
         ),
       ),
@@ -245,7 +245,7 @@ pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dyn
           left: xOffset + 442,
           top: yOffset + 150 + (i * itemSpacing),
           child: pw.Text(
-            "${normalItems[i] is CrewMember ? normalItems[i].flightWeight : normalItems[i] is Gear ? normalItems[i].totalGearWeight : normalItems[i].totalGearWeight} lbs",
+            "${normalItems[i] is CrewMember ? normalItems[i].flightWeight : normalItems[i] is Gear ? normalItems[i].totalGearWeight : normalItems[i].totalGearWeight} lb",
             style: pw.TextStyle(fontSize: fontSizeOF252),
           ),
         ),
@@ -268,7 +268,7 @@ pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dyn
           left: xOffset + 442,
           top: yOffset + 610,
           child: pw.Text(
-            '${load.weight.toString()} lbs',
+            '${load.weight.toString()} lb',
             style: pw.TextStyle(fontSize: fontSizeOF252),
           ),
         ),
@@ -300,7 +300,7 @@ pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dyn
         child: pw.Text(
           'Load #${load.loadNumber}, Page $pageIndex of $totalPages',
           style: pw.TextStyle(
-            fontSize: 16,
+            fontSize: AppData.text16,
             color: PdfColors.black,
           ),
         ),
@@ -312,7 +312,7 @@ pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dyn
         top: 13,
         child: pw.Text(
           helicopterNum!,
-          style: pw.TextStyle(fontSize: 16),
+          style: pw.TextStyle(fontSize: AppData.text16),
         ),
       ),
 
@@ -322,7 +322,7 @@ pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dyn
         top: 55,
         child: pw.Text(
           departure!,
-          style: pw.TextStyle(fontSize: 16),
+          style: pw.TextStyle(fontSize: AppData.text16),
         ),
       ),
 
@@ -332,7 +332,7 @@ pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dyn
         top: 55,
         child: pw.Text(
           destination!,
-          style: pw.TextStyle(fontSize: 16),
+          style: pw.TextStyle(fontSize: AppData.text16),
         ),
       ),
 
@@ -342,7 +342,7 @@ pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dyn
         top: yOffset + 656,
         child: pw.Text(
           manifestPreparer!,
-          style: pw.TextStyle(fontSize: 16),
+          style: pw.TextStyle(fontSize: AppData.text16),
         ),
       ),
     ],
@@ -407,7 +407,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           left: 267,
           top: yOffset + 150 + (i * itemSpacing),
           child: pw.Text(
-            "${load.loadPersonnel[i].flightWeight} lbs",
+            "${load.loadPersonnel[i].flightWeight} lb",
             style: pw.TextStyle(fontSize: 12),
           ),
         ),
@@ -418,7 +418,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           left: 323,
           top: yOffset + 150 + ((load.loadPersonnel.length + j) * itemSpacing),
           child: pw.Text(
-            "${load.loadGear[j].totalGearWeight} lbs",
+            "${load.loadGear[j].totalGearWeight} lb",
             style: pw.TextStyle(fontSize: 12),
           ),
         ),
@@ -427,7 +427,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           left: 323,
           top: yOffset + 150 + ((load.loadPersonnel.length + load.loadGear.length + k) * itemSpacing),
           child: pw.Text(
-            "${load.customItems[k].weight} lbs",
+            "${load.customItems[k].weight} lb",
             style: pw.TextStyle(fontSize: 12),
           ),
         ),
@@ -437,7 +437,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         left: 494,
         top: yOffset + 545,
         child: pw.Text(
-          '${load.weight.toString()} lbs',
+          '${load.weight.toString()} lb',
           style: pw.TextStyle(fontSize: 12),
         ),
       ),
@@ -457,7 +457,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         left: 260,
         top: yOffset + 545,
         child: pw.Text(
-          '${subtotalCrewMemberWeight.toString()} lbs',
+          '${subtotalCrewMemberWeight.toString()} lb',
           style: pw.TextStyle(fontSize: 12),
         ),
       ),
@@ -467,7 +467,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         left: 320,
         top: yOffset + 545,
         child: pw.Text(
-          '${subtotalGearWeight.toString()} lbs',
+          '${subtotalGearWeight.toString()} lb',
           style: pw.TextStyle(fontSize: 12),
         ),
       ),
@@ -531,7 +531,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
-              ' • ${widget.load.weight} lbs',
+              ' • ${widget.load.weight} lb',
               style: TextStyle(fontSize: 20, color: AppColors.textColorPrimary),
             ),
           ],
@@ -576,7 +576,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                         },
                         child: Text(
                           'Cancel',
-                          style: TextStyle(fontSize: 16, color: AppColors.cancelButton),
+                          style: TextStyle(fontSize: AppData.text16, color: AppColors.cancelButton),
                         ),
                       ),
                       TextButton(
@@ -602,7 +602,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                         },
                         child: Text(
                           'Export',
-                          style: TextStyle(fontSize: 16, color: AppColors.saveButtonAllowableWeight),
+                          style: TextStyle(fontSize: AppData.text16, color: AppColors.saveButtonAllowableWeight),
                         ),
                       ),
                     ],
@@ -693,7 +693,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                             Row(
                                               children: [
                                                 Text(
-                                                  'Weight: ${sling.weight} lbs',
+                                                  'Weight: ${sling.weight} lb',
                                                   style: TextStyle(
                                                     fontSize: 18,
                                                     color: AppColors.textColorPrimary,
@@ -731,7 +731,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                   style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
                                                 ),
                                                 subtitle: Text(
-                                                  'Weight: ${accoutrement.weight} lbs',
+                                                  'Weight: ${accoutrement.weight} lb',
                                                   style: TextStyle(color: Colors.black),
                                                 ),
                                               ),
@@ -776,7 +776,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                           ],
                                                         ),
                                                         Text(
-                                                          'Weight: ${gearItem.totalGearWeight} lbs',
+                                                          'Weight: ${gearItem.totalGearWeight} lb',
                                                           style: TextStyle(fontSize: 18),
                                                         ),
                                                       ],
@@ -804,7 +804,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                   customItem.name,
                                                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                                 ),
-                                                subtitle: Text('Weight: ${customItem.weight} lbs'),
+                                                subtitle: Text('Weight: ${customItem.weight} lb'),
                                               ),
                                             );
                                           }).toList(),
@@ -860,7 +860,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                 ),
                                               ),
                                               Text(
-                                                'Flight Weight: ${crewmember.flightWeight} lbs',
+                                                'Flight Weight: ${crewmember.flightWeight} lb',
                                                 style: TextStyle(
                                                   fontSize: 18,
                                                   color: AppColors.textColorPrimary,
@@ -892,7 +892,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
                                             content: Text(
-                                              '${gearItem.name} • ${gearItem.weight} lbs each',
+                                              '${gearItem.name} • ${gearItem.weight} lb each',
                                               style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
                                             ),
                                             backgroundColor: AppColors.textFieldColor2,
@@ -928,7 +928,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                 ],
                                               ),
                                               Text(
-                                                'Weight: ${gearItem.totalGearWeight} lbs',
+                                                'Weight: ${gearItem.totalGearWeight} lb',
                                                 style: TextStyle(fontSize: 18, color: Colors.black),
                                               ),
                                             ],
@@ -968,7 +968,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                               ],
                                             ),
                                             Text(
-                                              'Weight: ${customItem.weight} lbs',
+                                              'Weight: ${customItem.weight} lb',
                                               style: const TextStyle(
                                                 fontSize: 18,
                                               ),
@@ -1107,7 +1107,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
           },
           child: Text(
             'Cancel',
-            style: TextStyle(fontSize: 16, color: AppColors.cancelButton),
+            style: TextStyle(fontSize: AppData.text16, color: AppColors.cancelButton),
           ),
         ),
         TextButton(
@@ -1121,7 +1121,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
           },
           child: Text(
             'Confirm',
-            style: TextStyle(fontSize: 16, color: AppColors.saveButtonAllowableWeight),
+            style: TextStyle(fontSize: AppData.text16, color: AppColors.saveButtonAllowableWeight),
           ),
         ),
       ],

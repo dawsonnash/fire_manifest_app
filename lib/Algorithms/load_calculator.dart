@@ -594,7 +594,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: AppColors.textColorPrimary,
-                      fontSize: 16,
+                      fontSize: AppData.text16,
                     ),
                     children: [
                       TextSpan(
@@ -617,7 +617,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: AppColors.textColorPrimary,
-                      fontSize: 16,
+                      fontSize: AppData.text16,
                     ),
                     children: [
                       TextSpan(
@@ -640,7 +640,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.red, // Highlight duplicates
-                      fontSize: 16,
+                      fontSize: AppData.text16,
                     ),
                     children: [
                       TextSpan(
@@ -663,7 +663,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.red, // Highlight duplicates
-                      fontSize: 16,
+                      fontSize: AppData.text16,
                     ),
                     children: [
                       TextSpan(

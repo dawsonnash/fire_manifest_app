@@ -52,11 +52,11 @@ class _EditTripState extends State<EditTrip> {
   // This is what displays on each load
   String itemDisplayEditTrip(dynamic item) {
     if (item is Gear) {
-      return "${item.name}, ${item.totalGearWeight} lbs";
+      return "${item.name}, ${item.totalGearWeight} lb";
     } else if (item is CrewMember) {
-      return "${item.name}, ${item.flightWeight} lbs";
+      return "${item.name}, ${item.flightWeight} lb";
     } else if (item is CustomItem) {
-      return "${item.name}, ${item.weight} lbs";
+      return "${item.name}, ${item.weight} lb";
     } else {
       return "Unknown item type";
     }
@@ -154,7 +154,7 @@ class _EditTripState extends State<EditTrip> {
                                       ),
                                       //
                                       title: Text(
-                                        '${crew.name}, ${crew.flightWeight} lbs',
+                                        '${crew.name}, ${crew.flightWeight} lb',
                                         style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                         textAlign: TextAlign.start,
                                       ),
@@ -237,8 +237,8 @@ class _EditTripState extends State<EditTrip> {
                                                 Flexible(
                                                   child: Text(
                                                     gear.name,
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
+                                                    style: TextStyle(
+                                                      fontSize: AppData.text16,
                                                       fontWeight: FontWeight.bold,
                                                     ),
                                                     overflow: TextOverflow.ellipsis,
@@ -406,14 +406,14 @@ class _EditTripState extends State<EditTrip> {
                                                           Text(
                                                             item['name'],
                                                             style: TextStyle(
-                                                              fontSize: 16,
+                                                              fontSize: AppData.text16,
                                                               color: AppColors.textColorPrimary,
                                                             ),
                                                           ),
                                                           Text(
-                                                            '${item['weight']} lbs',
+                                                            '${item['weight']} lb',
                                                             style: TextStyle(
-                                                              fontSize: 16,
+                                                              fontSize: AppData.text16,
                                                               color: AppColors.textColorPrimary,
                                                             ),
                                                           ),
@@ -484,7 +484,7 @@ class _EditTripState extends State<EditTrip> {
                                     // Custom Item Weight Field
                                     TextField(
                                         decoration: InputDecoration(
-                                          labelText: 'Weight (lbs)',
+                                          labelText: 'Weight (lb)',
                                           labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
                                         ),
                                         keyboardType: TextInputType.number,
@@ -804,7 +804,7 @@ class _EditTripState extends State<EditTrip> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
-              'Allowable: ${widget.trip.allowable} lbs',
+              'Allowable: ${widget.trip.allowable} lb',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
           ],
@@ -979,7 +979,7 @@ class _EditTripState extends State<EditTrip> {
                                                 Row(
                                                   children: [
                                                     Text(
-                                                      '${calculateAvailableWeight(loads[index])} lbs',
+                                                      '${calculateAvailableWeight(loads[index])} lb',
                                                       style: TextStyle(
                                                         fontSize: 20,
                                                         fontWeight: FontWeight.bold,
@@ -1214,7 +1214,7 @@ class _EditTripState extends State<EditTrip> {
                                                       Text(
                                                         itemDisplayEditTrip(item),
                                                         style: TextStyle(
-                                                          fontSize: 16,
+                                                          fontSize: AppData.text16,
                                                           fontWeight: FontWeight.bold,
                                                           color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
                                                         ),
@@ -1429,7 +1429,7 @@ class _EditTripState extends State<EditTrip> {
                                                 ),
                                                 content: Text(
                                                   'Are you sure you want to delete this load?',
-                                                  style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                                  style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                                 ),
                                                 actions: [
                                                   TextButton(
@@ -1547,7 +1547,7 @@ class _EditTripState extends State<EditTrip> {
                       child: Text(
                         ' + Add Load',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: AppData.text16,
                           color: AppColors.textColorSecondary,
                           fontWeight: FontWeight.bold,
                         ),

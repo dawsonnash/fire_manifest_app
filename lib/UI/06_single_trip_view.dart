@@ -228,7 +228,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                       },
                                       child: Text(
                                         'Cancel',
-                                        style: TextStyle(fontSize: 16, color: AppColors.cancelButton),
+                                        style: TextStyle(fontSize: AppData.text16, color: AppColors.cancelButton),
                                       ),
                                     ),
                                     TextButton(
@@ -254,7 +254,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                       },
                                       child: Text(
                                         'Export',
-                                        style: TextStyle(fontSize: 16, color: AppColors.saveButtonAllowableWeight),
+                                        style: TextStyle(fontSize: AppData.text16, color: AppColors.saveButtonAllowableWeight),
                                       ),
                                     ),
                                   ],
@@ -308,7 +308,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                   ),
                                   content: Text(
                                     'Are you sure you want to delete this trip?',
-                                    style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                    style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                   ),
                                   actions: [
                                     TextButton(
@@ -433,7 +433,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                         ),
                                       ),
                                       Text(
-                                        'Weight: ${load.weight} lbs',
+                                        'Weight: ${load.weight} lb',
                                         style: TextStyle(
                                           fontSize: 18,
                                           color: AppColors.textColorPrimary,
@@ -578,7 +578,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
           },
           child: Text(
             'Cancel',
-            style: TextStyle(fontSize: 16, color: AppColors.cancelButton),
+            style: TextStyle(fontSize: AppData.text16, color: AppColors.cancelButton),
           ),
         ),
         TextButton(
@@ -592,7 +592,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
           },
           child: Text(
             'Confirm',
-            style: TextStyle(fontSize: 16, color: AppColors.saveButtonAllowableWeight),
+            style: TextStyle(fontSize: AppData.text16, color: AppColors.saveButtonAllowableWeight),
           ),
         ),
       ],

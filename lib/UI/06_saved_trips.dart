@@ -108,7 +108,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                     ),
                                     content: Text(
                                       'Are you sure you want to delete all trips?',
-                                      style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                     ),
                                     actions: [
                                       TextButton(
@@ -259,7 +259,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                       ),
                                       content: Text(
                                         'Are you sure you want to delete this trip?',
-                                        style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                        style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                       ),
                                       actions: [
                                         TextButton(
@@ -355,7 +355,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                                       Text(
                                                         formatTimestamp(trip.timestamp),
                                                         style: TextStyle(
-                                                          fontSize: 16,
+                                                          fontSize: AppData.text16,
                                                           fontWeight: FontWeight.w400,
                                                           color: AppColors.textColorPrimary,
                                                         ),
@@ -363,7 +363,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                                     ],
                                                   ),
                                                   Text(
-                                                    'Allowable: ${trip.allowable} lbs',
+                                                    'Allowable: ${trip.allowable} lb',
                                                     style: TextStyle(
                                                       fontSize: 18,
                                                       color: AppColors.textColorPrimary,

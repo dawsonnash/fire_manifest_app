@@ -394,7 +394,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                   child: Text(
                                     gear.name,
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: AppData.text16,
                                       color: AppColors.textColorPrimary,
                                     ),
                                     overflow: TextOverflow
@@ -470,7 +470,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                     Text(
                                       'Qty: ${selectedGearQuantities[gear] ?? 1}',
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: AppData.text16,
                                         color: AppColors.textColorPrimary,
                                       ),
                                     ),

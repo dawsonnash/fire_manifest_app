@@ -373,7 +373,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                                         subtitle: Text(
                                             "Load Preference: ${loadPreferenceMap[posPref.loadPreference]}",
                                             style: TextStyle(
-                                                fontSize: 16,
+                                                fontSize: AppData.text16,
                                                 color: AppColors
                                                     .textColorPrimary)),
                                         trailing: IconButton(
@@ -419,7 +419,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                                       subtitle: Text(
                                         "Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}",
                                         style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: AppData.text16,
                                             color: AppColors.textColorPrimary),
                                       ),
                                       trailing: IconButton(

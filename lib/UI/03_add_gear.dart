@@ -138,7 +138,7 @@ class _AddGearState extends State<AddGear> {
             ),
             content: Text(
               '$capitalizedGearName already exists as both a tool and an item in your inventory. Any gear that is also a personal tool must be edited in the Tool panel under the Crew tab. If you would like to add more to your gear inventory, do so within the Edit Gear panel.',
-              style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
             ),
             actions: [
               TextButton(
@@ -187,7 +187,7 @@ class _AddGearState extends State<AddGear> {
         const String universalMessage = 'Any gear that is also a personal tool can be added to your gear inventory, but it must be of the same weight and HAZMAT value.';
 
         if (personalToolWeight != gearWeight) {
-          weightError = '$capitalizedGearName must be of the weight, $personalToolWeight lbs.';
+          weightError = '$capitalizedGearName must be of the weight, $personalToolWeight lb.';
         }
 
         if (personalToolisHazmat != isHazmatFinal) {
@@ -216,7 +216,7 @@ class _AddGearState extends State<AddGear> {
               ),
               content: Text(
                 combinedError,
-                style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
               ),
               actions: [
                 TextButton(
@@ -269,7 +269,7 @@ class _AddGearState extends State<AddGear> {
             title: Text('Gear Conflict', style: TextStyle(color: AppColors.textColorPrimary)),
             content: Text(
               '$matchingGearName already exists in your gear inventory. If you would like to add more, edit the item quantity in the Edit Gear panel.',
-              style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
             ),
             actions: [
               TextButton(
@@ -522,7 +522,7 @@ class _AddGearState extends State<AddGear> {
                                     ],
                                     decoration: InputDecoration(
                                       labelText: 'Weight',
-                                      hintText: 'Up to 500 lbs',
+                                      hintText: 'Up to 500 lb',
                                       hintStyle: TextStyle(
                                         color: AppColors.textColorPrimary,
                                         fontSize: 20,
@@ -723,7 +723,7 @@ class _AddGearState extends State<AddGear> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    '${item['weight']} lbs',
+                                                    '${item['weight']} lb',
                                                     style: TextStyle(
                                                       color: AppColors.textColorPrimary,
                                                       fontWeight: FontWeight.normal,
@@ -782,7 +782,7 @@ class _AddGearState extends State<AddGear> {
                                     ],
                                     decoration: InputDecoration(
                                       labelText: 'Weight',
-                                      hintText: 'Up to 500 lbs',
+                                      hintText: 'Up to 500 lb',
                                       hintStyle: TextStyle(
                                         color: AppColors.textColorPrimary,
                                         fontSize: 20,

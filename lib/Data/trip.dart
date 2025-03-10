@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import '../CodeShare/colors.dart';
 import 'crewmember.dart';
 import 'gear.dart';
 import 'load.dart';
@@ -25,7 +26,8 @@ class Trip extends HiveObject {
   int? totalCrewWeight;
   @HiveField(8)
   bool? isExternal;
-
+  @HiveField(9)
+  int safetyBuffer;
   //
 
   Trip({
@@ -33,6 +35,7 @@ class Trip extends HiveObject {
     required this.allowable,
     required this.availableSeats,
     this.isExternal = false, // Default to false
+    this.safetyBuffer = 0,
     DateTime? timestamp,}) : timestamp = timestamp ?? DateTime.now(); // Default to current time if not provided;
 
   void addLoad(Trip trip, Load newLoad) {

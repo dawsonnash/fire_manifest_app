@@ -4,6 +4,8 @@ import 'package:fire_app/UI/05_byom_external.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../Data/crew.dart';
+import '../Data/gear.dart';
 import '../Data/trip.dart';
 import 'package:fire_app/UI/05_build_your_own_manifest.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -32,7 +34,6 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
   String? tripNameErrorMessage;
   String? availableSeatsErrorMessage;
   String? safetyBufferErrorMessage;
-
 
   bool isCalculateButtonEnabled = false; // Controls whether the save button shows
   bool isExternalManifest = false; // Default to internal manifest (personnel + cargo)
@@ -71,14 +72,12 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
       final String tripName = tripNameController.text;
 // Validate trip name existence (case-insensitive)
       final bool isTripNameUnique = !savedTrips.savedTrips.any(
-            (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
+        (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
       );
-
 
       final bool isTripNameValid = tripName.isNotEmpty && isTripNameUnique;
       final isAllowableValid = allowableController.text.isNotEmpty && allowableController.text != '0';
       var isAvailableSeatsValid = availableSeatsController.text.isNotEmpty && availableSeatsController.text != '0';
-
 
       if (isExternalManifest) {
         isAvailableSeatsValid = true;
@@ -99,20 +98,21 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
         final int allowable = int.parse(allowableController.text);
         // Convert available seats text to integer. Available seats not necessary in External Manifesting
         final int availableSeats = isExternalManifest ? -1 : int.parse(availableSeatsController.text);
-        final int safetyBuffer = int.parse(safetyBufferController.text);
+        int safetyBuffer = int.parse(safetyBufferController.text);
 
+        if (!isExternalManifest) {
+          safetyBuffer = 0;
+        }
         // Creating a new Trip object
         newTrip = Trip(
             tripName: tripNameCapitalized,
             allowable: allowable,
             availableSeats: availableSeats,
-            isExternal: isExternalManifest // This dynamically assigns the correct value
-        );
-
+            isExternal: isExternalManifest,
+            safetyBuffer: safetyBuffer);
       }
     });
   }
-
 
   void _incrementSlider() {
     setState(() {
@@ -132,16 +132,15 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
   Widget build(BuildContext context) {
     // Main theme button style
     final ButtonStyle style = ElevatedButton.styleFrom(
-      foregroundColor: Colors.black,
-      textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      backgroundColor: Colors.grey,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      elevation: 15,
-      shadowColor: Colors.black,
-      side: const BorderSide(color: Colors.black, width: 2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        fixedSize: Size(min(MediaQuery.of(context).size.width / 2, AppData.buttonMax),  MediaQuery.of(context).size.height / 10)
-    );
+        foregroundColor: Colors.black,
+        textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        backgroundColor: Colors.grey,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        elevation: 15,
+        shadowColor: Colors.black,
+        side: const BorderSide(color: Colors.black, width: 2),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        fixedSize: Size(min(MediaQuery.of(context).size.width / 2, AppData.buttonMax), MediaQuery.of(context).size.height / 10));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -162,11 +161,9 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                 height: double.infinity,
                 color: Colors.white.withValues(alpha: 0.05),
                 child: SingleChildScrollView(
-
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-
                       SizedBox(height: 16.0),
 
                       // Internal/External Manifest toggle
@@ -206,7 +203,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                       isExternalManifest = value;
                                     });
                                     _updateTrip();
-                                    },
+                                  },
                                 ),
                               ],
                             ),
@@ -235,7 +232,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
 
                                   // Check if crew member name already exists
                                   bool tripNameExists = savedTrips.savedTrips.any(
-                                        (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
+                                    (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
                                   );
 
                                   // Validate the input and set error message
@@ -356,7 +353,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                   setState(() {});
                                 },
                                 decoration: InputDecoration(
-                                  labelText: 'Enter Safety Buffer (lbs)',
+                                  labelText: 'Enter Safety Buffer (lb)',
                                   labelStyle: TextStyle(
                                     color: AppColors.textColorPrimary, // Label color when not focused
                                     fontSize: AppData.text18, // Label font size
@@ -412,7 +409,8 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                               ),
                             ],
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5), // Reduced padding
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                          // Reduced padding
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -468,15 +466,13 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                 });
                                               },
                                               decoration: InputDecoration(
-                                                hintText: 'Up to 9,999 lbs',
+                                                hintText: 'Up to 9,999 lb',
                                                 hintStyle: TextStyle(color: AppColors.textColorPrimary),
                                                 filled: true,
                                                 fillColor: AppColors.textFieldColor,
                                                 // Background color of the text field
                                                 counterText: '',
-                                                border: const OutlineInputBorder(
-
-                                                ),
+                                                border: const OutlineInputBorder(),
                                               ),
                                               style: TextStyle(
                                                 color: AppColors.textColorPrimary, // Color of the typed text
@@ -495,14 +491,14 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                               TextButton(
                                                 onPressed: isSaveEnabled
                                                     ? () {
-                                                  setState(() {
-                                                    if (keyboardController.text.isNotEmpty) {
-                                                      _sliderValue = double.parse(keyboardController.text).clamp(1000, 5000);
-                                                      allowableController.text = keyboardController.text;
-                                                    }
-                                                  });
-                                                  Navigator.of(context).pop();
-                                                }
+                                                        setState(() {
+                                                          if (keyboardController.text.isNotEmpty) {
+                                                            _sliderValue = double.parse(keyboardController.text).clamp(1000, 5000);
+                                                            allowableController.text = keyboardController.text;
+                                                          }
+                                                        });
+                                                        Navigator.of(context).pop();
+                                                      }
                                                     : null, // Disable Save if input is invalid
                                                 child: Text(
                                                   'Save',
@@ -537,7 +533,6 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                               // Background container with white background, black outline, and rounded corners
                               Positioned.fill(
                                 child: Container(
-
                                   decoration: BoxDecoration(
                                     color: AppColors.textFieldColor, // Background color
                                     border: Border.all(color: Colors.black, width: 2), // Black outline
@@ -574,7 +569,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                             Visibility(
                                               visible: lastInputFromSlider,
                                               child: Text(
-                                                '${_sliderValue.toStringAsFixed(0)} lbs',
+                                                '${_sliderValue.toStringAsFixed(0)} lb',
                                                 style: TextStyle(
                                                   fontSize: 32,
                                                   fontWeight: FontWeight.bold,
@@ -586,7 +581,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                             Visibility(
                                               visible: !lastInputFromSlider,
                                               child: Text(
-                                                '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lbs',
+                                                '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lb',
                                                 style: TextStyle(
                                                   fontSize: 32,
                                                   fontWeight: FontWeight.bold,
@@ -645,24 +640,121 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                         child: ElevatedButton(
                           onPressed: isCalculateButtonEnabled
                               ? () {
-                            _updateTrip();
+                                  _updateTrip();
 
-                            isExternalManifest
-                                ?
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BuildYourOwnManifest(trip: newTrip),
-                              ),
-                            )
-                                :
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BuildYourOwnManifestExternal(trip: newTrip, safetyBuffer: int.parse(safetyBufferController.text)),
-                              ),
-                            );
-                          }
+                                  if (isExternalManifest) {
+                                    final int allowable = int.parse(allowableController.text);
+                                    final int safetyBuffer = int.parse(safetyBufferController.text);
+                                    num remainingWeight = allowable - safetyBuffer;
+                                    Gear? heaviestGearItem;
+                                    num maxGearWeight = 0;
+
+                                    if (crew.gear.isNotEmpty) {
+                                      heaviestGearItem = crew.gear.reduce((a, b) => a.weight > b.weight ? a : b);
+                                      maxGearWeight = heaviestGearItem.weight;
+                                    }
+                                    if (crew.gear.isEmpty) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return StatefulBuilder(
+                                            builder: (context, setState) {
+                                              return AlertDialog(
+                                                backgroundColor: AppColors.textFieldColor2,
+                                                title: Text(
+                                                  'No Gear Available',
+                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                ),
+                                                content: Text('There is no existing gear. Create at least one to begin manifesting.', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: Text('OK', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                      );
+                                      return;
+                                    }
+                                    if (safetyBuffer >= allowable) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return StatefulBuilder(
+                                            builder: (context, setState) {
+                                              return AlertDialog(
+                                                backgroundColor: AppColors.textFieldColor2,
+                                                title: Text(
+                                                  'Input Error',
+                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                ),
+                                                content: Text('Safety Buffer must be lower than the allowable load weight.', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: Text('OK', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                      );
+                                      return;
+                                    }
+                                    if (remainingWeight < maxGearWeight) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return StatefulBuilder(
+                                            builder: (context, setState) {
+                                              return AlertDialog(
+                                                backgroundColor: AppColors.textFieldColor2,
+                                                title: Text(
+                                                  'Weight Error',
+                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                ),
+                                                content: Text(
+                                                    'The remaining allowable weight with the safety buffer ($remainingWeight lb) is less than the heaviest gear item (${heaviestGearItem?.name}: ${heaviestGearItem?.weight} lb). Adjust values and try again.',
+                                                    style: TextStyle(color: AppColors.textColorPrimary)),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: Text('OK', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                      );
+                                      return;
+                                    }
+                                  }
+
+                                  isExternalManifest
+                                      ? Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => BuildYourOwnManifestExternal(trip: newTrip, safetyBuffer: int.parse(safetyBufferController.text)),
+                                          ),
+                                        )
+                                      : Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => BuildYourOwnManifest(trip: newTrip),
+                                          ),
+                                        );
+                                }
                               : null,
                           style: style,
                           child: const Text('Build'),
@@ -678,6 +770,4 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
       ),
     );
   }
-
-
 }

@@ -268,7 +268,7 @@ class _EditCrewState extends State<EditCrew> {
                                         textAlign: TextAlign.right,
                                       ),
                                       Text(
-                                        '${crew.totalCrewWeight.toInt()} lbs',
+                                        '${crew.totalCrewWeight.toInt()} lb',
                                         style: subHeaderTextStyle,
                                         textAlign: TextAlign.right,
                                       ),
@@ -497,12 +497,12 @@ class _EditCrewState extends State<EditCrew> {
                                                       ...personalToolsList.map((tool) {
                                                         return DropdownMenuItem<String>(
                                                           value: tool.name,
-                                                          child: Text(tool.name, style: TextStyle(color: AppColors.textColorPrimary, fontSize: 16)),
+                                                          child: Text(tool.name, style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16)),
                                                         );
                                                       }),
                                                       DropdownMenuItem<String>(
                                                         value: '+ New Tool',
-                                                        child: Text('+ New Tool', style: TextStyle(color: AppColors.textColorPrimary, fontSize: 16)),
+                                                        child: Text('+ New Tool', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16)),
                                                       ),
                                                     ],
                                                     onChanged: (value) {
@@ -556,7 +556,7 @@ class _EditCrewState extends State<EditCrew> {
                                                         borderRadius: BorderRadius.circular(8.0),
                                                       ),
                                                     ),
-                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: 16),
+                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                                   ),
 
                                                   SizedBox(height: AppData.spacingStandard),
@@ -567,7 +567,7 @@ class _EditCrewState extends State<EditCrew> {
                                                     keyboardType: TextInputType.number,
                                                     inputFormatters: [LengthLimitingTextInputFormatter(2), FilteringTextInputFormatter.digitsOnly],
                                                     decoration: InputDecoration(
-                                                      labelText: 'Tool Weight (lbs)',
+                                                      labelText: 'Tool Weight (lb)',
                                                       labelStyle: TextStyle(color: AppColors.textColorPrimary),
                                                       filled: true,
                                                       fillColor: AppColors.textFieldColor2,
@@ -585,7 +585,7 @@ class _EditCrewState extends State<EditCrew> {
                                                         borderRadius: BorderRadius.circular(8.0),
                                                       ),
                                                     ),
-                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: 16),
+                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                                   ),
 
                                                   SizedBox(height: AppData.spacingStandard),
@@ -613,7 +613,7 @@ class _EditCrewState extends State<EditCrew> {
                                                         Text(
                                                           isHazmat ? 'Yes' : 'No', // Dynamic label
                                                           style: TextStyle(
-                                                            fontSize: 16,
+                                                            fontSize: AppData.text16,
                                                             color: AppColors.textColorPrimary,
                                                           ),
                                                         ),
@@ -666,7 +666,7 @@ class _EditCrewState extends State<EditCrew> {
                                                                     ),
                                                                     content: Text(
                                                                       'The tool, $selectedTool, will be removed from all crew members who have it. Do you want to proceed?',
-                                                                      style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                                                     ),
                                                                     actions: [
                                                                       TextButton(
@@ -796,7 +796,7 @@ class _EditCrewState extends State<EditCrew> {
                                                                 final conflictingTool = crew.gear.firstWhere(
                                                                   (tool) => tool.name.toLowerCase() == toolName.toLowerCase() && tool.weight != int.parse(toolWeightText),
                                                                 );
-                                                                weightConflict = 'This tool must match the same weight of the $toolName in your gear inventory: ${conflictingTool.weight} lbs.';
+                                                                weightConflict = 'This tool must match the same weight of the $toolName in your gear inventory: ${conflictingTool.weight} lb.';
                                                               }
 
                                                               // Add hazmat conflict message if applicable
@@ -826,7 +826,7 @@ class _EditCrewState extends State<EditCrew> {
                                                                     ),
                                                                     content: Text(
                                                                       combinedError,
-                                                                      style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                                                     ),
                                                                     actions: [
                                                                       TextButton(
@@ -931,7 +931,7 @@ class _EditCrewState extends State<EditCrew> {
                                                                   ),
                                                                   content: Text(
                                                                     'Updating $selectedTool will modify this tool for all crew members who have it, and will update it in your gear inventory if it exists. Do you want to proceed?',
-                                                                    style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                                                    style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                                                   ),
                                                                   actions: [
                                                                     TextButton(
