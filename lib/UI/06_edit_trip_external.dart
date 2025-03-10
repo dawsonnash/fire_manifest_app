@@ -13,6 +13,8 @@ import '../Data/customItem.dart';
 import 'package:fire_app/UI/05_byom_external.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'main.dart';
+
 // Double integers when calculating quantity dont always work out. a 45 lb QB can become 44
 // Update: Maybe fixed?
 class EditTripExternal extends StatefulWidget {
@@ -253,42 +255,43 @@ class _EditTripExternalState extends State<EditTripExternal> {
                               },
                               body: Column(
                                 children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: AppColors.gearYellow, // Background color
-                                      border: Border(
-                                        bottom: BorderSide(color: Colors.black, width: .75, // Black border
+                                  if (gearList.isNotEmpty)
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: AppColors.gearYellow, // Background color
+                                        border: Border(
+                                          bottom: BorderSide(color: Colors.black, width: .75, // Black border
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    child: CheckboxListTile(
-                                      title: Text(
-                                        'Select All',
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text16, color: Colors.black),
+                                      child: CheckboxListTile(
+                                        title: Text(
+                                          'Select All',
+                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text16, color: Colors.black),
+                                        ),
+                                        value: isSelectAllCheckedGear,
+                                        onChanged: (bool? isChecked) {
+                                          dialogSetState(() {
+                                            isSelectAllCheckedGear = isChecked ?? false;
+
+                                            if (isSelectAllCheckedGear) {
+                                              selectedItems.addAll(gearList.where((gear) => !selectedItems.contains(gear)));
+
+                                              selectedGearQuantities = {
+                                                for (var gear in gearList) gear: gear.quantity,
+                                              };
+                                            } else {
+                                              // Remove only gear items, keeping crew members
+                                              selectedItems.removeWhere((item) => item is Gear);
+
+                                              // Reset selected quantities for gear (avoid stale selections)
+                                              selectedGearQuantities.clear();
+                                            }
+                                            updateSelectAllState();
+                                          });
+                                        },
                                       ),
-                                      value: isSelectAllCheckedGear,
-                                      onChanged: (bool? isChecked) {
-                                        dialogSetState(() {
-                                          isSelectAllCheckedGear = isChecked ?? false;
-
-                                          if (isSelectAllCheckedGear) {
-                                            selectedItems.addAll(gearList.where((gear) => !selectedItems.contains(gear)));
-
-                                            selectedGearQuantities = {
-                                              for (var gear in gearList) gear: gear.quantity,
-                                            };
-                                          } else {
-                                            // Remove only gear items, keeping crew members
-                                            selectedItems.removeWhere((item) => item is Gear);
-
-                                            // Reset selected quantities for gear (avoid stale selections)
-                                            selectedGearQuantities.clear();
-                                          }
-                                          updateSelectAllState();
-                                        });
-                                      },
                                     ),
-                                  ),
                                   Column(
                                     children: sortedGearList.map((gear) {
                                       int remainingQuantity = gear.quantity - (selectedGearQuantities[gear] ?? 0);
@@ -567,7 +570,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                     // Custom Item Name Field
                                     TextField(
                                       decoration: InputDecoration(
-                                        labelText: 'Item Name',
+                                        labelText: ' Item Name',
                                         labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
                                       ),
                                       textCapitalization: TextCapitalization.words,
@@ -589,7 +592,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                     // Custom Item Weight Field
                                     TextField(
                                         decoration: InputDecoration(
-                                          labelText: 'Weight (lb)',
+                                          labelText: ' Weight (lb)',
                                           labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
                                         ),
                                         keyboardType: TextInputType.number,
@@ -765,6 +768,9 @@ class _EditTripExternalState extends State<EditTripExternal> {
       return load;
     }).toList();
 
+    // Update timestamp before saving
+    widget.trip.timestamp = DateTime.now();
+
     // Save the updated trip to Hive
     tripBox.put(widget.trip.tripName, widget.trip);
 
@@ -786,12 +792,10 @@ class _EditTripExternalState extends State<EditTripExternal> {
       ),
     );
 
-    // Navigate to the saved trips view
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => SavedTripsView(),
-      ),
-    );
+    Navigator.of(context).pop(); // Go back to the home screen
+    Navigator.of(context).pop(); // Go back to the home screen
+    selectedIndexNotifier.value = 1; // Switch to "Saved Trips" tab
+
   }
 
   // Function to calculate available weight for a load
@@ -977,7 +981,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                             color: Colors.red,
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Icon(Icons.delete, color: Colors.white),
+                            child: Icon(Icons.delete, color: Colors.black),
                           ),
                           confirmDismiss: (direction) async {
                             return await showDialog(
@@ -1369,7 +1373,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                   child: Card(
                                                                     elevation: 2,
                                                                     color: item is LoadAccoutrement ? AppColors.loadAccoutrementBlueGrey : AppColors.gearYellow,
-                                                                    margin: const EdgeInsets.symmetric(vertical: 0.5),
+                                                                    margin: const EdgeInsets.symmetric(vertical: 0.0),
                                                                     shape: RoundedRectangleBorder(
                                                                       borderRadius: BorderRadius.circular(0.0),
                                                                     ),

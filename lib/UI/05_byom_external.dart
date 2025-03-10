@@ -13,6 +13,8 @@ import '../Data/load.dart';
 import '../Data/customItem.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'main.dart';
+
 // Double integers when calculating quantity dont always work out. a 45 lb QB can become 44
 // Update: Maybe fixed?
 class BuildYourOwnManifestExternal extends StatefulWidget {
@@ -44,7 +46,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
     super.initState();
     gearBox = Hive.box<Gear>('gearBox');
     tripBox = Hive.box<Trip>('tripBox');
-    safetyBuffer = widget.trip.safetyBuffer!;
+    safetyBuffer = widget.trip.safetyBuffer;
 
     // Initialize a single Load with a single Sling when the page starts
     Sling initialSling = Sling(loadGear: [], slingNumber: 1, weight: 0, loadAccoutrements: []); // Create an empty Sling
@@ -260,14 +262,15 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                               },
                               body: Column(
                                 children: [
+                                  if (gearList.isNotEmpty)
                                   Container(
                                     decoration: BoxDecoration(
                                       color: AppColors.gearYellow, // Background color
                                       border: Border(
                                         bottom: BorderSide(color: Colors.black, width: .75, // Black border
-                                    ),
+                                        ),
                                       ),
-                              ),
+                                    ),
                                     child: CheckboxListTile(
                                       title: Text(
                                         'Select All',
@@ -322,37 +325,42 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Expanded(
-                                                child: Row(
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
+                                                    Row(
+                                                      children: [
 
-                                                    Flexible(
-                                                      child: Text(
-                                                        gear.name,
-                                                        style:  TextStyle(
-                                                          fontSize: AppData.text16,
-                                                          fontWeight: FontWeight.bold,
+                                                        Flexible(
+                                                          child: Text(
+                                                            gear.name,
+                                                            style: TextStyle(
+                                                              fontSize: AppData.text16,
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                            overflow: TextOverflow.ellipsis,
+                                                          ),
                                                         ),
-                                                        overflow: TextOverflow.ellipsis,
-                                                      ),
+                                                        if (gear.isHazmat)
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(left: 4.0),
+                                                            child: Icon(
+                                                              FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                              color: Colors.red, // Red color for hazard
+                                                              size: 14, // Icon size
+                                                            ),
+                                                          ),
+
+                                                      ],
                                                     ),
-                                                    if (gear.isHazmat)
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(left: 4.0),
-                                                        child: Icon(
-                                                          FontAwesomeIcons.triangleExclamation, // Hazard icon
-                                                          color: Colors.red, // Red color for hazard
-                                                          size: 14, // Icon size
-                                                        ),
-                                                      ),
                                                     Text(
-                                                      ' (x$remainingQuantity)  ',
+                                                      '${gear.weight} lb x$remainingQuantity',
                                                       style: TextStyle(
-                                                        fontSize: 12,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 14,
                                                         color: Colors.black,
                                                       ),
                                                     ),
-
                                                   ],
                                                 ),
                                               ),
@@ -569,7 +577,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                     // Custom Item Name Field
                                     TextField(
                                       decoration: InputDecoration(
-                                        labelText: 'Item Name',
+                                        labelText: ' Item Name',
                                         labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
                                       ),
                                       textCapitalization: TextCapitalization.words,
@@ -591,7 +599,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                     // Custom Item Weight Field
                                     TextField(
                                         decoration: InputDecoration(
-                                          labelText: 'Weight (lb)',
+                                          labelText: ' Weight (lb)',
                                           labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
                                         ),
                                         keyboardType: TextInputType.number,
@@ -654,7 +662,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                           int selectedQuantity = selectedGearQuantities[item] ?? 1;
 
                           final int existingGearIndex = loads[selectedLoadIndex].slings?[selectedSlingIndex].loadGear.indexWhere(
-                                (loadItem) => loadItem is Gear && loadItem.name == item.name && loadItem.isPersonalTool == item.isPersonalTool,
+                                (loadItem) => loadItem.name == item.name && loadItem.isPersonalTool == item.isPersonalTool,
                           ) ??
                               -1; // Default to -1 if null
 
@@ -705,7 +713,12 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
   }
 
   // Function to load the list of Gear items from Hive boxes
-  void loadItems() {
+  void loadItems() async{
+    // Simulate some async operation (like fetching data)
+    await Future.delayed(Duration(milliseconds: 500));
+
+    if (!mounted) return; // Prevent calling setState() after dispose
+
     setState(() {
       // Create deep copies of the gear and crew member data
       gearList = gearBox.values.map((gear) {
@@ -740,6 +753,8 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
       return load;
     }).toList();
 
+
+
     // Save the updated trip to Hive
     tripBox.put(widget.trip.tripName, widget.trip);
 
@@ -761,12 +776,9 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
       ),
     );
 
-    // Navigate to the saved trips view
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => SavedTripsView(),
-      ),
-    );
+    Navigator.of(context).pop(); // Go back to the home screen
+    selectedIndexNotifier.value = 1; // Switch to "Saved Trips" tab
+
   }
 
   // Function to calculate available weight for a load
@@ -820,6 +832,8 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
           },
         ),
         title: Column(
+          mainAxisSize: MainAxisSize.min, // Allows AppBar to resize dynamically
+
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -830,6 +844,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
               'Allowable: ${widget.trip.allowable} lb',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
+
           ],
         ),
         actions: [
@@ -949,7 +964,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                             color: Colors.red,
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Icon(Icons.delete, color: Colors.white),
+                            child: Icon(Icons.delete, color: Colors.black),
                           ),
                           confirmDismiss: (direction) async {
                             return await showDialog(
@@ -1036,7 +1051,8 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                       color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
                                           ? Colors.black // Warning color
                                           : AppColors.fireColor, // Normal color
-                                      borderRadius: (calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable && isExpanded)
+                                      // If overweight or safety buffer
+                                      borderRadius: ((calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable) || (calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable - safetyBuffer) && isExpanded )
                                           ? const BorderRadius.vertical(top: Radius.circular(8))
                                           : const BorderRadius.all(
                                         Radius.circular(10),
@@ -1137,6 +1153,32 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                             ),
                                           ),
                                         ),
+
+                                      if ((calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable - safetyBuffer) && !(calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable))
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 1.0),
+                                          child: Container(
+                                            width: double.infinity,
+                                            padding: const EdgeInsets.symmetric(vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              // Background color
+                                              borderRadius: const BorderRadius.vertical(
+                                                bottom: Radius.circular(8), // Only bottom corners rounded
+                                              ), // Rounded corners
+                                            ),
+                                            alignment: Alignment.center,
+                                            child:  Text(
+                                              'OVER $safetyBuffer LB SAFETY BUFFER',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+
                                       // **Display slings within the load**
                                       for (var slingIndex = 0; slingIndex < (loads[loadIndex].slings?.length ?? 0); slingIndex++)
                                         Dismissible(
@@ -1314,7 +1356,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                               child: Card(
                                                                 elevation: 2,
                                                                 color: item is LoadAccoutrement ? AppColors.loadAccoutrementBlueGrey : AppColors.gearYellow,
-                                                                margin: const EdgeInsets.symmetric(vertical: 0.5),
+                                                                margin: const EdgeInsets.symmetric(vertical: 0.0),
                                                                 shape: RoundedRectangleBorder(
                                                                   borderRadius: BorderRadius.circular(0.0),
                                                                 ),
@@ -1334,14 +1376,23 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                               fontWeight: FontWeight.bold,
                                                                             ),
                                                                           ),
-                                                                          if (item is! CustomItem)
+                                                                          if (item is Gear)
                                                                             Text(
-                                                                              (item is Gear || item is LoadAccoutrement) ? 'Quantity: ${(item is Gear) ? item.quantity : 1}' : '',
+                                                                              'Quantity: ${(item is Gear) ? item.quantity : 1} x ${item.weight} lb',
                                                                               style: TextStyle(
                                                                                 fontSize: 14,
-                                                                                color: item is LoadAccoutrement ? Colors.black : Colors.black,
+                                                                                color: Colors.black,
                                                                               ),
                                                                             ),
+                                                                          if (item is LoadAccoutrement)
+                                                                            Text(
+                                                                              'Quantity: 1',
+                                                                              style: TextStyle(
+                                                                                fontSize: 14,
+                                                                                color: Colors.black,
+                                                                              ),
+                                                                            ),
+
                                                                         ],
                                                                       ),
                                                                       IconButton(
