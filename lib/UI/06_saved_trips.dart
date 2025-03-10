@@ -376,7 +376,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                               icon: Icon(
                                                 Icons.arrow_forward_ios,
                                                 color: AppColors.textColorPrimary,
-                                                size: 32,
+                                                size: 28,
                                               ),
                                               onPressed: () {
                                                 Navigator.push(

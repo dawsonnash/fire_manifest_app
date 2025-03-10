@@ -37,6 +37,7 @@ List<List<dynamic>> paginateItems(List<dynamic> items, int totalPages) {
 
   return pages;
 }
+
 // Function to calculate the required number of pages
 int calculatePagesNeeded(int totalItems, int numHaz) {
   int numNorm = totalItems - numHaz;
@@ -46,6 +47,7 @@ int calculatePagesNeeded(int totalItems, int numHaz) {
 
   return totalLengthPagesNeeded > nonItemPagesNeeded ? totalLengthPagesNeeded : nonItemPagesNeeded;
 }
+
 // Generates PDF
 Future<Uint8List> generatePDF(Load load, String manifestForm, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {
   final pdf = pw.Document();
@@ -60,16 +62,7 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, String? helicopter
     pageFormat = PdfPageFormat.letter;
   } else if (manifestForm == 'of252') {
     imagePath = 'assets/images/helicopter_manifest_form.jpg';
-    fillFormFields = (load, pageIndex, totalPages, pageItems) =>
-        fillFormFieldsOF252(
-            load,
-            pageIndex,
-            totalPages,
-            pageItems,
-            helicopterNum,
-            departure,
-            destination,
-            manifestPreparer);
+    fillFormFields = (load, pageIndex, totalPages, pageItems) => fillFormFieldsOF252(load, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer);
     pageFormat = PdfPageFormat.a4;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
@@ -87,9 +80,7 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, String? helicopter
   ];
 
   // Count hazmat items
-  int numHaz = allItems
-      .where((item) => item is Gear && item.isHazmat)
-      .length;
+  int numHaz = allItems.where((item) => item is Gear && item.isHazmat).length;
 
   // Calculate the required number of pages
   int totalPages = calculatePagesNeeded(allItems.length, numHaz);
@@ -159,14 +150,7 @@ void previewPDF(BuildContext context, Load load, String manifestForm, String? he
   );
 }
 
-pw.Widget fillFormFieldsOF252(Load load,
-    int pageIndex,
-    int totalPages,
-    List<dynamic> pageItems,
-    String? helicopterNum,
-    String? departure,
-    String? destination,
-    String? manifestPreparer) {
+pw.Widget fillFormFieldsOF252(Load load, int pageIndex, int totalPages, List<dynamic> pageItems, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) {
   const double yOffset = 112; // Adjust this value to move everything vertically
   const double xOffset = 6; // Adjust this value to move everything horizontally
   const double itemSpacing = 27.4; // Adjust spacing between items
@@ -186,7 +170,6 @@ pw.Widget fillFormFieldsOF252(Load load,
   double hazmatPosition = yOffset + bottomOffset - (hazmatItems.length * itemSpacing);
 
   List<pw.Widget> hazmatWidgets = [];
-
 
   double adjustedPosition = yOffset + 606; // Start from the bottom of the page
 
@@ -221,7 +204,6 @@ pw.Widget fillFormFieldsOF252(Load load,
           i >= 2 ? '${hazmatItems[i].name} (HAZMAT)' : hazmatItems[i].name, // Fix condition
           style: pw.TextStyle(fontSize: fontSizeOF252),
         ),
-
       ),
     );
 
@@ -249,8 +231,8 @@ pw.Widget fillFormFieldsOF252(Load load,
             normalItems[i] is CrewMember
                 ? normalItems[i].name
                 : normalItems[i] is Gear
-                ? normalItems[i].name
-                : normalItems[i].name,
+                    ? normalItems[i].name
+                    : normalItems[i].name,
             style: pw.TextStyle(fontSize: fontSizeOF252),
           ),
         ),
@@ -267,7 +249,6 @@ pw.Widget fillFormFieldsOF252(Load load,
             style: pw.TextStyle(fontSize: fontSizeOF252),
           ),
         ),
-
 
       // **Gear Quantities**
       for (var i = 0; i < normalItems.length; i++)
@@ -379,7 +360,6 @@ pw.Widget fillFormFieldsPMS245(Load load) {
 
   return pw.Stack(
     children: [
-
       // Crew Name
       pw.Positioned(
         left: 96,
@@ -505,7 +485,6 @@ pw.Widget fillFormFieldsPMS245(Load load) {
   );
 }
 
-
 class SingleLoadView extends StatefulWidget {
   // This page requires a trip to be passed to it
   final Load load;
@@ -513,12 +492,9 @@ class SingleLoadView extends StatefulWidget {
 
   //final VoidCallback onUpdate;  // Callback for deletion to update previous page
 
-  const SingleLoadView({
-    super.key,
-    required this.load,
-    required this.isExternal
-    //required this.onUpdate,
-  });
+  const SingleLoadView({super.key, required this.load, required this.isExternal
+      //required this.onUpdate,
+      });
 
   @override
   State<SingleLoadView> createState() => _SingleLoadViewState();
@@ -550,7 +526,6 @@ class _SingleLoadViewState extends State<SingleLoadView> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-
             Text(
               'Load ${widget.load.loadNumber}',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
@@ -582,10 +557,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                       ),
                     ),
                     content: SizedBox(
-                      height: MediaQuery
-                          .of(context)
-                          .size
-                          .height * 0.15, // Dynamic height
+                      height: MediaQuery.of(context).size.height * 0.15, // Dynamic height
                       child: CupertinoPicker(
                         itemExtent: 50, // Height of each item in the picker
                         onSelectedItemChanged: (int index) {
@@ -593,7 +565,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                         },
                         children: [
                           Center(child: Text('Helicopter Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
-                          Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                          if (!widget.isExternal) Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
                         ],
                       ),
                     ),
@@ -618,28 +590,14 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                               builder: (BuildContext context) {
                                 return AdditionalInfoDialog(
                                   onConfirm: (String helicopterNum, String departure, String destination, String manifestPreparer) {
-                                    previewPDF(
-                                        context,
-                                        widget.load,
-                                        'of252',
-                                        helicopterNum,
-                                        departure,
-                                        destination,
-                                        manifestPreparer);
+                                    previewPDF(context, widget.load, 'of252', helicopterNum, departure, destination, manifestPreparer);
                                   },
                                 );
                               },
                             );
                           } else {
                             // Fixed-Wing manifest
-                            previewPDF(
-                                context,
-                                widget.load,
-                                'pms245',
-                                null,
-                                null,
-                                null,
-                                null);
+                            previewPDF(context, widget.load, 'pms245', null, null, null, null);
                           }
                         },
                         child: Text(
@@ -663,112 +621,335 @@ class _SingleLoadViewState extends State<SingleLoadView> {
             color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
             child: AppColors.isDarkMode
                 ? (AppColors.enableBackgroundImage
-                ? Stack(
-              children: [
-                ImageFiltered(
-                  imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                  child: Image.asset(
-                    'assets/images/logo1.png',
-                    fit: BoxFit.cover, // Cover the entire background
-                    width: double.infinity,
-                    height: double.infinity,
-                  ),
-                ),
-                Container(
-                  color: AppColors.logoImageOverlay, // Semi-transparent overlay
-                  width: double.infinity,
-                  height: double.infinity,
-                ),
-              ],
-            )
-                : null) // No image if background is disabled
+                    ? Stack(
+                        children: [
+                          ImageFiltered(
+                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                            child: Image.asset(
+                              'assets/images/logo1.png',
+                              fit: BoxFit.cover, // Cover the entire background
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                          Container(
+                            color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ],
+                      )
+                    : null) // No image if background is disabled
                 : ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
-              child: Image.asset(
-                'assets/images/logo1.png',
-                fit: BoxFit.cover, // Cover the entire background
-                width: double.infinity,
-                height: double.infinity,
-              ),
-            ),
+                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+                    child: Image.asset(
+                      'assets/images/logo1.png',
+                      fit: BoxFit.cover, // Cover the entire background
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
           ),
           Container(
             color: Colors.white.withValues(alpha: 0.05),
             child: Column(
               children: [
                 Expanded(
-                  child:  widget.isExternal
-                      ? ListView.builder(
-                    itemCount: widget.load.slings?.length ?? 0, // Number of slings in this load
-                    itemBuilder: (context, slingIndex) {
-                      final sling = widget.load.slings![slingIndex];
+                    child: widget.isExternal
+                        ? ListView.builder(
+                            itemCount: widget.load.slings?.length ?? 0, // Number of slings in this load
+                            itemBuilder: (context, slingIndex) {
+                              final sling = widget.load.slings![slingIndex];
 
-                      return ExpansionTile(
-                        title: Row(
-                          children: [
-                            Text(
-                              'Sling ${sling.slingNumber}',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textColorPrimary,
-                              ),
-                            ),
-                            Text(
-                              ' • ${sling.weight} lbs',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textColorPrimary,
-                              ),
-                            ),
-                            Text(
-                              ' • ${sling.loadGear.fold(0, (sum, gear) => sum + gear.quantity)} items',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textColorPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        children: [
-                          // Load Accoutrements Section (Displayed First)
-                          if (sling.loadAccoutrements.isNotEmpty)
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: sling.loadAccoutrements.map((accoutrement) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.textFieldColor,
+                                  border: Border(top: BorderSide(color: Colors.black, width: 1)), // Add a border
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 0.0),
+                                  child: ExpansionTile(
+                                    iconColor: Colors.white,
+                                    // Color of the expand/collapse arrow
+                                    collapsedIconColor: Colors.white,
+                                    leading: Icon(
+                                      Icons.grid_on,
+                                      color: AppColors.primaryColor,
+                                    ),
+                                    title: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Sling #${sling.slingNumber}',
+                                              style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.textColorPrimary,
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  'Weight: ${sling.weight} lbs',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: AppColors.textColorPrimary,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  ' • ${sling.loadGear.fold(0, (sum, gear) => sum + gear.quantity)} items',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.normal,
+                                                    color: AppColors.textColorPrimary,
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    children: [
+                                      // Load Accoutrements Section (Displayed First)
+                                      if (sling.loadAccoutrements.isNotEmpty)
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: sling.loadAccoutrements.map((accoutrement) {
+                                            return Container(
+                                              decoration: BoxDecoration(
+                                                color: AppColors.loadAccoutrementBlueGrey,
+                                                border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
+                                              ),
+                                              child: ListTile(
+                                                leading: Icon(Icons.link),
+                                                title: Text(
+                                                  accoutrement.name,
+                                                  style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+                                                ),
+                                                subtitle: Text(
+                                                  'Weight: ${accoutrement.weight} lbs',
+                                                  style: TextStyle(color: Colors.black),
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+
+                                      // Gear Section
+                                      if (sling.loadGear.isNotEmpty)
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: sling.loadGear.map((gearItem) {
+                                            return Container(
+                                              decoration: BoxDecoration(
+                                                color: gearItem.isPersonalTool ? AppColors.toolBlue.withOpacity(0.9) : AppColors.gearYellow.withOpacity(0.9),
+                                                border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
+                                              ),
+                                              child: ListTile(
+                                                leading: Icon(Icons.work_outline_outlined),
+                                                title: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              '${gearItem.name} ',
+                                                              style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+                                                            ),
+                                                            if (gearItem.isHazmat)
+                                                              Icon(
+                                                                FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                                color: Colors.red,
+                                                                size: 18,
+                                                              ),
+                                                            Text(
+                                                              ' (x${gearItem.quantity})',
+                                                              style: TextStyle(fontSize: 18),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Text(
+                                                          'Weight: ${gearItem.totalGearWeight} lbs',
+                                                          style: TextStyle(fontSize: 18),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+
+                                      // Custom Items Section
+                                      if (sling.customItems.isNotEmpty)
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: sling.customItems.map((customItem) {
+                                            return Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
+                                              ),
+                                              child: ListTile(
+                                                leading: Icon(Icons.inventory_2_outlined),
+                                                title: Text(
+                                                  customItem.name,
+                                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                ),
+                                                subtitle: Text('Weight: ${customItem.weight} lbs'),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        : ListView.builder(
+                            itemCount: widget.load.loadPersonnel.length + widget.load.loadGear.length + widget.load.customItems.length,
+                            itemBuilder: (context, index) {
+                              int numCrewMembers = widget.load.loadPersonnel.length;
+                              int numGearItems = widget.load.loadGear.length;
+
+                              if (index < numCrewMembers) {
+                                // Display a crew member
+                                final crewmember = widget.load.loadPersonnel[index];
                                 return Container(
                                   decoration: BoxDecoration(
-                                    color: AppColors.textFieldColor,
-                                    border: Border(bottom: BorderSide(color: AppColors.textColorPrimary, width: 1)),
+                                    color: AppColors.textFieldColor, // Background color
+                                    border: Border(top: BorderSide(color: Colors.black, width: 1)), // Add a border
                                   ),
-                                  child: ListTile(
-                                    leading: Icon(Icons.settings, color: AppColors.textColorPrimary,),
-                                    title: Text(
-                                      accoutrement.name,
-                                      style: TextStyle(fontSize: 20, color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                  child: GestureDetector(
+                                    onLongPress: () {
+                                      // Show a crew member's position when the tile is held
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            '${crewmember.name} • ${crewmember.getPositionTitle(crewmember.position)}',
+                                            style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
+                                          ),
+                                          backgroundColor: AppColors.textFieldColor2,
+                                          duration: Duration(seconds: 2), // How long the message appears
+                                        ),
+                                      );
+                                    },
+                                    child: ListTile(
+                                      iconColor: AppColors.primaryColor,
+                                      title: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                crewmember.name,
+                                                style: TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.textColorPrimary,
+                                                ),
+                                              ),
+                                              Text(
+                                                'Flight Weight: ${crewmember.flightWeight} lbs',
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  color: AppColors.textColorPrimary,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      leading: Icon(Icons.person),
                                     ),
-                                    subtitle: Text('Weight: ${accoutrement.weight} lbs', style: TextStyle(color: AppColors.textColorPrimary),),
                                   ),
                                 );
-                              }).toList(),
-                            ),
-
-                          // Gear Section
-                          if (sling.loadGear.isNotEmpty)
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: sling.loadGear.map((gearItem) {
+                              } else if (index < numCrewMembers + numGearItems) {
+                                // Display a gear item
+                                final gearIndex = index - numCrewMembers;
+                                final gearItem = widget.load.loadGear[gearIndex];
                                 return Container(
                                   decoration: BoxDecoration(
                                     color: gearItem.isPersonalTool
-                                        ? AppColors.toolBlue.withOpacity(0.9)
-                                        : AppColors.gearYellow.withOpacity(0.9),
-                                    border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
+                                        ? AppColors.toolBlue.withValues(alpha: 0.9) // Color for personal tools
+                                        : AppColors.gearYellow.withValues(alpha: 0.9), // Background color
+                                    border: Border(bottom: BorderSide(color: Colors.black, width: 1)), // Add a border
+                                  ),
+                                  child: GestureDetector(
+                                    onLongPress: () {
+                                      // Show a crew member's position when the tile is held
+                                      if (gearItem.quantity > 1) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              '${gearItem.name} • ${gearItem.weight} lbs each',
+                                              style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
+                                            ),
+                                            backgroundColor: AppColors.textFieldColor2,
+                                            duration: Duration(seconds: 2), // How long the message appears
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: ListTile(
+                                      iconColor: Colors.black,
+                                      title: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    '${gearItem.name} ',
+                                                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
+                                                  ),
+                                                  if (gearItem.isHazmat)
+                                                    Icon(
+                                                      FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                      color: Colors.red, // Red color for hazard
+                                                      size: 18, // Icon size
+                                                    ),
+                                                  Text(
+                                                    ' (x${gearItem.quantity})',
+                                                    style: TextStyle(fontSize: 18, color: Colors.black),
+                                                  ),
+                                                ],
+                                              ),
+                                              Text(
+                                                'Weight: ${gearItem.totalGearWeight} lbs',
+                                                style: TextStyle(fontSize: 18, color: Colors.black),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      leading: Icon(Icons.work_outline_outlined),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                // Display a custom item
+                                final customItemIndex = index - numCrewMembers - numGearItems;
+                                final customItem = widget.load.customItems[customItemIndex];
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white, // Background color
+                                    border: Border(bottom: BorderSide(color: Colors.black, width: 1)), // Add a border
                                   ),
                                   child: ListTile(
-                                    leading: Icon(Icons.work_outline_outlined),
+                                    iconColor: Colors.black,
                                     title: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
@@ -778,230 +959,30 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                             Row(
                                               children: [
                                                 Text(
-                                                  '${gearItem.name} ',
-                                                  style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
-                                                ),
-                                                if (gearItem.isHazmat)
-                                                  Icon(
-                                                    FontAwesomeIcons.triangleExclamation, // Hazard icon
-                                                    color: Colors.red,
-                                                    size: 18,
+                                                  customItem.name,
+                                                  style: const TextStyle(
+                                                    fontSize: 22,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
-                                                Text(
-                                                  ' (x${gearItem.quantity})',
-                                                  style: TextStyle(fontSize: 18),
                                                 ),
                                               ],
                                             ),
                                             Text(
-                                              'Weight: ${gearItem.totalGearWeight} lbs',
-                                              style: TextStyle(fontSize: 18),
+                                              'Weight: ${customItem.weight} lbs',
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                              ),
                                             ),
                                           ],
                                         ),
                                       ],
                                     ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-
-                          // Custom Items Section
-                          if (sling.customItems.isNotEmpty)
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: sling.customItems.map((customItem) {
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
-                                  ),
-                                  child: ListTile(
                                     leading: Icon(Icons.inventory_2_outlined),
-                                    title: Text(
-                                      customItem.name,
-                                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                                    ),
-                                    subtitle: Text('Weight: ${customItem.weight} lbs'),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                        ],
-                      );
-                    },
-                  )
-
-                      : ListView.builder(
-                    itemCount: widget.load.loadPersonnel.length + widget.load.loadGear.length + widget.load.customItems.length,
-                    itemBuilder: (context, index) {
-                      int numCrewMembers = widget.load.loadPersonnel.length;
-                      int numGearItems = widget.load.loadGear.length;
-
-                      if (index < numCrewMembers) {
-                        // Display a crew member
-                        final crewmember = widget.load.loadPersonnel[index];
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.textFieldColor, // Background color
-                            border: Border(top: BorderSide(color: Colors.black, width: 1)), // Add a border
-                          ),
-                          child: GestureDetector(
-                            onLongPress: () {
-                              // Show a crew member's position when the tile is held
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    '${crewmember.name} • ${crewmember.getPositionTitle(crewmember.position)}',
-                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
-                                  ),
-                                  backgroundColor: AppColors.textFieldColor2,
-                                  duration: Duration(seconds: 2), // How long the message appears
-                                ),
-                              );
-                            },
-                            child: ListTile(
-                              iconColor: AppColors.primaryColor,
-                              title: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        crewmember.name,
-                                        style: TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.textColorPrimary,
-                                        ),
-                                      ),
-                                      Text(
-                                        'Flight Weight: ${crewmember.flightWeight} lbs',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: AppColors.textColorPrimary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              leading: Icon(Icons.person),
-                            ),
-                          ),
-                        );
-                      } else if (index < numCrewMembers + numGearItems) {
-                        // Display a gear item
-                        final gearIndex = index - numCrewMembers;
-                        final gearItem = widget.load.loadGear[gearIndex];
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: gearItem.isPersonalTool
-                                ? AppColors.toolBlue.withValues(alpha: 0.9) // Color for personal tools
-                                : AppColors.gearYellow.withValues(alpha: 0.9), // Background color
-                            border: Border(bottom: BorderSide(color: Colors.black, width: 1)), // Add a border
-                          ),
-                          child: GestureDetector(
-                            onLongPress: () {
-                              // Show a crew member's position when the tile is held
-                              if (gearItem.quantity > 1) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      '${gearItem.name} • ${gearItem.weight} lbs each',
-                                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
-                                    ),
-                                    backgroundColor: AppColors.textFieldColor2,
-                                    duration: Duration(seconds: 2), // How long the message appears
                                   ),
                                 );
                               }
                             },
-                            child: ListTile(
-                              iconColor: Colors.black,
-                              title: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            '${gearItem.name} ',
-                                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                          if (gearItem.isHazmat)
-                                            Icon(
-                                              FontAwesomeIcons.triangleExclamation, // Hazard icon
-                                              color: Colors.red, // Red color for hazard
-                                              size: 18, // Icon size
-                                            ),
-                                          Text(
-                                            ' (x${gearItem.quantity})',
-                                            style: TextStyle(fontSize: 18, color: Colors.black),
-                                          ),
-                                        ],
-                                      ),
-                                      Text(
-                                        'Weight: ${gearItem.totalGearWeight} lbs',
-                                        style: TextStyle(fontSize: 18, color: Colors.black),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              leading: Icon(Icons.work_outline_outlined),
-                            ),
-                          ),
-                        );
-                      } else {
-                        // Display a custom item
-                        final customItemIndex = index - numCrewMembers - numGearItems;
-                        final customItem = widget.load.customItems[customItemIndex];
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white, // Background color
-                            border: Border(bottom: BorderSide(color: Colors.black, width: 1)), // Add a border
-                          ),
-                          child: ListTile(
-                            iconColor: Colors.black,
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          customItem.name,
-                                          style: const TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Text(
-                                      'Weight: ${customItem.weight} lbs',
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            leading: Icon(Icons.inventory_2_outlined),
-                          ),
-                        );
-                      }
-                    },
-                  )
-
-                ),
+                          )),
               ],
             ),
           ),
@@ -1030,8 +1011,8 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
   void initState() {
     super.initState();
     _manifestPreparerController.text = AppData.userName ?? ''; // Default to empty if null
-
   }
+
   @override
   void dispose() {
     _helicopterNumController.dispose();

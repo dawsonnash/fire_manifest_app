@@ -35,8 +35,22 @@ class Load extends HiveObject{
     this.loadAccoutrements, // Default is null (optional)
 
   });
+
   void addSling(Load load, Sling newSling) {
     load.slings?.add(newSling);
     save();
+  }
+
+  // Deep copy method
+  Load copy() {
+    return Load(
+      loadNumber: loadNumber,
+      weight: weight,
+      loadPersonnel: List.from(loadPersonnel),
+      loadGear: loadGear.map((gear) => gear.copyWith()).toList(),
+      customItems: customItems.map((item) => item.copy()).toList(),
+      slings: slings?.map((sling) => sling.copy()).toList(),
+      loadAccoutrements: List.from(loadAccoutrements!),
+    );
   }
 }

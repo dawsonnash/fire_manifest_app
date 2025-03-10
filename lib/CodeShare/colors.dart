@@ -22,7 +22,8 @@ class AppColors {
   static Color get saveButtonAllowableWeight => isDarkMode ? Colors.deepOrangeAccent : Colors.blue;
   static Color get toolBlue => isDarkMode ? Colors.blue[200]! : Colors.blue[100]!;
   static Color get gearYellow => isDarkMode ? Colors.orange[200]! : Colors.orange[100]!;
-  static Color get loadAccoutrement => isDarkMode ? Colors.white! : Colors.orange[100]!;
+  static Color get loadAccoutrementBlueGrey => isDarkMode ? Colors.blueGrey[200]! : Colors.blueGrey[200]!;
+
   static Color get quickGuideSection => enableBackgroundImage ? Colors.deepOrangeAccent : Colors.deepOrangeAccent;
   static Color get quickGuideSubsection => enableBackgroundImage ? Colors.grey : Colors.grey;
 

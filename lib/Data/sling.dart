@@ -24,4 +24,15 @@ class Sling extends HiveObject{
     required this.loadGear,
     this.customItems = const [],
   });
+
+  // **Deep Copy Method**
+  Sling copy() {
+    return Sling(
+      slingNumber: slingNumber,
+      weight: weight,
+      loadAccoutrements: List.from(loadAccoutrements), // Copy list items
+      loadGear: loadGear.map((gear) => gear.copyWith()).toList(), // Deep copy each gear item
+      customItems: customItems.map((item) => item.copy()).toList(), // Deep copy each custom item
+    );
+  }
 }
