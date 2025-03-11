@@ -201,7 +201,7 @@ class _TripPreferencesState extends State<TripPreferences> {
                                             ),
                                             content: Text(
                                               'Are you sure you want to delete this Trip Preference?',
-                                              style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                              style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                             ),
                                             actions: [
                                               TextButton(
@@ -307,7 +307,7 @@ class _TripPreferencesState extends State<TripPreferences> {
                                                                     ),
                                                                     content: Text(
                                                                       'This Trip Preference will be erased!',
-                                                                      style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                                                     ),
                                                                     actions: [
                                                                       TextButton(

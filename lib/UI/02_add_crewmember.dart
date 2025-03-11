@@ -342,7 +342,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                               ],
                               decoration: InputDecoration(
                                 labelText: 'Flight Weight',
-                                hintText: 'Up to 500 lbs',
+                                hintText: 'Up to 500 lb',
                                 hintStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
                                   fontSize: 20,
@@ -500,7 +500,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                               // Disable dropdown if no tools are available
                                               style: TextStyle(
                                                 color: AppColors.textColorPrimary,
-                                                fontSize: 16,
+                                                fontSize: AppData.text16,
                                               ),
                                             ),
                                             SizedBox(height: AppData.spacingStandard),
@@ -509,7 +509,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                                 controller: toolWeightController,
                                                 enabled: false, // Non-editable field
                                                 decoration: InputDecoration(
-                                                  labelText: 'Tool Weight (lbs)',
+                                                  labelText: 'Tool Weight (lb)',
                                                   labelStyle: TextStyle(color: AppColors.textColorPrimary),
                                                   filled: true,
                                                   fillColor: AppColors.textFieldColor2,
@@ -518,7 +518,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                                     borderSide: BorderSide(color: AppColors.textColorPrimary, width: 2), // Border for disabled state
                                                   ),
                                                 ),
-                                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: 16),
+                                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                               ),
                                           ],
                                         ),
@@ -617,7 +617,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                         ],
                                       ),
                                       subtitle: Text(
-                                        '${tool.weight} lbs',
+                                        '${tool.weight} lb',
                                         style: TextStyle(color: AppColors.textColorPrimary, fontSize: 20),
                                       ),
                                       trailing: IconButton(

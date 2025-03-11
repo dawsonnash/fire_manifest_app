@@ -680,7 +680,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.orange, // Highlight missing gear
-                      fontSize: 16,
+                      fontSize: AppData.text16,
                     ),
                     children: [
                       TextSpan(

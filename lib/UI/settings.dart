@@ -161,7 +161,7 @@ class _SettingsState extends State<SettingsView> {
 
       List<String> changes = [];
       if (current.flightWeight != saved.flightWeight) {
-        changes.add("\n-- ${saved.flightWeight} → ${current.flightWeight} lbs");
+        changes.add("\n-- ${saved.flightWeight} → ${current.flightWeight} lb");
       }
       if (current.position != saved.position) {
         changes.add("\n-- ${positionMap[saved.position]} → ${positionMap[current.position]}");
@@ -219,7 +219,7 @@ class _SettingsState extends State<SettingsView> {
 
       List<String> changes = [];
       if (current.weight != saved.weight) {
-        changes.add("\n-- ${saved.weight} → ${current.weight} lbs");
+        changes.add("\n-- ${saved.weight} → ${current.weight} lb");
       }
       if (current.quantity != saved.quantity) {
         changes.add("\n-- Quantity: ${saved.quantity} → ${current.quantity}");
@@ -266,7 +266,7 @@ class _SettingsState extends State<SettingsView> {
       // Compare attributes
       List<String> changes = [];
       if (current.weight != saved.weight) {
-        changes.add("\n-- ${saved.weight} → ${current.weight}lbs");
+        changes.add("\n-- ${saved.weight} → ${current.weight}lb");
       }
 
       if (current.isHazmat != saved.isHazmat) {
@@ -991,7 +991,7 @@ class _SettingsState extends State<SettingsView> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(fontSize: 16, color: AppColors.cancelButton),
+                  style: TextStyle(fontSize: AppData.text16, color: AppColors.cancelButton),
                 ),
               ),
               TextButton(
@@ -1036,7 +1036,7 @@ class _SettingsState extends State<SettingsView> {
                 },
                 child: Text(
                   selectedIndex == 0 ? 'Export' : 'Import',
-                  style: TextStyle(fontSize: 16, color: AppColors.saveButtonAllowableWeight),
+                  style: TextStyle(fontSize: AppData.text16, color: AppColors.saveButtonAllowableWeight),
                 ),
               ),
             ],
@@ -1761,7 +1761,7 @@ class _SettingsState extends State<SettingsView> {
                                               FilteringTextInputFormatter.digitsOnly,
                                             ],
                                             decoration: InputDecoration(
-                                              hintText: 'Enter Safety Buffer (lbs)',
+                                              hintText: 'Enter Safety Buffer (lb)',
                                               hintStyle: const TextStyle(color: Colors.white54),
                                               enabledBorder: const UnderlineInputBorder(
                                                 borderSide: BorderSide(color: Colors.white54),
@@ -2333,7 +2333,7 @@ class _SettingsState extends State<SettingsView> {
                                                 ),
                                                 content: Text(
                                                   'Are you sure you want to delete this loadout?',
-                                                  style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                                  style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                                 ),
                                                 actions: [
                                                   TextButton(

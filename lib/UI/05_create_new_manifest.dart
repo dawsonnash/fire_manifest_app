@@ -737,7 +737,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                             width: 2.0, // Outline width
                                           ),
                                           title: Text(
-                                            '${crew.name}, ${crew.flightWeight} lbs',
+                                            '${crew.name}, ${crew.flightWeight} lb',
                                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                             textAlign: TextAlign.start,
                                           ),
@@ -1279,7 +1279,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                         Padding(
                                           padding: EdgeInsets.only(left: 16),
                                           child: Text(
-                                            "- $totalHardwareWeight lbs for ${int.parse(net20x20QuantityController.text) + int.parse(net12x12QuantityController.text)} net, ${int.parse(leadLineQuantityController.text)} lead line, and ${int.parse(swivelQuantityController.text)} swivel\n",
+                                            "- $totalHardwareWeight lb for ${int.parse(net20x20QuantityController.text) + int.parse(net12x12QuantityController.text)} net, ${int.parse(leadLineQuantityController.text)} lead line, and ${int.parse(swivelQuantityController.text)} swivel\n",
                                             style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
                                           ),
                                         ),
@@ -1293,7 +1293,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                           style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
                                         ),
                                         Text(
-                                          "$totalGearWeightWithHardware lbs / $maxLoadWeight lbs = ${(totalGearWeightWithHardware / maxLoadWeight).toStringAsFixed(3)} = $updatedNumLoads load${updatedNumLoads > 1 ? 's' : ''}",
+                                          "$totalGearWeightWithHardware lb / $maxLoadWeight lb = ${(totalGearWeightWithHardware / maxLoadWeight).toStringAsFixed(3)} = $updatedNumLoads load${updatedNumLoads > 1 ? 's' : ''}",
                                           style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                         ),
                                         // Conditional message when margin is ≤ 0.2 and safetyBuffer > 0
@@ -1465,7 +1465,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               keyboardType: TextInputType.number,
                               inputFormatters: [LengthLimitingTextInputFormatter(2), FilteringTextInputFormatter.digitsOnly],
                               decoration: InputDecoration(
-                                labelText: 'lbs',
+                                labelText: 'lb',
                                 border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.borderPrimary)),
                                 focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor, width: 2.0)),
                                 contentPadding: EdgeInsets.all(4),
@@ -1667,7 +1667,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               keyboardType: TextInputType.number,
                               inputFormatters: [LengthLimitingTextInputFormatter(2), FilteringTextInputFormatter.digitsOnly],
                               decoration: InputDecoration(
-                                labelText: 'lbs',
+                                labelText: 'lb',
                                 border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.borderPrimary)),
                                 focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor, width: 2.0)),
                                 contentPadding: EdgeInsets.all(4),
@@ -1798,7 +1798,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               keyboardType: TextInputType.number,
                               inputFormatters: [LengthLimitingTextInputFormatter(2), FilteringTextInputFormatter.digitsOnly],
                               decoration: InputDecoration(
-                                labelText: 'lbs',
+                                labelText: 'lb',
                                 border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.borderPrimary)),
                                 focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor, width: 2.0)),
                                 contentPadding: EdgeInsets.all(4),
@@ -1996,7 +1996,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               keyboardType: TextInputType.number,
                               inputFormatters: [LengthLimitingTextInputFormatter(2), FilteringTextInputFormatter.digitsOnly],
                               decoration: InputDecoration(
-                                labelText: 'lbs',
+                                labelText: 'lb',
                                 border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.borderPrimary)),
                                 focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor, width: 2.0)),
                                 contentPadding: EdgeInsets.all(4),
@@ -2189,7 +2189,7 @@ class _QuickManifestState extends State<QuickManifest> {
     // Creating a new Trip object
     Trip newTrip;
     if (isExternalManifest) {
-       newTrip = Trip(tripName: tripNameCapitalized, allowable: allowable, availableSeats: availableSeats, isExternal: true);
+       newTrip = Trip(tripName: tripNameCapitalized, allowable: allowable, availableSeats: availableSeats, isExternal: true, safetyBuffer: safetyBuffer);
     }
     else{
        newTrip = Trip(tripName: tripNameCapitalized, allowable: allowable, availableSeats: availableSeats);
@@ -2332,6 +2332,7 @@ class _QuickManifestState extends State<QuickManifest> {
         );
         return;
       }
+
       if (safetyBuffer >= allowable) {
         showDialog(
           context: context,
@@ -2374,7 +2375,7 @@ class _QuickManifestState extends State<QuickManifest> {
                     style: TextStyle(color: AppColors.textColorPrimary),
                   ),
                   content: Text(
-                      'The remaining allowable weight with the safety buffer ($remainingWeight lbs) is less than the heaviest gear item (${heaviestGearItem?.name}: ${heaviestGearItem?.weight} lbs). Adjust values and try again.',
+                      'The remaining allowable weight with the safety buffer ($remainingWeight lb) is less than the heaviest gear item (${heaviestGearItem?.name}: ${heaviestGearItem?.weight} lb). Adjust values and try again.',
                       style: TextStyle(color: AppColors.textColorPrimary)),
                   actions: [
                     TextButton(
@@ -2696,7 +2697,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                   setState(() {});
                                 },
                                 decoration: InputDecoration(
-                                  labelText: 'Enter Safety Buffer (lbs)',
+                                  labelText: 'Enter Safety Buffer (lb)',
                                   labelStyle: TextStyle(
                                     color: AppColors.textColorPrimary, // Label color when not focused
                                     fontSize: AppData.text18, // Label font size
@@ -2984,7 +2985,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                 });
                                               },
                                               decoration: InputDecoration(
-                                                hintText: 'Up to 9,999 lbs',
+                                                hintText: 'Up to 9,999 lb',
                                                 hintStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                                                 filled: true,
                                                 fillColor: AppColors.textFieldColor,
@@ -3085,7 +3086,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                             Visibility(
                                               visible: lastInputFromSlider,
                                               child: Text(
-                                                '${_sliderValue.toStringAsFixed(0)} lbs',
+                                                '${_sliderValue.toStringAsFixed(0)} lb',
                                                 style: TextStyle(fontSize: AppData.text32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                               ),
                                             ),
@@ -3093,7 +3094,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                             Visibility(
                                               visible: !lastInputFromSlider,
                                               child: Text(
-                                                '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lbs',
+                                                '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lb',
                                                 style: TextStyle(fontSize: AppData.text32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                               ),
                                             ),

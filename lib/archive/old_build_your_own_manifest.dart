@@ -167,7 +167,7 @@
 //                                   padding: const EdgeInsets.all(8),
 //                                   color: Colors.deepOrangeAccent,
 //                                   child: Text(
-//                                     "${item is Gear ? item.name : (item as CrewMember).name}, ${item is Gear ? item.weight : (item as CrewMember).flightWeight} lbs",
+//                                     "${item is Gear ? item.name : (item as CrewMember).name}, ${item is Gear ? item.weight : (item as CrewMember).flightWeight} lb",
 //                                     style: const TextStyle(
 //                                       color: Colors.white,
 //                                       fontSize: 18,
@@ -182,7 +182,7 @@
 //                                 color: Colors.deepOrangeAccent.withOpacity(0.3),
 //                                 child: Center(
 //                                   child: Text(
-//                                     "${item is Gear ? item.name : (item as CrewMember).name}, ${item is Gear ? item.weight : (item as CrewMember).flightWeight} lbs",
+//                                     "${item is Gear ? item.name : (item as CrewMember).name}, ${item is Gear ? item.weight : (item as CrewMember).flightWeight} lb",
 //                                     style: const TextStyle(
 //                                       color: Colors.white,
 //                                       fontSize: 18,
@@ -220,7 +220,7 @@
 //                               // Display weight of gear/crewmember under each draggable target.
 //                               padding: const EdgeInsets.only(left: 8.0),
 //                               child: Text(
-//                                 "${item is Gear ? item.weight : (item as CrewMember).flightWeight} lbs",
+//                                 "${item is Gear ? item.weight : (item as CrewMember).flightWeight} lb",
 //                                 style: const TextStyle(
 //                                   color: Colors.white,
 //                                   fontSize: 14,
@@ -283,9 +283,9 @@
 //                               Padding(
 //                                 padding: const EdgeInsets.symmetric(vertical: 4),
 //                                 child: Text(
-//                                   'Available Weight: ${calculateAvailableWeight(loads[index])} lbs',
+//                                   'Available Weight: ${calculateAvailableWeight(loads[index])} lb',
 //                                   style: TextStyle(
-//                                     fontSize: 16,
+//                                     fontSize: AppData.text16,
 //                                     fontWeight: FontWeight.bold,
 //                                     color: calculateAvailableWeight(loads[index]) < 0 ? Colors.red : Colors.black,
 //                                   ),
@@ -296,7 +296,7 @@
 //                                 child: Text(
 //                                   'Available Seats: ${calculateAvailableSeats(loads[index])}',
 //                                   style: TextStyle(
-//                                     fontSize: 16,
+//                                     fontSize: AppData.text16,
 //                                     fontWeight: FontWeight.bold,
 //                                     color: calculateAvailableSeats(loads[index]) < 0 ? Colors.red : Colors.black,
 //                                   ),
@@ -317,10 +317,10 @@
 //                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //                                             children: [
 //                                               Text(
-//                                                 "${item is Gear ? item.name : (item as CrewMember).name}, ${item is Gear ? item.weight : (item as CrewMember).flightWeight} lbs",
+//                                                 "${item is Gear ? item.name : (item as CrewMember).name}, ${item is Gear ? item.weight : (item as CrewMember).flightWeight} lb",
 //                                                 style: const TextStyle(
 //                                                   color: Colors.white,
-//                                                   fontSize: 16,
+//                                                   fontSize: AppData.text16,
 //                                                   fontWeight: FontWeight.bold,
 //                                                 ),
 //                                               ),
@@ -371,7 +371,7 @@
 //                             child: const Text(
 //                               'Add Load',
 //                               style: TextStyle(
-//                                 fontSize: 16,
+//                                 fontSize: AppData.text16,
 //                                 color: Colors.white,
 //                                 fontWeight: FontWeight.bold,
 //                               ),

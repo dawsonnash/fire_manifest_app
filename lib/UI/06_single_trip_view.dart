@@ -11,13 +11,14 @@ import '../../Data/trip.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import '../Data/load_accoutrements.dart';
 import '../UI/06_edit_trip.dart';
 import '../CodeShare/colors.dart';
 import '../Data/gear.dart';
 import '../Data/load.dart';
 
 // Generates PDF
-Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {
+Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, bool isExternal, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {
   final pdf = pw.Document();
   late String imagePath;
   late pw.Widget Function(Load load, int pageIndex, int totalPages, List<dynamic> pageItems) fillFormFields;
@@ -30,7 +31,7 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, String? helico
     pageFormat = PdfPageFormat.letter;
   } else if (manifestForm == 'of252') {
     imagePath = 'assets/images/helicopter_manifest_form.jpg';
-    fillFormFields = (load, pageIndex, totalPages, pageItems) => fillFormFieldsOF252(load, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer);
+    fillFormFields = (load, pageIndex, totalPages, pageItems) => fillFormFieldsOF252(load, trip.isExternal ?? false, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer, null);
     pageFormat = PdfPageFormat.a4;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
@@ -43,11 +44,79 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, String? helico
   // Iterate through each load in the trip
   for (var load in trip.loads) {
     // Combine all items from the load
-    final allItems = [
-      ...load.loadPersonnel,
-      ...load.loadGear,
-      ...load.customItems,
-    ];
+    List<dynamic> allItems;
+    if (isExternal) {
+      allItems = load.slings?.expand((sling) => [...sling.loadGear, ...sling.loadAccoutrements]).toList() ?? [];
+
+      // Create a map to merge items with the same name (without modifying originals)
+      Map<String, dynamic> mergedItems = {};
+
+      for (var item in allItems) {
+        String itemName = item.name;
+
+        if (mergedItems.containsKey(itemName)) {
+          // Merge quantities for duplicate items
+          if (item is Gear) {
+            mergedItems[itemName] = Gear(
+              name: item.name,
+              quantity: mergedItems[itemName].quantity + item.quantity, // Sum quantity
+              weight: item.weight,
+              isHazmat: item.isHazmat,
+            );
+          } else if (item is LoadAccoutrement) {
+            mergedItems[itemName] = LoadAccoutrement(
+              name: item.name,
+              quantity: mergedItems[itemName].quantity + item.quantity, // Sum quantity
+              weight: item.weight,
+            );
+          }
+        } else {
+          // Clone the object without modifying original
+          if (item is Gear) {
+            mergedItems[itemName] = Gear(
+              name: item.name,
+              quantity: item.quantity,
+              weight: item.weight,
+              isHazmat: item.isHazmat,
+            );
+          } else if (item is LoadAccoutrement) {
+            mergedItems[itemName] = LoadAccoutrement(
+              name: item.name,
+              quantity: item.quantity,
+              weight: item.weight,
+            );
+          }
+        }
+      }
+
+      // Convert map back to list and update allItems
+      allItems = mergedItems.values.toList();
+
+      allItems.sort((a, b) {
+        // Prioritize LoadAccoutrements over Gear
+        if (a is LoadAccoutrement && b is! LoadAccoutrement) return -1;
+        if (a is! LoadAccoutrement && b is LoadAccoutrement) return 1;
+
+        // Prioritize specific LoadAccoutrement names
+        int getPriority(dynamic item) {
+          if (item is LoadAccoutrement) {
+            if (item.name.contains("Cargo Net")) return 1;
+            if (item.name.contains("Lead Line")) return 2;
+            if (item.name.contains("Swivel")) return 3;
+          }
+          return 4; // Default priority for other items
+        }
+
+        return getPriority(a).compareTo(getPriority(b));
+      });
+
+    } else {
+      allItems = [
+        ...load.loadPersonnel,
+        ...load.loadGear,
+        ...load.customItems,
+      ];
+    }
 
     // Count hazmat items
     int numHaz = allItems.where((item) => item is Gear && item.isHazmat).length;
@@ -99,16 +168,16 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, String? helico
 }
 
 // Display preview
-void previewTripPDF(BuildContext context, Trip trip, String manifestForm, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {
+void previewTripPDF(BuildContext context, Trip trip, String manifestForm, bool? isExternal, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {
   Uint8List pdfBytes;
   late PdfPageFormat pageFormat;
 
   // Determine the correct format based on the manifest form
   if (manifestForm == 'pms245') {
-    pdfBytes = await generateTripPDF(trip, 'pms245', null, null, null, null);
+    pdfBytes = await generateTripPDF(trip, 'pms245', isExternal ?? false, null, null, null, null);
     pageFormat = PdfPageFormat.letter; // PMS245 requires Letter format
   } else if (manifestForm == 'of252') {
-    pdfBytes = await generateTripPDF(trip, 'of252', helicopterNum, departure, destination, manifestPreparer);
+    pdfBytes = await generateTripPDF(trip, 'of252', isExternal!,  helicopterNum, departure, destination, manifestPreparer);
     pageFormat = PdfPageFormat.a4; // OF252 requires A4 format
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
@@ -228,7 +297,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                       },
                                       child: Text(
                                         'Cancel',
-                                        style: TextStyle(fontSize: 16, color: AppColors.cancelButton),
+                                        style: TextStyle(fontSize: AppData.text16, color: AppColors.cancelButton),
                                       ),
                                     ),
                                     TextButton(
@@ -242,19 +311,19 @@ class _SingleTripViewState extends State<SingleTripView> {
                                             builder: (BuildContext context) {
                                               return AdditionalInfoDialog(
                                                 onConfirm: (String helicopterNum, String departure, String destination, String manifestPreparer) {
-                                                  previewTripPDF(context, widget.trip, 'of252', helicopterNum, departure, destination, manifestPreparer);
+                                                  previewTripPDF(context, widget.trip, 'of252', widget.trip.isExternal, helicopterNum, departure, destination, manifestPreparer);
                                                 },
                                               );
                                             },
                                           );
                                         } else {
                                           // Fixed-Wing manifest
-                                          previewTripPDF(context, widget.trip, 'pms245', null, null, null, null);
+                                          previewTripPDF(context, widget.trip, 'pms245', null, null, null, null, null);
                                         }
                                       },
                                       child: Text(
                                         'Export',
-                                        style: TextStyle(fontSize: 16, color: AppColors.saveButtonAllowableWeight),
+                                        style: TextStyle(fontSize: AppData.text16, color: AppColors.saveButtonAllowableWeight),
                                       ),
                                     ),
                                   ],
@@ -308,7 +377,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                   ),
                                   content: Text(
                                     'Are you sure you want to delete this trip?',
-                                    style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                                    style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                   ),
                                   actions: [
                                     TextButton(
@@ -433,7 +502,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                         ),
                                       ),
                                       Text(
-                                        'Weight: ${load.weight} lbs',
+                                        'Weight: ${load.weight} lb',
                                         style: TextStyle(
                                           fontSize: 18,
                                           color: AppColors.textColorPrimary,
@@ -578,7 +647,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
           },
           child: Text(
             'Cancel',
-            style: TextStyle(fontSize: 16, color: AppColors.cancelButton),
+            style: TextStyle(fontSize: AppData.text16, color: AppColors.cancelButton),
           ),
         ),
         TextButton(
@@ -592,7 +661,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
           },
           child: Text(
             'Confirm',
-            style: TextStyle(fontSize: 16, color: AppColors.saveButtonAllowableWeight),
+            style: TextStyle(fontSize: AppData.text16, color: AppColors.saveButtonAllowableWeight),
           ),
         ),
       ],

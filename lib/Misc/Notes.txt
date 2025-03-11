@@ -1,2 +1,9 @@
 Hive
 -- Next Hive Field will be @11
+
+
+Coding Guidelines
+
+- Trip Editing
+-- BYOMExternal and EditTrip external are like
+the exact same besides saveTrip and loadData. everything else can be copy/pasted
