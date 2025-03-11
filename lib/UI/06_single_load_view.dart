@@ -86,6 +86,24 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, bool isExternal, S
             ...sling.customItems,
           ];
 
+          slingItems.sort((a, b) {
+            // Prioritize LoadAccoutrements over Gear
+            if (a is LoadAccoutrement && b is! LoadAccoutrement) return -1;
+            if (a is! LoadAccoutrement && b is LoadAccoutrement) return 1;
+
+            // Prioritize specific LoadAccoutrement names
+            int getPriority(dynamic item) {
+              if (item is LoadAccoutrement) {
+                if (item.name.contains("Cargo Net")) return 1;
+                if (item.name.contains("Lead Line")) return 2;
+                if (item.name.contains("Swivel")) return 3;
+              }
+              return 4; // Default priority for other items
+            }
+
+            return getPriority(a).compareTo(getPriority(b));
+          });
+
           // Count hazmat items in the sling
           int numHaz = slingItems.where((item) => item is Gear && item.isHazmat).length;
 
@@ -189,6 +207,24 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, bool isExternal, S
         // Convert map back to a new list (without modifying the original objects)
         List<dynamic> combinedSlingItems = mergedItems.values.toList();
 
+        combinedSlingItems.sort((a, b) {
+          // Prioritize LoadAccoutrements over Gear
+          if (a is LoadAccoutrement && b is! LoadAccoutrement) return -1;
+          if (a is! LoadAccoutrement && b is LoadAccoutrement) return 1;
+
+          // Prioritize specific LoadAccoutrement names
+          int getPriority(dynamic item) {
+            if (item is LoadAccoutrement) {
+              if (item.name.contains("Cargo Net")) return 1;
+              if (item.name.contains("Lead Line")) return 2;
+              if (item.name.contains("Swivel")) return 3;
+            }
+            return 4; // Default priority for other items
+          }
+
+          return getPriority(a).compareTo(getPriority(b));
+        });
+
         // Count hazmat items in the sling
         int numHaz = combinedSlingItems.where((item) => item is Gear && item.isHazmat).length;
 
@@ -240,6 +276,7 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, bool isExternal, S
         }
       }
     }
+
   } else {
     // Handle normal loads (not external or no slings)
     List<dynamic> allItems = [
@@ -248,7 +285,6 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, bool isExternal, S
       ...load.customItems,
     ];
 
-    print('Processing Normal Load: Total Items: ${allItems.length}');
 
     int numHaz = allItems.where((item) => item is Gear && item.isHazmat).length;
     int totalPages = calculatePagesNeeded(allItems.length, numHaz);
