@@ -782,8 +782,13 @@ class _EditTripState extends State<EditTrip> {
     // Update timestamp before saving
     widget.trip.timestamp = DateTime.now();
 
-    // Save the updated trip to Hive
+    if (tripBox.containsKey(widget.trip.key)) {
+      tripBox.delete(widget.trip.key);
+    }
+
+    // Save under the correct key
     tripBox.put(widget.trip.tripName, widget.trip);
+
 
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(

@@ -30,7 +30,7 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, String? helico
     pageFormat = PdfPageFormat.letter;
   } else if (manifestForm == 'of252') {
     imagePath = 'assets/images/helicopter_manifest_form.jpg';
-    fillFormFields = (load, pageIndex, totalPages, pageItems) => fillFormFieldsOF252(load, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer);
+    fillFormFields = (load, pageIndex, totalPages, pageItems) => fillFormFieldsOF252(load, trip.isExternal ?? false, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer, null);
     pageFormat = PdfPageFormat.a4;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
