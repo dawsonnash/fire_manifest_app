@@ -2298,13 +2298,16 @@ class _SettingsState extends State<SettingsView> {
                                       color: !isOutOfSync ? Colors.green : Colors.red,
                                       size: AppData.text22, // Adjust size if needed
                                     ),
-                                    Text(
-                                      ' Last Updated: $lastSavedTimestamp ',
-                                      style: TextStyle(
-                                        fontSize: AppData.text14,
-                                        color: isOutOfSync ? Colors.red : Colors.green.withOpacity(0.8),
-                                        fontStyle: FontStyle.italic,
-                                        fontWeight: isOutOfSync ? FontWeight.bold : FontWeight.normal,
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown, // Shrinks text if needed
+                                      child: Text(
+                                        ' Last Updated: $lastSavedTimestamp ',
+                                        style: TextStyle(
+                                          fontSize: AppData.text14,
+                                          color: isOutOfSync ? Colors.red : Colors.green.withOpacity(0.8),
+                                          fontStyle: FontStyle.italic,
+                                          fontWeight: isOutOfSync ? FontWeight.bold : FontWeight.normal,
+                                        ),
                                       ),
                                     ),
                                     if (isOutOfSync)

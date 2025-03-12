@@ -5,6 +5,7 @@ import 'package:fire_app/UI/02_crewmembers_view.dart';
 import 'package:fire_app/UI/03_gear_view.dart';
 import 'package:fire_app/UI/04_trip_preferences_view.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '03_add_gear.dart';
@@ -97,7 +98,7 @@ class _EditCrewState extends State<EditCrew> {
     final double panelWidth = AppData.screenWidth * 0.8; // 80% of the screen width
     final int topFlex = 2;
     final int middleFlex = 5;
-    final int toolFlex = 1;
+    final int toolFlex = 2;
     final int tripPrefFlex = 2;
 
     BoxDecoration panelDecoration = BoxDecoration(
@@ -1160,10 +1161,17 @@ class _EditCrewState extends State<EditCrew> {
                                     mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
                                   
                                     children: [
-                                      Icon(
-                                        Icons.handyman_outlined, // Add icon
-                                        color: AppColors.primaryColor,
-                                        size: 28, // Adjust size as needed
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 16.0),
+                                        child: Transform.scale(
+                                          scale: 2,
+                                          child: SvgPicture.asset(
+                                            'assets/icons/tools_icon.svg', // Your SVG file path
+                                            width: 24, // Adjust size as needed
+                                            height: 24,
+                                            colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
+                                          ),
+                                        ),
                                       ),
                                       Text(
                                         ' Tools',
