@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:math' as math; // Import this at the top of your file
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/Data/trip_preferences.dart';
 import 'package:fire_app/UI/quick_guide.dart';
@@ -119,29 +120,20 @@ class _SettingsState extends State<SettingsView> {
     // Extract unique crew member names from positional preferences (handles lists & individuals)
     Set<String> aCrewNames = a.positionalPreferences
         .expand((pp) => pp.crewMembersDynamic.expand((cm) => cm is CrewMember
-        ? [cm.name]  // Individual crew member
-        : (cm as List<CrewMember>).map((m) => m.name)))  // List of crew members
+            ? [cm.name] // Individual crew member
+            : (cm as List<CrewMember>).map((m) => m.name))) // List of crew members
         .toSet();
 
-    Set<String> bCrewNames = b.positionalPreferences
-        .expand((pp) => pp.crewMembersDynamic.expand((cm) => cm is CrewMember
-        ? [cm.name]
-        : (cm as List<CrewMember>).map((m) => m.name)))
-        .toSet();
+    Set<String> bCrewNames = b.positionalPreferences.expand((pp) => pp.crewMembersDynamic.expand((cm) => cm is CrewMember ? [cm.name] : (cm as List<CrewMember>).map((m) => m.name))).toSet();
 
     // Extract unique gear names from gear preferences
-    Set<String> aGearNames = a.gearPreferences
-        .expand((gp) => gp.gear.map((g) => g.name))
-        .toSet();
+    Set<String> aGearNames = a.gearPreferences.expand((gp) => gp.gear.map((g) => g.name)).toSet();
 
-    Set<String> bGearNames = b.gearPreferences
-        .expand((gp) => gp.gear.map((g) => g.name))
-        .toSet();
+    Set<String> bGearNames = b.gearPreferences.expand((gp) => gp.gear.map((g) => g.name)).toSet();
 
     // **Compare only presence of crew names and gear names** (ignoring any attribute changes)
     return setEquals(aCrewNames, bCrewNames) && setEquals(aGearNames, bGearNames);
   }
-
 
   Map<String, List<String>> _getCrewMemberDifferences(List<CrewMember> currentList, List<CrewMember> savedList) {
     List<String> removed = [];
@@ -2222,11 +2214,16 @@ class _SettingsState extends State<SettingsView> {
                             Tooltip(
                               message: "Update",
                               child: IconButton(
-                                icon: Icon(
-                                  Icons.sync,
-                                  color: (selectedLoadout != null && isOutOfSync) ? Colors.green : Colors.grey,
-                                  size: AppData.text32,
+                                icon: Transform(
+                                  alignment: Alignment.center,
+                                  transform: Matrix4.rotationY(math.pi), // Flips the icon horizontally
+                                  child: Icon(
+                                    Icons.sync,
+                                    color: (selectedLoadout != null && isOutOfSync) ? Colors.green : Colors.grey,
+                                    size: AppData.text32,
+                                  ),
                                 ),
+
                                 onPressed: (selectedLoadout != null && isOutOfSync)
                                     ? () async {
                                         bool? confirmed = await showDialog(
