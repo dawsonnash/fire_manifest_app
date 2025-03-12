@@ -5,6 +5,7 @@ import 'package:fire_app/UI/06_single_trip_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class SavedTripsView extends StatefulWidget {
   const SavedTripsView({super.key});
@@ -394,10 +395,20 @@ class _SavedTripsState extends State<SavedTripsView> {
                                             ),
                                           ],
                                         ),
-                                        leading: Icon(
-                                          trip.isExternal! ? FontAwesomeIcons.battleNet : FontAwesomeIcons.helicopter,
-                                          color: AppColors.primaryColor,
-                                        ),
+                                        leading: trip.isExternal!
+                                            ? Transform.scale(
+                                                scale: 1.5,
+                                                child: SvgPicture.asset(
+                                                  'assets/icons/sling_icon.svg', // Your SVG file path
+                                                  width: 24, // Adjust size as needed
+                                                  height: 24,
+                                                  colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
+                                                ),
+                                              )
+                                            : Icon(
+                                                FontAwesomeIcons.helicopter,
+                                                color: AppColors.primaryColor,
+                                              ),
                                       ),
                                     ),
                                   ),

@@ -6,6 +6,7 @@ import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:hive/hive.dart';
 import '../../Data/trip.dart';
 import '../UI/05_define_constraints_manifest.dart';
@@ -1183,9 +1184,9 @@ class _QuickManifestState extends State<QuickManifest> {
     // **Recalculate numLoads based on included hardware**
     updatedNumLoads = (totalGearWeightWithHardware / maxLoadWeight).ceil();
 
-    int noSafetyBufferMaxNumLoads= (totalGearWeightWithHardware / allowable).ceil();
+    int noSafetyBufferMaxNumLoads = (totalGearWeightWithHardware / allowable).ceil();
 
-        await showDialog(
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
@@ -1305,7 +1306,6 @@ class _QuickManifestState extends State<QuickManifest> {
                                               style: TextStyle(fontSize: AppData.text12, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary),
                                             ),
                                           ),
-
                                       ],
                                     ),
                                   ),
@@ -2128,7 +2128,7 @@ class _QuickManifestState extends State<QuickManifest> {
   // Function to check if input is valid and update button state
   void _checkInput() {
     final String tripName = tripNameController.text;
-  // Validate trip name existence (case-insensitive)
+    // Validate trip name existence (case-insensitive)
     final bool isTripNameUnique = !savedTrips.savedTrips.any(
       (member) => member.tripName.toLowerCase() == tripName.toLowerCase(),
     );
@@ -2189,12 +2189,10 @@ class _QuickManifestState extends State<QuickManifest> {
     // Creating a new Trip object
     Trip newTrip;
     if (isExternalManifest) {
-       newTrip = Trip(tripName: tripNameCapitalized, allowable: allowable, availableSeats: availableSeats, isExternal: true, safetyBuffer: safetyBuffer);
+      newTrip = Trip(tripName: tripNameCapitalized, allowable: allowable, availableSeats: availableSeats, isExternal: true, safetyBuffer: safetyBuffer);
+    } else {
+      newTrip = Trip(tripName: tripNameCapitalized, allowable: allowable, availableSeats: availableSeats);
     }
-    else{
-       newTrip = Trip(tripName: tripNameCapitalized, allowable: allowable, availableSeats: availableSeats);
-    }
-
 
     // Deep copy crewMembers and gear into the new Trip
     if (isExternalManifest) {
@@ -2532,11 +2530,21 @@ class _QuickManifestState extends State<QuickManifest> {
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min, // Keeps row from expanding
                               children: [
-                                Icon(
-                                  isExternalManifest ? FontAwesomeIcons.battleNet : FontAwesomeIcons.helicopter,
-                                  color: AppColors.primaryColor,
-                                  size: AppData.text24,
-                                ),
+                                isExternalManifest
+                                    ? Transform.scale(
+                                        scale: 1.5,
+                                        child: SvgPicture.asset(
+                                          'assets/icons/sling_icon.svg', // Your SVG file path
+                                          width: 24, // Adjust size as needed
+                                          height: 24,
+                                          colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
+                                        ),
+                                      )
+                                    : Icon(
+                                        FontAwesomeIcons.helicopter,
+                                        color: AppColors.primaryColor,
+                                        size: AppData.text24,
+                                      ),
                                 SizedBox(width: 8), // Add spacing between icon and switch
                                 Switch(
                                   value: isExternalManifest,
