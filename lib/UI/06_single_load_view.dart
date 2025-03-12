@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:pdf/pdf.dart';
 import '../Data/load.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -1043,9 +1044,14 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                     iconColor: Colors.white,
                                     // Color of the expand/collapse arrow
                                     collapsedIconColor: Colors.white,
-                                    leading: Icon(
-                                      Icons.grid_on,
-                                      color: AppColors.primaryColor,
+                                    leading: Transform.scale(
+                                      scale: 1.5,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/sling_icon.svg', // Your SVG file path
+                                        width: 24,
+                                        height: 24,
+                                        colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
+                                      ),
                                     ),
                                     title: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

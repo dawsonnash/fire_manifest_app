@@ -4,6 +4,7 @@ import 'package:fire_app/UI/05_byom_external.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import '../Data/crew.dart';
 import '../Data/gear.dart';
 import '../Data/trip.dart';
@@ -187,8 +188,18 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min, // Keeps row from expanding
                               children: [
-                                Icon(
-                                  isExternalManifest ? FontAwesomeIcons.battleNet : FontAwesomeIcons.helicopter,
+                                isExternalManifest
+                                    ? Transform.scale(
+                                  scale: 1.5,
+                                  child: SvgPicture.asset(
+                                    'assets/icons/sling_icon.svg', // Your SVG file path
+                                    width: 24, // Adjust size as needed
+                                    height: 24,
+                                    colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
+                                  ),
+                                )
+                                    : Icon(
+                                  FontAwesomeIcons.helicopter,
                                   color: AppColors.primaryColor,
                                   size: AppData.text24,
                                 ),
