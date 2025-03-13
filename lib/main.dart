@@ -1,28 +1,34 @@
+import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
-
+import 'dart:convert';
 import 'package:fire_app/Data/load_accoutrement_manager.dart';
 import 'package:fire_app/UI/05_create_new_manifest.dart';
 import 'package:fire_app/UI/06_saved_trips.dart';
 import 'package:fire_app/UI/settings.dart';
 import 'package:flutter/material.dart';
-import '../Data/sling.dart';
-import '01_edit_crew.dart';
+import 'Data/sling.dart';
+import 'package:fire_app/UI/01_edit_crew.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import '../../Data/gear.dart';
-import '../../Data/crewmember.dart';
-import '../Data/crew.dart';
-import '../Data/customItem.dart';
-import '../Data/load.dart';
-import '../Data/trip.dart';
-import '../Data/trip_preferences.dart';
-import '../Data/positional_preferences.dart';
-import '../Data/gear_preferences.dart';
-import '../Data/saved_preferences.dart';
-import '../Data/crewMemberList.dart';
-import '../Data/load_accoutrements.dart';
+import '../Data/gear.dart';
+import '../Data/crewmember.dart';
+import 'Data/crew.dart';
+import 'Data/customItem.dart';
+import 'Data/load.dart';
+import 'Data/trip.dart';
+import 'Data/trip_preferences.dart';
+import 'Data/positional_preferences.dart';
+import 'Data/gear_preferences.dart';
+import 'Data/saved_preferences.dart';
+import 'Data/crewMemberList.dart';
+import 'Data/load_accoutrements.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../CodeShare/colors.dart'; // Your colors.dart.dart file
+import 'CodeShare/colors.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+
+import 'UI/jsonFilePage.dart';
+
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
@@ -106,6 +112,7 @@ class MyApp extends StatelessWidget {
 }
 
 final GlobalKey<_MyHomePageState> homePageKey = GlobalKey<_MyHomePageState>();
+
 final ValueNotifier<int> selectedIndexNotifier = ValueNotifier<int>(0);
 
 class MyHomePage extends StatefulWidget {
@@ -137,6 +144,61 @@ class _MyHomePageState extends State<MyHomePage> {
           onSafetyBufferChange: _changeSafetyBuffer,
         ),
       ];
+
+  StreamSubscription<List<SharedMediaFile>>? _intentSubscription; // Store the subscription
+  String? _jsonFilePath;
+  String? _jsonContent;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Handle when the app is launched by opening a JSON file
+    ReceiveSharingIntent.instance.getInitialMedia().then((List<SharedMediaFile> value) {
+      if (value.isNotEmpty) {
+        _processJsonFile(value.first.path);
+      }
+    });
+
+    // Listen for shared JSON files when the app is already running
+    _intentSubscription = ReceiveSharingIntent.instance.getMediaStream().listen(
+          (List<SharedMediaFile> value) {
+        if (value.isNotEmpty) {
+          _processJsonFile(value.first.path);
+        }
+      },
+      onError: (err) {
+        print("Error receiving intent: $err");
+      },
+    );
+  }
+
+  void _processJsonFile(String filePath) async {
+    try {
+      File file = File(filePath);
+      String jsonString = await file.readAsString();
+
+      setState(() {
+        _jsonFilePath = filePath;
+        _jsonContent = jsonString;
+      });
+
+      // Navigate to a specific page when a JSON file is received
+      if (mounted) {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => JsonFilePage(filePath: _jsonFilePath!, jsonContent: _jsonContent!),
+        ));
+      }
+    } catch (e) {
+      print("Error reading JSON file: $e");
+    }
+  }
+
+  @override
+  void dispose() {
+    _intentSubscription?.cancel(); // Cancel the stream to prevent memory leaks
+    super.dispose();
+  }
 
   void switchTab(int index) {
     if (!mounted) return; // Prevents calling setState() on disposed widget
@@ -214,6 +276,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
 class DisclaimerScreen extends StatefulWidget {
   const DisclaimerScreen({super.key});
 

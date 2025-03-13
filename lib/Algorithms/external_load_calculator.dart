@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../CodeShare/colors.dart';
 import '../Data/sling.dart';
-import '../UI/main.dart';
+import '../main.dart';
 import '../Data/crew.dart';
 import '../Data/gear_preferences.dart';
 import '../Data/trip.dart';
