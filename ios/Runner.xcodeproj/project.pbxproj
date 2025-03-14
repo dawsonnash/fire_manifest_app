@@ -352,6 +352,7 @@
 				SUPPORTED_PLATFORMS = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+				CUSTOM_GROUP_ID = "group.fireManifest.app";
 			};
 			name = Profile;
 		};
