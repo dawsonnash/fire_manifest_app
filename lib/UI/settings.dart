@@ -22,8 +22,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../Data/crew_loadout.dart';
 import '../Data/crewmember.dart';
 import '../Data/gear.dart';
-import '../Data/gear_preferences.dart';
-import '../Data/positional_preferences.dart';
 
 class SettingsView extends StatefulWidget {
   final bool isDarkMode;
@@ -285,11 +283,12 @@ class _SettingsState extends State<SettingsView> {
   }
 
   Future<void> _checkSyncStatus(String loadoutName) async {
+
     Map<String, dynamic>? lastSavedData = await CrewLoadoutStorage.loadLoadout(loadoutName);
 
     if (lastSavedData == null) {
       setState(() {
-        isOutOfSync = true; // If no saved data, mark as out of sync
+        isOutOfSync = true;
       });
       return;
     }
@@ -310,6 +309,7 @@ class _SettingsState extends State<SettingsView> {
     setState(() {
       isOutOfSync = (lastSavedCrewJson != currentCrewJson) || (lastSavedPreferencesJson != currentPreferencesJson);
     });
+
   }
 
   void _showSyncDifferencesDialog() async {
@@ -2302,7 +2302,6 @@ class _SettingsState extends State<SettingsView> {
                                         style: TextStyle(
                                           fontSize: AppData.text14,
                                           color: isOutOfSync ? Colors.red : Colors.green.withOpacity(0.8),
-                                          fontStyle: FontStyle.italic,
                                           fontWeight: isOutOfSync ? FontWeight.bold : FontWeight.normal,
                                         ),
                                       ),

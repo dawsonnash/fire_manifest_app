@@ -13,7 +13,7 @@ import '../Data/customItem.dart';
 import 'package:fire_app/UI/05_byom_external.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import 'main.dart';
+import '../main.dart';
 
 // Double integers when calculating quantity dont always work out. a 45 lb QB can become 44
 // Update: Maybe fixed?

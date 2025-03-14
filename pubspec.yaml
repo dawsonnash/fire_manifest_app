@@ -48,7 +48,7 @@ dependencies:
   open_filex: ^4.6.0
   file_picker: ^8.3.1
   flutter_svg: ^2.0.17
-
+  receive_sharing_intent: ^1.8.1
 
 dev_dependencies:
   flutter_test:

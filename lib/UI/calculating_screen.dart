@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../Algorithms/load_calculator.dart';
 import '../Data/trip.dart';
 import '../Data/trip_preferences.dart';
-import 'main.dart';
+import '../main.dart';
 
 class CalculatingScreen extends StatefulWidget {
   const CalculatingScreen({super.key});

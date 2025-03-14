@@ -53,6 +53,18 @@
 			<string>This app needs access to documents to allow file sharing.</string>
 		<key>NSMicrophoneUsageDescription</key>
 			<string>This app does not record audio or need microphone access.</string>
-
+       <key>CFBundleDocumentTypes</key>
+            <array>
+                <dict>
+                    <key>CFBundleTypeName</key>
+                    <string>JSON File</string>
+                    <key>LSItemContentTypes</key>
+                    <array>
+                        <string>public.json</string>
+                    </array>
+                    <key>CFBundleTypeRole</key>
+                    <string>Viewer</string>
+                </dict>
+            </array>
 	</dict>
 </plist>

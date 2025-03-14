@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:fire_app/UI/main.dart';
+import 'package:fire_app/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
