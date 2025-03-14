@@ -7,6 +7,9 @@ import 'package:fire_app/UI/05_create_new_manifest.dart';
 import 'package:fire_app/UI/06_saved_trips.dart';
 import 'package:fire_app/UI/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'Data/crew_loadout.dart';
 import 'Data/sling.dart';
 import 'package:fire_app/UI/01_edit_crew.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -27,13 +30,21 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'CodeShare/colors.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
-import 'UI/jsonFilePage.dart';
-
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
   // Set up for Hive that needs to run before starting app
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Declare a variable to store the initial file path
+  String? initialJsonFilePath;
+
+  // Retrieve the file path before Flutter initializes
+  List<SharedMediaFile> sharedFiles = await ReceiveSharingIntent.instance.getInitialMedia();
+  if (sharedFiles.isNotEmpty) {
+    initialJsonFilePath = sharedFiles.first.path;
+  }
+
   // Disable Impeller
   PlatformDispatcher.instance.onPlatformConfigurationChanged = null;
   await Hive.initFlutter();
@@ -87,18 +98,19 @@ void main() async {
   AppData.safetyBuffer = await ThemePreferences.getSafetyBuffer();
 
   // start app
-  runApp(MyApp(showDisclaimer: !agreedToTerms));
+  runApp(MyApp(showDisclaimer: !agreedToTerms, initialJsonFilePath: initialJsonFilePath));
 }
 
 class MyApp extends StatelessWidget {
   final bool showDisclaimer;
+  final String? initialJsonFilePath;
 
-  const MyApp({super.key, required this.showDisclaimer});
+  const MyApp({super.key, required this.showDisclaimer, this.initialJsonFilePath});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false,    // Debug label
       scaffoldMessengerKey: scaffoldMessengerKey,
       title: 'Fire Manifest App',
       theme: ThemeData(
@@ -106,7 +118,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         // for theme based text-> style: Theme.of(context).textTheme.headlineMedium,
       ),
-      home: showDisclaimer ? const DisclaimerScreen() : MyHomePage(key: homePageKey),
+      home: showDisclaimer
+          ? const DisclaimerScreen()
+          : MyHomePage(initialJsonFilePath: initialJsonFilePath),
     );
   }
 }
@@ -116,7 +130,8 @@ final GlobalKey<_MyHomePageState> homePageKey = GlobalKey<_MyHomePageState>();
 final ValueNotifier<int> selectedIndexNotifier = ValueNotifier<int>(0);
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  final String? initialJsonFilePath;
+  const MyHomePage({super.key, this.initialJsonFilePath});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -147,56 +162,471 @@ class _MyHomePageState extends State<MyHomePage> {
 
   StreamSubscription<List<SharedMediaFile>>? _intentSubscription; // Store the subscription
   String? _jsonFilePath;
-  String? _jsonContent;
+
+  List<String> loadoutNames = [];
+  String? selectedLoadout;
 
   @override
   void initState() {
     super.initState();
+    _loadLoadoutNames();
 
-    // Handle when the app is launched by opening a JSON file
-    ReceiveSharingIntent.instance.getInitialMedia().then((List<SharedMediaFile> value) {
-      if (value.isNotEmpty) {
-        _processJsonFile(value.first.path);
-      }
-    });
-
-    // Listen for shared JSON files when the app is already running
+    // Step 1: Listen for shared files while the app is running
     _intentSubscription = ReceiveSharingIntent.instance.getMediaStream().listen(
           (List<SharedMediaFile> value) {
         if (value.isNotEmpty) {
-          _processJsonFile(value.first.path);
+          _handleIncomingFile(value.first.path);
         }
       },
       onError: (err) {
-        print("Error receiving intent: $err");
+      },
+    );
+
+    //  Step 2: Handle cold start with a shared JSON file
+    if (widget.initialJsonFilePath != null) {
+      _jsonFilePath = widget.initialJsonFilePath;
+
+      // Delay execution until UI is built
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted || _jsonFilePath == null) return;
+
+        bool outOfSync = await _checkSyncStatus();
+
+        if (outOfSync) {
+          bool confirmProceed = await _showUnsavedChangesDialog(context);
+          if (!confirmProceed) {
+            return;
+          }
+        }
+
+        _promptNewLoadoutName();
+      });
+    }
+  }
+
+  void _handleIncomingFile(String filePath) async {
+    if (!mounted) return;
+
+    setState(() {
+      _jsonFilePath = filePath;
+    });
+
+
+    // Delay execution until the UI has settled
+    await Future.delayed(Duration(milliseconds: 300));
+
+    // Check sync status before proceeding
+    bool outOfSync = await _checkSyncStatus();
+
+    // Delay again to prevent UI sync issues
+    await Future.delayed(Duration(milliseconds: 200));
+
+    // Proceed to prompt for new loadout name
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _promptNewLoadoutName();
+      }
+    });
+  }
+
+
+
+
+  void _promptNewLoadoutName() {
+    TextEditingController nameController = TextEditingController();
+    String? errorMessage;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.textFieldColor2,
+              title: Text(
+                'Save New Loadout',
+                style: TextStyle(color: AppColors.textColorPrimary),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameController,
+                    inputFormatters: [LengthLimitingTextInputFormatter(30)],
+                    decoration: InputDecoration(
+                      errorText: errorMessage,
+                      hintText: "Enter Loadout Name",
+                      hintStyle: TextStyle(color: AppColors.textColorPrimary),
+                    ),
+                    style: TextStyle(color: AppColors.textColorPrimary),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    String loadoutName = nameController.text.trim();
+
+                    if (loadoutName.isEmpty) {
+                      setDialogState(() {
+                        errorMessage = "Loadout name cannot be empty";
+                      });
+                      return;
+                    }
+
+                    // Check if name already exists
+                    List<String> existingLoadouts = await CrewLoadoutStorage.getAllLoadoutNames();
+                    if (existingLoadouts.contains(loadoutName)) {
+                      setDialogState(() {
+                        errorMessage = "Loadout name already exists";
+                      });
+                      return;
+                    }
+
+                    // Save new loadout
+                    Navigator.of(context).pop(); // Close input dialog
+                    _saveNewLoadout(loadoutName, _jsonFilePath!);
+                  },
+                  child: Text("Save", style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
+                ),
+
+
+              ],
+            );
+          },
+        );
       },
     );
   }
 
-  void _processJsonFile(String filePath) async {
+  Future<bool> _showUnsavedChangesDialog(BuildContext context) async {
+    return await showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing without action
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColors.textFieldColor2,
+          title: Text(
+            'Unsaved Changes Detected',
+            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'Importing this loadout will erase any unsaved changes to your current crew loadout. View specific changes by tapping the red Out of Sync icon within the Settings page. Do you want to continue?',
+            style: TextStyle(color: AppColors.textColorPrimary),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // Return false
+              child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // Return true
+              child: Text("Continue", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    ) ?? false; // Default return false if dialog is dismissed
+  }
+
+  Future<bool> _checkSyncStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lastUsedLoadout = prefs.getString('last_selected_loadout');
+
+    if (lastUsedLoadout == null) {
+      print("🚨 No previously saved loadout found. Marking as out of sync.");
+      return true;
+    }
+
+    Map<String, dynamic>? lastSavedData = await CrewLoadoutStorage.loadLoadout(lastUsedLoadout);
+
+    if (lastSavedData == null) {
+      print("🚨 No saved data for $lastUsedLoadout - marking as out of sync.");
+      return true;
+    }
+
+    // Convert saved crew and preferences to JSON
+    String lastSavedCrewJson = jsonEncode(lastSavedData["crew"]);
+    String lastSavedPreferencesJson = jsonEncode(lastSavedData["savedPreferences"]);
+
+    // Convert current crew and preferences to JSON (global state)
+    Map<String, dynamic> currentCrewData = {
+      "crew": crew.toJson(),
+      "savedPreferences": savedPreferences.toJson(),
+    };
+    String currentCrewJson = jsonEncode(currentCrewData["crew"]);
+    String currentPreferencesJson = jsonEncode(currentCrewData["savedPreferences"]);
+
+    // Compare Crew and Preferences JSONs
+    bool crewDiffers = (lastSavedCrewJson != currentCrewJson);
+    bool preferencesDiffers = (lastSavedPreferencesJson != currentPreferencesJson);
+
+    if (crewDiffers || preferencesDiffers) {
+      print("⚠ Crew Data Differs: $crewDiffers");
+      print("⚠ Preferences Data Differs: $preferencesDiffers");
+      return true; // Data is out of sync
+    }
+
+    print("✅ Data is IN SYNC.");
+    return false;
+  }
+
+
+  Future<void> _saveNewLoadout(String loadoutName, String filePath) async {
+    String timestamp = DateFormat('EEE, dd MMM yy, h:mm a').format(DateTime.now());
+
+    // Read JSON file
+    String jsonString = await File(filePath).readAsString();
+    Map<String, dynamic> jsonData = jsonDecode(jsonString);
+
+    // Save to storage
+    Map<String, dynamic> loadoutData = {
+      "crew": jsonData["crew"],
+      "savedPreferences": jsonData["savedPreferences"],
+      "lastSaved": timestamp,
+    };
+
+    await CrewLoadoutStorage.saveLoadout(loadoutName, loadoutData);
+
+    // Apply the new loadout to update UI and persist the selection
+    await _applyLoadout(loadoutName, loadoutData);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Center(
+          child: Text(
+            'Saved $loadoutName',
+            style: TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+        ),
+        duration: Duration(seconds: 1),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
+  Future<void> _applyLoadout(String loadoutName, Map<String, dynamic> loadoutData) async {
     try {
-      File file = File(filePath);
-      String jsonString = await file.readAsString();
+      // Convert JSON back to objects
+      Crew importedCrew = Crew.fromJson(loadoutData["crew"]);
+      SavedPreferences importedPreferences = SavedPreferences.fromJson(loadoutData["savedPreferences"]);
+
+      // Save the last selected loadout persistently
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('last_selected_loadout', loadoutName);
+
+      // Clear existing data
+      await Hive.box<CrewMember>('crewmemberBox').clear();
+      await Hive.box<Gear>('gearBox').clear();
+      await Hive.box<Gear>('personalToolsBox').clear();
+      await Hive.box<TripPreference>('tripPreferenceBox').clear();
+      savedPreferences.deleteAllTripPreferences();
+
+      // Save new Crew Data
+      var crewMemberBox = Hive.box<CrewMember>('crewmemberBox');
+      for (var member in importedCrew.crewMembers) {
+        await crewMemberBox.add(member);
+      }
+
+      var gearBox = Hive.box<Gear>('gearBox');
+      for (var gearItem in importedCrew.gear) {
+        await gearBox.add(gearItem);
+      }
+
+      var personalToolsBox = Hive.box<Gear>('personalToolsBox');
+      for (var tool in importedCrew.personalTools) {
+        await personalToolsBox.add(tool);
+      }
+
+      // Save new Trip Preferences
+      var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+      for (var tripPref in importedPreferences.tripPreferences) {
+        await tripPreferenceBox.add(tripPref);
+      }
+      savedPreferences.tripPreferences = tripPreferenceBox.values.toList();
+
+      // Reload data from Hive
+      await crew.loadCrewDataFromHive();
+      await savedPreferences.loadPreferencesFromHive();
+
+      // // Update last saved timestamp
+      // await _loadLastSavedTimestamp(loadoutName);
+
+      // // Re-check sync status after applying the loadout
+      // await _checkSyncStatus(loadoutName);
+      // Update state
+      selectedIndexNotifier.value = 0;
 
       setState(() {
-        _jsonFilePath = filePath;
-        _jsonContent = jsonString;
+        selectedLoadout = loadoutName;
       });
-
-      // Navigate to a specific page when a JSON file is received
-      if (mounted) {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => JsonFilePage(filePath: _jsonFilePath!, jsonContent: _jsonContent!),
-        ));
-      }
     } catch (e) {
-      print("Error reading JSON file: $e");
+      showErrorDialog("Error loading loadout: $e");
     }
+  }
+
+  Future<void> _loadLoadoutNames() async {
+    List<String> savedLoadouts = await CrewLoadoutStorage.getAllLoadoutNames();
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lastUsedLoadout = prefs.getString('last_selected_loadout');
+
+    setState(() {
+      loadoutNames = savedLoadouts;
+
+      if (lastUsedLoadout != null && loadoutNames.contains(lastUsedLoadout)) {
+        // If there was a previous selection, restore it
+        selectedLoadout = lastUsedLoadout;
+      } else {
+        // If no valid previous selection, keep it null (Select a Loadout)
+        selectedLoadout = null;
+
+      }
+    });
+  }
+
+  void confirmDataWipe(String filePath) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent users from dismissing without action
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColors.textFieldColor2,
+          title: Text(
+            'Warning',
+            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'Importing this file will overwrite all existing crew data (Crew Members, Gear, Tools, Trip Preferences). Proceed?',
+            style: TextStyle(color: AppColors.textColorPrimary),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cancel
+              },
+              child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the warning dialog
+                importCrewData(filePath); // Pass filePath instead of callback
+              },
+              child: Text('Confirm', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void importCrewData(String filePath) async {
+    try {
+      // Read file contents
+      String jsonString = await File(filePath).readAsString();
+      Map<String, dynamic> jsonData = jsonDecode(jsonString);
+
+      if (!jsonData.containsKey("crew") || !jsonData.containsKey("savedPreferences")) {
+        showErrorDialog("Invalid JSON format. Missing required fields.");
+        return;
+      }
+
+      // Import Crew Data
+      Crew importedCrew = Crew.fromJson(jsonData["crew"]);
+      SavedPreferences importedSavedPreferences = SavedPreferences.fromJson(jsonData["savedPreferences"]);
+
+      setState(() {});
+
+      // Clear old data
+      await Hive.box<CrewMember>('crewmemberBox').clear();
+      await Hive.box<Gear>('gearBox').clear();
+      await Hive.box<Gear>('personalToolsBox').clear();
+      await Hive.box<TripPreference>('tripPreferenceBox').clear();
+      savedPreferences.deleteAllTripPreferences();
+
+      // Save Crew Data
+      var crewMemberBox = Hive.box<CrewMember>('crewmemberBox');
+      for (var member in importedCrew.crewMembers) {
+        await crewMemberBox.add(member);
+      }
+
+      var gearBox = Hive.box<Gear>('gearBox');
+      for (var gearItem in importedCrew.gear) {
+        await gearBox.add(gearItem);
+      }
+
+      var personalToolsBox = Hive.box<Gear>('personalToolsBox');
+      for (var tool in importedCrew.personalTools) {
+        await personalToolsBox.add(tool);
+      }
+
+      // Save Trip Preferences to Hive
+      var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
+      for (var tripPref in importedSavedPreferences.tripPreferences) {
+        await tripPreferenceBox.add(tripPref);
+      }
+      savedPreferences.tripPreferences = tripPreferenceBox.values.toList();
+
+      // Reload data from Hive
+      await crew.loadCrewDataFromHive();
+      await savedPreferences.loadPreferencesFromHive();
+
+      setState(() {});
+
+      // Show Success Message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Center(
+            child: Text(
+              'Crew Imported!',
+              style: TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+          ),
+          duration: Duration(seconds: 1),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+    } catch (e) {
+      showErrorDialog("Unexpected error during import: $e");
+    }
+  }
+
+  void showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.red.shade900,
+          title: Text(
+            'Import Error',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            message,
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   void dispose() {
-    _intentSubscription?.cancel(); // Cancel the stream to prevent memory leaks
+    _intentSubscription?.cancel();
+    _intentSubscription = null; // Prevents re-triggering on reopening
     super.dispose();
   }
 
