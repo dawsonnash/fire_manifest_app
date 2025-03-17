@@ -6,6 +6,7 @@ import 'package:fire_app/Data/load_accoutrement_manager.dart';
 import 'package:fire_app/UI/05_create_new_manifest.dart';
 import 'package:fire_app/UI/06_saved_trips.dart';
 import 'package:fire_app/UI/settings.dart';
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -35,15 +36,24 @@ final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<Scaffol
 void main() async {
   // Set up for Hive that needs to run before starting app
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Declare a variable to store the initial file path
   String? initialJsonFilePath;
 
-  // Retrieve the file path before Flutter initializes
-  List<SharedMediaFile> sharedFiles = await ReceiveSharingIntent.instance.getInitialMedia();
-  if (sharedFiles.isNotEmpty) {
-    initialJsonFilePath = sharedFiles.first.path;
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    // Android: Use ReceiveSharingIntent
+    List<SharedMediaFile> sharedFiles = await ReceiveSharingIntent.instance.getInitialMedia();
+    if (sharedFiles.isNotEmpty) {
+      initialJsonFilePath = sharedFiles.first.path;
+    }
+  } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+    // iOS: Retrieve "Open In" file from UserDefaults
+    final userDefaults = await SharedPreferences.getInstance();
+    initialJsonFilePath = userDefaults.getString("sharedJsonFile");
+
+    if (initialJsonFilePath != null) {
+      await userDefaults.remove("sharedJsonFile"); //  Clear after retrieving
+    }
   }
+
 
   // Disable Impeller
   PlatformDispatcher.instance.onPlatformConfigurationChanged = null;
@@ -171,27 +181,29 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _loadLoadoutNames();
 
-    // Step 1: Listen for shared files while the app is running
-    _intentSubscription = ReceiveSharingIntent.instance.getMediaStream().listen(
-          (List<SharedMediaFile> value) {
-        if (value.isNotEmpty) {
-          _handleIncomingFile(value.first.path);
-        }
-      },
-      onError: (err) {
-      },
-    );
+    if (Platform.isAndroid) {
+      // ✅ Android: Listen for shared files while the app is running
+      _intentSubscription = ReceiveSharingIntent.instance.getMediaStream().listen(
+            (List<SharedMediaFile> value) {
+          if (value.isNotEmpty) {
+            _handleIncomingFile(value.first.path);
+          }
+        },
+        onError: (err) {},
+      );
+    } else if (Platform.isIOS) {
+      // ✅ iOS: Check for JSON file shared via "Open In"
+      _checkForIOSSharedFile();
+    }
 
-    //  Step 2: Handle cold start with a shared JSON file
+    // ✅ Handle cold start with a shared JSON file
     if (widget.initialJsonFilePath != null) {
       _jsonFilePath = widget.initialJsonFilePath;
 
-      // Delay execution until UI is built
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted || _jsonFilePath == null) return;
 
         bool outOfSync = await _checkSyncStatus();
-
         if (outOfSync) {
           bool confirmProceed = await _showUnsavedChangesDialog(context);
           if (!confirmProceed) {
@@ -203,6 +215,17 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
   }
+
+  void _checkForIOSSharedFile() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? sharedJsonPath = prefs.getString("sharedJsonFile");
+
+    if (sharedJsonPath != null) {
+      prefs.remove("sharedJsonFile"); // Clear after retrieving
+      _handleIncomingFile(sharedJsonPath);
+    }
+  }
+
 
   void _handleIncomingFile(String filePath) async {
     if (!mounted) return;

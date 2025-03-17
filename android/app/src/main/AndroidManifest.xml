@@ -32,17 +32,21 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
-            <!-- Add JSON file handling -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
 
-                <!-- Accept JSON files -->
+                <!-- Accept JSON files (even if misclassified as text/plain) -->
                 <data android:mimeType="application/json"/>
+                <data android:mimeType="text/plain"/>
+
+                <!-- Allow file opening from different sources -->
                 <data android:scheme="content"/>
                 <data android:scheme="file"/>
+                <data android:host="*" />
             </intent-filter>
+
 
         </activity>
         <!-- Don't delete the meta-data below.
