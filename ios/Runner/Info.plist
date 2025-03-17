@@ -5,7 +5,7 @@
     <key>CFBundleDisplayName</key>
     <string>Fire Manifesting</string>
 
-    <!-- ✅ JSON File Handling for "Open In" -->
+    <!-- JSON File Handling for "Open In" -->
     <key>CFBundleDocumentTypes</key>
     <array>
         <dict>
@@ -14,24 +14,26 @@
             <key>LSItemContentTypes</key>
             <array>
                 <string>public.json</string>
-                <string>public.data</string>  <!-- ✅ Extra compatibility -->
+                <string>public.text</string>  <!-- Extra compatibility for text-based formats -->
             </array>
             <key>CFBundleTypeRole</key>
-            <string>Editor</string>  <!-- ✅ Editor role ensures your app can modify the file -->
+            <string>Editor</string>  <!-- Ensures your app is listed as an editor -->
             <key>LSHandlerRank</key>
-            <string>Owner</string>   <!-- ✅ Prefer your app over others -->
+            <string>Owner</string>   <!-- Prioritize your app over others -->
         </dict>
     </array>
 
-    <!-- ✅ Allows opening files in place (Google Drive, Files, etc.) -->
+    <!-- Fix: Ensure proper file handling and "Open In" support -->
     <key>LSSupportsOpeningDocumentsInPlace</key>
     <true/>
 
-    <!-- ✅ Universal File Opening Support -->
+    <!-- Enable "Open In" and file sharing -->
     <key>UIFileSharingEnabled</key>
     <true/>
-    <key>UISupportsDocumentBrowser</key>
-    <true/>
+
+    <!-- Required for correct bundle type -->
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
 
     <key>CFBundleIdentifier</key>
     <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
@@ -42,9 +44,17 @@
     <key>LSRequiresIPhoneOS</key>
     <true/>
 
-    <!-- ✅ Required to access files -->
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+
+    <!-- Required for file access -->
     <key>NSDocumentsDirectoryUsageDescription</key>
     <string>This app needs access to documents to allow file sharing.</string>
+    
+    <!-- **Fix for App Store Warning** -->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>This app allows users to select files, which may include images, from their device.</string>
+
 
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
@@ -53,11 +63,17 @@
     <key>UIStatusBarHidden</key>
     <false/>
 
+    <!-- Fix: Ensure proper iPad multitasking support -->
     <key>UISupportedInterfaceOrientations</key>
     <array>
         <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>  <!-- Required for iPad -->
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
+
+    <key>CADisableMinimumFrameDurationOnPhone</key>
+    <true/>
 </dict>
 </plist>
+    
