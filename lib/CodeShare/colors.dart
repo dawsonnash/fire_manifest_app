@@ -88,7 +88,7 @@ class AppData {
   // **Dynamic Widths (Orientation+ScreenSize-Dependent)**
   static double get inputFieldWidth => isLandscape ? (screenWidth * 0.50) : (double.infinity);
   static double get buttonWidth => isLandscape ? (screenWidth * 0.2) : (screenWidth * 0.4);
-  static double get termsAndConditionsWidth => isLandscape ? (screenWidth * 0.35) : (screenWidth * 0.75);
+  static double get termsAndConditionsWidth => isLandscape ? (screenWidth * 0.35) : (screenWidth * 1);
   static double get selectionDialogWidth => isLandscape ? (screenWidth * 0.5) : (screenWidth * 0.8);
   static double get miniSelectionDialogWidth => isLandscape ? (screenWidth * 0.4) : (screenWidth * 0.7);
   static double get quickGuideImageWidth => isLandscape ? screenWidth * 0.3 : screenWidth * 0.9;
