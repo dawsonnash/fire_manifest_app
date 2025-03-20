@@ -654,7 +654,7 @@ class _EditGearState extends State<EditGear> {
                                 int? weight = int.tryParse(value);
                                 setState(() {
                                   if (weight == 0) {
-                                    quantityErrorMessage = 'Weight must be greater than 0.';
+                                    quantityErrorMessage = 'Quantity must be greater than 0.';
                                   }
                                   else{
                                     quantityErrorMessage = null;

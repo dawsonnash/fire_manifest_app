@@ -234,6 +234,8 @@ class _QuickManifestState extends State<QuickManifest> {
           quantity: gear.quantity,
           weight: gear.weight,
           isPersonalTool: gear.isPersonalTool,
+          isHazmat: gear.isHazmat,
+
         );
       }).toList();
       gearListExternal = gearBox.values.map((gear) {
@@ -242,6 +244,8 @@ class _QuickManifestState extends State<QuickManifest> {
           quantity: gear.quantity,
           weight: gear.weight,
           isPersonalTool: gear.isPersonalTool,
+          isHazmat: gear.isHazmat,
+
         );
       }).toList();
 
@@ -370,38 +374,47 @@ class _QuickManifestState extends State<QuickManifest> {
                                   int remainingQuantity = gear.quantity - (selectedGearQuantitiesExternal[gear] ?? 0);
 
                                   return Container(
-                                    color: AppColors.textFieldColor2,
+                                    color: AppColors.gearYellow,
                                     child: CheckboxListTile(
-                                      activeColor: AppColors.textColorPrimary,
-                                      // Checkbox outline color when active
-                                      checkColor: AppColors.textColorSecondary,
-                                      side: BorderSide(
-                                        color: AppColors.textColorPrimary, // Outline color
-                                        width: 2.0, // Outline width
-                                      ),
+
                                       title: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
-                                            child: Row(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Flexible(
-                                                  child: Text(
-                                                    gear.name,
-                                                    style: TextStyle(
-                                                      fontSize: AppData.text16,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: AppColors.textColorPrimary,
+                                                Row(
+                                                  children: [
+
+                                                    Flexible(
+                                                      child: Text(
+                                                        gear.name,
+                                                        style: TextStyle(
+                                                          fontSize: AppData.text16,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
                                                     ),
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
+                                                    if (gear.isHazmat == true)
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(left: 4.0),
+                                                        child: Icon(
+                                                          FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                          color: Colors.red, // Red color for hazard
+                                                          size: 14, // Icon size
+                                                        ),
+                                                      ),
+
+                                                  ],
                                                 ),
                                                 Text(
-                                                  ' (x$remainingQuantity)  ',
+                                                  '${gear.weight} lb x$remainingQuantity',
                                                   style: TextStyle(
-                                                    fontSize: AppData.text12,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: AppColors.textColorPrimary,
+                                                    fontSize: 14,
+                                                    color: Colors.black,
                                                   ),
                                                 ),
                                               ],
@@ -478,13 +491,13 @@ class _QuickManifestState extends State<QuickManifest> {
                                                         style: TextStyle(
                                                           fontWeight: FontWeight.bold,
                                                           fontSize: AppData.text14,
-                                                          color: AppColors.textColorPrimary,
+                                                          color: Colors.black,
                                                         ),
                                                       ),
                                                     if (gear.quantity > 1)
                                                       Icon(
                                                         Icons.arrow_drop_down,
-                                                        color: AppColors.textColorPrimary,
+                                                        color: Colors.black,
                                                         size: AppData.dropDownArrowSize,
                                                       ),
                                                   ],
@@ -563,6 +576,8 @@ class _QuickManifestState extends State<QuickManifest> {
                           quantity: selectedQuantity,
                           weight: gear.weight,
                           isPersonalTool: gear.isPersonalTool,
+                          isHazmat: gear.isHazmat,
+
                         );
                       }).toList();
                     }
@@ -796,19 +811,12 @@ class _QuickManifestState extends State<QuickManifest> {
                               body: Column(
                                 children: [
                                   Container(
-                                    color: AppColors.textFieldColor2,
+                                    color: AppColors.gearYellow,
                                     child: CheckboxListTile(
-                                      activeColor: AppColors.textColorPrimary,
-                                      // Checkbox outline color when active
-                                      checkColor: AppColors.textColorSecondary,
-                                      side: BorderSide(
-                                        color: AppColors.textColorPrimary, // Outline color
-                                        width: 2.0, // Outline width
-                                      ),
                                       // Checkmark color
                                       title: Text(
                                         'Select All',
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text16, color: Colors.black),
                                       ),
                                       value: isSelectAllCheckedGear,
                                       onChanged: (bool? isChecked) {
@@ -839,39 +847,49 @@ class _QuickManifestState extends State<QuickManifest> {
 
                                       return Container(
                                         //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
-                                        color: AppColors.textFieldColor2,
+                                        color: AppColors.gearYellow,
 
                                         child: CheckboxListTile(
-                                          activeColor: AppColors.textColorPrimary,
-                                          // Checkbox outline color when active
-                                          checkColor: AppColors.textColorSecondary,
-                                          side: BorderSide(
-                                            color: AppColors.textColorPrimary, // Outline color
-                                            width: 2.0, // Outline width
-                                          ),
+
+
                                           title: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Expanded(
-                                                child: Row(
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    Flexible(
-                                                      child: Text(
-                                                        gear.name,
-                                                        style: TextStyle(
-                                                          fontSize: AppData.text16,
-                                                          fontWeight: FontWeight.bold,
-                                                          color: AppColors.textColorPrimary,
+                                                    Row(
+                                                      children: [
+
+                                                        Flexible(
+                                                          child: Text(
+                                                            gear.name,
+                                                            style: TextStyle(
+                                                              fontSize: AppData.text16,
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                            overflow: TextOverflow.ellipsis,
+                                                          ),
                                                         ),
-                                                        overflow: TextOverflow.ellipsis,
-                                                      ),
+                                                        if (gear.isHazmat == true)
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(left: 4.0),
+                                                            child: Icon(
+                                                              FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                              color: Colors.red, // Red color for hazard
+                                                              size: 14, // Icon size
+                                                            ),
+                                                          ),
+
+                                                      ],
                                                     ),
                                                     Text(
-                                                      ' (x$remainingQuantity)  ',
+                                                      '${gear.weight} lb x$remainingQuantity',
                                                       style: TextStyle(
-                                                        fontSize: AppData.text12,
-                                                        fontWeight: FontWeight.bold,
-                                                        color: AppColors.textColorPrimary,
+                                                        fontSize: 14,
+                                                        color: Colors.black,
                                                       ),
                                                     ),
                                                   ],
@@ -948,13 +966,13 @@ class _QuickManifestState extends State<QuickManifest> {
                                                             style: TextStyle(
                                                               fontWeight: FontWeight.bold,
                                                               fontSize: AppData.text14,
-                                                              color: AppColors.textColorPrimary,
+                                                              color: Colors.black,
                                                             ),
                                                           ),
                                                         if (gear.quantity > 1)
                                                           Icon(
                                                             Icons.arrow_drop_down,
-                                                            color: AppColors.textColorPrimary,
+                                                            color: Colors.black,
                                                             size: AppData.dropDownArrowSize,
                                                           ),
                                                       ],
@@ -1042,6 +1060,7 @@ class _QuickManifestState extends State<QuickManifest> {
                           quantity: selectedQuantity,
                           weight: gear.weight,
                           isPersonalTool: gear.isPersonalTool,
+                          isHazmat: gear.isHazmat,
                         );
                       }).toList();
                     }
