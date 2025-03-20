@@ -29,6 +29,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
 
   late final Box<Gear> personalToolsBox;
   List<Gear> personalToolsList = [];
+  String? weightErrorMessage;
 
   // Variables to store user input
   late TextEditingController nameController;
@@ -524,6 +525,20 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                               ],
                               keyboardType: TextInputType.number,
                               // Only show numeric keyboard
+                              onChanged: (value) {
+                                int? weight = int.tryParse(value);
+                                setState(() {
+                                  // Validate the input and set error message
+                                  if (weight! > 500) {
+                                    weightErrorMessage = 'Weight must be less than 500.';
+                                  } else if (weight == 0) {
+                                    weightErrorMessage = 'Weight must be greater than 0.';
+                                  }
+                                  else{
+                                    weightErrorMessage = null;
+                                  }
+                                });
+                              },
 
                               decoration: InputDecoration(
                                 labelText: 'Edit flight weight',
@@ -532,6 +547,8 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                   fontSize: 22,
                                   //fontWeight: FontWeight.bold,
                                 ),
+                                errorText: weightErrorMessage,
+
                                 hintText: 'Up to 500 lb',
                                 hintStyle: TextStyle(
                                   color: AppColors.textColorPrimary,

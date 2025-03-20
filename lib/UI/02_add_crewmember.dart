@@ -18,6 +18,7 @@ class AddCrewmember extends StatefulWidget {
 class _AddCrewmemberState extends State<AddCrewmember> {
   late final Box<Gear> personalToolsBox;
   List<Gear> personalToolsList = [];
+  String? weightErrorMessage;
 
   // Variables to store user input
   final TextEditingController nameController = TextEditingController();
@@ -340,6 +341,21 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                 LengthLimitingTextInputFormatter(3),
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
+                              onChanged: (value) {
+                                int? weight = int.tryParse(value);
+                                setState(() {
+                                  // Validate the input and set error message
+                                  if (weight! > 500) {
+                                    weightErrorMessage = 'Weight must be less than 500.';
+                                  } else if (weight == 0) {
+                                    weightErrorMessage = 'Weight must be greater than 0.';
+                                  }
+                                  else{
+                                    weightErrorMessage = null;
+                                  }
+                                });
+                              },
+
                               decoration: InputDecoration(
                                 labelText: 'Flight Weight',
                                 hintText: 'Up to 500 lb',
@@ -347,6 +363,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                   color: AppColors.textColorPrimary,
                                   fontSize: 20,
                                 ),
+                                errorText: weightErrorMessage,
                                 labelStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
                                   fontSize: 22,

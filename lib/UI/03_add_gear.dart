@@ -18,6 +18,8 @@ class AddGear extends StatefulWidget {
 class _AddGearState extends State<AddGear> {
   late final Box<Gear> personalToolsBox;
   List<Gear> personalToolsList = [];
+  String? weightErrorMessage;
+  String? quantityErrorMessage;
 
   // Variables to store user input
   final TextEditingController gearNameController = TextEditingController();
@@ -520,6 +522,20 @@ class _AddGearState extends State<AddGear> {
                                       FilteringTextInputFormatter.digitsOnly,
                                       // Allow only digits
                                     ],
+                                    onChanged: (value) {
+                                      int? weight = int.tryParse(value);
+                                      setState(() {
+                                        // Validate the input and set error message
+                                        if (weight! > 500) {
+                                          weightErrorMessage = 'Weight must be less than 500.';
+                                        } else if (weight == 0) {
+                                          weightErrorMessage = 'Weight must be greater than 0.';
+                                        }
+                                        else{
+                                          weightErrorMessage = null;
+                                        }
+                                      });
+                                    },
                                     decoration: InputDecoration(
                                       labelText: 'Weight',
                                       hintText: 'Up to 500 lb',
@@ -527,6 +543,8 @@ class _AddGearState extends State<AddGear> {
                                         color: AppColors.textColorPrimary,
                                         fontSize: 20,
                                       ),
+                                      errorText: weightErrorMessage,
+
                                       labelStyle: TextStyle(
                                         color: AppColors.textColorPrimary,
                                         fontSize: 22,
@@ -569,6 +587,17 @@ class _AddGearState extends State<AddGear> {
                                       LengthLimitingTextInputFormatter(2),
                                       FilteringTextInputFormatter.digitsOnly,
                                     ],
+                                    onChanged: (value) {
+                                      int? weight = int.tryParse(value);
+                                      setState(() {
+                                      if (weight == 0) {
+                                          quantityErrorMessage = 'Weight must be greater than 0.';
+                                        }
+                                        else{
+                                        quantityErrorMessage = null;
+                                        }
+                                      });
+                                    },
                                     decoration: InputDecoration(
                                       labelText: 'Quantity',
                                       hintText: 'Up to 99',
@@ -576,6 +605,7 @@ class _AddGearState extends State<AddGear> {
                                         color: AppColors.textColorPrimary,
                                         fontSize: 20,
                                       ),
+                                      errorText: quantityErrorMessage,
                                       labelStyle: TextStyle(
                                         color: AppColors.textColorPrimary,
                                         fontSize: 22,
@@ -907,10 +937,8 @@ class _AddGearState extends State<AddGear> {
                                             final selectedGear = irpgItems.firstWhere(
                                               (item) => item['name'] == selectedGearName,
                                             );
-                                            if (selectedGear != null) {
-                                              selectedGear['hazmat'] = value; // Update the isHazmat attribute
-                                            }
-                                          });
+                                            selectedGear['hazmat'] = value; // Update the isHazmat attribute
+                                                                                    });
                                         },
                                         activeColor: Colors.red,
                                         inactiveThumbColor: AppColors.textColorPrimary,

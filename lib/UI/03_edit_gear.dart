@@ -26,6 +26,8 @@ class EditGear extends StatefulWidget {
 class _EditGearState extends State<EditGear> {
   late final Box<Gear> personalToolsBox;
   List<Gear> personalToolsList = [];
+  String? weightErrorMessage;
+  String? quantityErrorMessage;
 
   // Variables to store user input
   late TextEditingController gearNameController;
@@ -584,6 +586,20 @@ class _EditGearState extends State<EditGear> {
                                 LengthLimitingTextInputFormatter(3),
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
+                              onChanged: (value) {
+                                int? weight = int.tryParse(value);
+                                setState(() {
+                                  // Validate the input and set error message
+                                  if (weight! > 500) {
+                                    weightErrorMessage = 'Weight must be less than 500.';
+                                  } else if (weight == 0) {
+                                    weightErrorMessage = 'Weight must be greater than 0.';
+                                  }
+                                  else{
+                                    weightErrorMessage = null;
+                                  }
+                                });
+                              },
                               decoration: InputDecoration(
                                 labelText: 'Edit weight',
                                 hintText: 'Up to 500 lb',
@@ -591,6 +607,7 @@ class _EditGearState extends State<EditGear> {
                                   color: AppColors.textColorPrimary,
                                   fontSize: 20,
                                 ),
+                                errorText: weightErrorMessage,
                                 labelStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
                                   fontSize: 22,
@@ -633,6 +650,17 @@ class _EditGearState extends State<EditGear> {
                                 LengthLimitingTextInputFormatter(2),
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
+                              onChanged: (value) {
+                                int? weight = int.tryParse(value);
+                                setState(() {
+                                  if (weight == 0) {
+                                    quantityErrorMessage = 'Weight must be greater than 0.';
+                                  }
+                                  else{
+                                    quantityErrorMessage = null;
+                                  }
+                                });
+                              },
                               decoration: InputDecoration(
                                 labelText: 'Edit quantity',
                                 hintText: 'Up to 99',
@@ -640,6 +668,7 @@ class _EditGearState extends State<EditGear> {
                                   color: AppColors.textColorPrimary,
                                   fontSize: 20,
                                 ),
+                                errorText: quantityErrorMessage,
                                 labelStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
                                   fontSize: 22,
