@@ -1612,6 +1612,7 @@ class _SettingsState extends State<SettingsView> {
                                                 inputFormatters: [
                                                   LengthLimitingTextInputFormatter(30),
                                                 ],
+                                                textCapitalization: TextCapitalization.words,
                                                 decoration: InputDecoration(
                                                   hintText: 'Enter Crew Name',
                                                   hintStyle: const TextStyle(color: Colors.white54),
@@ -1669,6 +1670,7 @@ class _SettingsState extends State<SettingsView> {
                                                 inputFormatters: [
                                                   LengthLimitingTextInputFormatter(30),
                                                 ],
+                                                textCapitalization: TextCapitalization.words,
                                                 decoration: InputDecoration(
                                                   hintText: 'Enter Your Name',
                                                   hintStyle: const TextStyle(color: Colors.white54),
