@@ -1,0 +1,2 @@
+C:/Users/dawso/AndroidStudioProjects/fire_app/android/app/.cxx/RelWithDebInfo/4v3b414v/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/dawso/AndroidStudioProjects/fire_app/android/app/.cxx/RelWithDebInfo/4v3b414v/x86_64/CMakeFiles/rebuild_cache.dir
