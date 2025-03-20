@@ -6,7 +6,6 @@ import 'package:fire_app/Data/load_accoutrement_manager.dart';
 import 'package:fire_app/UI/05_create_new_manifest.dart';
 import 'package:fire_app/UI/06_saved_trips.dart';
 import 'package:fire_app/UI/settings.dart';
-import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -36,24 +35,15 @@ final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<Scaffol
 void main() async {
   // Set up for Hive that needs to run before starting app
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Declare a variable to store the initial file path
   String? initialJsonFilePath;
 
-  if (defaultTargetPlatform == TargetPlatform.android) {
-    // Android: Use ReceiveSharingIntent
-    List<SharedMediaFile> sharedFiles = await ReceiveSharingIntent.instance.getInitialMedia();
-    if (sharedFiles.isNotEmpty) {
-      initialJsonFilePath = sharedFiles.first.path;
-    }
-  } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-    // iOS: Retrieve "Open In" file from UserDefaults
-    final userDefaults = await SharedPreferences.getInstance();
-    initialJsonFilePath = userDefaults.getString("sharedJsonFile");
-
-    if (initialJsonFilePath != null) {
-      await userDefaults.remove("sharedJsonFile"); //  Clear after retrieving
-    }
+  // Retrieve the file path before Flutter initializes
+  List<SharedMediaFile> sharedFiles = await ReceiveSharingIntent.instance.getInitialMedia();
+  if (sharedFiles.isNotEmpty) {
+    initialJsonFilePath = sharedFiles.first.path;
   }
-
 
   // Disable Impeller
   PlatformDispatcher.instance.onPlatformConfigurationChanged = null;
@@ -149,26 +139,27 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0; // To track the currently selected tab
+  bool _isLoading = true; // Show loading screen initially for opening JSONs on cold start
 
   // Use a getter to dynamically create the pages list
   List<Widget> get _pages => [
-        CreateNewManifest(onSwitchTab: _onItemTapped), // Pass the callback
-        SavedTripsView(),
-        EditCrew(
-        ),
-        SettingsView(
-          isDarkMode: AppColors.isDarkMode,
-          enableBackgroundImage: AppColors.enableBackgroundImage,
-          crewName: AppData.crewName,
-          userName: AppData.userName,
-          safetyBuffer: AppData.safetyBuffer,
-          onThemeChanged: _toggleTheme,
-          onBackgroundImageChange: _toggleBackgroundImage,
-          onCrewNameChanged: _changeCrewName,
-          onUserNameChanged: _changeUserName,
-          onSafetyBufferChange: _changeSafetyBuffer,
-        ),
-      ];
+    CreateNewManifest(onSwitchTab: _onItemTapped), // Pass the callback
+    SavedTripsView(),
+    EditCrew(
+    ),
+    SettingsView(
+      isDarkMode: AppColors.isDarkMode,
+      enableBackgroundImage: AppColors.enableBackgroundImage,
+      crewName: AppData.crewName,
+      userName: AppData.userName,
+      safetyBuffer: AppData.safetyBuffer,
+      onThemeChanged: _toggleTheme,
+      onBackgroundImageChange: _toggleBackgroundImage,
+      onCrewNameChanged: _changeCrewName,
+      onUserNameChanged: _changeUserName,
+      onSafetyBufferChange: _changeSafetyBuffer,
+    ),
+  ];
 
   StreamSubscription<List<SharedMediaFile>>? _intentSubscription; // Store the subscription
   String? _jsonFilePath;
@@ -181,29 +172,32 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _loadLoadoutNames();
 
-    if (Platform.isAndroid) {
-      // ✅ Android: Listen for shared files while the app is running
-      _intentSubscription = ReceiveSharingIntent.instance.getMediaStream().listen(
-            (List<SharedMediaFile> value) {
-          if (value.isNotEmpty) {
-            _handleIncomingFile(value.first.path);
-          }
-        },
-        onError: (err) {},
-      );
-    } else if (Platform.isIOS) {
-      // ✅ iOS: Check for JSON file shared via "Open In"
-      _checkForIOSSharedFile();
-    }
+    // Step 1: Listen for shared files while the app is running
+    _intentSubscription = ReceiveSharingIntent.instance.getMediaStream().listen(
+          (List<SharedMediaFile> value) {
+        if (value.isNotEmpty) {
+          _handleIncomingFile(value.first.path);  // Ensures sync check happens
+        }
+      },
+      onError: (err) {},
+    );
 
-    // ✅ Handle cold start with a shared JSON file
+    // Step 2: Handle cold start with a shared JSON file
     if (widget.initialJsonFilePath != null) {
       _jsonFilePath = widget.initialJsonFilePath;
 
+      // Delay execution until UI is built
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted || _jsonFilePath == null) return;
 
+        // Show loading indicator
+        _showLoadingDialog();
+
         bool outOfSync = await _checkSyncStatus();
+
+        // Hide loading indicator
+        Navigator.of(context).pop();
+
         if (outOfSync) {
           bool confirmProceed = await _showUnsavedChangesDialog(context);
           if (!confirmProceed) {
@@ -216,16 +210,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _checkForIOSSharedFile() async {
-    final prefs = await SharedPreferences.getInstance();
-    String? sharedJsonPath = prefs.getString("sharedJsonFile");
-
-    if (sharedJsonPath != null) {
-      prefs.remove("sharedJsonFile"); // Clear after retrieving
-      _handleIncomingFile(sharedJsonPath);
-    }
-  }
-
 
   void _handleIncomingFile(String filePath) async {
     if (!mounted) return;
@@ -234,17 +218,25 @@ class _MyHomePageState extends State<MyHomePage> {
       _jsonFilePath = filePath;
     });
 
+    // Show loading indicator
+    _showLoadingDialog();
 
-    // Delay execution until the UI has settled
     await Future.delayed(Duration(milliseconds: 300));
 
     // Check sync status before proceeding
     bool outOfSync = await _checkSyncStatus();
 
-    // Delay again to prevent UI sync issues
-    await Future.delayed(Duration(milliseconds: 200));
+    // Hide loading indicator
+    Navigator.of(context).pop(); // Close the loading dialog
 
-    // Proceed to prompt for new loadout name
+    if (outOfSync) {
+      bool confirmProceed = await _showUnsavedChangesDialog(context);
+      if (!confirmProceed) {
+        return; // Stop if user cancels
+      }
+    }
+
+    // Now proceed to prompt for a new loadout name
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _promptNewLoadoutName();
@@ -252,6 +244,33 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+// Show a loading dialog while checking sync status
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent user from closing it manually
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.8),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(color: Colors.white),
+                SizedBox(height: 10),
+                Text("Checking sync status...", style: TextStyle(color: Colors.white)),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
 
 
@@ -361,14 +380,12 @@ class _MyHomePageState extends State<MyHomePage> {
     String? lastUsedLoadout = prefs.getString('last_selected_loadout');
 
     if (lastUsedLoadout == null) {
-      print("🚨 No previously saved loadout found. Marking as out of sync.");
       return true;
     }
 
     Map<String, dynamic>? lastSavedData = await CrewLoadoutStorage.loadLoadout(lastUsedLoadout);
 
     if (lastSavedData == null) {
-      print("🚨 No saved data for $lastUsedLoadout - marking as out of sync.");
       return true;
     }
 
@@ -389,12 +406,9 @@ class _MyHomePageState extends State<MyHomePage> {
     bool preferencesDiffers = (lastSavedPreferencesJson != currentPreferencesJson);
 
     if (crewDiffers || preferencesDiffers) {
-      print("⚠ Crew Data Differs: $crewDiffers");
-      print("⚠ Preferences Data Differs: $preferencesDiffers");
       return true; // Data is out of sync
     }
 
-    print("✅ Data is IN SYNC.");
     return false;
   }
 
@@ -780,10 +794,10 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
                         padding: const EdgeInsets.all(16.0),
                         child:  Text(
                           'The calculations provided by this app are intended for informational purposes only. '
-                          'While every effort has been made to ensure accuracy, users must independently verify and validate '
-                          'all data before relying on it for operational or decision-making purposes. The developers assume no '
-                          'liability for errors, omissions, or any outcomes resulting from the use of this app. By continuing, '
-                          'you acknowledge and accept full responsibility for reviewing and confirming all calculations.',
+                              'While every effort has been made to ensure accuracy, users must independently verify and validate '
+                              'all data before relying on it for operational or decision-making purposes. The developers assume no '
+                              'liability for errors, omissions, or any outcomes resulting from the use of this app. By continuing, '
+                              'you acknowledge and accept full responsibility for reviewing and confirming all calculations.',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: AppData.text22,
@@ -827,13 +841,13 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
                       child: ElevatedButton(
                         onPressed: userAgreed
                             ? () async {
-                                SharedPreferences prefs = await SharedPreferences.getInstance();
-                                await prefs.setBool('agreedToTerms', true);
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const MyHomePage()),
-                                );
-                              }
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          await prefs.setBool('agreedToTerms', true);
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const MyHomePage()),
+                          );
+                        }
                             : null,
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
@@ -877,7 +891,7 @@ Future<void> updateAllTripPreferencesFromBoxes() async {
         if (member is CrewMember) {
           // Match by name and update attributes
           var updatedMember = crewMemberBox.values.firstWhere(
-            (cm) => cm.name == member.name,
+                (cm) => cm.name == member.name,
             orElse: () => member, // Fallback to the current member if not found
           );
 
@@ -886,7 +900,7 @@ Future<void> updateAllTripPreferencesFromBoxes() async {
           // If it's a group (like a Saw Team), update each member
           for (int j = 0; j < member.length; j++) {
             var updatedMember = crewMemberBox.values.firstWhere(
-              (cm) => cm.name == member[j].name,
+                  (cm) => cm.name == member[j].name,
               orElse: () => member[j],
             );
             member[j] = updatedMember;
@@ -902,7 +916,7 @@ Future<void> updateAllTripPreferencesFromBoxes() async {
 
         // Match by name and update attributes
         var updatedGear = gearBox.values.firstWhere(
-          (g) => g.name == gearItem.name,
+              (g) => g.name == gearItem.name,
           orElse: () => gearItem, // Fallback to the current gear if not found
         );
 
