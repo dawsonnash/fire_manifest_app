@@ -1,13 +1,14 @@
 import 'dart:ui';
+
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+
 import '../../Data/crew.dart';
 import '../../Data/crewmember.dart';
-import 'package:hive/hive.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../CodeShare/keyboardActions.dart';
 import '../CodeShare/variables.dart';
 import '../Data/gear.dart';
@@ -28,7 +29,6 @@ class EditCrewmember extends StatefulWidget {
 }
 
 class _EditCrewmemberState extends State<EditCrewmember> {
-
   late final Box<Gear> personalToolsBox;
   List<Gear> personalToolsList = [];
   String? weightErrorMessage;
@@ -102,6 +102,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
 
     addedTools = List.from(widget.crewMember.personalTools ?? []);
   }
+
   // Function to load the list of tool items from the Hive box
   void loadPersonalToolsList() {
     setState(() {
@@ -126,23 +127,23 @@ class _EditCrewmemberState extends State<EditCrewmember> {
 
     // Find the selected tool in the personalToolsList
     final Gear selectedGear = personalToolsList.firstWhere(
-          (tool) => tool.name == toolName,
+      (tool) => tool.name == toolName,
       orElse: () => Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true, isHazmat: false),
     );
 
     // Check for duplicate tool names
     final bool isDuplicate = addedTools?.any(
           (tool) => tool.name.toLowerCase() == toolName.toLowerCase(),
-    ) ??
+        ) ??
         false;
 
     if (isDuplicate) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+          SnackBar(
           content: Center(
             child: Text(
               'Tool Already Added',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.black),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text28, color: Colors.black),
             ),
           ),
           backgroundColor: Colors.red,
@@ -185,11 +186,10 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     final isNameValid = nameController.text.isNotEmpty;
     final isFlightWeightValid = flightWeightController.text.isNotEmpty && int.tryParse(flightWeightController.text) != null;
     final isNameChanged = nameController.text != oldCrewMemberName;
-    final isFlightWeightChanged =
-        int.tryParse(flightWeightController.text) != null && // Ensure valid input
-            int.parse(flightWeightController.text) > 0 &&       // Greater than zero
-            int.parse(flightWeightController.text) < 500 &&     // Less than 500
-            int.parse(flightWeightController.text) != oldCrewMemberFlightWeight;
+    final isFlightWeightChanged = int.tryParse(flightWeightController.text) != null && // Ensure valid input
+        int.parse(flightWeightController.text) > 0 && // Greater than zero
+        int.parse(flightWeightController.text) < 500 && // Less than 500
+        int.parse(flightWeightController.text) != oldCrewMemberFlightWeight;
     final isPositionChanged = (selectedPosition ?? -1) != oldCrewMemberPosition; // Assuming -1 as an invalid/initial value
 
     final areToolsChanged = !compareLists(oldCrewMemberTools.cast<Gear>(), addedTools);
@@ -208,20 +208,19 @@ class _EditCrewmemberState extends State<EditCrewmember> {
 
     // Check if new crew member name already exists
     bool crewMemberNameExists = crew.crewMembers.any(
-          (member) => member.name.toLowerCase() == newCrewMemberName.toLowerCase() &&
-          member.name.toLowerCase() != originalCrewMemberName.toLowerCase(),
+      (member) => member.name.toLowerCase() == newCrewMemberName.toLowerCase() && member.name.toLowerCase() != originalCrewMemberName.toLowerCase(),
     );
 
     if (crewMemberNameExists) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+          SnackBar(
           content: Center(
             child: Text(
               'Crew member name already used!',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.black,
-                fontSize: 28,
+                fontSize: AppData.text28,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -242,7 +241,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     savedPreferences.updateCrewMemberInPreferences(originalCrewMemberName, originalCrewMemberPosition, widget.crewMember);
 
     final key = crewmemberBox.keys.firstWhere(
-          (key) => crewmemberBox.get(key) == widget.crewMember,
+      (key) => crewmemberBox.get(key) == widget.crewMember,
       orElse: () => null,
     );
 
@@ -259,18 +258,18 @@ class _EditCrewmemberState extends State<EditCrewmember> {
 
     // Show confirmation message
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Center(
           child: Text(
             'Crew Member Updated!',
             style: TextStyle(
               color: Colors.black,
-              fontSize: 32,
+              fontSize: AppData.text32,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        duration: Duration(seconds: 1),
+        duration: const Duration(seconds: 1),
         backgroundColor: Colors.green,
       ),
     );
@@ -283,7 +282,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     // Main theme button style
     final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
-        textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        textStyle: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold),
         backgroundColor: Colors.deepOrangeAccent,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         //surfaceTintColor: Colors.grey,
@@ -309,9 +308,9 @@ class _EditCrewmemberState extends State<EditCrewmember> {
             Navigator.of(context).pop(); // Navigate back when pressed
           },
         ),
-        title:  Text(
+        title: Text(
           'Edit Crew Member',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
           IconButton(
@@ -351,18 +350,20 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context).pop(); // Close the dialog without deleting
-
                                         },
                                         child: Text(
                                           'Cancel',
-                                          style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize,),
+                                          style: TextStyle(
+                                            color: AppColors.cancelButton,
+                                            fontSize: AppData.bottomDialogTextSize,
+                                          ),
                                         ),
                                       ),
                                       TextButton(
                                         onPressed: () {
                                           // Remove item from the Hive box
                                           final keyToRemove = crewmemberBox.keys.firstWhere(
-                                                (key) => crewmemberBox.get(key) == widget.crewMember,
+                                            (key) => crewmemberBox.get(key) == widget.crewMember,
                                             orElse: () => null,
                                           );
 
@@ -382,9 +383,9 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                                 child: Text(
                                                   '$oldCrewMemberName Deleted!',
                                                   // Maybe change look
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     color: Colors.black,
-                                                    fontSize: 32,
+                                                    fontSize: AppData.text32,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
@@ -397,7 +398,6 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                           Navigator.of(context).pop(); // Dismiss the dialog
                                           Navigator.of(context).pop(); // Return to previous screen
                                         },
-
                                         child: Text(
                                           'Delete',
                                           style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
@@ -440,34 +440,34 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                     color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
                     child: AppColors.isDarkMode
                         ? (AppColors.enableBackgroundImage
-                        ? Stack(
-                      children: [
-                        ImageFiltered(
-                          imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                          child: Image.asset(
-                            'assets/images/logo1.png',
-                            fit: BoxFit.cover, // Cover the entire background
-                            width: double.infinity,
-                            height: double.infinity,
-                          ),
-                        ),
-                        Container(
-                          color: AppColors.logoImageOverlay, // Semi-transparent overlay
-                          width: double.infinity,
-                          height: double.infinity,
-                        ),
-                      ],
-                    )
-                        : null) // No image if background is disabled
+                            ? Stack(
+                                children: [
+                                  ImageFiltered(
+                                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                                    child: Image.asset(
+                                      'assets/images/logo1.png',
+                                      fit: BoxFit.cover, // Cover the entire background
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                    ),
+                                  ),
+                                  Container(
+                                    color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  ),
+                                ],
+                              )
+                            : null) // No image if background is disabled
                         : ImageFiltered(
-                      imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
-                      child: Image.asset(
-                        'assets/images/logo1.png',
-                        fit: BoxFit.cover, // Cover the entire background
-                        width: double.infinity,
-                        height: double.infinity,
-                      ),
-                    ),
+                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+                            child: Image.asset(
+                              'assets/images/logo1.png',
+                              fit: BoxFit.cover, // Cover the entire background
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
                   ),
 
                   Container(
@@ -490,13 +490,13 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                 labelText: 'Edit name',
                                 labelStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
-                                  fontSize: 22,
+                                  fontSize: AppData.text22,
                                   //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
                                 fillColor: AppColors.textFieldColor,
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide:  BorderSide(
+                                  borderSide: BorderSide(
                                     color: AppColors.borderPrimary,
                                     // Border color when the TextField is not focused
                                     width: 2.0, // Border width
@@ -504,7 +504,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                   borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide:  BorderSide(
+                                  borderSide: BorderSide(
                                     color: AppColors.primaryColor,
                                     // Border color when the TextField is focused
                                     width: 2.0, // Border width
@@ -512,9 +512,9 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
                               ),
-                              style:  TextStyle(
+                              style: TextStyle(
                                 color: AppColors.textColorPrimary,
-                                fontSize: 28,
+                                fontSize: AppData.text28,
                               ),
                             )),
 
@@ -546,8 +546,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                       weightErrorMessage = 'Weight must be less than 500.';
                                     } else if (weight == 0) {
                                       weightErrorMessage = 'Weight must be greater than 0.';
-                                    }
-                                    else{
+                                    } else {
                                       weightErrorMessage = null;
                                     }
                                   });
@@ -555,13 +554,12 @@ class _EditCrewmemberState extends State<EditCrewmember> {
 
                                 decoration: InputDecoration(
                                   labelText: 'Edit flight weight',
-                                  labelStyle:  TextStyle(
+                                  labelStyle: TextStyle(
                                     color: AppColors.textColorPrimary,
-                                    fontSize: 22,
+                                    fontSize: AppData.text22,
                                     //fontWeight: FontWeight.bold,
                                   ),
                                   errorText: weightErrorMessage,
-
                                   hintText: 'Up to 500 lb',
                                   hintStyle: TextStyle(
                                     color: AppColors.textColorPrimary,
@@ -570,7 +568,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                   filled: true,
                                   fillColor: AppColors.textFieldColor,
                                   enabledBorder: OutlineInputBorder(
-                                    borderSide:  BorderSide(
+                                    borderSide: BorderSide(
                                       color: AppColors.textFieldColor,
                                       // Border color when the TextField is not focused
                                       width: 2.0, // Border width
@@ -578,7 +576,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                     borderRadius: BorderRadius.circular(12.0), // Rounded corners
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderSide:  BorderSide(
+                                    borderSide: BorderSide(
                                       color: AppColors.primaryColor,
                                       // Border color when the TextField is focused
                                       width: 2.0, // Border width
@@ -586,9 +584,9 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                     borderRadius: BorderRadius.circular(12.0),
                                   ),
                                 ),
-                                style:  TextStyle(
+                                style: TextStyle(
                                   color: AppColors.textColorPrimary,
-                                  fontSize: 28,
+                                  fontSize: AppData.text28,
                                 ),
                               ),
                             )),
@@ -610,9 +608,9 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                               child: DropdownButton<int>(
                                 value: selectedPosition,
                                 dropdownColor: AppColors.textFieldColor2,
-                                style:  TextStyle(
+                                style: TextStyle(
                                   color: AppColors.textColorPrimary,
-                                  fontSize: 22,
+                                  fontSize: AppData.text22,
                                 ),
                                 iconEnabledColor: AppColors.textColorPrimary,
                                 items: positionMap.entries.map((entry) {
@@ -652,7 +650,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                     builder: (BuildContext context, StateSetter setState) {
                                       return AlertDialog(
                                         backgroundColor: AppColors.textFieldColor2,
-                                        title:  Text(
+                                        title: Text(
                                           '+ Add Personal Tool',
                                           style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                         ),
@@ -681,31 +679,31 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                               dropdownColor: AppColors.textFieldColor2,
                                               items: personalToolsList.isNotEmpty
                                                   ? personalToolsList.map((tool) {
-                                                return DropdownMenuItem<String>(
-                                                  value: tool.name,
-                                                  child: Text(tool.name),
-                                                );
-                                              }).toList()
+                                                      return DropdownMenuItem<String>(
+                                                        value: tool.name,
+                                                        child: Text(tool.name),
+                                                      );
+                                                    }).toList()
                                                   : [
-                                                DropdownMenuItem<String>(
-                                                  value: null,
-                                                  child: Text(
-                                                    'No tools available',
-                                                    style: TextStyle(color: Colors.grey), // Optional styling for "No tools" message
-                                                  ),
-                                                ),
-                                              ],
+                                                      DropdownMenuItem<String>(
+                                                        value: null,
+                                                        child: Text(
+                                                          'No tools available',
+                                                          style: TextStyle(color: Colors.grey), // Optional styling for "No tools" message
+                                                        ),
+                                                      ),
+                                                    ],
                                               onChanged: personalToolsList.isNotEmpty
                                                   ? (value) {
-                                                setState(() {
-                                                  // Select existing tool and update weight
-                                                  selectedTool = value;
-                                                  final selectedGear = personalToolsList.firstWhere((tool) => tool.name == value);
-                                                  newToolWeightController.text = selectedGear.weight.toString();
-                                                  newToolNameController.text = selectedGear.name;
-                                                  isHazmatTool = selectedGear.isHazmat; // Correctly update isHazmatTool
-                                                });
-                                              }
+                                                      setState(() {
+                                                        // Select existing tool and update weight
+                                                        selectedTool = value;
+                                                        final selectedGear = personalToolsList.firstWhere((tool) => tool.name == value);
+                                                        newToolWeightController.text = selectedGear.weight.toString();
+                                                        newToolNameController.text = selectedGear.name;
+                                                        isHazmatTool = selectedGear.isHazmat; // Correctly update isHazmatTool
+                                                      });
+                                                    }
                                                   : null, // Disable dropdown if no tools are available
                                               style: TextStyle(
                                                 color: AppColors.textColorPrimary,
@@ -727,10 +725,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                                     borderSide: BorderSide(color: AppColors.textColorPrimary, width: 2), // Border for disabled state
                                                   ),
                                                 ),
-                                                style:  TextStyle(
-                                                    color: AppColors.textColorPrimary,
-                                                    fontSize: AppData.text16
-                                                ),
+                                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                               ),
                                           ],
                                         ),
@@ -739,9 +734,12 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                             onPressed: () {
                                               Navigator.of(context).pop(); // Close the dialog
                                             },
-                                            child:  Text(
+                                            child: Text(
                                               'Cancel',
-                                              style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize,),
+                                              style: TextStyle(
+                                                color: AppColors.cancelButton,
+                                                fontSize: AppData.bottomDialogTextSize,
+                                              ),
                                             ),
                                           ),
                                           if (selectedTool != null)
@@ -750,9 +748,14 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                                 addTool(); // Save tool logic
                                                 Navigator.of(context).pop(); // Close current dialog
                                               },
-                                              child:  Text(
+                                              child: Text(
                                                 'Add',
-                                                style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold,  fontSize: AppData.bottomDialogTextSize,),                                              ),
+                                                style: TextStyle(
+                                                  color: AppColors.saveButtonAllowableWeight,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: AppData.bottomDialogTextSize,
+                                                ),
+                                              ),
                                             ),
                                         ],
                                       );
@@ -773,10 +776,10 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                 ),
                               ),
                               alignment: Alignment.center,
-                              child:  Text(
+                              child: Text(
                                 '+ Add Tools',
                                 style: TextStyle(
-                                  fontSize: 22,
+                                  fontSize: AppData.text22,
                                   color: Colors.black,
                                 ),
                               ),
@@ -799,20 +802,19 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                   color: AppColors.textFieldColor,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                    color: AppColors.textFieldColor, // Background color (optional)
-                                    border: Border.all(
-                                      color: AppColors.borderPrimary, // Border color
-                                      width: 2.0,          // Border thickness
+                                      color: AppColors.textFieldColor, // Background color (optional)
+                                      border: Border.all(
+                                        color: AppColors.borderPrimary, // Border color
+                                        width: 2.0, // Border thickness
+                                      ),
+                                      borderRadius: BorderRadius.circular(12), // Rounded corners (optional)
                                     ),
-                                    borderRadius: BorderRadius.circular(12), // Rounded corners (optional)
-                                  ),
-
                                     child: ListTile(
                                       title: Row(
                                         children: [
                                           Text(
                                             tool!.name,
-                                            style:  TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text20, fontWeight: FontWeight.bold),
+                                            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text20, fontWeight: FontWeight.bold),
                                           ),
                                           if (tool.isHazmat)
                                             Padding(
@@ -831,10 +833,10 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                       ),
                                       subtitle: Text(
                                         '${tool.weight} lb',
-                                        style:  TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text20),
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text20),
                                       ),
                                       trailing: IconButton(
-                                        icon: const Icon(Icons.delete, color: Colors.red, size: 28),
+                                        icon:   Icon(Icons.delete, color: Colors.red, size: AppData.text28),
                                         onPressed: () {
                                           removeTool(index);
                                           _checkInput();
@@ -875,4 +877,3 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     );
   }
 }
-

@@ -1,11 +1,12 @@
 import 'dart:ui';
+
 import 'package:fire_app/CodeShare/variables.dart';
 import 'package:fire_app/Data/trip.dart';
 import 'package:fire_app/UI/06_single_trip_view.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart';
 
 class SavedTripsView extends StatefulWidget {
   const SavedTripsView({super.key});
@@ -71,7 +72,7 @@ class _SavedTripsState extends State<SavedTripsView> {
         // Centers the title
         title: Text(
           'Saved Trips',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
           IconButton(
@@ -138,7 +139,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                           // Close the dialogs
                                           Navigator.of(context).pop(); // Close confirmation dialog
                                         },
-                                        child:   Text(
+                                        child: Text(
                                           'Delete',
                                           style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                         ),
@@ -247,10 +248,10 @@ class _SavedTripsState extends State<SavedTripsView> {
                                 color: Colors.red, // Background color when swiped
                                 alignment: Alignment.centerRight,
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.delete,
                                   color: Colors.white,
-                                  size: 32,
+                                  size: AppData.text32,
                                 ),
                               ),
                               confirmDismiss: (direction) async {
@@ -291,7 +292,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                             // Close the dialogs
                                             Navigator.of(context).pop(); // Close confirmation dialog
                                           },
-                                          child:   Text(
+                                          child: Text(
                                             'Delete',
                                             style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                           ),
@@ -342,7 +343,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                                         child: Text(
                                                           trip.tripName,
                                                           style: TextStyle(
-                                                            fontSize: 22,
+                                                            fontSize: AppData.text22,
                                                             fontWeight: FontWeight.bold,
                                                             color: AppColors.textColorPrimary,
                                                           ),
@@ -354,7 +355,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                                       Text(
                                                         '•',
                                                         style: TextStyle(
-                                                          fontSize: 22,
+                                                          fontSize: AppData.text22,
                                                           color: AppColors.textColorPrimary,
                                                         ),
                                                       ),
@@ -383,7 +384,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                               icon: Icon(
                                                 Icons.arrow_forward_ios,
                                                 color: AppColors.textColorPrimary,
-                                                size: 28,
+                                                size: AppData.text28,
                                               ),
                                               onPressed: () {
                                                 Navigator.push(

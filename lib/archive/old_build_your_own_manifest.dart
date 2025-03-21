@@ -105,7 +105,7 @@
 //         backgroundColor: Colors.deepOrangeAccent,
 //         title: Text(
 //           widget.trip.tripName,
-//           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+//           style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold),
 //         ),
 //         actions: [
 //           Padding(
@@ -148,7 +148,7 @@
 //               Expanded(
 //                 flex: 1,
 //                 child: Container(
-//                   color: Colors.black.withOpacity(0.6),
+//                   color: Colors.black.withValues(alpha: 0.6),
 //                   child: Scrollbar(
 //                     child: ListView.builder(
 //                       padding: const EdgeInsets.all(8.0),
@@ -179,7 +179,7 @@
 //                               childWhenDragging: Container(
 //                                 margin: const EdgeInsets.symmetric(vertical: 4),
 //                                 padding: const EdgeInsets.all(8),
-//                                 color: Colors.deepOrangeAccent.withOpacity(0.3),
+//                                 color: Colors.deepOrangeAccent.withValues(alpha: 0.3),
 //                                 child: Center(
 //                                   child: Text(
 //                                     "${item is Gear ? item.name : (item as CrewMember).name}, ${item is Gear ? item.weight : (item as CrewMember).flightWeight} lb",
@@ -238,7 +238,7 @@
 //               Expanded(
 //                 flex: 2,
 //                 child: Container(
-//                   color: Colors.grey.withOpacity(0.8),
+//                   color: Colors.grey.withValues(alpha: 0.8),
 //                   child: Scrollbar(
 //                     child: ListView(
 //                       padding: const EdgeInsets.all(8.0),
@@ -308,7 +308,7 @@
 //                                     width: double.infinity,
 //                                     height: 150 + (loads[index].length * 40),
 //                                     margin: const EdgeInsets.symmetric(vertical: 8),
-//                                     color: Colors.white.withOpacity(0.2),
+//                                     color: Colors.white.withValues(alpha: 0.2),
 //                                     padding: const EdgeInsets.all(8),
 //                                     child: Column(
 //                                       children: [

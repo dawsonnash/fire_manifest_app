@@ -1,15 +1,17 @@
 import 'dart:ui';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+
+import '../CodeShare/functions.dart';
 import '../CodeShare/keyboardActions.dart';
 import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
 import '../Data/gear.dart';
-import 'package:hive/hive.dart';
-import '../CodeShare/functions.dart';
 import '../Data/saved_preferences.dart';
-import 'package:collection/collection.dart';
 
 class EditGear extends StatefulWidget {
   // THis page requires a gear item to be passed to it - to edit it
@@ -131,7 +133,7 @@ class _EditGearState extends State<EditGear> {
 
     bool onlyQuantityChanged = (oldGearName.toLowerCase() == newGearName.toLowerCase()) && (oldGearHazmatValue == newHazmatValue) && (oldGearQuantity.toString() != newGearQuantity);
     final matchingTool = personalToolsList.firstWhereOrNull(
-          (tool) => tool.name.toLowerCase() == newGearName.toLowerCase(),
+      (tool) => tool.name.toLowerCase() == newGearName.toLowerCase(),
     );
 
     final bool weightMatches = matchingTool?.weight == int.tryParse(gearWeightController.text);
@@ -139,7 +141,6 @@ class _EditGearState extends State<EditGear> {
     final bool matchesPersonalToolValues = weightMatches && hazmatMatches;
 
     if (personalToolExists && !onlyQuantityChanged && !gearNameExists && !matchesPersonalToolValues) {
-
       // Show a single AlertDialog
       showDialog(
         context: context,
@@ -182,7 +183,6 @@ class _EditGearState extends State<EditGear> {
     }
 
     if (personalToolExists && !onlyQuantityChanged && gearNameExists) {
-
       // Show a single AlertDialog
       showDialog(
         context: context,
@@ -266,7 +266,6 @@ class _EditGearState extends State<EditGear> {
     widget.gear.weight = int.parse(gearWeightController.text);
     widget.gear.isHazmat = newHazmatValue;
 
-
     // Check if any GearPreference prevents reducing quantity
     bool quantityConflict = savedPreferences.updateGearInPreferences(oldGearName, newGearQuantity, widget.gear);
 
@@ -283,7 +282,7 @@ class _EditGearState extends State<EditGear> {
             ),
             content: Text(
               'The quantity you are trying to set ($newGearQuantity) is less than the quantity used in an existing gear preference. '
-                  'You must first delete the affected gear preference before reducing the quantity. All other fields have been updated.',
+              'You must first delete the affected gear preference before reducing the quantity. All other fields have been updated.',
               style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
             ),
             actions: [
@@ -302,13 +301,12 @@ class _EditGearState extends State<EditGear> {
       setState(() {
         gearQuantityController.text = oldGearQuantity.toString();
         // Update the gear's attributes
-        oldGearName= capitalizedGearName;
+        oldGearName = capitalizedGearName;
         oldGearWeight = int.parse(gearWeightController.text);
         oldGearHazmatValue = newHazmatValue;
         _checkInput(); // Re-validate inputs
       });
-    }
-    else {
+    } else {
       widget.gear.quantity = int.parse(gearQuantityController.text);
     }
 
@@ -335,23 +333,24 @@ class _EditGearState extends State<EditGear> {
     // Show successful save popup
     if (!quantityConflict) {
       ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Center(
-          child: Text(
-            'Gear Updated!',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
+        SnackBar(
+          content: Center(
+            child: Text(
+              'Gear Updated!',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: AppData.text32,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Colors.green,
         ),
-        duration: Duration(seconds: 1),
-        backgroundColor: Colors.green,
-      ),
-    );}
+      );
+    }
 
-    if(!quantityConflict) {
+    if (!quantityConflict) {
       Navigator.of(context).pop(); // Return to previous screen
     }
   }
@@ -361,7 +360,7 @@ class _EditGearState extends State<EditGear> {
     // Main theme button style
     final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
-        textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        textStyle: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold),
         backgroundColor: Colors.deepOrangeAccent,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         //surfaceTintColor: Colors.grey,
@@ -389,7 +388,7 @@ class _EditGearState extends State<EditGear> {
         backgroundColor: AppColors.appBarColor,
         title: Text(
           'Edit Gear',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
           IconButton(
@@ -459,9 +458,9 @@ class _EditGearState extends State<EditGear> {
                                                 child: Text(
                                                   '$oldGearName Deleted!',
                                                   // Maybe change look
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     color: Colors.black,
-                                                    fontSize: 32,
+                                                    fontSize: AppData.text32,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
@@ -474,7 +473,7 @@ class _EditGearState extends State<EditGear> {
                                           Navigator.of(context).pop(); // Dismiss the dialog
                                           Navigator.of(context).pop(); // Return to previous screen
                                         },
-                                        child:  Text(
+                                        child: Text(
                                           'Delete',
                                           style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                         ),
@@ -566,7 +565,7 @@ class _EditGearState extends State<EditGear> {
                                 labelText: 'Edit gear name',
                                 labelStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
-                                  fontSize: 22,
+                                  fontSize: AppData.text22,
                                 ),
                                 filled: true,
                                 fillColor: AppColors.textFieldColor,
@@ -589,7 +588,7 @@ class _EditGearState extends State<EditGear> {
                               ),
                               style: TextStyle(
                                 color: AppColors.textColorPrimary,
-                                fontSize: 28,
+                                fontSize: AppData.text28,
                               ),
                             )),
 
@@ -620,8 +619,7 @@ class _EditGearState extends State<EditGear> {
                                       weightErrorMessage = 'Weight must be less than 500.';
                                     } else if (weight == 0) {
                                       weightErrorMessage = 'Weight must be greater than 0.';
-                                    }
-                                    else{
+                                    } else {
                                       weightErrorMessage = null;
                                     }
                                   });
@@ -636,7 +634,7 @@ class _EditGearState extends State<EditGear> {
                                   errorText: weightErrorMessage,
                                   labelStyle: TextStyle(
                                     color: AppColors.textColorPrimary,
-                                    fontSize: 22,
+                                    fontSize: AppData.text22,
                                     //fontWeight: FontWeight.bold,
                                   ),
                                   filled: true,
@@ -660,7 +658,7 @@ class _EditGearState extends State<EditGear> {
                                 ),
                                 style: TextStyle(
                                   color: AppColors.textColorPrimary,
-                                  fontSize: 28,
+                                  fontSize: AppData.text28,
                                 ),
                               ),
                             )),
@@ -689,8 +687,7 @@ class _EditGearState extends State<EditGear> {
                                   setState(() {
                                     if (weight == 0) {
                                       quantityErrorMessage = 'Quantity must be greater than 0.';
-                                    }
-                                    else{
+                                    } else {
                                       quantityErrorMessage = null;
                                     }
                                   });
@@ -705,7 +702,7 @@ class _EditGearState extends State<EditGear> {
                                   errorText: quantityErrorMessage,
                                   labelStyle: TextStyle(
                                     color: AppColors.textColorPrimary,
-                                    fontSize: 22,
+                                    fontSize: AppData.text22,
                                     //fontWeight: FontWeight.bold,
                                   ),
                                   filled: true,
@@ -729,7 +726,7 @@ class _EditGearState extends State<EditGear> {
                                 ),
                                 style: TextStyle(
                                   color: AppColors.textColorPrimary,
-                                  fontSize: 28,
+                                  fontSize: AppData.text28,
                                 ),
                               ),
                             )),
@@ -753,7 +750,7 @@ class _EditGearState extends State<EditGear> {
                                 Text(
                                   'HAZMAT',
                                   style: TextStyle(
-                                    fontSize: 22,
+                                    fontSize: AppData.text22,
                                     color: AppColors.textColorPrimary,
                                   ),
                                 ),

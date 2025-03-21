@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import '../CodeShare/variables.dart';
+
 import 'crewmember.dart';
 import 'gear.dart';
 import 'load.dart';

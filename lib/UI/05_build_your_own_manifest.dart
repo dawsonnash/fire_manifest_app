@@ -1,15 +1,17 @@
 import 'dart:ui';
+
 import 'package:fire_app/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import '../CodeShare/variables.dart';
-import '../Data/gear.dart';
-import '../Data/crewmember.dart';
-import '../Data/trip.dart';
-import '../Data/load.dart';
-import '../Data/customItem.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart';
+
+import '../CodeShare/variables.dart';
+import '../Data/crewmember.dart';
+import '../Data/customItem.dart';
+import '../Data/gear.dart';
+import '../Data/load.dart';
+import '../Data/trip.dart';
 
 // Double integers when calculating quantity dont always work out. a 45 lb QB can become 44
 
@@ -142,7 +144,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       // Rounded corners
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.grey.withOpacity(0.8),
+                                          color: Colors.grey.withValues(alpha: 0.8),
                                           spreadRadius: 1,
                                           blurRadius: 5,
                                           offset: Offset(0, 3), // Shadow position
@@ -266,7 +268,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                           // Rounded corners
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.grey.withOpacity(0.8),
+                                              color: Colors.grey.withValues(alpha: 0.8),
                                               spreadRadius: 1,
                                               blurRadius: 5,
                                               offset: Offset(0, 3), // Shadow position
@@ -345,7 +347,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                   children: List<Widget>.generate(
                                                                     gear.quantity,
                                                                     // Use the full quantity for selection
-                                                                        (int index) {
+                                                                    (int index) {
                                                                       return Center(
                                                                         child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                       );
@@ -369,7 +371,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                     });
                                                                     Navigator.of(context).pop();
                                                                   },
-                                                                  child: Text('Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize,color: AppColors.saveButtonAllowableWeight)),
+                                                                  child: Text('Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight)),
                                                                 ),
                                                               ],
                                                             );
@@ -382,7 +384,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                         if (gear.quantity > 1)
                                                           Text(
                                                             'Qty: ${selectedGearQuantities[gear] ?? 1}',
-                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text14, color: AppColors.textColorSecondary),
+                                                            style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorSecondary),
                                                           ),
                                                         if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
                                                       ],
@@ -496,7 +498,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                 },
                                                 child: Text(
                                                   'Cancel',
-                                                  style: TextStyle(color: AppColors.cancelButton,     fontSize: AppData.bottomDialogTextSize),
+                                                  style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                 ),
                                               ),
                                             ),
@@ -608,7 +610,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                           int selectedQuantity = selectedGearQuantities[item] ?? 1;
 
                           final existingGearIndex = loads[selectedLoadIndex].indexWhere(
-                                (loadItem) => loadItem is Gear && loadItem.name == item.name && loadItem.isPersonalTool == item.isPersonalTool, // Ensure same isPersonalTool status
+                            (loadItem) => loadItem is Gear && loadItem.name == item.name && loadItem.isPersonalTool == item.isPersonalTool, // Ensure same isPersonalTool status
                           );
 
                           if (existingGearIndex != -1) {
@@ -642,7 +644,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                           if (item.personalTools != null) {
                             for (var tool in item.personalTools!) {
                               final existingToolIndex = loads[selectedLoadIndex].indexWhere(
-                                    (loadItem) => loadItem is Gear && loadItem.name == tool.name && loadItem.isPersonalTool == tool.isPersonalTool, // Ensure same isPersonalTool status
+                                (loadItem) => loadItem is Gear && loadItem.name == tool.name && loadItem.isPersonalTool == tool.isPersonalTool, // Ensure same isPersonalTool status
                               );
 
                               if (existingToolIndex != -1) {
@@ -755,25 +757,24 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Center(
           child: Text(
             'Trip Saved!',
             style: TextStyle(
               color: Colors.black,
-              fontSize: 32,
+              fontSize: AppData.text32,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
         backgroundColor: Colors.green,
       ),
     );
 
     Navigator.of(context).pop(); // Go back to the home screen
     selectedIndexNotifier.value = 1; // Switch to "Saved Trips" tab
-
   }
 
   // Function to calculate available weight for a load
@@ -791,7 +792,6 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
     });
     return totalWeight;
   }
-
 
 // Function to calculate available seats for a load
   int calculateAvailableSeats(List<dynamic> loadItems) {
@@ -840,7 +840,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
           children: [
             Text(
               widget.trip.tripName,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lb',
@@ -877,36 +877,36 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
             // Background color for dark mode
             child: AppColors.isDarkMode
                 ? (AppColors.enableBackgroundImage
-                ? Stack(
-              children: [
-                ImageFiltered(
-                  imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                  // Blur effect
-                  child: Image.asset(
-                    'assets/images/logo1.png',
-                    fit: BoxFit.cover, // Cover the entire background
-                    width: double.infinity,
-                    height: double.infinity,
-                  ),
-                ),
-                Container(
-                  color: AppColors.logoImageOverlay, // Semi-transparent overlay
-                  width: double.infinity,
-                  height: double.infinity,
-                ),
-              ],
-            )
-                : null) // No image if background is disabled
+                    ? Stack(
+                        children: [
+                          ImageFiltered(
+                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                            // Blur effect
+                            child: Image.asset(
+                              'assets/images/logo1.png',
+                              fit: BoxFit.cover, // Cover the entire background
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                          Container(
+                            color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ],
+                      )
+                    : null) // No image if background is disabled
                 : ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-              // Always display in light mode
-              child: Image.asset(
-                'assets/images/logo1.png',
-                fit: BoxFit.cover, // Cover the entire background
-                width: double.infinity,
-                height: double.infinity,
-              ),
-            ),
+                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                    // Always display in light mode
+                    child: Image.asset(
+                      'assets/images/logo1.png',
+                      fit: BoxFit.cover, // Cover the entire background
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
           ),
 
           Container(
@@ -1009,7 +1009,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                   } else {
                                     // General gear: update or add back to gearList
                                     final existingGear = gearList.firstWhere(
-                                          (gear) => gear.name == item.name && !gear.isPersonalTool,
+                                      (gear) => gear.name == item.name && !gear.isPersonalTool,
                                       orElse: () => Gear(name: item.name, quantity: 0, weight: item.totalGearWeight ~/ item.quantity, isHazmat: item.isHazmat),
                                     );
 
@@ -1038,7 +1038,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: Colors.black.withValues(alpha: 0.2),
                                   blurRadius: 5,
                                   offset: const Offset(0, 3),
                                 ),
@@ -1073,8 +1073,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         borderRadius: _isExpanded[index]
                                             ? const BorderRadius.vertical(top: Radius.circular(10))
                                             : const BorderRadius.all(
-                                          Radius.circular(10),
-                                        ),
+                                                Radius.circular(10),
+                                              ),
                                       ),
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1088,7 +1088,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                   color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                                       ? Colors.white // Warning color
                                                       : Colors.black,
-                                                  fontSize: 22,
+                                                  fontSize: AppData.text22,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -1164,7 +1164,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                             color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                                 ? Colors.white // Warning color
                                                 : Colors.black,
-                                            size: 36,
+                                            size: AppData.text36,
                                           ),
                                         ],
                                       ),
@@ -1180,7 +1180,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                           // If overweight
                                           if (calculateAvailableWeight(loads[index]) > widget.trip.allowable)
                                             Padding(
-                                              padding: const EdgeInsets.symmetric(vertical:0),
+                                              padding: const EdgeInsets.symmetric(vertical: 0),
                                               child: Container(
                                                 width: double.infinity,
                                                 padding: const EdgeInsets.symmetric(vertical: 4),
@@ -1191,7 +1191,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                   // Rounded corners
                                                 ),
                                                 alignment: Alignment.center,
-                                                child:  Text(
+                                                child: Text(
                                                   'OVERWEIGHT',
                                                   style: TextStyle(
                                                     fontSize: AppData.text18,
@@ -1235,7 +1235,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                               }
                                               return 0; // Keep relative order for same types
                                             }))
-                                          // Swipe Deletion
+                                            // Swipe Deletion
                                             Dismissible(
                                               key: ValueKey(item),
                                               // Unique key for each item
@@ -1260,7 +1260,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                     if (item is Gear) {
                                                       // No changes needed for Gear removal
                                                       var existingGear = gearList.firstWhere(
-                                                            (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
+                                                        (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
                                                         orElse: () => Gear(
                                                             name: item.name,
                                                             quantity: 0,
@@ -1282,7 +1282,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                         for (var tool in item.personalTools!) {
                                                           // Check and update in the gearList, ensuring it matches `isPersonalTool`
                                                           final gearListIndex = gearList.indexWhere(
-                                                                (gear) => gear.name == tool.name && gear.isPersonalTool == tool.isPersonalTool,
+                                                            (gear) => gear.name == tool.name && gear.isPersonalTool == tool.isPersonalTool,
                                                           );
 
                                                           if (gearListIndex != -1) {
@@ -1296,7 +1296,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                           } else {
                                                             // Check and update in the load
                                                             final toolIndex = loads[index].indexWhere(
-                                                                  (loadItem) => loadItem is Gear && loadItem.name == tool.name && loadItem.isPersonalTool == tool.isPersonalTool,
+                                                              (loadItem) => loadItem is Gear && loadItem.name == tool.name && loadItem.isPersonalTool == tool.isPersonalTool,
                                                             );
 
                                                             if (toolIndex != -1) {
@@ -1325,8 +1325,8 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                 color: item is CrewMember
                                                     ? AppColors.textFieldColor2 // Color for CrewMembers
                                                     : item is Gear && item.isPersonalTool == true
-                                                    ? AppColors.toolBlue // Color for personal tools
-                                                    : AppColors.gearYellow,
+                                                        ? AppColors.toolBlue // Color for personal tools
+                                                        : AppColors.gearYellow,
                                                 // Color for regular Gear
                                                 // Different colors for CrewMember and Gear
                                                 margin: const EdgeInsets.symmetric(vertical: 0.0),
@@ -1351,9 +1351,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                           ),
                                                           if (item is! CustomItem)
                                                             Text(
-                                                              item is Gear
-                                                                  ?  'Quantity: ${ item.quantity} x ${item.weight} lb'
-                                                                  : item.getPositionTitle(item.position),
+                                                              item is Gear ? 'Quantity: ${item.quantity} x ${item.weight} lb' : item.getPositionTitle(item.position),
                                                               style: TextStyle(
                                                                 fontSize: AppData.text14,
                                                                 color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
@@ -1393,7 +1391,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                                     dropdownColor: AppColors.textFieldColor2,
                                                                                     items: List.generate(
                                                                                       item.quantity,
-                                                                                          (index) => DropdownMenuItem(
+                                                                                      (index) => DropdownMenuItem(
                                                                                         value: index + 1,
                                                                                         child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                                       ),
@@ -1422,7 +1420,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
                                                                                       // Handle returning the removed quantity to the inventory
                                                                                       var existingGear = gearList.firstWhere(
-                                                                                            (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
+                                                                                        (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool,
                                                                                         // Ensure same isPersonalTool status
                                                                                         orElse: () => Gear(
                                                                                             name: item.name,
@@ -1462,7 +1460,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                     // Remove single gear item
                                                                     loads[index].remove(item);
                                                                     var existingGear = gearList.firstWhere(
-                                                                          (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool, // Ensure same isPersonalTool status
+                                                                      (gear) => gear.name == item.name && gear.isPersonalTool == item.isPersonalTool, // Ensure same isPersonalTool status
                                                                       orElse: () =>
                                                                           Gear(name: item.name, quantity: 0, weight: item.weight, isPersonalTool: item.isPersonalTool, isHazmat: item.isHazmat),
                                                                     );
@@ -1480,7 +1478,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                     for (var tool in item.personalTools!) {
                                                                       // Ensure the removal only applies to personal tools
                                                                       final gearListIndex = gearList.indexWhere(
-                                                                            (gear) => gear.name == tool.name && gear.isPersonalTool == tool.isPersonalTool,
+                                                                        (gear) => gear.name == tool.name && gear.isPersonalTool == tool.isPersonalTool,
                                                                       );
 
                                                                       if (gearListIndex != -1) {
@@ -1494,7 +1492,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                         // Update load quantities
                                                                         // Ensure removal from load only applies to personal tools
                                                                         final toolIndex = loads[index].indexWhere(
-                                                                              (loadItem) => loadItem is Gear && loadItem.name == tool.name && loadItem.isPersonalTool == tool.isPersonalTool,
+                                                                          (loadItem) => loadItem is Gear && loadItem.name == tool.name && loadItem.isPersonalTool == tool.isPersonalTool,
                                                                         );
 
                                                                         if (toolIndex != -1) {
@@ -1524,7 +1522,6 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                               ),
                                             ),
                                           //const SizedBox(height: 4),
-
 
                                           // Add Item
                                           GestureDetector(
@@ -1581,7 +1578,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                               textAlign: TextAlign.center,
                               softWrap: true,
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: AppData.text22,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textColorPrimary,
                               ),

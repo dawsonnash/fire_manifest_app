@@ -1,12 +1,14 @@
 import 'dart:ui';
-import 'package:fire_app/UI/02_add_crewmember.dart';
+
 import 'package:fire_app/Data/crewmember.dart';
+import 'package:fire_app/UI/02_add_crewmember.dart';
 import 'package:fire_app/UI/02_edit_crewmember.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
+
 import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CrewmembersView extends StatefulWidget {
   const CrewmembersView({super.key});
@@ -48,6 +50,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
       isSelectionMode = selectedCrew.isNotEmpty;
     });
   }
+
   void _showDeleteConfirmationDialog() {
     showDialog(
       context: context,
@@ -69,7 +72,10 @@ class _CrewmembersViewState extends State<CrewmembersView> {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize,),
+                style: TextStyle(
+                  color: AppColors.cancelButton,
+                  fontSize: AppData.bottomDialogTextSize,
+                ),
               ),
             ),
             TextButton(
@@ -89,7 +95,6 @@ class _CrewmembersViewState extends State<CrewmembersView> {
   }
 
   void deleteSelectedCrew() {
-
     for (var member in selectedCrew) {
       crew.removeCrewMember(member);
     }
@@ -102,7 +107,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Selected crew members deleted", style: TextStyle(fontSize: AppData.text22,  fontWeight: FontWeight.bold, color: Colors.black)),
+        content: Text("Selected crew members deleted", style: TextStyle(fontSize: AppData.text22, fontWeight: FontWeight.bold, color: Colors.black)),
         backgroundColor: Colors.red,
         duration: Duration(seconds: 1),
       ),
@@ -114,7 +119,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
     List<CrewMember> sortedCrewMemberList = sortCrewListByPosition(crewmemberList);
 
     TextStyle panelTextStyle = TextStyle(
-      fontSize: 22,
+      fontSize: AppData.text22,
       fontWeight: FontWeight.bold,
       color: AppColors.textColorPrimary,
     );
@@ -143,7 +148,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
               ),
         title: Text(
           isSelectionMode ? "Delete Crew Members" : "Crew Members",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
           if (isSelectionMode)
@@ -206,7 +211,10 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                           },
                                           child: Text(
                                             'Cancel',
-                                            style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize,),
+                                            style: TextStyle(
+                                              color: AppColors.cancelButton,
+                                              fontSize: AppData.bottomDialogTextSize,
+                                            ),
                                           ),
                                         ),
                                         TextButton(
@@ -216,7 +224,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                             Navigator.of(context).pop(); // Close the dialog after deletion
                                             Navigator.of(context).pop(); // Home screen
                                           },
-                                          child:  Text(
+                                          child: Text(
                                             'Delete',
                                             style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                           ),
@@ -302,7 +310,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                                 'No crew members created...',
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
-                                                  fontSize: 22,
+                                                  fontSize: AppData.text22,
                                                   fontWeight: FontWeight.bold,
                                                   color: AppColors.textColorPrimary,
                                                 ),
@@ -378,7 +386,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                             children: [
                                               Text(
                                                 '${crewMember.name}, ${crewMember.flightWeight} lb',
-                                                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                                style: TextStyle(fontSize: AppData.text22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                               ),
                                               Row(
                                                 children: [
@@ -405,7 +413,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                     trailing: isSelectionMode
                                         ? null
                                         : IconButton(
-                                      icon: Icon(Icons.edit, color: AppColors.textColorPrimary, size: 32),
+                                            icon: Icon(Icons.edit, color: AppColors.textColorPrimary, size: AppData.text32),
                                             onPressed: () {
                                               Navigator.push(
                                                 context,

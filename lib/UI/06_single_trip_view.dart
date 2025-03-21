@@ -1,21 +1,21 @@
 import 'dart:ui';
+
 import 'package:fire_app/UI/06_edit_trip_external.dart';
 import 'package:fire_app/UI/06_single_load_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
-import '../../Data/trip.dart';
-
 // For exporting to pdf
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import '../Data/load_accoutrements.dart';
-import '../UI/06_edit_trip.dart';
+
+import '../../Data/trip.dart';
 import '../CodeShare/variables.dart';
 import '../Data/gear.dart';
 import '../Data/load.dart';
+import '../Data/load_accoutrements.dart';
+import '../UI/06_edit_trip.dart';
 
 // Generates PDF
 Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, bool isExternal, String? helicopterNum, String? departure, String? destination, String? manifestPreparer) async {
@@ -31,7 +31,8 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, bool isExterna
     pageFormat = PdfPageFormat.letter;
   } else if (manifestForm == 'of252') {
     imagePath = 'assets/images/helicopter_manifest_form.jpg';
-    fillFormFields = (load, pageIndex, totalPages, pageItems) => fillFormFieldsOF252(load, trip.isExternal ?? false, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer, null);
+    fillFormFields = (load, pageIndex, totalPages, pageItems) =>
+        fillFormFieldsOF252(load, trip.isExternal ?? false, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer, null);
     pageFormat = PdfPageFormat.a4;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
@@ -109,7 +110,6 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, bool isExterna
 
         return getPriority(a).compareTo(getPriority(b));
       });
-
     } else {
       allItems = [
         ...load.loadPersonnel,
@@ -177,7 +177,7 @@ void previewTripPDF(BuildContext context, Trip trip, String manifestForm, bool? 
     pdfBytes = await generateTripPDF(trip, 'pms245', isExternal ?? false, null, null, null, null);
     pageFormat = PdfPageFormat.letter; // PMS245 requires Letter format
   } else if (manifestForm == 'of252') {
-    pdfBytes = await generateTripPDF(trip, 'of252', isExternal!,  helicopterNum, departure, destination, manifestPreparer);
+    pdfBytes = await generateTripPDF(trip, 'of252', isExternal!, helicopterNum, departure, destination, manifestPreparer);
     pageFormat = PdfPageFormat.a4; // OF252 requires A4 format
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
@@ -235,7 +235,7 @@ class _SingleTripViewState extends State<SingleTripView> {
         ),
         title: Text(
           widget.trip.tripName,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
           overflow: TextOverflow.ellipsis, // Add this
           maxLines: 1,
         ),
@@ -274,7 +274,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                     title: Text(
                                       'Select Manifest Type',
                                       style: TextStyle(
-                                        fontSize: 22,
+                                        fontSize: AppData.text22,
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.textColorPrimary,
                                       ),
@@ -399,7 +399,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                           Navigator.of(context).pop(); // Close the dialog after deletion
                                           Navigator.of(context).pop();
                                         },
-                                        child:   Text(
+                                        child: Text(
                                           'Delete',
                                           style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                         ),
@@ -499,7 +499,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                       Text(
                                         'Load ${load.loadNumber.toString()}',
                                         style: TextStyle(
-                                          fontSize: 22,
+                                          fontSize: AppData.text22,
                                           fontWeight: FontWeight.bold,
                                           color: AppColors.textColorPrimary,
                                         ),
@@ -516,7 +516,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                   Icon(Icons.arrow_forward_ios,
                                       //Icons.edit,
                                       color: AppColors.textColorPrimary,
-                                      size: 28),
+                                      size: AppData.text28),
                                 ],
                               ),
                             ),
@@ -573,7 +573,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
       // Adjust padding
       title: Text(
         'Additional Information',
-        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+        style: TextStyle(fontSize: AppData.text22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
       ),
       content: SingleChildScrollView(
         // Wrap content in a scrollable view
@@ -663,7 +663,8 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
             Navigator.of(context).pop();
           },
           child: Text(
-            'Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight),
+            'Confirm',
+            style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight),
           ),
         ),
       ],

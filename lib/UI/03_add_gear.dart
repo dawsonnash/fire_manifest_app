@@ -1,13 +1,15 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+
+import '../CodeShare/functions.dart';
 import '../CodeShare/keyboardActions.dart';
 import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
 import '../Data/gear.dart';
-import '../CodeShare/functions.dart';
 
 // Tester data
 class AddGear extends StatefulWidget {
@@ -136,7 +138,6 @@ class _AddGearState extends State<AddGear> {
     bool personalToolExists = personalToolsList.any((gear) => gear.name.toLowerCase() == gearName.toLowerCase());
 
     if (personalToolExists && gearNameExists) {
-
       // Show a single AlertDialog
       showDialog(
         context: context,
@@ -167,24 +168,21 @@ class _AddGearState extends State<AddGear> {
       );
 
       // Reset values for both conditions if applicable
-        setState(() {
-          if(isCustom) {
-            gearNameController.text = '';
-            gearWeightController.text = '';
-            isHazmat = false;
-          }
-          else{
-            irpgGearNameController.text = '';
-            irpgGearWeightController.text = '';
-            selectedGearName = null;
-            isHazmatIRPG = false;
-          }
-          _checkInput(); // Re-validate inputs
-        });
+      setState(() {
+        if (isCustom) {
+          gearNameController.text = '';
+          gearWeightController.text = '';
+          isHazmat = false;
+        } else {
+          irpgGearNameController.text = '';
+          irpgGearWeightController.text = '';
+          selectedGearName = null;
+          isHazmatIRPG = false;
+        }
+        _checkInput(); // Re-validate inputs
+      });
 
-        return;
-
-
+      return;
     }
 
     if (personalToolExists) {
@@ -253,8 +251,7 @@ class _AddGearState extends State<AddGear> {
             if (personalToolisHazmat != isHazmatFinal) {
               isHazmat = personalToolisHazmat;
             }
-          }
-          else{
+          } else {
             if (personalToolWeight != gearWeight) {
               irpgGearWeightController.text = personalToolWeight.toString();
             }
@@ -267,7 +264,6 @@ class _AddGearState extends State<AddGear> {
 
         return;
       }
-
     }
 
     if (gearNameExists) {
@@ -297,13 +293,12 @@ class _AddGearState extends State<AddGear> {
         },
       );
       setState(() {
-        if(isCustom) {
+        if (isCustom) {
           gearNameController.text = '';
           gearWeightController.text = '';
           gearQuantityController.text = '1';
           isHazmat = false;
-        }
-        else{
+        } else {
           irpgGearNameController.text = '';
           irpgGearWeightController.text = '';
           irpgGearQuantityController.text = '1';
@@ -316,26 +311,26 @@ class _AddGearState extends State<AddGear> {
     }
 
     // Creating a new gear object
-    Gear newGearItem =  Gear(name: capitalizedGearName, weight: gearWeight, quantity: gearQuantity, isHazmat: isHazmatFinal);
+    Gear newGearItem = Gear(name: capitalizedGearName, weight: gearWeight, quantity: gearQuantity, isHazmat: isHazmatFinal);
 
     // Add the new member to the global crew object
     crew.addGear(newGearItem);
 
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Center(
           child: Text(
             'Gear Saved!',
             // Maybe change look
             style: TextStyle(
               color: Colors.black,
-              fontSize: 32,
+              fontSize: AppData.text32,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
         backgroundColor: Colors.green,
       ),
     );
@@ -364,7 +359,7 @@ class _AddGearState extends State<AddGear> {
     // Main theme button style
     final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
-        textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        textStyle: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold),
         backgroundColor: Colors.deepOrangeAccent,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         //surfaceTintColor: Colors.grey,
@@ -393,7 +388,7 @@ class _AddGearState extends State<AddGear> {
           backgroundColor: AppColors.appBarColor,
           title: Text(
             'Add Gear',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+            style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
           ),
           bottom: TabBar(
             labelColor: AppColors.primaryColor,
@@ -487,7 +482,7 @@ class _AddGearState extends State<AddGear> {
                                       labelText: 'Gear Name',
                                       labelStyle: TextStyle(
                                         color: AppColors.textColorPrimary,
-                                        fontSize: 22,
+                                        fontSize: AppData.text22,
                                         //fontWeight: FontWeight.bold,
                                       ),
                                       filled: true,
@@ -511,7 +506,7 @@ class _AddGearState extends State<AddGear> {
                                     ),
                                     style: TextStyle(
                                       color: AppColors.textColorPrimary,
-                                      fontSize: 28,
+                                      fontSize: AppData.text28,
                                     ),
                                   )),
 
@@ -546,8 +541,7 @@ class _AddGearState extends State<AddGear> {
                                             weightErrorMessage = 'Weight must be less than 500.';
                                           } else if (weight == 0) {
                                             weightErrorMessage = 'Weight must be greater than 0.';
-                                          }
-                                          else{
+                                          } else {
                                             weightErrorMessage = null;
                                           }
                                         });
@@ -560,10 +554,9 @@ class _AddGearState extends State<AddGear> {
                                           fontSize: AppData.text20,
                                         ),
                                         errorText: weightErrorMessage,
-
                                         labelStyle: TextStyle(
                                           color: AppColors.textColorPrimary,
-                                          fontSize: 22,
+                                          fontSize: AppData.text22,
                                           //fontWeight: FontWeight.bold,
                                         ),
                                         filled: true,
@@ -587,7 +580,7 @@ class _AddGearState extends State<AddGear> {
                                       ),
                                       style: TextStyle(
                                         color: AppColors.textColorPrimary,
-                                        fontSize: 28,
+                                        fontSize: AppData.text28,
                                       ),
                                     ),
                                   )),
@@ -602,7 +595,6 @@ class _AddGearState extends State<AddGear> {
                                       focusNodes: [_quantityFocusNode],
                                     ),
                                     disableScroll: true,
-
                                     child: TextField(
                                       focusNode: _quantityFocusNode,
                                       controller: gearQuantityController,
@@ -615,11 +607,10 @@ class _AddGearState extends State<AddGear> {
                                       onChanged: (value) {
                                         int? weight = int.tryParse(value);
                                         setState(() {
-                                        if (weight == 0) {
+                                          if (weight == 0) {
                                             quantityErrorMessage = 'Quantity must be greater than 0.';
-                                          }
-                                          else{
-                                          quantityErrorMessage = null;
+                                          } else {
+                                            quantityErrorMessage = null;
                                           }
                                         });
                                       },
@@ -633,7 +624,7 @@ class _AddGearState extends State<AddGear> {
                                         errorText: quantityErrorMessage,
                                         labelStyle: TextStyle(
                                           color: AppColors.textColorPrimary,
-                                          fontSize: 22,
+                                          fontSize: AppData.text22,
                                           //fontWeight: FontWeight.bold,
                                         ),
                                         filled: true,
@@ -657,7 +648,7 @@ class _AddGearState extends State<AddGear> {
                                       ),
                                       style: TextStyle(
                                         color: AppColors.textColorPrimary,
-                                        fontSize: 28,
+                                        fontSize: AppData.text28,
                                       ),
                                     ),
                                   )),
@@ -680,7 +671,7 @@ class _AddGearState extends State<AddGear> {
                                       Text(
                                         'HAZMAT',
                                         style: TextStyle(
-                                          fontSize: 22,
+                                          fontSize: AppData.text22,
                                           color: AppColors.textColorPrimary,
                                         ),
                                       ),
@@ -763,7 +754,6 @@ class _AddGearState extends State<AddGear> {
                                           ),
                                           isExpanded: true,
                                           underline: SizedBox(),
-
                                           items: irpgItems.map((item) {
                                             return DropdownMenuItem<String>(
                                               value: item['name'],
@@ -812,7 +802,7 @@ class _AddGearState extends State<AddGear> {
                                                   style: TextStyle(
                                                     color: AppColors.textColorPrimary,
                                                     fontWeight: FontWeight.normal,
-                                                    fontSize: 22,
+                                                    fontSize: AppData.text22,
                                                   ),
                                                 ),
                                               );
@@ -851,8 +841,7 @@ class _AddGearState extends State<AddGear> {
                                             irpgWeightErrorMessage = 'Weight must be less than 500.';
                                           } else if (weight == 0) {
                                             irpgWeightErrorMessage = 'Weight must be greater than 0.';
-                                          }
-                                          else{
+                                          } else {
                                             irpgWeightErrorMessage = null;
                                           }
                                         });
@@ -867,7 +856,7 @@ class _AddGearState extends State<AddGear> {
                                         errorText: irpgWeightErrorMessage,
                                         labelStyle: TextStyle(
                                           color: AppColors.textColorPrimary,
-                                          fontSize: 22,
+                                          fontSize: AppData.text22,
                                           //fontWeight: FontWeight.bold,
                                         ),
                                         filled: true,
@@ -891,7 +880,7 @@ class _AddGearState extends State<AddGear> {
                                       ),
                                       style: TextStyle(
                                         color: AppColors.textColorPrimary,
-                                        fontSize: 28,
+                                        fontSize: AppData.text28,
                                       ),
                                     ),
                                   )),
@@ -906,7 +895,6 @@ class _AddGearState extends State<AddGear> {
                                       focusNodes: [_quantityFocusNode2],
                                     ),
                                     disableScroll: true,
-
                                     child: TextField(
                                       focusNode: _quantityFocusNode2,
                                       controller: irpgGearQuantityController,
@@ -921,8 +909,7 @@ class _AddGearState extends State<AddGear> {
                                         setState(() {
                                           if (weight == 0) {
                                             irpgQuantityErrorMessage = 'Quantity must be greater than 0.';
-                                          }
-                                          else{
+                                          } else {
                                             irpgQuantityErrorMessage = null;
                                           }
                                         });
@@ -937,7 +924,7 @@ class _AddGearState extends State<AddGear> {
                                         errorText: irpgQuantityErrorMessage,
                                         labelStyle: TextStyle(
                                           color: AppColors.textColorPrimary,
-                                          fontSize: 22,
+                                          fontSize: AppData.text22,
                                           //fontWeight: FontWeight.bold,
                                         ),
                                         filled: true,
@@ -961,7 +948,7 @@ class _AddGearState extends State<AddGear> {
                                       ),
                                       style: TextStyle(
                                         color: AppColors.textColorPrimary,
-                                        fontSize: 28,
+                                        fontSize: AppData.text28,
                                       ),
                                     ),
                                   )),
@@ -983,16 +970,17 @@ class _AddGearState extends State<AddGear> {
                                       Text(
                                         'HAZMAT',
                                         style: TextStyle(
-                                          fontSize: 22,
+                                          fontSize: AppData.text22,
                                           color: AppColors.textColorPrimary,
                                         ),
                                       ),
                                       Spacer(),
                                       Text(
                                         selectedGearName == null
-                                        ? ''
-                                        :
-                                        isHazmatIRPG ? 'Yes' : 'No', // Dynamic label
+                                            ? ''
+                                            : isHazmatIRPG
+                                                ? 'Yes'
+                                                : 'No', // Dynamic label
                                         style: TextStyle(
                                           fontSize: AppData.text18,
                                           color: AppColors.textColorPrimary,
@@ -1003,12 +991,12 @@ class _AddGearState extends State<AddGear> {
                                       Switch(
                                         value: isHazmatIRPG,
                                         onChanged: selectedGearName == null
-                                            ? (_) {}  // Prevent interaction but keep the track visible
+                                            ? (_) {} // Prevent interaction but keep the track visible
                                             : (bool value) {
-                                          setState(() {
-                                            isHazmatIRPG = value; // Update the toggle state
-                                          });
-                                        },
+                                                setState(() {
+                                                  isHazmatIRPG = value; // Update the toggle state
+                                                });
+                                              },
                                         activeColor: Colors.red,
                                         inactiveThumbColor: selectedGearName == null
                                             ? Colors.grey[400] // Gray out thumb when disabled
@@ -1017,8 +1005,6 @@ class _AddGearState extends State<AddGear> {
                                             ? Colors.grey[600] // Keep track visible when disabled
                                             : AppColors.textFieldColor,
                                       ),
-
-
                                     ],
                                   ),
                                 ),

@@ -1,18 +1,17 @@
 import 'dart:ui';
+
 import 'package:fire_app/Data/load_accoutrements.dart';
-import 'package:fire_app/UI/06_saved_trips.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
+
 import '../CodeShare/variables.dart';
+import '../Data/customItem.dart';
 import '../Data/gear.dart';
-import '../Data/crewmember.dart';
+import '../Data/load.dart';
 import '../Data/sling.dart';
 import '../Data/trip.dart';
-import '../Data/load.dart';
-import '../Data/customItem.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../main.dart';
 
 // Double integers when calculating quantity dont always work out. a 45 lb QB can become 44
@@ -198,7 +197,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                       borderRadius: BorderRadius.circular(0.0),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.8),
+                                          color: Colors.black.withValues(alpha: 0.8),
                                           spreadRadius: 1,
                                           blurRadius: 5,
                                           offset: Offset(0, 3),
@@ -314,7 +313,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                           // Rounded corners
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.grey.withOpacity(0.8),
+                                              color: Colors.grey.withValues(alpha: 0.8),
                                               spreadRadius: 1,
                                               blurRadius: 5,
                                               offset: Offset(0, 3), // Shadow position
@@ -419,7 +418,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                     });
                                                                     Navigator.of(context).pop();
                                                                   },
-                                                                  child: Text('Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize,color: AppColors.saveButtonAllowableWeight)),
+                                                                  child: Text('Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight)),
                                                                 ),
                                                               ],
                                                             );
@@ -432,7 +431,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                         if (gear.quantity > 1)
                                                           Text(
                                                             'Qty: ${selectedGearQuantities[gear] ?? 1}',
-                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text14, color: AppColors.textColorSecondary),
+                                                            style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorSecondary),
                                                           ),
                                                         if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
                                                       ],
@@ -756,18 +755,18 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
 
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Center(
           child: Text(
             'Trip Saved!',
             style: TextStyle(
               color: Colors.black,
-              fontSize: 32,
+              fontSize: AppData.text32,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        duration: Duration(seconds: 1),
+        duration: const Duration(seconds: 1),
         backgroundColor: Colors.green,
       ),
     );
@@ -833,7 +832,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
           children: [
             Text(
               widget.trip.tripName,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lb',
@@ -1069,7 +1068,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                 color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
                                                     ? Colors.white // Warning color
                                                     : Colors.black,
-                                                fontSize: 22,
+                                                fontSize: AppData.text22,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
@@ -1112,7 +1111,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                           color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
                                               ? Colors.white // Warning color
                                               : Colors.black,
-                                          size: 36,
+                                          size: AppData.text36,
                                         ),
                                       ],
                                     ),
@@ -1138,7 +1137,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                               ), // Rounded corners
                                             ),
                                             alignment: Alignment.center,
-                                            child:  Text(
+                                            child: Text(
                                               'OVERWEIGHT',
                                               style: TextStyle(
                                                 fontSize: AppData.text18,
@@ -1373,7 +1372,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                               ),
                                                                               if (item is Gear)
                                                                                 Text(
-                                                                                  'Quantity: ${(item is Gear) ? item.quantity : 1} x ${item.weight} lb',
+                                                                                  'Quantity: ${item.quantity} x ${item.weight} lb',
                                                                                   style: TextStyle(
                                                                                     fontSize: AppData.text14,
                                                                                     color: Colors.black,
@@ -1597,7 +1596,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                               textAlign: TextAlign.center,
                                               softWrap: true,
                                               style: TextStyle(
-                                                fontSize: 22,
+                                                fontSize: AppData.text22,
                                                 fontWeight: FontWeight.bold,
                                                 color: AppColors.textColorPrimary,
                                               ),
@@ -1649,7 +1648,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                               textAlign: TextAlign.center,
                               softWrap: true,
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: AppData.text22,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textColorPrimary,
                               ),

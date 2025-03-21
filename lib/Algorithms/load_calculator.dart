@@ -1,16 +1,17 @@
+import 'dart:math';
+
 import 'package:fire_app/Data/positional_preferences.dart';
 import 'package:flutter/material.dart';
 
 import '../CodeShare/variables.dart';
-import '../main.dart';
 import '../Data/crew.dart';
-import '../Data/gear_preferences.dart';
-import '../Data/trip.dart';
-import 'dart:math';
-import '../Data/load.dart';
 import '../Data/crewmember.dart';
 import '../Data/gear.dart';
+import '../Data/gear_preferences.dart';
+import '../Data/load.dart';
+import '../Data/trip.dart';
 import '../Data/trip_preferences.dart';
+import '../main.dart';
 
 // TripPreference based sorting algorithm
 Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference, bool isExternalManifest, int safetyBuffer) async {
@@ -134,15 +135,15 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                     );
                   }));
                   // Add all personal tools
-                  crewMembersDynamic.forEach((member) {
+                  for (var member in crewMembersDynamic) {
                     load.loadGear
                         .addAll(member.personalTools as Iterable<Gear>);
-                  });
+                  }
                   load.weight += totalGroupWeight;
                   // Remove members from crewMembersCopy based on their name
-                  crewMembersDynamic.forEach((dynamicMember) {
+                  for (var dynamicMember in crewMembersDynamic) {
                     crewMembersCopy.removeWhere((member) => member.name == dynamicMember.name);
-                  });
+                  }
                   break;
                 }
               }
@@ -203,15 +204,15 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                       }).toList(),
                     );
                   }));
-                  crewMembersDynamic.forEach((member) {
+                  for (var member in crewMembersDynamic) {
                     load.loadGear
                         .addAll(member.personalTools as Iterable<Gear>);
-                  });
+                  }
                   load.weight += totalGroupWeight;
                   // Remove members from crewMembersCopy based on their name
-                  crewMembersDynamic.forEach((dynamicMember) {
+                  for (var dynamicMember in crewMembersDynamic) {
                     crewMembersCopy.removeWhere((member) => member.name == dynamicMember.name);
-                  });
+                  }
                   break;
                 }
               }
@@ -310,15 +311,15 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                         }).toList(),
                       );
                     }));
-                    crewMembersDynamic.forEach((member) {
+                    for (var member in crewMembersDynamic) {
                       load.loadGear
                           .addAll(member.personalTools as Iterable<Gear>);
-                    });
+                    }
                     load.weight += totalGroupWeight;
                     // Remove members from crewMembersCopy based on their name
-                    crewMembersDynamic.forEach((dynamicMember) {
+                    for (var dynamicMember in crewMembersDynamic) {
                       crewMembersCopy.removeWhere((member) => member.name == dynamicMember.name);
-                    });
+                    }
                     loadIndex = (loadIndex + 1) %
                         loads.length; // Loop through loads cyclically
                     break;

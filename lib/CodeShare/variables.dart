@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/material.dart';
 
 // Dark Modes on left side
 class AppColors {
@@ -128,11 +127,13 @@ class AppData {
   static double get text22 => 22 * _textScalingFactor * _textOrientationFactor;
   static double get text24 => 24 * _textScalingFactor * _textOrientationFactor;
   static double get text28 => 28 * _textScalingFactor * _textOrientationFactor;
+  static double get text30 => 30 * _textScalingFactor * _textOrientationFactor;
   static double get text32 => 32 * _textScalingFactor * _textOrientationFactor;
+  static double get text36 => 36 * _textScalingFactor * _textOrientationFactor;
   static double get text48 => 48 * _textScalingFactor * _textOrientationFactor;
   static double get tabBarTextSize => 14 * _textScalingFactor * _textOrientationFactor;
   static double get tabBarIconSize => 24 * _textScalingFactor * _textOrientationFactor;
-  static double get bottomDialogTextSize => 12 * _textScalingFactor * _textOrientationFactor;
+  static double get bottomDialogTextSize => 14 * _textScalingFactor * _textOrientationFactor;
   static double get dropDownArrowSize => 14 * _textScalingFactor * _textOrientationFactor;
   static double get cupertinoPickerItemSize => 24 * _textScalingFactor * _textOrientationFactor;
   static double get miniDialogTitleTextSize => 22 * _textScalingFactor * _textOrientationFactor;
@@ -225,7 +226,7 @@ Widget proxyDecorator(Widget child, int index, Animation<double> animation) {
       return Material(
         elevation: elevation,
         color: Colors.transparent,
-        shadowColor: Colors.black.withOpacity(0.5),
+        shadowColor: Colors.black.withValues(alpha: 0.5),
         child: child,
       );
     },

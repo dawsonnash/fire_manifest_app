@@ -1,5 +1,9 @@
-import 'dart:ui';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math' as math; // Import this at the top of your file
+import 'dart:ui';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/Data/trip_preferences.dart';
 import 'package:fire_app/UI/quick_guide.dart';
@@ -7,24 +11,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
-import 'package:keyboard_actions/keyboard_actions_config.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../CodeShare/variables.dart';
-import 'dart:convert';
-import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../CodeShare/keyboardActions.dart';
+import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../Data/crew_loadout.dart';
 import '../Data/crewmember.dart';
 import '../Data/gear.dart';
-import '../CodeShare/keyboardActions.dart';
 
 class SettingsView extends StatefulWidget {
   final bool isDarkMode;
@@ -289,7 +290,6 @@ class _SettingsState extends State<SettingsView> {
   }
 
   Future<void> _checkSyncStatus(String loadoutName) async {
-
     Map<String, dynamic>? lastSavedData = await CrewLoadoutStorage.loadLoadout(loadoutName);
 
     if (lastSavedData == null) {
@@ -315,7 +315,6 @@ class _SettingsState extends State<SettingsView> {
     setState(() {
       isOutOfSync = (lastSavedCrewJson != currentCrewJson) || (lastSavedPreferencesJson != currentPreferencesJson);
     });
-
   }
 
   void _showSyncDifferencesDialog() async {
@@ -628,14 +627,14 @@ class _SettingsState extends State<SettingsView> {
 
                 // Show successful save popup
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                    SnackBar(
                     content: Center(
                       child: Text(
                         'Crew Imported!',
                         // Maybe change look
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 22,
+                          fontSize: AppData.text22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -646,7 +645,8 @@ class _SettingsState extends State<SettingsView> {
                 );
               },
               child: Text(
-                'Confirm', style: TextStyle(color: Colors.red),
+                'Confirm',
+                style: TextStyle(color: Colors.red),
               ),
             ),
           ],
@@ -912,7 +912,7 @@ class _SettingsState extends State<SettingsView> {
                 Text(
                   'Select an option',
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: AppData.text22,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textColorPrimary,
                   ),
@@ -921,7 +921,7 @@ class _SettingsState extends State<SettingsView> {
                   icon: Icon(
                     Icons.info_outline, // Info icon
                     color: Colors.white,
-                    size: 22, // Adjust size if needed
+                    size: AppData.text22, // Adjust size if needed
                   ),
                   onPressed: () {
                     // Show an info dialog or tooltip when clicked
@@ -1197,7 +1197,7 @@ class _SettingsState extends State<SettingsView> {
             // Maybe change look
             style: TextStyle(
               color: Colors.black,
-              fontSize: 22,
+              fontSize: AppData.text22,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1233,7 +1233,7 @@ class _SettingsState extends State<SettingsView> {
             // Maybe change look
             style: TextStyle(
               color: Colors.black,
-              fontSize: 22,
+              fontSize: AppData.text22,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1269,7 +1269,7 @@ class _SettingsState extends State<SettingsView> {
             // Maybe change look
             style: TextStyle(
               color: Colors.black,
-              fontSize: 22,
+              fontSize: AppData.text22,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1355,7 +1355,6 @@ class _SettingsState extends State<SettingsView> {
 
   final FocusNode _focusNode = FocusNode();
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1363,7 +1362,7 @@ class _SettingsState extends State<SettingsView> {
         title: Center(
           child: Text(
             'Settings',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+            style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
           ),
         ),
         backgroundColor: AppColors.appBarColor,
@@ -1480,7 +1479,7 @@ class _SettingsState extends State<SettingsView> {
                           trailing: Icon(
                             Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
                             color: Colors.white, // Match the arrow color with the text color
-                            size: 24, // Set a fixed size for consistency
+                            size: AppData.text24, // Set a fixed size for consistency
                           ),
                           children: [
                             // Dark Mode Toggle
@@ -1509,26 +1508,26 @@ class _SettingsState extends State<SettingsView> {
                             //   ),
                             // ),
                             // Enable Background Image Toggle (Visible only if Dark Mode is ON)
-                          //  if (isDarkMode)
-                              ListTile(
-                                title: Text(
-                                  'Enable Background Image',
-                                  style: TextStyle(fontSize: AppData.text18, color: Colors.white),
-                                ),
-                                trailing: Switch(
-                                  value: enableBackgroundImage,
-                                  onChanged: (value) {
-                                    widget.onBackgroundImageChange(value); // Notify parent widget
-                                    setState(() {
-                                      enableBackgroundImage = value;
-                                    });
-                                    ThemePreferences.setBackgroundImagePreference(value); // Save preference
-                                  },
-                                  activeColor: Colors.green,
-                                  inactiveThumbColor: Colors.grey,
-                                  inactiveTrackColor: Colors.white24,
-                                ),
+                            //  if (isDarkMode)
+                            ListTile(
+                              title: Text(
+                                'Enable Background Image',
+                                style: TextStyle(fontSize: AppData.text18, color: Colors.white),
                               ),
+                              trailing: Switch(
+                                value: enableBackgroundImage,
+                                onChanged: (value) {
+                                  widget.onBackgroundImageChange(value); // Notify parent widget
+                                  setState(() {
+                                    enableBackgroundImage = value;
+                                  });
+                                  ThemePreferences.setBackgroundImagePreference(value); // Save preference
+                                },
+                                activeColor: Colors.green,
+                                inactiveThumbColor: Colors.grey,
+                                inactiveTrackColor: Colors.white24,
+                              ),
+                            ),
                           ],
                         ),
 
@@ -1544,7 +1543,7 @@ class _SettingsState extends State<SettingsView> {
                                 icon: Icon(
                                   Icons.info_outline, // Info icon
                                   color: Colors.white,
-                                  size: 22, // Adjust size if needed
+                                  size: AppData.text22, // Adjust size if needed
                                 ),
                                 onPressed: () {
                                   // Show an info dialog or tooltip when clicked
@@ -1580,7 +1579,7 @@ class _SettingsState extends State<SettingsView> {
                           trailing: Icon(
                             Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
                             color: Colors.white, // Match the arrow color with the text color
-                            size: 24, // Set a fixed size for consistency
+                            size: AppData.text24, // Set a fixed size for consistency
                           ),
                           children: [
                             Column(
@@ -1598,7 +1597,7 @@ class _SettingsState extends State<SettingsView> {
                                       trailing: Icon(
                                         Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
                                         color: Colors.white, // Match the arrow color with the text color
-                                        size: 24, // Set a fixed size for consistency
+                                        size: AppData.text24, // Set a fixed size for consistency
                                       ),
                                       children: [
                                         ListTile(
@@ -1656,7 +1655,7 @@ class _SettingsState extends State<SettingsView> {
                                       trailing: Icon(
                                         Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
                                         color: Colors.white, // Match the arrow color with the text color
-                                        size: 24, // Set a fixed size for consistency
+                                        size: AppData.text24, // Set a fixed size for consistency
                                       ),
                                       children: [
                                         ListTile(
@@ -1720,7 +1719,7 @@ class _SettingsState extends State<SettingsView> {
                           trailing: Icon(
                             Icons.keyboard_arrow_down,
                             color: Colors.white,
-                            size: 24,
+                            size: AppData.text24,
                           ),
                           children: [
                             Column(
@@ -1738,7 +1737,7 @@ class _SettingsState extends State<SettingsView> {
                                   trailing: Icon(
                                     Icons.keyboard_arrow_down,
                                     color: Colors.white,
-                                    size: 24,
+                                    size: AppData.text24,
                                   ),
                                   children: [
                                     ListTile(
@@ -1816,7 +1815,7 @@ class _SettingsState extends State<SettingsView> {
                                 //                 icon: Icon(
                                 //                   Icons.info_outline, // Info icon
                                 //                   color: Colors.white,
-                                //                   size: 22, // Adjust size if needed
+                                //                   size: AppData.text22, // Adjust size if needed
                                 //                 ),
                                 //                 onPressed: () {
                                 //                   showDialog(
@@ -1932,16 +1931,16 @@ class _SettingsState extends State<SettingsView> {
                                             ),
                                           ),
                                         if (selectedLoadout != null)
-                                        DropdownMenuItem<String>(
-                                          value: 'Delete Current Loadout',
-                                          child: Row(
-                                            children: [
-                                              Icon(Icons.delete_forever, color: Colors.red), // Reset icon
-                                              SizedBox(width: 8),
-                                              Text('Delete Current Loadout', style: TextStyle(color: Colors.red, fontWeight: FontWeight.normal)),
-                                            ],
+                                          DropdownMenuItem<String>(
+                                            value: 'Delete Current Loadout',
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.delete_forever, color: Colors.red), // Reset icon
+                                                SizedBox(width: 8),
+                                                Text('Delete Current Loadout', style: TextStyle(color: Colors.red, fontWeight: FontWeight.normal)),
+                                              ],
+                                            ),
                                           ),
-                                        ),
                                         // Save Current Loadout Option
                                         DropdownMenuItem<String>(
                                           value: 'Save Current',
@@ -1967,7 +1966,7 @@ class _SettingsState extends State<SettingsView> {
                                       ],
                                       onChanged: (String? newValue) async {
                                         String? previousLoadout = selectedLoadout;
-                                        if (newValue == 'Delete Current Loadout'){
+                                        if (newValue == 'Delete Current Loadout') {
                                           showDialog(
                                             context: context,
                                             builder: (BuildContext context) {
@@ -1998,7 +1997,7 @@ class _SettingsState extends State<SettingsView> {
                                                       // Close the dialogs
                                                       Navigator.of(context).pop(); // Close confirmation dialog
                                                     },
-                                                    child:   Text(
+                                                    child: Text(
                                                       'Delete',
                                                       style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                                     ),
@@ -2374,7 +2373,7 @@ class _SettingsState extends State<SettingsView> {
                                             ' Last Updated: $lastSavedTimestamp ',
                                             style: TextStyle(
                                               fontSize: AppData.text14,
-                                              color: isOutOfSync ? Colors.red : Colors.green.withOpacity(0.8),
+                                              color: isOutOfSync ? Colors.red : Colors.green.withValues(alpha: 0.8),
                                               fontWeight: isOutOfSync ? FontWeight.bold : FontWeight.normal,
                                             ),
                                           ),
@@ -2406,7 +2405,7 @@ class _SettingsState extends State<SettingsView> {
                           icon: Icon(
                             Icons.people_outline_rounded,
                             color: Colors.white,
-                            size: 28,
+                            size: AppData.text28,
                           )),
                       TextButton(
                         onPressed: importExportDialog,
@@ -2444,11 +2443,12 @@ class _SettingsState extends State<SettingsView> {
                                     ),
                                     content: SingleChildScrollView(
                                       child: Text(
-                                        'The calculations provided by this app are intended for informational purposes only. '
-                                        'While every effort has been made to ensure accuracy, users must independently verify and validate '
-                                        'all data before relying on it for operational or decision-making purposes. The developers assume no '
-                                        'liability for errors, omissions, or any outcomes resulting from the use of this app. By continuing, '
-                                        'you acknowledge and accept full responsibility for reviewing and confirming all calculations.',
+                                        'This application is designed to assist wildland fire personnel in creating detailed manifests for internal and external aviation operations. '
+                                            'The calculations and information provided and generated by this app are for INFORMATIONAL PURPOSES ONLY and should not be solely relied upon for ANY operational, legal, safety, or decision-making purpose.\n\n'
+                                            'While reasonable efforts have been made to ensure accuracy in weight calculations, the developers, distributors, and associated entities make no warranties, express or implied, regarding the reliability, completeness, or correctness of the data generated. '
+                                            'Users assume full responsibility for independently verifying and validating all outputs before use.\n\n'
+                                            'By proceeding, you expressly acknowledge and agree that the developers and associated entities shall not be held liable for any direct, indirect, incidental, consequential, or special damages, including but not limited to financial loss, injury, or regulatory non-compliance, arising from or related to the use or misuse of this application. '
+                                            'Continued use constitutes acceptance of these terms and an agreement to waive any claims against the developers or associated parties.',
                                         style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18),
                                       ),
                                     ),

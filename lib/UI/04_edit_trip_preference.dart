@@ -1,15 +1,17 @@
 import 'dart:ui';
-import 'package:flutter/material.dart';
+
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/UI/04_add_load_preference.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import '../CodeShare/variables.dart';
+import '../Data/crew.dart';
+import '../Data/crewmember.dart';
 import '../Data/gear_preferences.dart';
 import '../Data/positional_preferences.dart';
 import '../Data/trip_preferences.dart';
-import '../Data/crew.dart';
-import '../Data/crewmember.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../CodeShare/variables.dart';
 
 class EditTripPreference extends StatefulWidget {
   final TripPreference tripPreference;
@@ -35,11 +37,11 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        TextEditingController titleController =
-        TextEditingController(text: widget.tripPreference.tripPreferenceName);
+        TextEditingController titleController = TextEditingController(text: widget.tripPreference.tripPreferenceName);
         String? errorMessage; // Variable to hold error message
 
-        return StatefulBuilder( // Enables state updates inside the dialog
+        return StatefulBuilder(
+          // Enables state updates inside the dialog
           builder: (context, setState) {
             return AlertDialog(
               backgroundColor: AppColors.textFieldColor2,
@@ -73,9 +75,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                 TextButton(
                   onPressed: () {
                     bool tripNameExists = savedPreferences.tripPreferences.any(
-                          (preference) =>
-                      preference.tripPreferenceName == titleController.text &&
-                          preference != widget.tripPreference, // Exclude current name if editing the same trip
+                      (preference) => preference.tripPreferenceName == titleController.text && preference != widget.tripPreference, // Exclude current name if editing the same trip
                     );
 
                     if (tripNameExists) {
@@ -89,7 +89,6 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                           errorMessage = null;
                         });
                       });
-
                     } else if (titleController.text.trim().isEmpty) {
                       setState(() {
                         errorMessage = "Trip Preference name cannot be empty";
@@ -101,7 +100,6 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                           errorMessage = null;
                         });
                       });
-
                     } else {
                       setState(() {
                         widget.tripPreference.tripPreferenceName = titleController.text.trim();
@@ -160,7 +158,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
     );
 
     TextStyle panelTextStyle = TextStyle(
-      fontSize: 22,
+      fontSize: AppData.text22,
       fontWeight: FontWeight.bold,
       color: AppColors.textColorPrimary,
     );
@@ -181,7 +179,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
           onDoubleTap: _editTitle,
           child: Text(
             widget.tripPreference.tripPreferenceName,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+            style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
           ),
         ),
         actions: [
@@ -193,7 +191,6 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
             onPressed: _editTitle,
           ),
         ],
-
         backgroundColor: AppColors.appBarColor,
       ),
       body: Stack(
@@ -261,7 +258,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                           'No Load Preferences added...',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
-                                            fontSize: 22,
+                                            fontSize: AppData.text22,
                                             fontWeight: FontWeight.bold,
                                             color: AppColors.textColorPrimary,
                                           ),
@@ -290,43 +287,40 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                         color: AppColors.textFieldColor,
                                         borderRadius: BorderRadius.circular(9),
                                       ),
-                                    child: ListTile(
-                                      title: Text(
-                                        posPref.crewMembersDynamic.map((item) {
-                                          if (item is CrewMember) {
-                                            return item.name; // Display individual crew member name
-                                          } else if (item is List<CrewMember>) {
-                                            // Check which Saw Team the list matches and return the appropriate Saw Team name
-                                            for (int i = 1; i <= 6; i++) {
-                                              List<CrewMember> sawTeam = crew.getSawTeam(i);
+                                      child: ListTile(
+                                        title: Text(
+                                          posPref.crewMembersDynamic.map((item) {
+                                            if (item is CrewMember) {
+                                              return item.name; // Display individual crew member name
+                                            } else if (item is List<CrewMember>) {
+                                              // Check which Saw Team the list matches and return the appropriate Saw Team name
+                                              for (int i = 1; i <= 6; i++) {
+                                                List<CrewMember> sawTeam = crew.getSawTeam(i);
 
-                                              bool isMatchingSawTeam = sawTeam.length == item.length &&
-                                                  sawTeam.every((teamMember) =>
-                                                      item.any((importedMember) =>
-                                                      importedMember.name == teamMember.name &&
-                                                          importedMember.position == teamMember.position));
+                                                bool isMatchingSawTeam = sawTeam.length == item.length &&
+                                                    sawTeam
+                                                        .every((teamMember) => item.any((importedMember) => importedMember.name == teamMember.name && importedMember.position == teamMember.position));
 
-                                              if (isMatchingSawTeam) {
-                                                return 'Saw Team $i'; // Return Saw Team name
+                                                if (isMatchingSawTeam) {
+                                                  return 'Saw Team $i'; // Return Saw Team name
+                                                }
                                               }
                                             }
-
-                                          }
-                                          return '';
-                                        }).join(', '),
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text20, color: AppColors.textColorPrimary),
+                                            return '';
+                                          }).join(', '),
+                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text20, color: AppColors.textColorPrimary),
+                                        ),
+                                        subtitle: Text("Load Preference: ${loadPreferenceMap[posPref.loadPreference]}", style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary)),
+                                        trailing: IconButton(
+                                          icon: const Icon(Icons.delete, color: Colors.red),
+                                          onPressed: () {
+                                            setState(() {
+                                              widget.tripPreference.positionalPreferences.removeAt(index);
+                                              widget.tripPreference.save(); // Save changes to Hive
+                                            });
+                                          },
+                                        ),
                                       ),
-                                      subtitle: Text("Load Preference: ${loadPreferenceMap[posPref.loadPreference]}", style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary)),
-                                      trailing: IconButton(
-                                        icon: const Icon(Icons.delete, color: Colors.red),
-                                        onPressed: () {
-                                          setState(() {
-                                            widget.tripPreference.positionalPreferences.removeAt(index);
-                                            widget.tripPreference.save(); // Save changes to Hive
-                                          });
-                                        },
-                                      ),
-                                    ),
                                     ),
                                   );
                                 }
@@ -335,29 +329,29 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                 final gearIndex = index - widget.tripPreference.positionalPreferences.length;
                                 final gearPref = widget.tripPreference.gearPreferences[gearIndex];
                                 return Card(
-                                    color: Colors.transparent,
-                                    child: Container(
+                                  color: Colors.transparent,
+                                  child: Container(
                                     decoration: BoxDecoration(
-                                    color: AppColors.textFieldColor,
-                                    borderRadius: BorderRadius.circular(9),
-                                ),
-                                  child: ListTile(
-                                    title: Text(
-                                      gearPref.gear.map((item) => '${item.name} (x${item.quantity})').join(', '),
-                                      style:  TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text20, color: AppColors.textColorPrimary),
+                                      color: AppColors.textFieldColor,
+                                      borderRadius: BorderRadius.circular(9),
                                     ),
-                                    subtitle: Text("Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}", style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary)),
-                                    trailing: IconButton(
-                                      icon: const Icon(Icons.delete, color: Colors.red),
-                                      onPressed: () {
-                                        setState(() {
-                                          widget.tripPreference.gearPreferences.removeAt(gearIndex);
-                                          widget.tripPreference.save(); // Save changes to Hive
-                                        });
-                                      },
+                                    child: ListTile(
+                                      title: Text(
+                                        gearPref.gear.map((item) => '${item.name} (x${item.quantity})').join(', '),
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text20, color: AppColors.textColorPrimary),
+                                      ),
+                                      subtitle: Text("Load Preference: ${loadPreferenceMap[gearPref.loadPreference]}", style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary)),
+                                      trailing: IconButton(
+                                        icon: const Icon(Icons.delete, color: Colors.red),
+                                        onPressed: () {
+                                          setState(() {
+                                            widget.tripPreference.gearPreferences.removeAt(gearIndex);
+                                            widget.tripPreference.save(); // Save changes to Hive
+                                          });
+                                        },
+                                      ),
                                     ),
                                   ),
-                                    ),
                                 );
                               },
                             ),

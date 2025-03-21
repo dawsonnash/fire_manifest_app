@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
-import 'positional_preferences.dart';
+
 import 'gear_preferences.dart';
+import 'positional_preferences.dart';
 
 part 'trip_preferences.g.dart';
 

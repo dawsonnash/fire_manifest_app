@@ -1,19 +1,18 @@
 import 'dart:math';
-import 'dart:ui';
+
+import 'package:fire_app/UI/05_build_your_own_manifest.dart';
 import 'package:fire_app/UI/05_byom_external.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+
 import '../CodeShare/keyboardActions.dart';
+import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
 import '../Data/gear.dart';
 import '../Data/trip.dart';
-import 'package:fire_app/UI/05_build_your_own_manifest.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import '../CodeShare/variables.dart';
 
 class DesignNewManifest extends StatefulWidget {
   const DesignNewManifest({super.key});
@@ -111,12 +110,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
           safetyBuffer = 0;
         }
         // Creating a new Trip object
-        newTrip = Trip(
-            tripName: tripNameCapitalized,
-            allowable: allowable,
-            availableSeats: availableSeats,
-            isExternal: isExternalManifest,
-            safetyBuffer: safetyBuffer);
+        newTrip = Trip(tripName: tripNameCapitalized, allowable: allowable, availableSeats: availableSeats, isExternal: isExternalManifest, safetyBuffer: safetyBuffer);
       }
     });
   }
@@ -140,7 +134,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
     // Main theme button style
     final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
-        textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        textStyle: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold),
         backgroundColor: Colors.grey,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         elevation: 15,
@@ -196,19 +190,19 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                               children: [
                                 isExternalManifest
                                     ? Transform.scale(
-                                  scale: 1.5,
-                                  child: SvgPicture.asset(
-                                    'assets/icons/sling_icon.svg', // Your SVG file path
-                                    width: 24, // Adjust size as needed
-                                    height: 24,
-                                    colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
-                                  ),
-                                )
+                                        scale: 1.5,
+                                        child: SvgPicture.asset(
+                                          'assets/icons/sling_icon.svg', // Your SVG file path
+                                          width: 24, // Adjust size as needed
+                                          height: 24,
+                                          colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
+                                        ),
+                                      )
                                     : Icon(
-                                  FontAwesomeIcons.helicopter,
-                                  color: AppColors.primaryColor,
-                                  size: AppData.text24,
-                                ),
+                                        FontAwesomeIcons.helicopter,
+                                        color: AppColors.primaryColor,
+                                        size: AppData.text24,
+                                      ),
                                 SizedBox(width: 8), // Add spacing between icon and switch
                                 Switch(
                                   value: isExternalManifest,
@@ -288,7 +282,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                               ),
                               style: TextStyle(
                                 color: AppColors.textColorPrimary,
-                                fontSize: 24,
+                                fontSize: AppData.text24,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -527,8 +521,11 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                   keyboardController.text = originalValue;
                                                   Navigator.of(context).pop();
                                                 },
-                                                child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton,     fontSize: AppData.bottomDialogTextSize,
-                                                )),
+                                                child: Text('Cancel',
+                                                    style: TextStyle(
+                                                      color: AppColors.cancelButton,
+                                                      fontSize: AppData.bottomDialogTextSize,
+                                                    )),
                                               ),
                                               TextButton(
                                                 onPressed: isSaveEnabled
@@ -545,7 +542,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                 child: Text(
                                                   'Save',
                                                   style: TextStyle(
-                                                    color: isSaveEnabled ? AppColors.saveButtonAllowableWeight : Colors.grey,     fontSize: AppData.bottomDialogTextSize,
+                                                    color: isSaveEnabled ? AppColors.saveButtonAllowableWeight : Colors.grey, fontSize: AppData.bottomDialogTextSize,
                                                     // Show enabled/disabled state
                                                   ),
                                                 ),
@@ -557,7 +554,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                     },
                                   );
                                 },
-                                icon: Icon(FontAwesomeIcons.keyboard, size: 32, color: Colors.black),
+                                icon: Icon(FontAwesomeIcons.keyboard, size: AppData.text32, color: Colors.black),
                               ),
                             ],
                           ),
@@ -602,7 +599,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                             side: const BorderSide(color: Colors.black, width: 2),
                                             shape: CircleBorder(),
                                           ),
-                                          child: const Icon(Icons.remove, color: Colors.black, size: 32),
+                                          child: Icon(Icons.remove, color: Colors.black, size: AppData.text32),
                                         ),
                                         const Spacer(),
                                         Stack(
@@ -614,7 +611,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                               child: Text(
                                                 '${_sliderValue.toStringAsFixed(0)} lb',
                                                 style: TextStyle(
-                                                  fontSize: 32,
+                                                  fontSize: AppData.text32,
                                                   fontWeight: FontWeight.bold,
                                                   color: AppColors.textColorPrimary,
                                                 ),
@@ -626,7 +623,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                               child: Text(
                                                 '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lb',
                                                 style: TextStyle(
-                                                  fontSize: 32,
+                                                  fontSize: AppData.text32,
                                                   fontWeight: FontWeight.bold,
                                                   color: AppColors.textColorPrimary,
                                                 ),
@@ -646,7 +643,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                             side: const BorderSide(color: Colors.black, width: 2),
                                             shape: CircleBorder(),
                                           ),
-                                          child: const Icon(Icons.add, color: Colors.black, size: 32),
+                                          child: Icon(Icons.add, color: Colors.black, size: AppData.text32),
                                         ),
                                       ],
                                     ),

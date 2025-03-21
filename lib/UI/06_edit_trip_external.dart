@@ -1,18 +1,17 @@
 import 'dart:ui';
+
 import 'package:fire_app/Data/load_accoutrements.dart';
-import 'package:fire_app/UI/06_saved_trips.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
+
 import '../CodeShare/variables.dart';
+import '../Data/customItem.dart';
 import '../Data/gear.dart';
+import '../Data/load.dart';
 import '../Data/sling.dart';
 import '../Data/trip.dart';
-import '../Data/load.dart';
-import '../Data/customItem.dart';
-import 'package:fire_app/UI/05_byom_external.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../main.dart';
 
 // Double integers when calculating quantity dont always work out. a 45 lb QB can become 44
@@ -191,7 +190,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                       borderRadius: BorderRadius.circular(0.0),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.8),
+                                          color: Colors.black.withValues(alpha: 0.8),
                                           spreadRadius: 1,
                                           blurRadius: 5,
                                           offset: Offset(0, 3),
@@ -201,7 +200,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                     child: CheckboxListTile(
                                       title: Text(
                                         accName,
-                                        style:  TextStyle(fontSize: AppData.text16, fontWeight: FontWeight.bold, color: Colors.black),
+                                        style: TextStyle(fontSize: AppData.text16, fontWeight: FontWeight.bold, color: Colors.black),
                                       ),
                                       value: selectedItems.any((item) => item is LoadAccoutrement && item.name == accName),
                                       onChanged: (bool? isChecked) {
@@ -260,7 +259,8 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                       decoration: BoxDecoration(
                                         color: AppColors.gearYellow, // Background color
                                         border: Border(
-                                          bottom: BorderSide(color: Colors.black, width: .75, // Black border
+                                          bottom: BorderSide(
+                                            color: Colors.black, width: .75, // Black border
                                           ),
                                         ),
                                       ),
@@ -306,7 +306,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                           // Rounded corners
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.grey.withOpacity(0.8),
+                                              color: Colors.grey.withValues(alpha: 0.8),
                                               spreadRadius: 1,
                                               blurRadius: 5,
                                               offset: Offset(0, 3), // Shadow position
@@ -324,7 +324,6 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                   children: [
                                                     Row(
                                                       children: [
-
                                                         Flexible(
                                                           child: Text(
                                                             gear.name,
@@ -344,7 +343,6 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                               size: AppData.text14, // Icon size
                                                             ),
                                                           ),
-
                                                       ],
                                                     ),
                                                     Text(
@@ -388,7 +386,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                   children: List<Widget>.generate(
                                                                     gear.quantity,
                                                                     // Use the full quantity for selection
-                                                                        (int index) {
+                                                                    (int index) {
                                                                       return Center(
                                                                         child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                       );
@@ -413,7 +411,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                     });
                                                                     Navigator.of(context).pop();
                                                                   },
-                                                                  child: Text('Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize,color: AppColors.saveButtonAllowableWeight)),
+                                                                  child: Text('Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight)),
                                                                 ),
                                                               ],
                                                             );
@@ -426,7 +424,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                         if (gear.quantity > 1)
                                                           Text(
                                                             'Qty: ${selectedGearQuantities[gear] ?? 1}',
-                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text14, color: AppColors.textColorSecondary),
+                                                            style: TextStyle( fontSize: AppData.text14, color: AppColors.textColorSecondary),
                                                           ),
                                                         if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
                                                       ],
@@ -542,7 +540,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                 },
                                                 child: Text(
                                                   'Cancel',
-                                                 style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
+                                                  style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                 ),
                                               ),
                                             ),
@@ -636,11 +634,11 @@ class _EditTripExternalState extends State<EditTripExternal> {
                       if (customItemName.isNotEmpty && customItemWeight > 0) {
                         // Add the custom item to the load
                         loads[selectedLoadIndex].slings![selectedSlingIndex].customItems.add(
-                          CustomItem(
-                            name: customItemName,
-                            weight: customItemWeight,
-                          ),
-                        );
+                              CustomItem(
+                                name: customItemName,
+                                weight: customItemWeight,
+                              ),
+                            );
                         // Clear fields after adding
                         customItemName = '';
                         customItemWeight = 0;
@@ -653,8 +651,8 @@ class _EditTripExternalState extends State<EditTripExternal> {
                           int selectedQuantity = selectedGearQuantities[item] ?? 1;
 
                           final int existingGearIndex = loads[selectedLoadIndex].slings?[selectedSlingIndex].loadGear.indexWhere(
-                                (loadItem) => loadItem is Gear && loadItem.name == item.name && loadItem.isPersonalTool == item.isPersonalTool,
-                          ) ??
+                                    (loadItem) => loadItem is Gear && loadItem.name == item.name && loadItem.isPersonalTool == item.isPersonalTool,
+                                  ) ??
                               -1; // Default to -1 if null
 
                           if (existingGearIndex != -1) {
@@ -665,14 +663,14 @@ class _EditTripExternalState extends State<EditTripExternal> {
                           } else {
                             // If it doesn't exist, add the new gear item to the load
                             loads[selectedLoadIndex].slings![selectedSlingIndex].loadGear.add(
-                              Gear(
-                                  name: item.name,
-                                  quantity: selectedQuantity,
-                                  weight: item.weight,
-                                  // Per-item weight, not total weight
-                                  isPersonalTool: item.isPersonalTool,
-                                  isHazmat: item.isHazmat),
-                            );
+                                  Gear(
+                                      name: item.name,
+                                      quantity: selectedQuantity,
+                                      weight: item.weight,
+                                      // Per-item weight, not total weight
+                                      isPersonalTool: item.isPersonalTool,
+                                      isHazmat: item.isHazmat),
+                                );
                           }
 
                           // Update the remaining quantity in the original inventory
@@ -682,12 +680,12 @@ class _EditTripExternalState extends State<EditTripExternal> {
                           }
                         } else if (item is LoadAccoutrement) {
                           loads[selectedLoadIndex].slings![selectedSlingIndex].loadAccoutrements.add(
-                            LoadAccoutrement(
-                              name: item.name,
-                              quantity: 1,
-                              weight: item.weight,
-                            ),
-                          );
+                                LoadAccoutrement(
+                                  name: item.name,
+                                  quantity: 1,
+                                  weight: item.weight,
+                                ),
+                              );
                         }
                       }
                     });
@@ -711,11 +709,10 @@ class _EditTripExternalState extends State<EditTripExternal> {
 
       // Iterate through each Load object and track gear usage
       for (var load in loads) {
-
         // Also track gear inside Slings (if they exist)
         if (load.slings != null) {
           for (var sling in load.slings!) {
-            for (var gear in sling.loadGear ) {
+            for (var gear in sling.loadGear) {
               usedGearQuantities[gear.name] = (usedGearQuantities[gear.name] ?? 0) + gear.quantity;
             }
           }
@@ -778,18 +775,18 @@ class _EditTripExternalState extends State<EditTripExternal> {
 
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Center(
           child: Text(
             'Trip Saved!',
             style: TextStyle(
               color: Colors.black,
-              fontSize: 32,
+              fontSize: AppData.text32,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        duration: Duration(seconds: 1),
+        duration: const Duration(seconds: 1),
         backgroundColor: Colors.green,
       ),
     );
@@ -797,7 +794,6 @@ class _EditTripExternalState extends State<EditTripExternal> {
     Navigator.of(context).pop(); // Go back to the home screen
     Navigator.of(context).pop(); // Go back to the home screen
     selectedIndexNotifier.value = 1; // Switch to "Saved Trips" tab
-
   }
 
   // Function to calculate available weight for a load
@@ -857,13 +853,12 @@ class _EditTripExternalState extends State<EditTripExternal> {
           children: [
             Text(
               widget.trip.tripName,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lb',
               style: TextStyle(fontSize: AppData.text18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
-
           ],
         ),
         actions: [
@@ -1071,7 +1066,8 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                           ? Colors.black // Warning color
                                           : AppColors.fireColor, // Normal color
                                       // If overweight or safety buffer
-                                      borderRadius: ((calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable) || (calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable - safetyBuffer) && isExpanded )
+                                      borderRadius: ((calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable) ||
+                                              (calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable - safetyBuffer) && isExpanded)
                                           ? const BorderRadius.vertical(top: Radius.circular(8))
                                           : const BorderRadius.all(
                                               Radius.circular(10),
@@ -1093,7 +1089,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                 color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
                                                     ? Colors.white // Warning color
                                                     : Colors.black,
-                                                fontSize: 22,
+                                                fontSize: AppData.text22,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
@@ -1136,7 +1132,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                           color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
                                               ? Colors.white // Warning color
                                               : Colors.black,
-                                          size: 36,
+                                          size: AppData.text36,
                                         ),
                                       ],
                                     ),
@@ -1187,7 +1183,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                               ), // Rounded corners
                                             ),
                                             alignment: Alignment.center,
-                                            child:  Text(
+                                            child: Text(
                                               'OVER $safetyBuffer LB SAFETY BUFFER',
                                               style: TextStyle(
                                                 fontSize: AppData.text18,
@@ -1397,7 +1393,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                               ),
                                                                               if (item is Gear)
                                                                                 Text(
-                                                                                      'Quantity: ${(item is Gear) ? item.quantity : 1} x ${item.weight} lb',
+                                                                                  'Quantity: ${(item is Gear) ? item.quantity : 1} x ${item.weight} lb',
                                                                                   style: TextStyle(
                                                                                     fontSize: AppData.text14,
                                                                                     color: Colors.black,
@@ -1411,7 +1407,6 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                                     color: Colors.black,
                                                                                   ),
                                                                                 ),
-
                                                                             ],
                                                                           ),
                                                                           IconButton(
@@ -1461,7 +1456,8 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                                                   onPressed: () {
                                                                                                     Navigator.of(context).pop(); // Cancel action
                                                                                                   },
-                                                                                                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
+                                                                                                  child: Text('Cancel',
+                                                                                                      style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                                                                                                 ),
                                                                                                 TextButton(
                                                                                                   onPressed: () {
@@ -1621,7 +1617,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                               textAlign: TextAlign.center,
                                               softWrap: true,
                                               style: TextStyle(
-                                                fontSize: 22,
+                                                fontSize: AppData.text22,
                                                 fontWeight: FontWeight.bold,
                                                 color: AppColors.textColorPrimary,
                                               ),
@@ -1673,7 +1669,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                               textAlign: TextAlign.center,
                               softWrap: true,
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: AppData.text22,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textColorPrimary,
                               ),

@@ -1,22 +1,21 @@
 import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:pdf/pdf.dart';
-import '../Data/load.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import 'package:intl/intl.dart';
+import 'package:pdf/pdf.dart';
 // For exporting to pdf
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:intl/intl.dart';
 
 import '../CodeShare/variables.dart';
 import '../Data/crewmember.dart';
 import '../Data/customItem.dart';
 import '../Data/gear.dart';
+import '../Data/load.dart';
 import '../Data/load_accoutrements.dart';
 import '../Data/sling.dart';
 
@@ -277,7 +276,6 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, bool isExternal, S
         }
       }
     }
-
   } else {
     // Handle normal loads (not external or no slings)
     List<dynamic> allItems = [
@@ -285,7 +283,6 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, bool isExternal, S
       ...load.loadGear,
       ...load.customItems,
     ];
-
 
     int numHaz = allItems.where((item) => item is Gear && item.isHazmat).length;
     int totalPages = calculatePagesNeeded(allItems.length, numHaz);
@@ -484,24 +481,22 @@ pw.Widget fillFormFieldsOF252(
         // **Total Load Weight (Last Page Only)**
         if (pageIndex == totalPages)
           !exportAsLoad
-        ?
-          pw.Positioned(
-            left: xOffset + 442,
-            top: yOffset + 610,
-            child: pw.Text(
-              '${sling?.weight.toString()} lb',
-              style: pw.TextStyle(fontSize: fontSizeOF252),
-            ),
-          )
-          :    pw.Positioned(
-            left: xOffset + 442,
-            top: yOffset + 610,
-            child: pw.Text(
-              '${load.weight.toString()} lb',
-              style: pw.TextStyle(fontSize: fontSizeOF252),
-            ),
-          ),
-
+              ? pw.Positioned(
+                  left: xOffset + 442,
+                  top: yOffset + 610,
+                  child: pw.Text(
+                    '${sling?.weight.toString()} lb',
+                    style: pw.TextStyle(fontSize: fontSizeOF252),
+                  ),
+                )
+              : pw.Positioned(
+                  left: xOffset + 442,
+                  top: yOffset + 610,
+                  child: pw.Text(
+                    '${load.weight.toString()} lb',
+                    style: pw.TextStyle(fontSize: fontSizeOF252),
+                  ),
+                ),
 
         // **Current Date**
         pw.Positioned(
@@ -895,7 +890,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
           children: [
             Text(
               'Load ${widget.load.loadNumber}',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
               ' • ${widget.load.weight} lb',
@@ -905,7 +900,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.ios_share, size: 28, color: AppColors.textColorPrimary),
+            icon: Icon(Icons.ios_share, size: AppData.text28, color: AppColors.textColorPrimary),
             // Does this work for android, i dont know
             onPressed: () {
               showDialog(
@@ -918,7 +913,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                     title: Text(
                       'Select Manifest Type',
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: AppData.text22,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textColorPrimary,
                       ),
@@ -1062,7 +1057,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                             Text(
                                               'Sling #${sling.slingNumber}',
                                               style: TextStyle(
-                                                fontSize: 22,
+                                                fontSize: AppData.text22,
                                                 fontWeight: FontWeight.bold,
                                                 color: AppColors.textColorPrimary,
                                               ),
@@ -1123,7 +1118,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                           children: sling.loadGear.map((gearItem) {
                                             return Container(
                                               decoration: BoxDecoration(
-                                                color: gearItem.isPersonalTool ? AppColors.toolBlue.withOpacity(0.9) : AppColors.gearYellow.withOpacity(0.9),
+                                                color: gearItem.isPersonalTool ? AppColors.toolBlue.withValues(alpha: 0.9) : AppColors.gearYellow.withValues(alpha: 0.9),
                                                 border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
                                               ),
                                               child: ListTile(
@@ -1231,7 +1226,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                               Text(
                                                 crewmember.name,
                                                 style: TextStyle(
-                                                  fontSize: 22,
+                                                  fontSize: AppData.text22,
                                                   fontWeight: FontWeight.bold,
                                                   color: AppColors.textColorPrimary,
                                                 ),
@@ -1290,7 +1285,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                 children: [
                                                   Text(
                                                     '${gearItem.name} ',
-                                                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
+                                                    style: TextStyle(fontSize: AppData.text22, fontWeight: FontWeight.bold, color: Colors.black),
                                                   ),
                                                   if (gearItem.isHazmat)
                                                     Icon(
@@ -1337,8 +1332,8 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                               children: [
                                                 Text(
                                                   customItem.name,
-                                                  style: const TextStyle(
-                                                    fontSize: 22,
+                                                  style:   TextStyle(
+                                                    fontSize: AppData.text22,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
@@ -1410,7 +1405,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
       // Adjust padding
       title: Text(
         'Additional Information',
-        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+        style: TextStyle(fontSize: AppData.text22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
       ),
       content: SingleChildScrollView(
         // Wrap content in a scrollable view
@@ -1554,7 +1549,8 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
             Navigator.of(context).pop();
           },
           child: Text(
-            'Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight),
+            'Confirm',
+            style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight),
           ),
         ),
       ],

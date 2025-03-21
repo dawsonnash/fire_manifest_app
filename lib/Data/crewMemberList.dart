@@ -1,5 +1,7 @@
 import 'package:hive/hive.dart';
+
 import 'crewmember.dart';
+
 part 'crewMemberList.g.dart';
 
 @HiveType(typeId: 8)

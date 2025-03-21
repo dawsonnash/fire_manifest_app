@@ -2,7 +2,6 @@ import 'package:fire_app/Data/load_accoutrements.dart';
 import 'package:fire_app/Data/sling.dart';
 import 'package:hive/hive.dart';
 
-import '../UI/05_build_your_own_manifest.dart';
 import 'crewmember.dart';
 import 'customItem.dart';
 import 'gear.dart';

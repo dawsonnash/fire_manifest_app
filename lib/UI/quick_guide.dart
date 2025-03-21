@@ -1,6 +1,8 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
 import '../CodeShare/variables.dart';
 
 class QuickGuide extends StatefulWidget {
@@ -182,7 +184,7 @@ class _QuickGuideState extends State<QuickGuide> {
         backgroundColor: AppColors.appBarColor,
         title: Text(
           'Quick Guide',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
       ),
       body: Stack(
@@ -275,7 +277,6 @@ class _QuickGuideState extends State<QuickGuide> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
                         // Overview Image
                         Center(
                           child: Image.asset(
@@ -307,7 +308,11 @@ class _QuickGuideState extends State<QuickGuide> {
                                 children: [
                                   Text("1.0", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSection)),
                                   Text("  Crew Management ", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
-                                  Icon(Icons.person, size: AppData.text24, color: AppColors.quickGuideSection,)
+                                  Icon(
+                                    Icons.person,
+                                    size: AppData.text24,
+                                    color: AppColors.quickGuideSection,
+                                  )
                                 ],
                               ),
                               SelectableText("\nThe Fire Manifesting App allows you to manage...\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
@@ -331,11 +336,15 @@ class _QuickGuideState extends State<QuickGuide> {
                                   Text("  Crew Members and Gear", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
                                 ],
                               ),
-                              SelectableText("\nCrew members and gear items can be added and edited via the Crew page. When making a new crew member, required fields include the last name, flight weight (consisting of the total weight on your person when on the aircraft: body, helmet, pack, and uniform weights), primary position (e.g. 'Saw Team 1' is primary over 'Supply'), and all personal tools.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText(
+                                  "\nCrew members and gear items can be added and edited via the Crew page. When making a new crew member, required fields include the last name, flight weight (consisting of the total weight on your person when on the aircraft: body, helmet, pack, and uniform weights), primary position (e.g. 'Saw Team 1' is primary over 'Supply'), and all personal tools.\n ",
+                                  style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
                               SizedBox(height: AppData.sizedBox10),
                               Image.asset("assets/images/quick_guide/edit_crewmember.png"),
                               SizedBox(height: AppData.sizedBox20),
-                              SelectableText("\nWhen adding gear items, include the name, weight, quantity, and whether the item is a hazardous material (anything potentially combustible). The hazardous material items will be placed in their designated slots in any generated manifests. Items from the Incident Response Pocket Guide (IRPG) can also be selected and added to your crew inventory; weights for these items can be adjusted.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText(
+                                  "\nWhen adding gear items, include the name, weight, quantity, and whether the item is a hazardous material (anything potentially combustible). The hazardous material items will be placed in their designated slots in any generated manifests. Items from the Incident Response Pocket Guide (IRPG) can also be selected and added to your crew inventory; weights for these items can be adjusted.\n ",
+                                  style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
                               SizedBox(height: AppData.sizedBox10),
                               Image.asset("assets/images/quick_guide/edit_gear.png"),
                               SizedBox(height: AppData.sizedBox20),
@@ -346,7 +355,7 @@ class _QuickGuideState extends State<QuickGuide> {
                         // 1.2 Trip Preferences
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Trip Preferences", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
-                          )["key"],
+                              )["key"],
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -356,9 +365,15 @@ class _QuickGuideState extends State<QuickGuide> {
                                   Text("  Trip Preferences", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
                                 ],
                               ),
-                              SelectableText("\nTrip Preferences are your way to decide how you want your crew sorted into loads. Each Trip Preference can contain both positional or gear load preferences that can be defined based on the standard operating procedures that you or your crew follow.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
-                              SelectableText("Trip Preferences are used within the Quick Manifest feature, which utilizes a built in load-calculating algorithm. There are 3 ways to customize this algorithm: first, last, and balanced load preferences. Giving a crew member or gear item a 'First' preference places it on the first load available; if there is not enough weight it will place it on the next available load working from the first load to the last. The 'Last' preference does the exact same thing except in the opposite direction. When you select the 'Balanced' preference, all crew members and gear items in that load preference will be placed cyclically (e.g. 1, 2, 3, 1, 2, 3, ...) onto the loads in the order that you placed them in the preference. This allows for an even distribution of items and personnel.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
-                              SelectableText("Below is an example of a Trip Preference for going to a fire, a situation where you may need certain gear items or positions to go on specific loads. This preference set up ensures a Superintendent (Ex. Burnham) and Assistant Superintendent (Ex. Burnett) go first to a fire to gain situational awareness, Saw Teams are distributed evenly, and food, water, and emergency gear are appropriately allocated to the right loads.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText(
+                                  "\nTrip Preferences are your way to decide how you want your crew sorted into loads. Each Trip Preference can contain both positional or gear load preferences that can be defined based on the standard operating procedures that you or your crew follow.\n ",
+                                  style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText(
+                                  "Trip Preferences are used within the Quick Manifest feature, which utilizes a built in load-calculating algorithm. There are 3 ways to customize this algorithm: first, last, and balanced load preferences. Giving a crew member or gear item a 'First' preference places it on the first load available; if there is not enough weight it will place it on the next available load working from the first load to the last. The 'Last' preference does the exact same thing except in the opposite direction. When you select the 'Balanced' preference, all crew members and gear items in that load preference will be placed cyclically (e.g. 1, 2, 3, 1, 2, 3, ...) onto the loads in the order that you placed them in the preference. This allows for an even distribution of items and personnel.\n ",
+                                  style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText(
+                                  "Below is an example of a Trip Preference for going to a fire, a situation where you may need certain gear items or positions to go on specific loads. This preference set up ensures a Superintendent (Ex. Burnham) and Assistant Superintendent (Ex. Burnett) go first to a fire to gain situational awareness, Saw Teams are distributed evenly, and food, water, and emergency gear are appropriately allocated to the right loads.\n ",
+                                  style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
                               SizedBox(height: AppData.sizedBox10),
                               Image.asset("assets/images/quick_guide/trip_preference.png"),
                               SizedBox(height: AppData.sizedBox20),
@@ -369,7 +384,7 @@ class _QuickGuideState extends State<QuickGuide> {
                         // 1.3 Tools
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Tools", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
-                          )["key"],
+                              )["key"],
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -379,7 +394,9 @@ class _QuickGuideState extends State<QuickGuide> {
                                   Text("  Tools", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
                                 ],
                               ),
-                              SelectableText("\nThe Tools panel allows you to create and manage personal tool templates for your crew. These are the tools that will constantly be with your person when you travel via helicopter. They must be created and edited within the designated tools panel first before adding to any crew member. Once you add a personal tool to a crew member, it will be attached to them so that whenever you create a new trip, it will always accompany them on their load. If you wish to travel without a tool, you must first delete it within the Edit Crew Member page.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText(
+                                  "\nThe Tools panel allows you to create and manage personal tool templates for your crew. These are the tools that will constantly be with your person when you travel via helicopter. They must be created and edited within the designated tools panel first before adding to any crew member. Once you add a personal tool to a crew member, it will be attached to them so that whenever you create a new trip, it will always accompany them on their load. If you wish to travel without a tool, you must first delete it within the Edit Crew Member page.\n ",
+                                  style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
                               SizedBox(height: AppData.sizedBox10),
                               Image.asset("assets/images/quick_guide/add_tool.png"),
                               SizedBox(height: AppData.sizedBox20),
@@ -390,7 +407,7 @@ class _QuickGuideState extends State<QuickGuide> {
                         // 1.4  Crew Sharing
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Crew Sharing", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
-                          )["key"],
+                              )["key"],
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -400,7 +417,9 @@ class _QuickGuideState extends State<QuickGuide> {
                                   Text("  Crew Sharing", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
                                 ],
                               ),
-                              SelectableText("\nWithin the Settings page, you will find the Crew Sharing feature. This allows you to have one person on your crew to manage all the data you input. Once a crew is created, you may export your crew members, gear, and tools to a file that can be shared with users. To share on iOS, you will need to export and AirDrop. On Android, you will need to export and send the file via the internet. Importing will be overwrite any crew information you have on your own device. The file will be in a .json format.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText(
+                                  "\nWithin the Settings page, you will find the Crew Sharing feature. This allows you to have one person on your crew to manage all the data you input. Once a crew is created, you may export your crew members, gear, and tools to a file that can be shared with users. To share on iOS, you will need to export and AirDrop. On Android, you will need to export and send the file via the internet. Importing will be overwrite any crew information you have on your own device. The file will be in a .json format.\n ",
+                                  style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
                               SizedBox(height: AppData.sizedBox10),
                             ],
                           ),
@@ -409,7 +428,7 @@ class _QuickGuideState extends State<QuickGuide> {
                         // 2.0 Manifesting
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Manifesting", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
-                          )["key"],
+                              )["key"],
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -417,10 +436,16 @@ class _QuickGuideState extends State<QuickGuide> {
                                 children: [
                                   Text("2.0", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.quickGuideSection)),
                                   Text("  Manifesting ", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
-                                  Icon(Icons.assignment, size: AppData.text24, color: AppColors.quickGuideSection,)
+                                  Icon(
+                                    Icons.assignment,
+                                    size: AppData.text24,
+                                    color: AppColors.quickGuideSection,
+                                  )
                                 ],
                               ),
-                              SelectableText("\nThere are two options for generating manifests: Quick Manifest or Build Your Own. Either option allows you to create Trips based on an allowable helicopter weight and number of available seats.\n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText(
+                                  "\nThere are two options for generating manifests: Quick Manifest or Build Your Own. Either option allows you to create Trips based on an allowable helicopter weight and number of available seats.\n ",
+                                  style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
                               SizedBox(height: AppData.sizedBox20),
                             ],
                           ),
@@ -429,7 +454,7 @@ class _QuickGuideState extends State<QuickGuide> {
                         // 2.1 Quick Manifest
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Quick Manifest", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
-                          )["key"],
+                              )["key"],
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -439,7 +464,9 @@ class _QuickGuideState extends State<QuickGuide> {
                                   Text("  Quick Manifest", style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: Colors.white)),
                                 ],
                               ),
-                              SelectableText("\nThe Quick Manifest option allows you to input a trip name, number of available seats, a selection of crew members and gear items, a Trip Preference, and an allowable weight. To generate loads, it uses a customizable algorithm based on your created Trip Preference.  \n ", style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
+                              SelectableText(
+                                  "\nThe Quick Manifest option allows you to input a trip name, number of available seats, a selection of crew members and gear items, a Trip Preference, and an allowable weight. To generate loads, it uses a customizable algorithm based on your created Trip Preference.  \n ",
+                                  style: TextStyle(fontSize: AppData.text16, color: Colors.white)),
                               SizedBox(height: AppData.sizedBox10),
                               Image.asset("assets/images/quick_guide/quick_manifest.png"),
                               SizedBox(height: AppData.sizedBox20),
@@ -450,7 +477,7 @@ class _QuickGuideState extends State<QuickGuide> {
                         // 2.2 BYOM
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Build Your Own", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
-                          )["key"],
+                              )["key"],
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -471,7 +498,7 @@ class _QuickGuideState extends State<QuickGuide> {
                         // 2.3 Editing Trips
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Editing Trips", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
-                          )["key"],
+                              )["key"],
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -492,7 +519,7 @@ class _QuickGuideState extends State<QuickGuide> {
                         // 2.4  Exporting Trips
                         Container(
                           key: sectionKeys.firstWhere((item) => item["title"] == "Exporting Trips", orElse: () => {"key": GlobalKey()} // Fallback to avoid crashes
-                          )["key"],
+                              )["key"],
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

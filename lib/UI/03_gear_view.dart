@@ -1,12 +1,14 @@
 import 'dart:ui';
+
+import 'package:fire_app/UI/03_add_gear.dart';
 import 'package:fire_app/UI/03_edit_gear.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
-import 'package:fire_app/UI/03_add_gear.dart';
+
 import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
 import '../Data/gear.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class GearView extends StatefulWidget {
   const GearView({super.key});
@@ -63,7 +65,9 @@ class _GearViewState extends State<GearView> {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(color: AppColors.cancelButton,     fontSize: AppData.bottomDialogTextSize,
+                style: TextStyle(
+                  color: AppColors.cancelButton,
+                  fontSize: AppData.bottomDialogTextSize,
                 ),
               ),
             ),
@@ -115,7 +119,7 @@ class _GearViewState extends State<GearView> {
     List<Gear> sortedGearList = sortGearListAlphabetically(gearList);
 
     TextStyle panelTextStyle = TextStyle(
-      fontSize: 22,
+      fontSize: AppData.text22,
       fontWeight: FontWeight.bold,
       color: AppColors.textColorPrimary,
     );
@@ -145,7 +149,7 @@ class _GearViewState extends State<GearView> {
               ),
         title: Text(
           isSelectionMode ? "Delete Gear" : "Gear",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
           if (isSelectionMode)
@@ -205,7 +209,9 @@ class _GearViewState extends State<GearView> {
                                           },
                                           child: Text(
                                             'Cancel',
-                                            style: TextStyle(color: AppColors.cancelButton,     fontSize: AppData.bottomDialogTextSize,
+                                            style: TextStyle(
+                                              color: AppColors.cancelButton,
+                                              fontSize: AppData.bottomDialogTextSize,
                                             ),
                                           ),
                                         ),
@@ -302,7 +308,7 @@ class _GearViewState extends State<GearView> {
                                                 'No gear created...',
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
-                                                  fontSize: 22,
+                                                  fontSize: AppData.text22,
                                                   fontWeight: FontWeight.bold,
                                                   color: AppColors.textColorPrimary,
                                                 ),
@@ -385,7 +391,7 @@ class _GearViewState extends State<GearView> {
                                                     TextSpan(
                                                       text: '${gear.name} ',
                                                       style: TextStyle(
-                                                        fontSize: 22,
+                                                        fontSize: AppData.text22,
                                                         fontWeight: FontWeight.bold,
                                                         color: AppColors.textColorPrimary,
                                                       ),
@@ -421,7 +427,7 @@ class _GearViewState extends State<GearView> {
                                     trailing: isSelectionMode
                                         ? null
                                         : IconButton(
-                                            icon: Icon(Icons.edit, color: AppColors.textColorPrimary, size: 32),
+                                            icon: Icon(Icons.edit, color: AppColors.textColorPrimary, size: AppData.text32),
                                             onPressed: () {
                                               Navigator.push(
                                                 context,

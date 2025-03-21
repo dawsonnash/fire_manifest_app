@@ -1,14 +1,16 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+
 import '../CodeShare/keyboardActions.dart';
 import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
 import '../Data/crewmember.dart';
 import '../Data/gear.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AddCrewmember extends StatefulWidget {
   const AddCrewmember({super.key});
@@ -90,7 +92,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
 
     // Find the selected tool in the personalToolsList
     final Gear selectedGear = personalToolsList.firstWhere(
-          (tool) => tool.name == toolName,
+      (tool) => tool.name == toolName,
       orElse: () => Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true, isHazmat: false),
     );
 
@@ -102,11 +104,11 @@ class _AddCrewmemberState extends State<AddCrewmember> {
 
     if (isDuplicate) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+          SnackBar(
           content: Center(
             child: Text(
               'Tool Already Added',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.black),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text28, color: Colors.black),
             ),
           ),
           backgroundColor: Colors.red,
@@ -116,12 +118,12 @@ class _AddCrewmemberState extends State<AddCrewmember> {
       return; // Exit function if the tool is a duplicate
     }
 
-      setState(() {
-        addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true, isHazmat: selectedGear.isHazmat));
-        toolNameController.clear();
-        toolWeightController.clear();
-        setState(() {});
-      });
+    setState(() {
+      addedTools?.add(Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true, isHazmat: selectedGear.isHazmat));
+      toolNameController.clear();
+      toolWeightController.clear();
+      setState(() {});
+    });
   }
 
   void removeTool(int index) {
@@ -140,14 +142,14 @@ class _AddCrewmemberState extends State<AddCrewmember> {
 
     if (crewMemberNameExists) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+          SnackBar(
           content: Center(
             child: Text(
               'Crew member name already used!',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.black,
-                fontSize: 28,
+                fontSize: AppData.text28,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -171,19 +173,19 @@ class _AddCrewmemberState extends State<AddCrewmember> {
 
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Center(
           child: Text(
             'Crew Member Saved!',
             // Maybe change look
             style: TextStyle(
               color: Colors.black,
-              fontSize: 32,
+              fontSize: AppData.text32,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        duration: Duration(seconds: 1),
+        duration: const Duration(seconds: 1),
         backgroundColor: Colors.green,
       ),
     );
@@ -208,7 +210,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
     // Main theme button style
     final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
-        textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        textStyle: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold),
         backgroundColor: Colors.deepOrangeAccent,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         //surfaceTintColor: Colors.grey,
@@ -235,7 +237,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
         backgroundColor: AppColors.appBarColor,
         title: Text(
           'Add Crew Member',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
       ),
       body: GestureDetector(
@@ -306,7 +308,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                 labelText: 'Last Name',
                                 labelStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
-                                  fontSize: 22,
+                                  fontSize: AppData.text22,
                                   //fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
@@ -330,7 +332,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                               ),
                               style: TextStyle(
                                 color: AppColors.textColorPrimary,
-                                fontSize: 28,
+                                fontSize: AppData.text28,
                               ),
                             )),
                         SizedBox(height: AppData.spacingStandard),
@@ -342,7 +344,6 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                 focusNodes: [_weightFocusNode],
                               ),
                               disableScroll: true,
-
                               child: TextField(
                                 focusNode: _weightFocusNode,
                                 controller: flightWeightController,
@@ -360,13 +361,11 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                       weightErrorMessage = 'Weight must be less than 500.';
                                     } else if (weight == 0) {
                                       weightErrorMessage = 'Weight must be greater than 0.';
-                                    }
-                                    else{
+                                    } else {
                                       weightErrorMessage = null;
                                     }
                                   });
                                 },
-
                                 decoration: InputDecoration(
                                   labelText: 'Flight Weight',
                                   hintText: 'Up to 500 lb',
@@ -377,7 +376,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                   errorText: weightErrorMessage,
                                   labelStyle: TextStyle(
                                     color: AppColors.textColorPrimary,
-                                    fontSize: 22,
+                                    fontSize: AppData.text22,
                                     //fontWeight: FontWeight.bold,
                                   ),
                                   filled: true,
@@ -401,7 +400,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                 ),
                                 style: TextStyle(
                                   color: AppColors.textColorPrimary,
-                                  fontSize: 28,
+                                  fontSize: AppData.text28,
                                 ),
                               ),
                             )),
@@ -425,13 +424,13 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                   'Primary Position',
                                   style: TextStyle(
                                     color: AppColors.textColorPrimary,
-                                    fontSize: 22,
+                                    fontSize: AppData.text22,
                                   ),
                                 ),
                                 dropdownColor: AppColors.textFieldColor2,
                                 style: TextStyle(
                                   color: AppColors.textColorPrimary,
-                                  fontSize: 22,
+                                  fontSize: AppData.text22,
                                 ),
                                 iconEnabledColor: AppColors.textColorPrimary,
                                 items: positionMap.entries.map((entry) {
@@ -558,7 +557,9 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                             },
                                             child: Text(
                                               'Cancel',
-                                              style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize,
+                                              style: TextStyle(
+                                                color: AppColors.cancelButton,
+                                                fontSize: AppData.bottomDialogTextSize,
                                               ),
                                             ),
                                           ),
@@ -570,7 +571,11 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                               },
                                               child: Text(
                                                 'Add',
-                                                style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold,  fontSize: AppData.bottomDialogTextSize,),
+                                                style: TextStyle(
+                                                  color: AppColors.saveButtonAllowableWeight,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: AppData.bottomDialogTextSize,
+                                                ),
                                               ),
                                             ),
                                         ],
@@ -592,10 +597,10 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                 ),
                               ),
                               alignment: Alignment.center,
-                              child: const Text(
+                              child:   Text(
                                 '+ Add Tools',
                                 style: TextStyle(
-                                  fontSize: 22,
+                                  fontSize: AppData.text22,
                                   color: Colors.black,
                                 ),
                               ),
@@ -651,7 +656,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                         style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text20),
                                       ),
                                       trailing: IconButton(
-                                        icon: const Icon(Icons.delete, color: Colors.red, size: 28),
+                                        icon:   Icon(Icons.delete, color: Colors.red, size: AppData.text28),
                                         onPressed: () => removeTool(index),
                                       ),
                                     ),

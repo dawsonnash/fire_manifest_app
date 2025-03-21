@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:fire_app/Algorithms/external_load_calculator.dart';
 import 'package:fire_app/CodeShare/variables.dart';
 import 'package:fire_app/Data/load_accoutrements.dart';
@@ -7,17 +8,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+
 import '../../Data/trip.dart';
 import '../CodeShare/keyboardActions.dart';
-import '../UI/05_define_constraints_manifest.dart';
 import '../Data/crewmember.dart';
 import '../Data/gear.dart';
-import '../Algorithms/load_calculator.dart';
 import '../Data/trip_preferences.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import '../UI/05_define_constraints_manifest.dart';
 import 'calculating_screen.dart';
 
 class CreateNewManifest extends StatelessWidget {
@@ -241,7 +241,6 @@ class _QuickManifestState extends State<QuickManifest> {
           weight: gear.weight,
           isPersonalTool: gear.isPersonalTool,
           isHazmat: gear.isHazmat,
-
         );
       }).toList();
       gearListExternal = gearBox.values.map((gear) {
@@ -251,7 +250,6 @@ class _QuickManifestState extends State<QuickManifest> {
           weight: gear.weight,
           isPersonalTool: gear.isPersonalTool,
           isHazmat: gear.isHazmat,
-
         );
       }).toList();
 
@@ -382,7 +380,6 @@ class _QuickManifestState extends State<QuickManifest> {
                                   return Container(
                                     color: AppColors.gearYellow,
                                     child: CheckboxListTile(
-
                                       title: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
@@ -393,7 +390,6 @@ class _QuickManifestState extends State<QuickManifest> {
                                               children: [
                                                 Row(
                                                   children: [
-
                                                     Flexible(
                                                       child: Text(
                                                         gear.name,
@@ -413,7 +409,6 @@ class _QuickManifestState extends State<QuickManifest> {
                                                           size: AppData.text14, // Icon size
                                                         ),
                                                       ),
-
                                                   ],
                                                 ),
                                                 Text(
@@ -495,7 +490,6 @@ class _QuickManifestState extends State<QuickManifest> {
                                                       Text(
                                                         'Qty: ${selectedGearQuantitiesExternal[gear] ?? 1}',
                                                         style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
                                                           fontSize: AppData.text14,
                                                           color: Colors.black,
                                                         ),
@@ -583,7 +577,6 @@ class _QuickManifestState extends State<QuickManifest> {
                           weight: gear.weight,
                           isPersonalTool: gear.isPersonalTool,
                           isHazmat: gear.isHazmat,
-
                         );
                       }).toList();
                     }
@@ -856,8 +849,6 @@ class _QuickManifestState extends State<QuickManifest> {
                                         color: AppColors.gearYellow,
 
                                         child: CheckboxListTile(
-
-
                                           title: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
@@ -868,7 +859,6 @@ class _QuickManifestState extends State<QuickManifest> {
                                                   children: [
                                                     Row(
                                                       children: [
-
                                                         Flexible(
                                                           child: Text(
                                                             gear.name,
@@ -888,7 +878,6 @@ class _QuickManifestState extends State<QuickManifest> {
                                                               size: AppData.text14, // Icon size
                                                             ),
                                                           ),
-
                                                       ],
                                                     ),
                                                     Text(
@@ -970,7 +959,6 @@ class _QuickManifestState extends State<QuickManifest> {
                                                           Text(
                                                             'Qty: ${selectedGearQuantities[gear] ?? 1}',
                                                             style: TextStyle(
-                                                              fontWeight: FontWeight.bold,
                                                               fontSize: AppData.text14,
                                                               color: Colors.black,
                                                             ),
@@ -1383,7 +1371,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                 ),
                                 Text(
                                   " (12'x12')",
-                                  style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary.withOpacity(0.9)),
+                                  style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary.withValues(alpha: 0.9)),
                                 ),
                               ],
                             ),
@@ -1586,7 +1574,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                 ),
                                 Text(
                                   " (20'x20')",
-                                  style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary.withOpacity(0.9)),
+                                  style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary.withValues(alpha: 0.9)),
                                 ),
                               ],
                             ),

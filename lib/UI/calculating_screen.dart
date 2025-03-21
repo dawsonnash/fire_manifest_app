@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../Algorithms/load_calculator.dart';
@@ -23,15 +24,12 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
   bool isCalculating = true;
   int dotCount = 0;
 
-
   final List<String> algorithmLines = [
     "int availableSeats = trip.availableSeats;",
     "int maxLoadWeight = trip.allowable;",
-
     "int numLoadsByAllowable = (trip.totalCrewWeight! / trip.allowable).ceil();",
     "int numLoadsBySeat = (trip.crewMembers.length / trip.availableSeats).ceil();",
     "int numLoads = numLoadsByAllowable > numLoadsBySeat ? numLoadsByAllowable : numLoadsBySeat;",
-
     "var crewMembersCopy = trip.crewMembers.map((member) {",
     "  return CrewMember(",
     "    name: member.name,",
@@ -48,9 +46,7 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
     "    }).toList(),",
     "  );",
     "}).toList();",
-
     "shuffleCrewMembers(crewMembersCopy);",
-
     "var gearCopy = <Gear>[];",
     "for (var gear in trip.gear) {",
     "  for (int i = 0; i < gear.quantity; i++) {",
@@ -63,7 +59,6 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
     "    ));",
     "  }",
     "}",
-
     "List<Load> loads = List.generate(",
     "  numLoads,",
     "  (index) => Load(",
@@ -73,7 +68,6 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
     "    loadGear: [],",
     "  )",
     ");",
-
     "if (tripPreference != null) {",
     "  var tripPreferenceCopy = cleanTripPreference(tripPreference, trip);",
     "  for (var posPref in tripPreferenceCopy.positionalPreferences) {",
@@ -127,16 +121,13 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
     "    }",
     "  }",
     "}",
-
     "int loadIndex = 0;",
     "bool noMoreCrewCanBeAdded = false;",
     "bool noMoreGearCanBeAdded = false;",
-
     "while ((crewMembersCopy.isNotEmpty && !noMoreCrewCanBeAdded) || (gearCopy.isNotEmpty && !noMoreGearCanBeAdded)) {",
     "  Load currentLoad = loads[loadIndex];",
     "  num currentLoadWeight = currentLoad.weight;",
     "  bool itemAdded = false;",
-
     "  if (crewMembersCopy.isNotEmpty && currentLoadWeight + crewMembersCopy.first.totalCrewMemberWeight <= maxLoadWeight && currentLoad.loadPersonnel.length < availableSeats) {",
     "    var firstCrewMember = crewMembersCopy.first;",
     "    currentLoadWeight += firstCrewMember.totalCrewMemberWeight;",
@@ -147,7 +138,6 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
     "  } else if (crewMembersCopy.isNotEmpty && loads.every((load) => load.weight + crewMembersCopy.first.totalCrewMemberWeight > maxLoadWeight || load.loadPersonnel.length >= availableSeats)) {",
     "    noMoreCrewCanBeAdded = true;",
     "  }",
-
     "  if (!itemAdded && gearCopy.isNotEmpty && currentLoadWeight + gearCopy.first.weight <= maxLoadWeight) {",
     "    currentLoadWeight += gearCopy.first.weight;",
     "    currentLoad.loadGear.add(gearCopy.first);",
@@ -156,11 +146,9 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
     "  } else if (gearCopy.isNotEmpty && loads.every((load) => load.weight + gearCopy.first.weight > maxLoadWeight)) {",
     "    noMoreGearCanBeAdded = true;",
     "  }",
-
     "  currentLoad.weight = currentLoadWeight.toInt();",
     "  loadIndex = (loadIndex + 1) % loads.length;",
     "}",
-
     "loads.removeWhere((load) => load.weight == 0);",
     "for (int i = 0; i < loads.length; i++) {",
     "  loads[i].loadNumber = i + 1;",
@@ -226,6 +214,7 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
       });
     });
   }
+
   void _startCodeDisplayInOrder() {
     _scrollController = ScrollController();
     int currentIndex = Random().nextInt(algorithmLines.length); // Start at a random index
@@ -292,17 +281,19 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
                   controller: _scrollController,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: codeLines.map((code) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
-                      child: Text(
-                        code,
-                        style: TextStyle(
-                          color: Colors.greenAccent.withOpacity(_random.nextDouble()), // Glitch effect
-                          fontSize: AppData.text14,
-                          fontFamily: "monospace",
-                        ),
-                      ),
-                    )).toList(),
+                    children: codeLines
+                        .map((code) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+                              child: Text(
+                                code,
+                                style: TextStyle(
+                                  color: Colors.greenAccent.withValues(alpha: _random.nextDouble()), // Glitch effect
+                                  fontSize: AppData.text14,
+                                  fontFamily: "monospace",
+                                ),
+                              ),
+                            ))
+                        .toList(),
                   ),
                 ),
               ),
@@ -315,12 +306,11 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
                 children: [
                   Text(
                     "Calculating${"." * (dotCount + 1)}", // Dynamically appends ".", "..", or "..."
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ],
               ),
             ),
-
           ],
         ),
       ),
@@ -328,13 +318,7 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
   }
 }
 
-Future<void> startCalculation(
-    BuildContext context,
-    bool isExternalManifest,
-    Trip newTrip,
-    TripPreference? selectedTripPreference,
-    int safetyBuffer
-    ) async {
+Future<void> startCalculation(BuildContext context, bool isExternalManifest, Trip newTrip, TripPreference? selectedTripPreference, int safetyBuffer) async {
   await showDialog(
     context: context,
     barrierDismissible: false,
@@ -350,14 +334,14 @@ Future<void> startCalculation(
   }
 
   scaffoldMessengerKey.currentState?.showSnackBar(
-    const SnackBar(
+    SnackBar(
       content: Center(
         child: Text(
           'Trip Saved!',
-          style: TextStyle(color: Colors.black, fontSize: 32, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontSize: AppData.text32, fontWeight: FontWeight.bold),
         ),
       ),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
       backgroundColor: Colors.green,
     ),
   );

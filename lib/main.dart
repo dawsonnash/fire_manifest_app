@@ -1,34 +1,36 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
-import 'dart:convert';
+
 import 'package:fire_app/Data/load_accoutrement_manager.dart';
+import 'package:fire_app/UI/01_edit_crew.dart';
 import 'package:fire_app/UI/05_create_new_manifest.dart';
 import 'package:fire_app/UI/06_saved_trips.dart';
 import 'package:fire_app/UI/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
-import 'Data/crew_loadout.dart';
-import 'Data/sling.dart';
-import 'package:fire_app/UI/01_edit_crew.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import '../Data/gear.dart';
+import 'package:intl/intl.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../Data/crewmember.dart';
+import '../Data/gear.dart';
+import 'CodeShare/variables.dart';
 import 'Data/crew.dart';
+import 'Data/crewMemberList.dart';
+import 'Data/crew_loadout.dart';
 import 'Data/customItem.dart';
+import 'Data/gear_preferences.dart';
 import 'Data/load.dart';
+import 'Data/load_accoutrements.dart';
+import 'Data/positional_preferences.dart';
+import 'Data/saved_preferences.dart';
+import 'Data/sling.dart';
 import 'Data/trip.dart';
 import 'Data/trip_preferences.dart';
-import 'Data/positional_preferences.dart';
-import 'Data/gear_preferences.dart';
-import 'Data/saved_preferences.dart';
-import 'Data/crewMemberList.dart';
-import 'Data/load_accoutrements.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'CodeShare/variables.dart';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
@@ -259,7 +261,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.8),
+              color: Colors.black.withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
@@ -441,7 +443,7 @@ class _MyHomePageState extends State<MyHomePage> {
         content: Center(
           child: Text(
             'Saved $loadoutName',
-            style: TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.black, fontSize: AppData.text22, fontWeight: FontWeight.bold),
           ),
         ),
         duration: Duration(seconds: 1),
@@ -624,7 +626,7 @@ class _MyHomePageState extends State<MyHomePage> {
           content: Center(
             child: Text(
               'Crew Imported!',
-              style: TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.black, fontSize: AppData.text22, fontWeight: FontWeight.bold),
             ),
           ),
           duration: Duration(seconds: 1),
@@ -858,7 +860,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
                               Icon(
                                 Icons.keyboard_arrow_down,
                                 size: 30,
-                                color: Colors.black.withOpacity(0.6),
+                                color: Colors.black.withValues(alpha: 0.6),
                               ),
                               Text(' More', style: TextStyle(fontSize: AppData.text16, color: Colors.black),)
                             ],

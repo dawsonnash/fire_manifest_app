@@ -1,16 +1,16 @@
 import 'dart:ui';
-import 'package:fire_app/UI/06_saved_trips.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import '../CodeShare/variables.dart';
-import '../Data/gear.dart';
-import '../Data/crewmember.dart';
-import '../Data/trip.dart';
-import '../Data/load.dart';
-import '../Data/customItem.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart';
 
+import '../CodeShare/variables.dart';
+import '../Data/crewmember.dart';
+import '../Data/customItem.dart';
+import '../Data/gear.dart';
+import '../Data/load.dart';
+import '../Data/trip.dart';
 import '../main.dart';
 
 // Double integers when calculating quantity dont always work out. a 45 lb QB can become 44
@@ -148,7 +148,7 @@ class _EditTripState extends State<EditTrip> {
                                       // Rounded corners
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.grey.withOpacity(0.8),
+                                          color: Colors.grey.withValues(alpha: 0.8),
                                           spreadRadius: 1,
                                           blurRadius: 5,
                                           offset: Offset(0, 3), // Shadow position
@@ -272,7 +272,7 @@ class _EditTripState extends State<EditTrip> {
                                           // Rounded corners
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.grey.withOpacity(0.8),
+                                              color: Colors.grey.withValues(alpha: 0.8),
                                               spreadRadius: 1,
                                               blurRadius: 5,
                                               offset: Offset(0, 3), // Shadow position
@@ -375,7 +375,7 @@ class _EditTripState extends State<EditTrip> {
                                                                     });
                                                                     Navigator.of(context).pop();
                                                                   },
-                                                                  child: Text('Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize,color: AppColors.saveButtonAllowableWeight)),
+                                                                  child: Text('Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight)),
                                                                 ),
                                                               ],
                                                             );
@@ -388,7 +388,7 @@ class _EditTripState extends State<EditTrip> {
                                                         if (gear.quantity > 1)
                                                           Text(
                                                             'Qty: ${selectedGearQuantities[gear] ?? 1}',
-                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text14, color: AppColors.textColorSecondary),
+                                                            style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorSecondary),
                                                           ),
                                                         if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
                                                       ],
@@ -502,7 +502,7 @@ class _EditTripState extends State<EditTrip> {
                                                 },
                                                 child: Text(
                                                   'Cancel',
-                                                 style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
+                                                  style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                 ),
                                               ),
                                             ),
@@ -787,30 +787,27 @@ class _EditTripState extends State<EditTrip> {
     // Save under the correct key
     tripBox.put(widget.trip.tripName, widget.trip);
 
-
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Center(
           child: Text(
             'Trip Saved!',
             style: TextStyle(
               color: Colors.black,
-              fontSize: 32,
+              fontSize: AppData.text32,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        duration: Duration(seconds: 1),
+        duration: const Duration(seconds: 1),
         backgroundColor: Colors.green,
       ),
     );
 
-
     Navigator.of(context).pop(); // Go back to the home screen
     Navigator.of(context).pop(); // Go back to the home screen
     selectedIndexNotifier.value = 1; // Switch to "Saved Trips" tab
-
   }
 
   // Function to calculate available weight for a load
@@ -875,7 +872,7 @@ class _EditTripState extends State<EditTrip> {
           children: [
             Text(
               widget.trip.tripName,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lb',
@@ -1073,7 +1070,7 @@ class _EditTripState extends State<EditTrip> {
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: Colors.black.withValues(alpha: 0.2),
                                   blurRadius: 5,
                                   offset: const Offset(0, 3),
                                 ),
@@ -1123,7 +1120,7 @@ class _EditTripState extends State<EditTrip> {
                                                   color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                                       ? Colors.white // Warning color
                                                       : Colors.black,
-                                                  fontSize: 22,
+                                                  fontSize: AppData.text22,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -1199,7 +1196,7 @@ class _EditTripState extends State<EditTrip> {
                                             color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                                 ? Colors.white // Warning color
                                                 : Colors.black,
-                                            size: 36,
+                                            size: AppData.text36,
                                           ),
                                         ],
                                       ),
@@ -1215,7 +1212,7 @@ class _EditTripState extends State<EditTrip> {
                                           // If overweight
                                           if (calculateAvailableWeight(loads[index]) > widget.trip.allowable)
                                             Padding(
-                                              padding: const EdgeInsets.symmetric(vertical:0),
+                                              padding: const EdgeInsets.symmetric(vertical: 0),
                                               child: Container(
                                                 width: double.infinity,
                                                 padding: const EdgeInsets.symmetric(vertical: 4),
@@ -1226,7 +1223,7 @@ class _EditTripState extends State<EditTrip> {
                                                   // Rounded corners
                                                 ),
                                                 alignment: Alignment.center,
-                                                child:  Text(
+                                                child: Text(
                                                   'OVERWEIGHT',
                                                   style: TextStyle(
                                                     fontSize: AppData.text18,
@@ -1250,7 +1247,7 @@ class _EditTripState extends State<EditTrip> {
                                                   // Rounded corners
                                                 ),
                                                 alignment: Alignment.center,
-                                                child:  Text(
+                                                child: Text(
                                                   'NOT ENOUGH SEATS',
                                                   style: TextStyle(
                                                     fontSize: AppData.text18,
@@ -1385,15 +1382,13 @@ class _EditTripState extends State<EditTrip> {
                                                             ),
                                                           ),
                                                           if (item is! CustomItem)
-                                                          Text(
-                                                            item is Gear
-                                                                ?  'Quantity: ${ item.quantity} x ${item.weight} lb'
-                                                                : item.getPositionTitle(item.position),
-                                                            style: TextStyle(
-                                                              fontSize: AppData.text14,
-                                                              color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
+                                                            Text(
+                                                              item is Gear ? 'Quantity: ${item.quantity} x ${item.weight} lb' : item.getPositionTitle(item.position),
+                                                              style: TextStyle(
+                                                                fontSize: AppData.text14,
+                                                                color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
+                                                              ),
                                                             ),
-                                                          ),
                                                         ],
                                                       ),
 
@@ -1560,7 +1555,6 @@ class _EditTripState extends State<EditTrip> {
                                             ),
                                           //const SizedBox(height: 4),
 
-
                                           // Add Item
                                           GestureDetector(
                                             onTap: () => _showSelectionDialog(index),
@@ -1616,7 +1610,7 @@ class _EditTripState extends State<EditTrip> {
                               textAlign: TextAlign.center,
                               softWrap: true,
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: AppData.text22,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textColorPrimary,
                               ),

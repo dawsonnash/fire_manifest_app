@@ -1,6 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+
 import 'gear.dart';
+
 part 'gear_preferences.g.dart';
 
 @HiveType(typeId: 4)
