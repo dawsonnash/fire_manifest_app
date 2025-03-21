@@ -1,7 +1,7 @@
 import 'package:fire_app/Data/positional_preferences.dart';
 import 'package:flutter/material.dart';
 
-import '../CodeShare/colors.dart';
+import '../CodeShare/variables.dart';
 import '../main.dart';
 import '../Data/crew.dart';
 import '../Data/gear_preferences.dart';

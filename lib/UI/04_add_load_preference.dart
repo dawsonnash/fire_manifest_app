@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
-import '../CodeShare/colors.dart';
+import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
 import '../Data/gear.dart';
 import '../Data/saved_preferences.dart';

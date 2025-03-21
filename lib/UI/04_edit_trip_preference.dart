@@ -9,7 +9,7 @@ import '../Data/trip_preferences.dart';
 import '../Data/crew.dart';
 import '../Data/crewmember.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../CodeShare/colors.dart';
+import '../CodeShare/variables.dart';
 
 class EditTripPreference extends StatefulWidget {
   final TripPreference tripPreference;

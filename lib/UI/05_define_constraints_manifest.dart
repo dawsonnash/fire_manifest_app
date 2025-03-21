@@ -11,7 +11,7 @@ import '../Data/trip.dart';
 import 'package:fire_app/UI/05_build_your_own_manifest.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../CodeShare/colors.dart';
+import '../CodeShare/variables.dart';
 
 class DesignNewManifest extends StatefulWidget {
   const DesignNewManifest({super.key});

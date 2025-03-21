@@ -8,9 +8,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
+import 'package:keyboard_actions/keyboard_actions_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../CodeShare/colors.dart';
+import '../CodeShare/variables.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -22,6 +24,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../Data/crew_loadout.dart';
 import '../Data/crewmember.dart';
 import '../Data/gear.dart';
+import '../CodeShare/keyboardActions.dart';
 
 class SettingsView extends StatefulWidget {
   final bool isDarkMode;
@@ -1348,6 +1351,9 @@ class _SettingsState extends State<SettingsView> {
     await _applyLoadout(loadoutName, loadoutData);
   }
 
+  final FocusNode _focusNode = FocusNode();
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1745,34 +1751,42 @@ class _SettingsState extends State<SettingsView> {
                                         ),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(horizontal: 8),
-                                          child: TextField(
-                                            controller: safetyBufferController,
-                                            // Pre-fill with current user name
-                                            style: const TextStyle(color: Colors.white, fontSize: 18),
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: [
-                                              LengthLimitingTextInputFormatter(3),
-                                              FilteringTextInputFormatter.digitsOnly,
-                                            ],
-                                            decoration: InputDecoration(
-                                              hintText: 'Enter Safety Buffer (lb)',
-                                              hintStyle: const TextStyle(color: Colors.white54),
-                                              enabledBorder: const UnderlineInputBorder(
-                                                borderSide: BorderSide(color: Colors.white54),
-                                              ),
-                                              focusedBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(color: AppColors.fireColor),
-                                              ),
+                                          child: KeyboardActions(
+                                            config: keyboardActionsConfig(
+                                              focusNodes: [_focusNode],
                                             ),
-                                            onSubmitted: (value) {
-                                              setState(() {
-                                                int? parsedValue = int.tryParse(value.trim());
-                                                if (parsedValue != null) {
-                                                  widget.onSafetyBufferChange(parsedValue);
-                                                  ThemePreferences.setSafetyBuffer(parsedValue);
-                                                }
-                                              });
-                                            },
+                                            disableScroll: true,
+                                            child: TextField(
+                                              focusNode: _focusNode,
+                                              controller: safetyBufferController,
+                                              // Pre-fill with current user name
+                                              style: const TextStyle(color: Colors.white, fontSize: 18),
+                                              keyboardType: TextInputType.number,
+                                              textInputAction: TextInputAction.done,
+                                              inputFormatters: [
+                                                LengthLimitingTextInputFormatter(3),
+                                                FilteringTextInputFormatter.digitsOnly,
+                                              ],
+                                              decoration: InputDecoration(
+                                                hintText: 'Enter Safety Buffer (lb)',
+                                                hintStyle: const TextStyle(color: Colors.white54),
+                                                enabledBorder: const UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: Colors.white54),
+                                                ),
+                                                focusedBorder: UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: AppColors.fireColor),
+                                                ),
+                                              ),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  int? parsedValue = int.tryParse(value.trim());
+                                                  if (parsedValue != null) {
+                                                    widget.onSafetyBufferChange(parsedValue);
+                                                    ThemePreferences.setSafetyBuffer(parsedValue);
+                                                  }
+                                                });
+                                              },
+                                            ),
                                           ),
                                         ),
                                       ),

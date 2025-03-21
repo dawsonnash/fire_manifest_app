@@ -9,7 +9,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '03_add_gear.dart';
-import '../CodeShare/colors.dart';
+import '../CodeShare/variables.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../Data/crew.dart';

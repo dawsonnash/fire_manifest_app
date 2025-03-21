@@ -4,7 +4,7 @@ import 'package:fire_app/Data/crewmember.dart';
 import 'package:fire_app/UI/02_edit_crewmember.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import '../CodeShare/colors.dart';
+import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 

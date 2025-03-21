@@ -3,7 +3,7 @@ import 'package:fire_app/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import '../CodeShare/colors.dart';
+import '../CodeShare/variables.dart';
 import '../Data/gear.dart';
 import '../Data/crewmember.dart';
 import '../Data/trip.dart';

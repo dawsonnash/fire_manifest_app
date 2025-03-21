@@ -7,7 +7,7 @@ import '../../Data/crewmember.dart';
 import 'package:hive/hive.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../CodeShare/colors.dart';
+import '../CodeShare/variables.dart';
 import '../Data/gear.dart';
 
 class EditCrewmember extends StatefulWidget {

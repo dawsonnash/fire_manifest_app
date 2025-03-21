@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:fire_app/Algorithms/external_load_calculator.dart';
-import 'package:fire_app/CodeShare/colors.dart';
+import 'package:fire_app/CodeShare/variables.dart';
 import 'package:fire_app/Data/load_accoutrements.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/cupertino.dart';

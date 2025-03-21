@@ -1,7 +1,7 @@
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/Data/trip_preferences.dart';
 
-import '../CodeShare/colors.dart';
+import '../CodeShare/variables.dart';
 import 'crewmember.dart';
 import 'gear.dart';
 import 'package:hive/hive.dart';

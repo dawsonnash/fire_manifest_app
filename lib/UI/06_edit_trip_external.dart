@@ -4,7 +4,7 @@ import 'package:fire_app/UI/06_saved_trips.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import '../CodeShare/colors.dart';
+import '../CodeShare/variables.dart';
 import '../Data/gear.dart';
 import '../Data/sling.dart';
 import '../Data/trip.dart';

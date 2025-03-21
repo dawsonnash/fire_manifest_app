@@ -4,7 +4,7 @@ import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '04_edit_trip_preference.dart';
-import '../CodeShare/colors.dart';
+import '../CodeShare/variables.dart';
 import '../Data/trip_preferences.dart';
 import 'package:hive/hive.dart';
 

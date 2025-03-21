@@ -13,7 +13,7 @@ import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 
-import '../CodeShare/colors.dart';
+import '../CodeShare/variables.dart';
 import '../Data/crewmember.dart';
 import '../Data/customItem.dart';
 import '../Data/gear.dart';

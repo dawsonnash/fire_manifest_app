@@ -27,7 +27,7 @@ import 'Data/crewMemberList.dart';
 import 'Data/load_accoutrements.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'CodeShare/colors.dart';
+import 'CodeShare/variables.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
