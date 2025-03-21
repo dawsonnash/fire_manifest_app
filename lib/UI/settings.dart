@@ -1482,32 +1482,32 @@ class _SettingsState extends State<SettingsView> {
                           ),
                           children: [
                             // Dark Mode Toggle
-                            ListTile(
-                              title: const Text(
-                                'Dark Mode',
-                                style: TextStyle(fontSize: 18, color: Colors.white),
-                              ),
-                              trailing: Switch(
-                                value: isDarkMode,
-                                onChanged: (value) {
-                                  widget.onThemeChanged(value); // Notify parent widget
-                                  setState(() {
-                                    isDarkMode = value;
-                                    if (!isDarkMode) {
-                                      widget.onBackgroundImageChange(value); // Notify parent widget
-                                      enableBackgroundImage = false;
-                                      ThemePreferences.setBackgroundImagePreference(value);
-                                    }
-                                    ThemePreferences.setTheme(value); // Save dark mode preference
-                                  });
-                                },
-                                activeColor: Colors.green,
-                                inactiveThumbColor: Colors.grey,
-                                inactiveTrackColor: Colors.white24,
-                              ),
-                            ),
+                            // ListTile(
+                            //   title: const Text(
+                            //     'Dark Mode',
+                            //     style: TextStyle(fontSize: 18, color: Colors.white),
+                            //   ),
+                            //   trailing: Switch(
+                            //     value: isDarkMode,
+                            //     onChanged: (value) {
+                            //       widget.onThemeChanged(value); // Notify parent widget
+                            //       setState(() {
+                            //         isDarkMode = value;
+                            //         if (!isDarkMode) {
+                            //           widget.onBackgroundImageChange(value); // Notify parent widget
+                            //           enableBackgroundImage = false;
+                            //           ThemePreferences.setBackgroundImagePreference(value);
+                            //         }
+                            //         ThemePreferences.setTheme(value); // Save dark mode preference
+                            //       });
+                            //     },
+                            //     activeColor: Colors.green,
+                            //     inactiveThumbColor: Colors.grey,
+                            //     inactiveTrackColor: Colors.white24,
+                            //   ),
+                            // ),
                             // Enable Background Image Toggle (Visible only if Dark Mode is ON)
-                            if (isDarkMode)
+                          //  if (isDarkMode)
                               ListTile(
                                 title: const Text(
                                   'Enable Background Image',
