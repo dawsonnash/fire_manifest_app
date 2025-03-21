@@ -36,6 +36,10 @@ void main() async {
   // Set up for Hive that needs to run before starting app
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Disable landscape mode temporarily, until UI is implemented
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   // Declare a variable to store the initial file path
   String? initialJsonFilePath;
 
