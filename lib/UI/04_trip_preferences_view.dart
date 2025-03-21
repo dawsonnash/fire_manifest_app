@@ -264,99 +264,102 @@ class _TripPreferencesState extends State<TripPreferences> {
                                                     backgroundColor: AppColors.textFieldColor2,
                                                     context: context,
                                                     builder: (BuildContext context) {
-                                                      return Column(
-                                                        mainAxisSize: MainAxisSize.min,
-                                                        children: <Widget>[
-                                                          ListTile(
-                                                            leading: Icon(Icons.edit, color: AppColors.textColorPrimary),
-                                                            title: Text(
-                                                              'Edit Trip Preference',
-                                                              style: TextStyle(color: AppColors.textColorPrimary),
-                                                            ),
-                                                            onTap: () async {
-                                                              Navigator.of(context).pop(); //
+                                                      return Padding(
+                                                        padding: EdgeInsets.only(bottom: AppData.bottomModalPadding),
+                                                        child: Column(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: <Widget>[
+                                                            ListTile(
+                                                              leading: Icon(Icons.edit, color: AppColors.textColorPrimary),
+                                                              title: Text(
+                                                                'Edit Trip Preference',
+                                                                style: TextStyle(color: AppColors.textColorPrimary),
+                                                              ),
+                                                              onTap: () async {
+                                                                Navigator.of(context).pop(); //
 
-                                                              // Awaits the result from the next page so it updates in real time
-                                                              await Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                  builder: (context) => EditTripPreference(tripPreference: tripPreference, onUpdate: loadTripPreferenceList),
-                                                                ),
-                                                              );
-                                                              // Calls the update function after returning from AddTripPreference
-                                                              loadTripPreferenceList();
-                                                            },
-                                                          ),
-                                                          ListTile(
-                                                            leading: Icon(Icons.delete, color: Colors.red),
-                                                            title: Text(
-                                                              'Delete Trip Preference',
-                                                              style: TextStyle(color: AppColors.textColorPrimary),
+                                                                // Awaits the result from the next page so it updates in real time
+                                                                await Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                    builder: (context) => EditTripPreference(tripPreference: tripPreference, onUpdate: loadTripPreferenceList),
+                                                                  ),
+                                                                );
+                                                                // Calls the update function after returning from AddTripPreference
+                                                                loadTripPreferenceList();
+                                                              },
                                                             ),
-                                                            onTap: () {
-                                                              Navigator.of(context).pop(); // Close the dialog without deleting
+                                                            ListTile(
+                                                              leading: Icon(Icons.delete, color: Colors.red),
+                                                              title: Text(
+                                                                'Delete Trip Preference',
+                                                                style: TextStyle(color: AppColors.textColorPrimary),
+                                                              ),
+                                                              onTap: () {
+                                                                Navigator.of(context).pop(); // Close the dialog without deleting
 
-                                                              showDialog(
-                                                                context: context,
-                                                                builder: (BuildContext context) {
-                                                                  return AlertDialog(
-                                                                    backgroundColor: AppColors.textFieldColor2,
-                                                                    title: Text(
-                                                                      'Confirm Deletion',
-                                                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                                                    ),
-                                                                    content: Text(
-                                                                      'This Trip Preference will be erased!',
-                                                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
-                                                                    ),
-                                                                    actions: [
-                                                                      TextButton(
-                                                                        onPressed: () {
-                                                                          Navigator.of(context).pop(); // Close the dialog without deleting
-                                                                        },
-                                                                        child: Text(
-                                                                          'Cancel',
-                                                                          style: TextStyle(color: AppColors.cancelButton),
-                                                                        ),
+                                                                showDialog(
+                                                                  context: context,
+                                                                  builder: (BuildContext context) {
+                                                                    return AlertDialog(
+                                                                      backgroundColor: AppColors.textFieldColor2,
+                                                                      title: Text(
+                                                                        'Confirm Deletion',
+                                                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                                                       ),
-                                                                      TextButton(
-                                                                        onPressed: () {
-                                                                          savedPreferences.removeTripPreference(tripPreference);
+                                                                      content: Text(
+                                                                        'This Trip Preference will be erased!',
+                                                                        style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                                                      ),
+                                                                      actions: [
+                                                                        TextButton(
+                                                                          onPressed: () {
+                                                                            Navigator.of(context).pop(); // Close the dialog without deleting
+                                                                          },
+                                                                          child: Text(
+                                                                            'Cancel',
+                                                                            style: TextStyle(color: AppColors.cancelButton),
+                                                                          ),
+                                                                        ),
+                                                                        TextButton(
+                                                                          onPressed: () {
+                                                                            savedPreferences.removeTripPreference(tripPreference);
 
-                                                                          // Show deletion pop-up
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
-                                                                            SnackBar(
-                                                                              content: Center(
-                                                                                child: Text(
-                                                                                  'Trip Preference Deleted!',
-                                                                                  // Maybe change look
-                                                                                  style: const TextStyle(
-                                                                                    color: Colors.black,
-                                                                                    fontSize: 32,
-                                                                                    fontWeight: FontWeight.bold,
+                                                                            // Show deletion pop-up
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(
+                                                                                content: Center(
+                                                                                  child: Text(
+                                                                                    'Trip Preference Deleted!',
+                                                                                    // Maybe change look
+                                                                                    style: const TextStyle(
+                                                                                      color: Colors.black,
+                                                                                      fontSize: 32,
+                                                                                      fontWeight: FontWeight.bold,
+                                                                                    ),
                                                                                   ),
                                                                                 ),
+                                                                                duration: Duration(seconds: 2),
+                                                                                backgroundColor: Colors.red,
                                                                               ),
-                                                                              duration: Duration(seconds: 2),
-                                                                              backgroundColor: Colors.red,
-                                                                            ),
-                                                                          );
+                                                                            );
 
-                                                                          Navigator.of(context).pop(); // Dismiss the dialog
-                                                                          loadTripPreferenceList();
-                                                                        },
-                                                                        child: const Text(
-                                                                          'Delete',
-                                                                          style: TextStyle(color: Colors.red),
+                                                                            Navigator.of(context).pop(); // Dismiss the dialog
+                                                                            loadTripPreferenceList();
+                                                                          },
+                                                                          child: const Text(
+                                                                            'Delete',
+                                                                            style: TextStyle(color: Colors.red),
+                                                                          ),
                                                                         ),
-                                                                      ),
-                                                                    ],
-                                                                  );
-                                                                },
-                                                              );
-                                                            },
-                                                          ),
-                                                        ],
+                                                                      ],
+                                                                    );
+                                                                  },
+                                                                );
+                                                              },
+                                                            ),
+                                                          ],
+                                                        ),
                                                       );
                                                     },
                                                   );

@@ -320,94 +320,97 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                   backgroundColor: AppColors.textFieldColor2,
                   context: context,
                   builder: (BuildContext context) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        ListTile(
-                          leading: Icon(Icons.delete, color: Colors.red),
-                          title: Text(
-                            'Delete Crew Member',
-                            style: TextStyle(color: AppColors.textColorPrimary),
-                          ),
-                          onTap: () {
-                            Navigator.of(context).pop(); // Close the dialog without deleting
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: AppData.bottomModalPadding),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            leading: Icon(Icons.delete, color: Colors.red),
+                            title: Text(
+                              'Delete Crew Member',
+                              style: TextStyle(color: AppColors.textColorPrimary),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop(); // Close the dialog without deleting
 
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  backgroundColor: AppColors.textFieldColor2,
-                                  title: Text(
-                                    'Confirm Deletion',
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                  ),
-                                  content: Text(
-                                    'This crew member data ($oldCrewMemberName) and any positional preference data containing them will be erased!',
-                                    style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(); // Close the dialog without deleting
-
-                                      },
-                                      child: Text(
-                                        'Cancel',
-                                        style: TextStyle(color: AppColors.cancelButton),
-                                      ),
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: AppColors.textFieldColor2,
+                                    title: Text(
+                                      'Confirm Deletion',
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                     ),
-                                    TextButton(
-                                      onPressed: () {
-                                        // Remove item from the Hive box
-                                        final keyToRemove = crewmemberBox.keys.firstWhere(
-                                              (key) => crewmemberBox.get(key) == widget.crewMember,
-                                          orElse: () => null,
-                                        );
+                                    content: Text(
+                                      'This crew member data ($oldCrewMemberName) and any positional preference data containing them will be erased!',
+                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Close the dialog without deleting
 
-                                        if (keyToRemove != null) {
-                                          crewmemberBox.delete(keyToRemove);
-                                        }
+                                        },
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(color: AppColors.cancelButton),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          // Remove item from the Hive box
+                                          final keyToRemove = crewmemberBox.keys.firstWhere(
+                                                (key) => crewmemberBox.get(key) == widget.crewMember,
+                                            orElse: () => null,
+                                          );
 
-                                        // Remove the crew member
-                                        crew.removeCrewMember(widget.crewMember);
+                                          if (keyToRemove != null) {
+                                            crewmemberBox.delete(keyToRemove);
+                                          }
 
-                                        widget.onUpdate(); // Callback function to update UI with new data
+                                          // Remove the crew member
+                                          crew.removeCrewMember(widget.crewMember);
 
-                                        // Show deletion pop-up
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Center(
-                                              child: Text(
-                                                '$oldCrewMemberName Deleted!',
-                                                // Maybe change look
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 32,
-                                                  fontWeight: FontWeight.bold,
+                                          widget.onUpdate(); // Callback function to update UI with new data
+
+                                          // Show deletion pop-up
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Center(
+                                                child: Text(
+                                                  '$oldCrewMemberName Deleted!',
+                                                  // Maybe change look
+                                                  style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 32,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
                                               ),
+                                              duration: Duration(seconds: 2),
+                                              backgroundColor: Colors.red,
                                             ),
-                                            duration: Duration(seconds: 2),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
+                                          );
 
-                                        Navigator.of(context).pop(); // Dismiss the dialog
-                                        Navigator.of(context).pop(); // Return to previous screen
-                                      },
+                                          Navigator.of(context).pop(); // Dismiss the dialog
+                                          Navigator.of(context).pop(); // Return to previous screen
+                                        },
 
-                                      child: const Text(
-                                        'Delete',
-                                        style: TextStyle(color: Colors.red),
+                                        child: const Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ],
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     );
                   },
                 );

@@ -84,70 +84,73 @@ class _SavedTripsState extends State<SavedTripsView> {
                   backgroundColor: AppColors.textFieldColor2,
                   context: context,
                   builder: (BuildContext context) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        ListTile(
-                          leading: Icon(Icons.delete, color: Colors.red),
-                          title: Text(
-                            'Delete All Trips',
-                            style: TextStyle(color: AppColors.textColorPrimary),
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: AppData.bottomModalPadding),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            leading: Icon(Icons.delete, color: Colors.red),
+                            title: Text(
+                              'Delete All Trips',
+                              style: TextStyle(color: AppColors.textColorPrimary),
+                            ),
+                            onTap: () {
+                              if (savedTrips.savedTrips.isEmpty) {
+                                Navigator.of(context).pop(); // Close confirmation dialog
+                                return;
+                              }
+                              Navigator.of(context).pop(); // Close the dialog without deleting
+
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: AppColors.textFieldColor2,
+                                    title: Text(
+                                      'Confirm Deletion',
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                    ),
+                                    content: Text(
+                                      'Are you sure you want to delete all trips?',
+                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Close the dialog without deleting
+                                        },
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(color: AppColors.textColorPrimary),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          // Perform deletion
+                                          savedTrips.deleteAllTrips();
+
+                                          // Update the parent widget state
+                                          setState(() {
+                                            loadTripList();
+                                          });
+
+                                          // Close the dialogs
+                                          Navigator.of(context).pop(); // Close confirmation dialog
+                                        },
+                                        child: const Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
                           ),
-                          onTap: () {
-                            if (savedTrips.savedTrips.isEmpty) {
-                              Navigator.of(context).pop(); // Close confirmation dialog
-                              return;
-                            }
-                            Navigator.of(context).pop(); // Close the dialog without deleting
-
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  backgroundColor: AppColors.textFieldColor2,
-                                  title: Text(
-                                    'Confirm Deletion',
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                  ),
-                                  content: Text(
-                                    'Are you sure you want to delete all trips?',
-                                    style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(); // Close the dialog without deleting
-                                      },
-                                      child: Text(
-                                        'Cancel',
-                                        style: TextStyle(color: AppColors.textColorPrimary),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        // Perform deletion
-                                        savedTrips.deleteAllTrips();
-
-                                        // Update the parent widget state
-                                        setState(() {
-                                          loadTripList();
-                                        });
-
-                                        // Close the dialogs
-                                        Navigator.of(context).pop(); // Close confirmation dialog
-                                      },
-                                      child: const Text(
-                                        'Delete',
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ],
+                        ],
+                      ),
                     );
                   },
                 );

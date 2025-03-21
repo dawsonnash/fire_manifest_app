@@ -160,72 +160,75 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                     backgroundColor: AppColors.textFieldColor2,
                     context: context,
                     builder: (BuildContext context) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          ListTile(
-                            leading: Icon(Icons.person_remove, color: Colors.red),
-                            title: Text(
-                              'Delete Select Crew Members',
-                              style: TextStyle(color: AppColors.textColorPrimary),
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: AppData.bottomModalPadding),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            ListTile(
+                              leading: Icon(Icons.person_remove, color: Colors.red),
+                              title: Text(
+                                'Select Delete',
+                                style: TextStyle(color: AppColors.textColorPrimary),
+                              ),
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                setState(() {
+                                  isSelectionMode = true;
+                                });
+                              },
                             ),
-                            onTap: () {
-                              Navigator.of(context).pop();
-                              setState(() {
-                                isSelectionMode = true;
-                              });
-                            },
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.delete, color: Colors.red),
-                            title: Text(
-                              'Delete All Crew Members',
-                              style: TextStyle(color: AppColors.textColorPrimary),
+                            ListTile(
+                              leading: Icon(Icons.delete, color: Colors.red),
+                              title: Text(
+                                'Delete All Crew Members',
+                                style: TextStyle(color: AppColors.textColorPrimary),
+                              ),
+                              onTap: () {
+                                Navigator.of(context).pop(); // Close the dialog without deleting
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      backgroundColor: AppColors.textFieldColor2,
+                                      title: Text(
+                                        'Confirm Deletion',
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                      ),
+                                      content: Text(
+                                        'Are you sure you want to delete all crew members?',
+                                        style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop(); // Close the dialog without deleting
+                                          },
+                                          child: Text(
+                                            'Cancel',
+                                            style: TextStyle(color: AppColors.cancelButton),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            crew.deleteAllCrewMembers();
+                                            setState(() {});
+                                            Navigator.of(context).pop(); // Close the dialog after deletion
+                                            Navigator.of(context).pop(); // Home screen
+                                          },
+                                          child: const Text(
+                                            'Delete',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
                             ),
-                            onTap: () {
-                              Navigator.of(context).pop(); // Close the dialog without deleting
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    backgroundColor: AppColors.textFieldColor2,
-                                    title: Text(
-                                      'Confirm Deletion',
-                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                    ),
-                                    content: Text(
-                                      'Are you sure you want to delete all crew members?',
-                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(); // Close the dialog without deleting
-                                        },
-                                        child: Text(
-                                          'Cancel',
-                                          style: TextStyle(color: AppColors.cancelButton),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          crew.deleteAllCrewMembers();
-                                          setState(() {});
-                                          Navigator.of(context).pop(); // Close the dialog after deletion
-                                          Navigator.of(context).pop(); // Home screen
-                                        },
-                                        child: const Text(
-                                          'Delete',
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ],
+                          ],
+                        ),
                       );
                     },
                   );

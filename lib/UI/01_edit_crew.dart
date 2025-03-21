@@ -526,7 +526,7 @@ class _EditCrewState extends State<EditCrew> {
                                             left: 24,
                                             right: 24,
                                             top: 16,
-                                            bottom: MediaQuery.of(dialogContext).viewInsets.bottom, // Adjust for keyboard
+                                            bottom: MediaQuery.of(dialogContext).viewInsets.bottom + AppData.bottomModalPadding, // Adjust for keyboard
                                           ),
                                           decoration: BoxDecoration(
                                             color: AppColors.textFieldColor2,

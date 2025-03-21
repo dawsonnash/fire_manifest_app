@@ -398,92 +398,95 @@ class _EditGearState extends State<EditGear> {
                   backgroundColor: AppColors.textFieldColor2,
                   context: context,
                   builder: (BuildContext context) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        ListTile(
-                          leading: Icon(Icons.delete, color: Colors.red),
-                          title: Text(
-                            'Delete Gear',
-                            style: TextStyle(color: AppColors.textColorPrimary),
-                          ),
-                          onTap: () {
-                            Navigator.of(context).pop(); // Close the dialog without deleting
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: AppData.bottomModalPadding),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            leading: Icon(Icons.delete, color: Colors.red),
+                            title: Text(
+                              'Delete Gear',
+                              style: TextStyle(color: AppColors.textColorPrimary),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop(); // Close the dialog without deleting
 
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  backgroundColor: AppColors.textFieldColor2,
-                                  title: Text(
-                                    'Confirm Deletion',
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                  ),
-                                  content: Text(
-                                    'This gear data ($oldGearName) and any gear preference data containing it will be erased!',
-                                    style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(); // Close the dialog without deleting
-                                      },
-                                      child: Text(
-                                        'Cancel',
-                                        style: TextStyle(color: AppColors.cancelButton),
-                                      ),
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: AppColors.textFieldColor2,
+                                    title: Text(
+                                      'Confirm Deletion',
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                     ),
-                                    TextButton(
-                                      onPressed: () {
-                                        // Remove item from the Hive box
-                                        final keyToRemove = gearBox.keys.firstWhere(
-                                          (key) => gearBox.get(key) == widget.gear,
-                                          orElse: () => null,
-                                        );
+                                    content: Text(
+                                      'This gear data ($oldGearName) and any gear preference data containing it will be erased!',
+                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Close the dialog without deleting
+                                        },
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(color: AppColors.cancelButton),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          // Remove item from the Hive box
+                                          final keyToRemove = gearBox.keys.firstWhere(
+                                            (key) => gearBox.get(key) == widget.gear,
+                                            orElse: () => null,
+                                          );
 
-                                        if (keyToRemove != null) {
-                                          gearBox.delete(keyToRemove);
-                                        }
+                                          if (keyToRemove != null) {
+                                            gearBox.delete(keyToRemove);
+                                          }
 
-                                        // Remove the crew member from local memory
-                                        crew.removeGear(widget.gear);
+                                          // Remove the crew member from local memory
+                                          crew.removeGear(widget.gear);
 
-                                        widget.onUpdate(); // Callback function to update UI with new data
+                                          widget.onUpdate(); // Callback function to update UI with new data
 
-                                        // Show deletion pop-up
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Center(
-                                              child: Text(
-                                                '$oldGearName Deleted!',
-                                                // Maybe change look
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 32,
-                                                  fontWeight: FontWeight.bold,
+                                          // Show deletion pop-up
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Center(
+                                                child: Text(
+                                                  '$oldGearName Deleted!',
+                                                  // Maybe change look
+                                                  style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 32,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
                                               ),
+                                              duration: Duration(seconds: 2),
+                                              backgroundColor: Colors.red,
                                             ),
-                                            duration: Duration(seconds: 2),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
+                                          );
 
-                                        Navigator.of(context).pop(); // Dismiss the dialog
-                                        Navigator.of(context).pop(); // Return to previous screen
-                                      },
-                                      child: const Text(
-                                        'Delete',
-                                        style: TextStyle(color: Colors.red),
+                                          Navigator.of(context).pop(); // Dismiss the dialog
+                                          Navigator.of(context).pop(); // Return to previous screen
+                                        },
+                                        child: const Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ],
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     );
                   },
                 );

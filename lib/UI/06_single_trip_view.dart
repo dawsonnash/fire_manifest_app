@@ -247,168 +247,171 @@ class _SingleTripViewState extends State<SingleTripView> {
               ),
               onPressed: () {
                 showModalBottomSheet(
-                  backgroundColor: AppColors.textFieldColor,
+                  backgroundColor: AppColors.textFieldColor2,
                   context: context,
                   builder: (BuildContext context) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        // Export
-                        ListTile(
-                          leading: Icon(Icons.ios_share, color: AppColors.textColorPrimary),
-                          title: Text(
-                            'Export',
-                            style: TextStyle(color: AppColors.textColorPrimary),
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: AppData.bottomModalPadding),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          // Export
+                          ListTile(
+                            leading: Icon(Icons.ios_share, color: AppColors.textColorPrimary),
+                            title: Text(
+                              'Export',
+                              style: TextStyle(color: AppColors.textColorPrimary),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  int selectedIndex = 0; // Initial selection index
+
+                                  return AlertDialog(
+                                    backgroundColor: AppColors.textFieldColor2,
+                                    title: Text(
+                                      'Select Manifest Type',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textColorPrimary,
+                                      ),
+                                    ),
+                                    content: SizedBox(
+                                      height: MediaQuery.of(context).size.height * 0.15, // Dynamic height
+                                      child: CupertinoPicker(
+                                        itemExtent: 50, // Height of each item in the picker
+                                        onSelectedItemChanged: (int index) {
+                                          selectedIndex = index;
+                                        },
+                                        children: [
+                                          Center(child: Text('Helicopter Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                                          if (!isExternal!) Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                                        ],
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(fontSize: AppData.text16, color: AppColors.cancelButton),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+
+                                          if (selectedIndex == 0) {
+                                            // Show additional input dialog for `of252`
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AdditionalInfoDialog(
+                                                  onConfirm: (String helicopterNum, String departure, String destination, String manifestPreparer) {
+                                                    previewTripPDF(context, widget.trip, 'of252', widget.trip.isExternal, helicopterNum, departure, destination, manifestPreparer);
+                                                  },
+                                                );
+                                              },
+                                            );
+                                          } else {
+                                            // Fixed-Wing manifest
+                                            previewTripPDF(context, widget.trip, 'pms245', null, null, null, null, null);
+                                          }
+                                        },
+                                        child: Text(
+                                          'Export',
+                                          style: TextStyle(fontSize: AppData.text16, color: AppColors.saveButtonAllowableWeight),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
                           ),
-                          onTap: () {
-                            Navigator.of(context).pop();
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                int selectedIndex = 0; // Initial selection index
 
-                                return AlertDialog(
-                                  backgroundColor: AppColors.textFieldColor2,
-                                  title: Text(
-                                    'Select Manifest Type',
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.textColorPrimary,
-                                    ),
-                                  ),
-                                  content: SizedBox(
-                                    height: MediaQuery.of(context).size.height * 0.15, // Dynamic height
-                                    child: CupertinoPicker(
-                                      itemExtent: 50, // Height of each item in the picker
-                                      onSelectedItemChanged: (int index) {
-                                        selectedIndex = index;
-                                      },
-                                      children: [
-                                        Center(child: Text('Helicopter Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
-                                        if (!isExternal!) Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
-                                      ],
-                                    ),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text(
-                                        'Cancel',
-                                        style: TextStyle(fontSize: AppData.text16, color: AppColors.cancelButton),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-
-                                        if (selectedIndex == 0) {
-                                          // Show additional input dialog for `of252`
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AdditionalInfoDialog(
-                                                onConfirm: (String helicopterNum, String departure, String destination, String manifestPreparer) {
-                                                  previewTripPDF(context, widget.trip, 'of252', widget.trip.isExternal, helicopterNum, departure, destination, manifestPreparer);
-                                                },
-                                              );
-                                            },
-                                          );
-                                        } else {
-                                          // Fixed-Wing manifest
-                                          previewTripPDF(context, widget.trip, 'pms245', null, null, null, null, null);
-                                        }
-                                      },
-                                      child: Text(
-                                        'Export',
-                                        style: TextStyle(fontSize: AppData.text16, color: AppColors.saveButtonAllowableWeight),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-
-                        // Edit
-                        ListTile(
-                          leading: Icon(Icons.edit, color: AppColors.textColorPrimary),
-                          title: Text(
-                            'Edit Trip',
-                            style: TextStyle(color: AppColors.textColorPrimary),
+                          // Edit
+                          ListTile(
+                            leading: Icon(Icons.edit, color: AppColors.textColorPrimary),
+                            title: Text(
+                              'Edit Trip',
+                              style: TextStyle(color: AppColors.textColorPrimary),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => widget.trip.isExternal!
+                                        ? EditTripExternal(
+                                            trip: widget.trip,
+                                          )
+                                        : EditTrip(
+                                            trip: widget.trip,
+                                          )),
+                              );
+                            },
                           ),
-                          onTap: () {
-                            Navigator.of(context).pop();
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => widget.trip.isExternal!
-                                      ? EditTripExternal(
-                                          trip: widget.trip,
-                                        )
-                                      : EditTrip(
-                                          trip: widget.trip,
-                                        )),
-                            );
-                          },
-                        ),
 
-                        // Delete
-                        ListTile(
-                          leading: Icon(Icons.delete, color: Colors.red),
-                          title: Text(
-                            'Delete trip',
-                            style: TextStyle(color: AppColors.textColorPrimary),
+                          // Delete
+                          ListTile(
+                            leading: Icon(Icons.delete, color: Colors.red),
+                            title: Text(
+                              'Delete trip',
+                              style: TextStyle(color: AppColors.textColorPrimary),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              // if (savedTrips.savedTrips.isNotEmpty) {}
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: AppColors.textFieldColor2,
+                                    title: Text(
+                                      'Confirm Deletion',
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                    ),
+                                    content: Text(
+                                      'Are you sure you want to delete this trip?',
+                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Close the dialog without deleting
+                                        },
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(color: AppColors.cancelButton),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            savedTrips.removeTrip(widget.trip);
+                                          });
+                                          Navigator.of(context).pop(); // Close the dialog after deletion
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
                           ),
-                          onTap: () {
-                            Navigator.of(context).pop();
-                            // if (savedTrips.savedTrips.isNotEmpty) {}
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  backgroundColor: AppColors.textFieldColor2,
-                                  title: Text(
-                                    'Confirm Deletion',
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                  ),
-                                  content: Text(
-                                    'Are you sure you want to delete this trip?',
-                                    style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(); // Close the dialog without deleting
-                                      },
-                                      child: Text(
-                                        'Cancel',
-                                        style: TextStyle(color: AppColors.cancelButton),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          savedTrips.removeTrip(widget.trip);
-                                        });
-                                        Navigator.of(context).pop(); // Close the dialog after deletion
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text(
-                                        'Delete',
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ],
+                        ],
+                      ),
                     );
                   },
                 );

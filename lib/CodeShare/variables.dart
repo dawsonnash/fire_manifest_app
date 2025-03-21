@@ -115,6 +115,8 @@ class AppData {
   static double get padding10 => 10.0 * _scalingFactorPadding;
   static double get padding8 => 8.0 * _scalingFactorPadding;
   static double get padding5 => 5.0 * _scalingFactorPadding;
+  static double get bottomModalPadding => 16.0 * _scalingFactorPadding;
+
 
   // **Predefined Scaled Text Sizes**
   static double get text10 => 10 * _textScalingFactor * _textOrientationFactor;
