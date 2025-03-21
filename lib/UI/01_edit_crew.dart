@@ -769,6 +769,18 @@ class _EditCrewState extends State<EditCrew> {
 
                                                                         // Update parent state
                                                                         setState(() {});
+                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                          SnackBar(
+                                                                            content: Center(
+                                                                              child: Text(
+                                                                                'Tool deleted!',
+                                                                                style: TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+                                                                              ),
+                                                                            ),
+                                                                            duration: Duration(seconds: 1),
+                                                                            backgroundColor: Colors.red,
+                                                                          ),
+                                                                        );
                                                                       },
                                                                       child: const Text(
                                                                         'Delete',
@@ -931,6 +943,18 @@ class _EditCrewState extends State<EditCrew> {
 
                                                           Navigator.of(dialogContext).pop(); // Close dialog
                                                           setState(() {}); // Reflect changes in the parent state
+                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                            SnackBar(
+                                                              content: Center(
+                                                                child: Text(
+                                                                  'Tool saved!',
+                                                                  style: TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+                                                                ),
+                                                              ),
+                                                              duration: Duration(seconds: 1),
+                                                              backgroundColor: Colors.green,
+                                                            ),
+                                                          );
                                                         }
 
                                                         // Updating Tools Check
@@ -1125,6 +1149,18 @@ class _EditCrewState extends State<EditCrew> {
                                                                       crew.updateTotalCrewWeight();
                                                                       Navigator.of(dialogContext).pop(); // Close the main dialog
                                                                       setState(() {}); // Reflect changes in the parent state
+                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                        SnackBar(
+                                                                          content: Center(
+                                                                            child: Text(
+                                                                              'Tool updated!',
+                                                                              style: TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+                                                                            ),
+                                                                          ),
+                                                                          duration: Duration(seconds: 1),
+                                                                          backgroundColor: Colors.green,
+                                                                        ),
+                                                                      );
                                                                     },
                                                                     child: Text(
                                                                       'Update',
