@@ -265,7 +265,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                 errorText: tripNameErrorMessage,
                                 labelStyle: TextStyle(
                                   color: AppColors.textColorPrimary, // Label color when not focused
-                                  fontSize: 18, // Label font size
+                                  fontSize: AppData.text18, // Label font size
                                 ),
                                 filled: true,
                                 fillColor: AppColors.textFieldColor,
@@ -452,7 +452,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                 child: Text(
                                   'Choose Allowable',
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: AppData.text18,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black,
                                   ),
@@ -516,7 +516,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                 ),
                                                 style: TextStyle(
                                                   color: AppColors.textColorPrimary, // Color of the typed text
-                                                  fontSize: 18, // Font size for the typed text
+                                                  fontSize: AppData.text18, // Font size for the typed text
                                                 ),
                                               ),
                                             ),

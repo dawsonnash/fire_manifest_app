@@ -96,7 +96,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
               backgroundColor: AppColors.textFieldColor2,
               title: Text(
                 'Add Crew Members and Gear',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textColorPrimary),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text18, color: AppColors.textColorPrimary),
               ),
               contentPadding: const EdgeInsets.all(16),
               content: ConstrainedBox(
@@ -300,7 +300,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                             child: Icon(
                                                               FontAwesomeIcons.triangleExclamation, // Hazard icon
                                                               color: Colors.red, // Red color for hazard
-                                                              size: 14, // Icon size
+                                                              size: AppData.text14, // Icon size
                                                             ),
                                                           ),
                                                       ],
@@ -308,7 +308,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                     Text(
                                                       '${gear.weight} lb x$remainingQuantity',
                                                       style: TextStyle(
-                                                        fontSize: 14,
+                                                        fontSize: AppData.text14,
                                                         color: Colors.black,
                                                       ),
                                                     ),
@@ -382,7 +382,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                         if (gear.quantity > 1)
                                                           Text(
                                                             'Qty: ${selectedGearQuantities[gear] ?? 1}',
-                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textColorSecondary),
+                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text14, color: AppColors.textColorSecondary),
                                                           ),
                                                         if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
                                                       ],
@@ -446,7 +446,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                               'IRPG Item Weights',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 20,
+                                                fontSize: AppData.text20,
                                                 color: AppColors.textColorPrimary,
                                               ),
                                             ),
@@ -844,7 +844,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lb',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.text18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
           ],
         ),
@@ -861,7 +861,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                 'Save',
                 style: TextStyle(
                   color: AppColors.textColorSecondary,
-                  fontSize: 20,
+                  fontSize: AppData.text20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1111,7 +1111,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                         Text(
                                                           '${calculateAvailableWeight(loads[index])} lb',
                                                           style: TextStyle(
-                                                            fontSize: 20,
+                                                            fontSize: AppData.text20,
                                                             fontWeight: FontWeight.bold,
                                                             color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                                                 ? Colors.white // Warning color
@@ -1134,7 +1134,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                         Text(
                                                           '${calculateAvailableSeats(loads[index])}',
                                                           style: TextStyle(
-                                                            fontSize: 20,
+                                                            fontSize: AppData.text20,
                                                             fontWeight: FontWeight.bold,
                                                             color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                                                 ? Colors.white // Warning color
@@ -1144,7 +1144,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                         Text(
                                                           '/${widget.trip.availableSeats} seats',
                                                           style: TextStyle(
-                                                            fontSize: 20,
+                                                            fontSize: AppData.text20,
                                                             fontWeight: FontWeight.bold,
                                                             color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
                                                                 ? Colors.white // Warning color
@@ -1191,10 +1191,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                   // Rounded corners
                                                 ),
                                                 alignment: Alignment.center,
-                                                child: const Text(
+                                                child:  Text(
                                                   'OVERWEIGHT',
                                                   style: TextStyle(
-                                                    fontSize: 18,
+                                                    fontSize: AppData.text18,
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.black,
                                                   ),
@@ -1215,10 +1215,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                   // Rounded corners
                                                 ),
                                                 alignment: Alignment.center,
-                                                child: const Text(
+                                                child: Text(
                                                   'NOT ENOUGH SEATS',
                                                   style: TextStyle(
-                                                    fontSize: 18,
+                                                    fontSize: AppData.text18,
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.black,
                                                   ),
@@ -1355,7 +1355,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                   ?  'Quantity: ${ item.quantity} x ${item.weight} lb'
                                                                   : item.getPositionTitle(item.position),
                                                               style: TextStyle(
-                                                                fontSize: 14,
+                                                                fontSize: AppData.text14,
                                                                 color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
                                                               ),
                                                             ),
@@ -1541,7 +1541,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                               alignment: Alignment.center,
                                               child: Text(
                                                 '+ Add Item',
-                                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+                                                style: TextStyle(fontSize: AppData.text18, fontWeight: FontWeight.bold, color: Colors.black),
                                               ),
                                             ),
                                           ),

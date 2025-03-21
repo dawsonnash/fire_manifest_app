@@ -405,7 +405,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                 Text(
                                   ' (x$remainingQuantity)  ',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: AppData.text12,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey,
                                   ),
@@ -448,7 +448,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                               return Center(
                                                 child: Text(
                                                   '${index + 1}',
-                                                  style: TextStyle(fontSize: 20, color: AppColors.textColorPrimary),
+                                                  style: TextStyle(fontSize: AppData.text20, color: AppColors.textColorPrimary),
                                                 ),
                                               );
                                             }),

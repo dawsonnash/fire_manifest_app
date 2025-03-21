@@ -509,7 +509,7 @@ pw.Widget fillFormFieldsOF252(
           top: 15,
           child: pw.Text(
             formattedDate,
-            style: pw.TextStyle(fontSize: 14),
+            style: pw.TextStyle(fontSize: AppData.text14),
           ),
         ),
 
@@ -519,7 +519,7 @@ pw.Widget fillFormFieldsOF252(
           top: 15,
           child: pw.Text(
             formattedTime,
-            style: pw.TextStyle(fontSize: 14),
+            style: pw.TextStyle(fontSize: AppData.text14),
           ),
         ),
 
@@ -644,7 +644,7 @@ pw.Widget fillFormFieldsOF252(
           top: 15,
           child: pw.Text(
             formattedDate,
-            style: pw.TextStyle(fontSize: 14),
+            style: pw.TextStyle(fontSize: AppData.text14),
           ),
         ),
 
@@ -654,7 +654,7 @@ pw.Widget fillFormFieldsOF252(
           top: 15,
           child: pw.Text(
             formattedTime,
-            style: pw.TextStyle(fontSize: 14),
+            style: pw.TextStyle(fontSize: AppData.text14),
           ),
         ),
 
@@ -733,7 +733,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         top: yOffset - 58,
         child: pw.Text(
           AppData.crewName,
-          style: pw.TextStyle(fontSize: 10),
+          style: pw.TextStyle(fontSize: AppData.text10),
         ),
       ),
       // Crew Members
@@ -743,7 +743,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           top: yOffset + 150 + (i * itemSpacing),
           child: pw.Text(
             load.loadPersonnel[i].name,
-            style: pw.TextStyle(fontSize: 12),
+            style: pw.TextStyle(fontSize: AppData.text12),
           ),
         ),
       // Gear
@@ -753,7 +753,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           top: yOffset + 150 + ((load.loadPersonnel.length + j) * itemSpacing),
           child: pw.Text(
             "${load.loadGear[j].name} (x${load.loadGear[j].quantity})",
-            style: pw.TextStyle(fontSize: 12),
+            style: pw.TextStyle(fontSize: AppData.text12),
           ),
         ),
 
@@ -764,7 +764,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           top: yOffset + 150 + ((load.loadPersonnel.length + load.loadGear.length + k) * itemSpacing),
           child: pw.Text(
             load.customItems[k].name,
-            style: pw.TextStyle(fontSize: 12),
+            style: pw.TextStyle(fontSize: AppData.text12),
           ),
         ),
 
@@ -775,7 +775,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           top: yOffset + 150 + (i * itemSpacing),
           child: pw.Text(
             "${load.loadPersonnel[i].flightWeight} lb",
-            style: pw.TextStyle(fontSize: 12),
+            style: pw.TextStyle(fontSize: AppData.text12),
           ),
         ),
 
@@ -786,7 +786,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           top: yOffset + 150 + ((load.loadPersonnel.length + j) * itemSpacing),
           child: pw.Text(
             "${load.loadGear[j].totalGearWeight} lb",
-            style: pw.TextStyle(fontSize: 12),
+            style: pw.TextStyle(fontSize: AppData.text12),
           ),
         ),
       for (var k = 0; k < load.customItems.length; k++)
@@ -795,7 +795,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           top: yOffset + 150 + ((load.loadPersonnel.length + load.loadGear.length + k) * itemSpacing),
           child: pw.Text(
             "${load.customItems[k].weight} lb",
-            style: pw.TextStyle(fontSize: 12),
+            style: pw.TextStyle(fontSize: AppData.text12),
           ),
         ),
 
@@ -805,7 +805,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         top: yOffset + 545,
         child: pw.Text(
           '${load.weight.toString()} lb',
-          style: pw.TextStyle(fontSize: 12),
+          style: pw.TextStyle(fontSize: AppData.text12),
         ),
       ),
 
@@ -815,7 +815,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         top: yOffset + 545,
         child: pw.Text(
           load.loadPersonnel.length.toString(),
-          style: pw.TextStyle(fontSize: 12),
+          style: pw.TextStyle(fontSize: AppData.text12),
         ),
       ),
 
@@ -825,7 +825,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         top: yOffset + 545,
         child: pw.Text(
           '${subtotalCrewMemberWeight.toString()} lb',
-          style: pw.TextStyle(fontSize: 12),
+          style: pw.TextStyle(fontSize: AppData.text12),
         ),
       ),
 
@@ -835,7 +835,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         top: yOffset + 545,
         child: pw.Text(
           '${subtotalGearWeight.toString()} lb',
-          style: pw.TextStyle(fontSize: 12),
+          style: pw.TextStyle(fontSize: AppData.text12),
         ),
       ),
 
@@ -845,7 +845,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         top: yOffset + 580,
         child: pw.Text(
           formattedDate.toString(),
-          style: pw.TextStyle(fontSize: 12),
+          style: pw.TextStyle(fontSize: AppData.text12),
         ),
       ),
     ],
@@ -899,7 +899,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
             ),
             Text(
               ' • ${widget.load.weight} lb',
-              style: TextStyle(fontSize: 20, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.text20, color: AppColors.textColorPrimary),
             ),
           ],
         ),
@@ -931,8 +931,8 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                           selectedIndex = index;
                         },
                         children: [
-                          Center(child: Text('Helicopter Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
-                          if (!widget.isExternal) Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                          Center(child: Text('Helicopter Manifest', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary))),
+                          if (!widget.isExternal) Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary))),
                         ],
                       ),
                     ),
@@ -1072,14 +1072,14 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                 Text(
                                                   'Weight: ${sling.weight} lb',
                                                   style: TextStyle(
-                                                    fontSize: 18,
+                                                    fontSize: AppData.text18,
                                                     color: AppColors.textColorPrimary,
                                                   ),
                                                 ),
                                                 Text(
                                                   ' • ${sling.loadGear.fold(0, (sum, gear) => sum + gear.quantity)} items',
                                                   style: TextStyle(
-                                                    fontSize: 18,
+                                                    fontSize: AppData.text18,
                                                     fontWeight: FontWeight.normal,
                                                     color: AppColors.textColorPrimary,
                                                   ),
@@ -1105,7 +1105,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                 leading: Icon(Icons.link),
                                                 title: Text(
                                                   accoutrement.name,
-                                                  style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+                                                  style: TextStyle(fontSize: AppData.text20, color: Colors.black, fontWeight: FontWeight.bold),
                                                 ),
                                                 subtitle: Text(
                                                   'Weight: ${accoutrement.weight} lb',
@@ -1138,23 +1138,23 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                           children: [
                                                             Text(
                                                               '${gearItem.name} ',
-                                                              style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+                                                              style: TextStyle(fontSize: AppData.text20, color: Colors.black, fontWeight: FontWeight.bold),
                                                             ),
                                                             if (gearItem.isHazmat)
                                                               Icon(
                                                                 FontAwesomeIcons.triangleExclamation, // Hazard icon
                                                                 color: Colors.red,
-                                                                size: 18,
+                                                                size: AppData.text18,
                                                               ),
                                                             Text(
                                                               ' (x${gearItem.quantity})',
-                                                              style: TextStyle(fontSize: 18),
+                                                              style: TextStyle(fontSize: AppData.text18),
                                                             ),
                                                           ],
                                                         ),
                                                         Text(
                                                           'Weight: ${gearItem.totalGearWeight} lb',
-                                                          style: TextStyle(fontSize: 18),
+                                                          style: TextStyle(fontSize: AppData.text18),
                                                         ),
                                                       ],
                                                     ),
@@ -1179,7 +1179,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                 leading: Icon(Icons.inventory_2_outlined),
                                                 title: Text(
                                                   customItem.name,
-                                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                  style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold),
                                                 ),
                                                 subtitle: Text('Weight: ${customItem.weight} lb'),
                                               ),
@@ -1213,7 +1213,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                         SnackBar(
                                           content: Text(
                                             '${crewmember.name} • ${crewmember.getPositionTitle(crewmember.position)}',
-                                            style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
+                                            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18),
                                           ),
                                           backgroundColor: AppColors.textFieldColor2,
                                           duration: Duration(seconds: 2), // How long the message appears
@@ -1239,7 +1239,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                               Text(
                                                 'Flight Weight: ${crewmember.flightWeight} lb',
                                                 style: TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: AppData.text18,
                                                   color: AppColors.textColorPrimary,
                                                 ),
                                               ),
@@ -1270,7 +1270,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                           SnackBar(
                                             content: Text(
                                               '${gearItem.name} • ${gearItem.weight} lb each',
-                                              style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
+                                              style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18),
                                             ),
                                             backgroundColor: AppColors.textFieldColor2,
                                             duration: Duration(seconds: 2), // How long the message appears
@@ -1296,17 +1296,17 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                     Icon(
                                                       FontAwesomeIcons.triangleExclamation, // Hazard icon
                                                       color: Colors.red, // Red color for hazard
-                                                      size: 18, // Icon size
+                                                      size: AppData.text18, // Icon size
                                                     ),
                                                   Text(
                                                     ' (x${gearItem.quantity})',
-                                                    style: TextStyle(fontSize: 18, color: Colors.black),
+                                                    style: TextStyle(fontSize: AppData.text18, color: Colors.black),
                                                   ),
                                                 ],
                                               ),
                                               Text(
                                                 'Weight: ${gearItem.totalGearWeight} lb',
-                                                style: TextStyle(fontSize: 18, color: Colors.black),
+                                                style: TextStyle(fontSize: AppData.text18, color: Colors.black),
                                               ),
                                             ],
                                           ),
@@ -1346,8 +1346,8 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                             ),
                                             Text(
                                               'Weight: ${customItem.weight} lb',
-                                              style: const TextStyle(
-                                                fontSize: 18,
+                                              style: TextStyle(
+                                                fontSize: AppData.text18,
                                               ),
                                             ),
                                           ],
@@ -1486,7 +1486,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
                   children: [
                     Text(
                       "Export as:  ",
-                      style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary),
+                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                     ),
                     Expanded(
                       // Ensures consistent sizing without fixed width

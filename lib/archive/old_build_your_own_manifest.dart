@@ -120,7 +120,7 @@
 //                 'Save',
 //                 style: TextStyle(
 //                   color: Colors.white,
-//                   fontSize: 20,
+//                   fontSize: AppData.text20,
 //                   fontWeight: FontWeight.bold,
 //                 ),
 //               ),
@@ -170,7 +170,7 @@
 //                                     "${item is Gear ? item.name : (item as CrewMember).name}, ${item is Gear ? item.weight : (item as CrewMember).flightWeight} lb",
 //                                     style: const TextStyle(
 //                                       color: Colors.white,
-//                                       fontSize: 18,
+//                                       fontSize: AppData.text18,
 //                                       fontWeight: FontWeight.bold,
 //                                     ),
 //                                   ),
@@ -185,7 +185,7 @@
 //                                     "${item is Gear ? item.name : (item as CrewMember).name}, ${item is Gear ? item.weight : (item as CrewMember).flightWeight} lb",
 //                                     style: const TextStyle(
 //                                       color: Colors.white,
-//                                       fontSize: 18,
+//                                       fontSize: AppData.text18,
 //                                       fontWeight: FontWeight.bold,
 //                                     ),
 //                                   ),
@@ -209,7 +209,7 @@
 //                                     item is Gear ? item.name : (item as CrewMember).name,
 //                                     style: const TextStyle(
 //                                       color: Colors.white,
-//                                       fontSize: 18,
+//                                       fontSize: AppData.text18,
 //                                       fontWeight: FontWeight.bold,
 //                                     ),
 //                                   ),
@@ -223,7 +223,7 @@
 //                                 "${item is Gear ? item.weight : (item as CrewMember).flightWeight} lb",
 //                                 style: const TextStyle(
 //                                   color: Colors.white,
-//                                   fontSize: 14,
+//                                   fontSize: AppData.text14,
 //                                 ),
 //                               ),
 //                             ),
@@ -254,7 +254,7 @@
 //                                     'Load ${index + 1}',
 //                                     style: const TextStyle(
 //                                       color: Colors.black,
-//                                       fontSize: 18,
+//                                       fontSize: AppData.text18,
 //                                       fontWeight: FontWeight.bold,
 //                                     ),
 //                                   ),
@@ -274,7 +274,7 @@
 //                                       'Delete Load',
 //                                       style: TextStyle(
 //                                         color: Colors.white,
-//                                         fontSize: 14,
+//                                         fontSize: AppData.text14,
 //                                       ),
 //                                     ),
 //                                   ),
@@ -328,7 +328,7 @@
 //                                                 icon: const Icon(
 //                                                   Icons.delete,
 //                                                   color: Colors.red,
-//                                                   size: 20,
+//                                                   size: AppData.text20,
 //                                                 ),
 //                                                 onPressed: () {
 //                                                   setState(() {

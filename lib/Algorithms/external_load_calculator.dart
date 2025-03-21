@@ -5,12 +5,8 @@ import 'package:flutter/material.dart';
 import '../CodeShare/variables.dart';
 import '../Data/sling.dart';
 import '../main.dart';
-import '../Data/crew.dart';
-import '../Data/gear_preferences.dart';
 import '../Data/trip.dart';
-import 'dart:math';
 import '../Data/load.dart';
-import '../Data/crewmember.dart';
 import '../Data/gear.dart';
 import '../Data/trip_preferences.dart';
 

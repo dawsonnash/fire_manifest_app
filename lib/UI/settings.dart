@@ -976,8 +976,8 @@ class _SettingsState extends State<SettingsView> {
                   });
                 },
                 children: [
-                  Center(child: Text('Export', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
-                  Center(child: Text('Import', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                  Center(child: Text('Export', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary))),
+                  Center(child: Text('Import', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary))),
                 ],
               ),
             ),
@@ -1421,9 +1421,9 @@ class _SettingsState extends State<SettingsView> {
                   // Help Title
                   ListTile(
                     leading: Icon(Icons.help_outline, color: Colors.white),
-                    title: const Text(
+                    title: Text(
                       'HELP',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(fontSize: AppData.text18, color: Colors.white),
                     ),
                   ),
 
@@ -1440,15 +1440,15 @@ class _SettingsState extends State<SettingsView> {
                               MaterialPageRoute(builder: (context) => QuickGuide()),
                             );
                           },
-                          child: const Text('Quick Guide', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: 18)),
+                          child: Text('Quick Guide', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: AppData.text18)),
                         ),
                         TextButton(
                           onPressed: _reportBugs,
-                          child: const Text('Report Bugs', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: 18)),
+                          child: Text('Report Bugs', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: AppData.text18)),
                         ),
                         TextButton(
                           onPressed: _submitFeedback,
-                          child: const Text('Submit Feedback', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: 18)),
+                          child: Text('Submit Feedback', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: AppData.text18)),
                         ),
                       ],
                     ),
@@ -1459,9 +1459,9 @@ class _SettingsState extends State<SettingsView> {
                   // App Settings Title
                   ListTile(
                     leading: Icon(Icons.settings, color: Colors.white),
-                    title: const Text(
+                    title: Text(
                       'APP SETTINGS',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(fontSize: AppData.text18, color: Colors.white),
                     ),
                   ),
 
@@ -1475,7 +1475,7 @@ class _SettingsState extends State<SettingsView> {
                         ExpansionTile(
                           title: Text(
                             'Display',
-                            style: TextStyle(fontSize: 18, color: Colors.white), // White text for the label
+                            style: TextStyle(fontSize: AppData.text18, color: Colors.white), // White text for the label
                           ),
                           trailing: Icon(
                             Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
@@ -1487,7 +1487,7 @@ class _SettingsState extends State<SettingsView> {
                             // ListTile(
                             //   title: const Text(
                             //     'Dark Mode',
-                            //     style: TextStyle(fontSize: 18, color: Colors.white),
+                            //     style: TextStyle(fontSize: AppData.text18, color: Colors.white),
                             //   ),
                             //   trailing: Switch(
                             //     value: isDarkMode,
@@ -1511,9 +1511,9 @@ class _SettingsState extends State<SettingsView> {
                             // Enable Background Image Toggle (Visible only if Dark Mode is ON)
                           //  if (isDarkMode)
                               ListTile(
-                                title: const Text(
+                                title: Text(
                                   'Enable Background Image',
-                                  style: TextStyle(fontSize: 18, color: Colors.white),
+                                  style: TextStyle(fontSize: AppData.text18, color: Colors.white),
                                 ),
                                 trailing: Switch(
                                   value: enableBackgroundImage,
@@ -1538,7 +1538,7 @@ class _SettingsState extends State<SettingsView> {
                             children: [
                               Text(
                                 'Crew Details',
-                                style: TextStyle(color: Colors.white, fontSize: 18),
+                                style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                               ),
                               IconButton(
                                 icon: Icon(
@@ -1593,7 +1593,7 @@ class _SettingsState extends State<SettingsView> {
                                     ExpansionTile(
                                       title: Text(
                                         'Crew Name',
-                                        style: TextStyle(color: Colors.white, fontSize: 18),
+                                        style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                                       ),
                                       trailing: Icon(
                                         Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
@@ -1616,7 +1616,7 @@ class _SettingsState extends State<SettingsView> {
                                               child: TextField(
                                                 controller: crewNameController,
                                                 // Pre-fill with current crew name
-                                                style: const TextStyle(color: Colors.white, fontSize: 18),
+                                                style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                                                 inputFormatters: [
                                                   LengthLimitingTextInputFormatter(30),
                                                 ],
@@ -1651,7 +1651,7 @@ class _SettingsState extends State<SettingsView> {
                                     ExpansionTile(
                                       title: Text(
                                         'Your Name',
-                                        style: TextStyle(color: Colors.white, fontSize: 18),
+                                        style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                                       ),
                                       trailing: Icon(
                                         Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
@@ -1674,7 +1674,7 @@ class _SettingsState extends State<SettingsView> {
                                               child: TextField(
                                                 controller: userNameController,
                                                 // Pre-fill with current user name
-                                                style: const TextStyle(color: Colors.white, fontSize: 18),
+                                                style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                                                 inputFormatters: [
                                                   LengthLimitingTextInputFormatter(30),
                                                 ],
@@ -1715,7 +1715,7 @@ class _SettingsState extends State<SettingsView> {
                         ExpansionTile(
                           title: Text(
                             'External Manifesting',
-                            style: TextStyle(color: Colors.white, fontSize: 18),
+                            style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                           ),
                           trailing: Icon(
                             Icons.keyboard_arrow_down,
@@ -1732,7 +1732,7 @@ class _SettingsState extends State<SettingsView> {
                                     'Safety Buffer',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 18,
+                                      fontSize: AppData.text18,
                                     ),
                                   ),
                                   trailing: Icon(
@@ -1762,7 +1762,7 @@ class _SettingsState extends State<SettingsView> {
                                               focusNode: _focusNode,
                                               controller: safetyBufferController,
                                               // Pre-fill with current user name
-                                              style: const TextStyle(color: Colors.white, fontSize: 18),
+                                              style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                                               keyboardType: TextInputType.number,
                                               textInputAction: TextInputAction.done,
                                               inputFormatters: [
@@ -1810,7 +1810,7 @@ class _SettingsState extends State<SettingsView> {
                                 //             children: [
                                 //               Text(
                                 //                 'Load Accoutrements ',
-                                //                 style: TextStyle(color: Colors.white, fontSize: 18),
+                                //                 style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                                 //               ),
                                 //               IconButton(
                                 //                 icon: Icon(
@@ -1867,9 +1867,9 @@ class _SettingsState extends State<SettingsView> {
                   // Crew Loadout Title
                   ListTile(
                     leading: Icon(Icons.swap_horiz, color: Colors.white),
-                    title: const Text(
+                    title: Text(
                       'CREW LOADOUTS',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(fontSize: AppData.text18, color: Colors.white),
                     ),
                   ),
 
@@ -2410,7 +2410,7 @@ class _SettingsState extends State<SettingsView> {
                           )),
                       TextButton(
                         onPressed: importExportDialog,
-                        child: const Text('Crew Sharing', style: TextStyle(color: Colors.white, fontSize: 18)),
+                        child: Text('Crew Sharing', style: TextStyle(color: Colors.white, fontSize: AppData.text18)),
                       ),
                     ],
                   ),
@@ -2420,9 +2420,9 @@ class _SettingsState extends State<SettingsView> {
                   // Legal Section
                   ListTile(
                     leading: Icon(Icons.gavel, color: Colors.white),
-                    title: const Text(
+                    title: Text(
                       'LEGAL',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(fontSize: AppData.text18, color: Colors.white),
                     ),
                   ),
                   GestureDetector(
@@ -2449,7 +2449,7 @@ class _SettingsState extends State<SettingsView> {
                                         'all data before relying on it for operational or decision-making purposes. The developers assume no '
                                         'liability for errors, omissions, or any outcomes resulting from the use of this app. By continuing, '
                                         'you acknowledge and accept full responsibility for reviewing and confirming all calculations.',
-                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18),
                                       ),
                                     ),
                                     actions: [
@@ -2467,9 +2467,9 @@ class _SettingsState extends State<SettingsView> {
                                 },
                               );
                             },
-                            child: const Text(
+                            child: Text(
                               'Terms and Conditions',
-                              style: TextStyle(color: Colors.white, fontSize: 18),
+                              style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                             ),
                           ),
                         ],

@@ -372,7 +372,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                   hintText: 'Up to 500 lb',
                                   hintStyle: TextStyle(
                                     color: AppColors.textColorPrimary,
-                                    fontSize: 20,
+                                    fontSize: AppData.text20,
                                   ),
                                   errorText: weightErrorMessage,
                                   labelStyle: TextStyle(
@@ -472,7 +472,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                         backgroundColor: AppColors.textFieldColor2,
                                         title: Text(
                                           '+ Add Personal Tool',
-                                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                          style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                         ),
                                         content: Column(
                                           mainAxisSize: MainAxisSize.min,
@@ -629,7 +629,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                         children: [
                                           Text(
                                             tool!.name,
-                                            style: TextStyle(color: AppColors.textColorPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                                            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text20, fontWeight: FontWeight.bold),
                                           ),
                                           if (tool.isHazmat)
                                             Padding(
@@ -640,7 +640,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                                 child: Icon(
                                                   FontAwesomeIcons.triangleExclamation, // Hazard icon
                                                   color: Colors.red, // Red color for hazard
-                                                  size: 18, // Icon size
+                                                  size: AppData.text18, // Icon size
                                                 ),
                                               ),
                                             ),
@@ -648,7 +648,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                       ),
                                       subtitle: Text(
                                         '${tool.weight} lb',
-                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: 20),
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text20),
                                       ),
                                       trailing: IconButton(
                                         icon: const Icon(Icons.delete, color: Colors.red, size: 28),

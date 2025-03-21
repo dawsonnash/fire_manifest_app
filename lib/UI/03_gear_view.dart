@@ -400,7 +400,7 @@ class _GearViewState extends State<GearView> {
                                                           child: Icon(
                                                             FontAwesomeIcons.triangleExclamation,
                                                             color: Colors.red,
-                                                            size: 18,
+                                                            size: AppData.text18,
                                                           ),
                                                         ),
                                                       ),

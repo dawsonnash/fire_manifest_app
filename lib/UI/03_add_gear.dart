@@ -557,7 +557,7 @@ class _AddGearState extends State<AddGear> {
                                         hintText: 'Up to 500 lb',
                                         hintStyle: TextStyle(
                                           color: AppColors.textColorPrimary,
-                                          fontSize: 20,
+                                          fontSize: AppData.text20,
                                         ),
                                         errorText: weightErrorMessage,
 
@@ -628,7 +628,7 @@ class _AddGearState extends State<AddGear> {
                                         hintText: 'Up to 99',
                                         hintStyle: TextStyle(
                                           color: AppColors.textColorPrimary,
-                                          fontSize: 20,
+                                          fontSize: AppData.text20,
                                         ),
                                         errorText: quantityErrorMessage,
                                         labelStyle: TextStyle(
@@ -688,7 +688,7 @@ class _AddGearState extends State<AddGear> {
                                       Text(
                                         isHazmat ? 'Yes' : 'No', // Dynamic label
                                         style: TextStyle(
-                                          fontSize: 18,
+                                          fontSize: AppData.text18,
                                           color: AppColors.textColorPrimary,
                                         ),
                                       ),
@@ -758,7 +758,7 @@ class _AddGearState extends State<AddGear> {
                                             style: TextStyle(
                                               color: AppColors.textColorPrimary,
                                               fontWeight: FontWeight.normal,
-                                              fontSize: 20,
+                                              fontSize: AppData.text20,
                                             ),
                                           ),
                                           isExpanded: true,
@@ -775,7 +775,7 @@ class _AddGearState extends State<AddGear> {
                                                     style: TextStyle(
                                                       color: AppColors.textColorPrimary,
                                                       fontWeight: FontWeight.normal,
-                                                      fontSize: 18,
+                                                      fontSize: AppData.text18,
                                                     ),
                                                   ),
                                                   Text(
@@ -783,7 +783,7 @@ class _AddGearState extends State<AddGear> {
                                                     style: TextStyle(
                                                       color: AppColors.textColorPrimary,
                                                       fontWeight: FontWeight.normal,
-                                                      fontSize: 18,
+                                                      fontSize: AppData.text18,
                                                     ),
                                                   ),
                                                 ],
@@ -862,7 +862,7 @@ class _AddGearState extends State<AddGear> {
                                         hintText: 'Up to 500 lb',
                                         hintStyle: TextStyle(
                                           color: AppColors.textColorPrimary,
-                                          fontSize: 20,
+                                          fontSize: AppData.text20,
                                         ),
                                         errorText: irpgWeightErrorMessage,
                                         labelStyle: TextStyle(
@@ -932,7 +932,7 @@ class _AddGearState extends State<AddGear> {
                                         hintText: 'Up to 99',
                                         hintStyle: TextStyle(
                                           color: AppColors.textColorPrimary,
-                                          fontSize: 20,
+                                          fontSize: AppData.text20,
                                         ),
                                         errorText: irpgQuantityErrorMessage,
                                         labelStyle: TextStyle(
@@ -994,7 +994,7 @@ class _AddGearState extends State<AddGear> {
                                         :
                                         isHazmatIRPG ? 'Yes' : 'No', // Dynamic label
                                         style: TextStyle(
-                                          fontSize: 18,
+                                          fontSize: AppData.text18,
                                           color: AppColors.textColorPrimary,
                                         ),
                                       ),

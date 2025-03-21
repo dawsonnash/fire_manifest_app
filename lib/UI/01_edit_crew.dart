@@ -134,7 +134,7 @@ class _EditCrewState extends State<EditCrew> {
         // decorationColor: AppColors.primaryColor, // Set the color of the underlin
         shadows: outlinedText(strokeColor: Colors.black));
 
-    TextStyle subHeaderTextStyle = TextStyle(fontSize: 18, color: Colors.white, shadows: outlinedText(strokeColor: Colors.black));
+    TextStyle subHeaderTextStyle = TextStyle(fontSize: AppData.text18, color: Colors.white, shadows: outlinedText(strokeColor: Colors.black));
     return Stack(
       children: [
         // Background
@@ -587,7 +587,7 @@ class _EditCrewState extends State<EditCrew> {
                                                       child: Text(
                                                         'Edit Tool Details',
                                                         style: TextStyle(
-                                                          fontSize: 18,
+                                                          fontSize: AppData.text18,
                                                           fontWeight: FontWeight.bold,
                                                           color: AppColors.textColorEditToolDetails,
                                                         ),
@@ -679,7 +679,7 @@ class _EditCrewState extends State<EditCrew> {
                                                       Text(
                                                         'HAZMAT',
                                                         style: TextStyle(
-                                                          fontSize: 20,
+                                                          fontSize: AppData.text20,
                                                           color: AppColors.textColorPrimary,
                                                         ),
                                                       ),

@@ -204,7 +204,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                   "No trips created...",
                   style: TextStyle(
                     color: AppColors.textColorPrimary,
-                    fontSize: 20,
+                    fontSize: AppData.text20,
                     fontWeight: AppColors.isDarkMode ? FontWeight.normal : FontWeight.bold,
                     shadows: AppColors.isDarkMode
                         ? null // No shadow in dark mode
@@ -372,7 +372,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                                   Text(
                                                     'Allowable: ${trip.allowable} lb',
                                                     style: TextStyle(
-                                                      fontSize: 18,
+                                                      fontSize: AppData.text18,
                                                       color: AppColors.textColorPrimary,
                                                     ),
                                                   )

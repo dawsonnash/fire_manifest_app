@@ -148,7 +148,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
               backgroundColor: AppColors.textFieldColor2,
               title: Text(
                 'Add Gear',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textColorPrimary),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text18, color: AppColors.textColorPrimary),
               ),
               contentPadding: const EdgeInsets.all(16),
               content: ConstrainedBox(
@@ -348,7 +348,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                             child: Icon(
                                                               FontAwesomeIcons.triangleExclamation, // Hazard icon
                                                               color: Colors.red, // Red color for hazard
-                                                              size: 14, // Icon size
+                                                              size: AppData.text14, // Icon size
                                                             ),
                                                           ),
                                                       ],
@@ -356,7 +356,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                     Text(
                                                       '${gear.weight} lb x$remainingQuantity',
                                                       style: TextStyle(
-                                                        fontSize: 14,
+                                                        fontSize: AppData.text14,
                                                         color: Colors.black,
                                                       ),
                                                     ),
@@ -432,7 +432,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                         if (gear.quantity > 1)
                                                           Text(
                                                             'Qty: ${selectedGearQuantities[gear] ?? 1}',
-                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textColorSecondary),
+                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text14, color: AppColors.textColorSecondary),
                                                           ),
                                                         if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
                                                       ],
@@ -498,7 +498,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                               'IRPG Item Weights',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 20,
+                                                fontSize: AppData.text20,
                                                 color: AppColors.textColorPrimary,
                                               ),
                                             ),
@@ -837,7 +837,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lb',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.text18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
           ],
         ),
@@ -854,7 +854,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                 'Save',
                 style: TextStyle(
                   color: AppColors.textColorSecondary,
-                  fontSize: 20,
+                  fontSize: AppData.text20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1092,7 +1092,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                       Text(
                                                         '${calculateAvailableWeight(loads[loadIndex])} lb',
                                                         style: TextStyle(
-                                                          fontSize: 20,
+                                                          fontSize: AppData.text20,
                                                           fontWeight: FontWeight.bold,
                                                           color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
                                                               ? Colors.white // Warning color
@@ -1138,10 +1138,10 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                               ), // Rounded corners
                                             ),
                                             alignment: Alignment.center,
-                                            child: const Text(
+                                            child:  Text(
                                               'OVERWEIGHT',
                                               style: TextStyle(
-                                                fontSize: 18,
+                                                fontSize: AppData.text18,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.black,
                                               ),
@@ -1166,7 +1166,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                             child: Text(
                                               'OVER $safetyBuffer LB SAFETY BUFFER',
                                               style: TextStyle(
-                                                fontSize: 18,
+                                                fontSize: AppData.text18,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.black,
                                               ),
@@ -1283,11 +1283,11 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                         children: [
                                                           Text(
                                                             'Sling #${slingIndex + 1}',
-                                                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                                                            style: TextStyle(color: Colors.white, fontSize: AppData.text18, fontWeight: FontWeight.bold),
                                                           ),
                                                           Text(
                                                             '${calculateSlingWeight(loads[loadIndex].slings![slingIndex])} lb',
-                                                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                                                            style: TextStyle(color: Colors.white, fontSize: AppData.text18, fontWeight: FontWeight.bold),
                                                           ),
                                                           Icon(
                                                             _isSlingExpanded[loadIndex][slingIndex] ? Icons.expand_less : Icons.expand_more,
@@ -1375,7 +1375,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                                 Text(
                                                                                   'Quantity: ${(item is Gear) ? item.quantity : 1} x ${item.weight} lb',
                                                                                   style: TextStyle(
-                                                                                    fontSize: 14,
+                                                                                    fontSize: AppData.text14,
                                                                                     color: Colors.black,
                                                                                   ),
                                                                                 ),
@@ -1383,7 +1383,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                                 Text(
                                                                                   'Quantity: 1',
                                                                                   style: TextStyle(
-                                                                                    fontSize: 14,
+                                                                                    fontSize: AppData.text14,
                                                                                     color: Colors.black,
                                                                                   ),
                                                                                 ),

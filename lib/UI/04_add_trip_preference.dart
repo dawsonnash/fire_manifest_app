@@ -366,7 +366,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                                           }).join(', '),
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
-                                              fontSize: 20,
+                                              fontSize: AppData.text20,
                                               color:
                                                   AppColors.textColorPrimary),
                                         ),
@@ -413,7 +413,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                                             .join(', '),
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 20,
+                                            fontSize: AppData.text20,
                                             color: AppColors.textColorPrimary),
                                       ),
                                       subtitle: Text(

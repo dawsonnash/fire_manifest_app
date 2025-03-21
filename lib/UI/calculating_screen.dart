@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../Algorithms/load_calculator.dart';
+import '../CodeShare/variables.dart';
 import '../Data/trip.dart';
 import '../Data/trip_preferences.dart';
 import '../main.dart';
@@ -297,7 +298,7 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
                         code,
                         style: TextStyle(
                           color: Colors.greenAccent.withOpacity(_random.nextDouble()), // Glitch effect
-                          fontSize: 14,
+                          fontSize: AppData.text14,
                           fontFamily: "monospace",
                         ),
                       ),

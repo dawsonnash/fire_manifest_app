@@ -631,7 +631,7 @@ class _EditGearState extends State<EditGear> {
                                   hintText: 'Up to 500 lb',
                                   hintStyle: TextStyle(
                                     color: AppColors.textColorPrimary,
-                                    fontSize: 20,
+                                    fontSize: AppData.text20,
                                   ),
                                   errorText: weightErrorMessage,
                                   labelStyle: TextStyle(
@@ -700,7 +700,7 @@ class _EditGearState extends State<EditGear> {
                                   hintText: 'Up to 99',
                                   hintStyle: TextStyle(
                                     color: AppColors.textColorPrimary,
-                                    fontSize: 20,
+                                    fontSize: AppData.text20,
                                   ),
                                   errorText: quantityErrorMessage,
                                   labelStyle: TextStyle(
@@ -761,7 +761,7 @@ class _EditGearState extends State<EditGear> {
                                 Text(
                                   newHazmatValue ? 'Yes' : 'No', // Dynamic label
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: AppData.text18,
                                     color: AppColors.textColorPrimary,
                                   ),
                                 ),

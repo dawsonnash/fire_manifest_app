@@ -272,7 +272,6 @@ class SavedPreferences {
 
       // Print Positional Preferences
       for (var posPref in trip.positionalPreferences) {
-        print('  Positional Preference: Priority ${posPref.priority}');
         print('    Load Preference: ${loadPreferenceMap[posPref.loadPreference]}');
         for (var member in posPref.crewMembersDynamic) {
           if (member is CrewMember) {

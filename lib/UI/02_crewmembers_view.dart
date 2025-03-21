@@ -385,12 +385,12 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                                   Text(
                                                     ' ${crewMember.getPositionTitle(crewMember.position)}'
                                                     '${(crewMember.personalTools?.isNotEmpty ?? false) ? ' • ' : ''}', // Conditionally add the dot
-                                                    style: TextStyle(fontSize: 14, color: AppColors.textColorPrimary),
+                                                    style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
                                                   ),
                                                   Expanded(
                                                     child: Text(
                                                       (crewMember.personalTools ?? []).map((gearItem) => gearItem.name).join(', '),
-                                                      style: TextStyle(fontSize: 14, color: AppColors.textColorPrimary),
+                                                      style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
                                                       maxLines: 1,
                                                       overflow: TextOverflow.ellipsis,
                                                     ),

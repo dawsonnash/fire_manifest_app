@@ -410,7 +410,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                         child: Icon(
                                                           FontAwesomeIcons.triangleExclamation, // Hazard icon
                                                           color: Colors.red, // Red color for hazard
-                                                          size: 14, // Icon size
+                                                          size: AppData.text14, // Icon size
                                                         ),
                                                       ),
 
@@ -419,7 +419,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                 Text(
                                                   '${gear.weight} lb x$remainingQuantity',
                                                   style: TextStyle(
-                                                    fontSize: 14,
+                                                    fontSize: AppData.text14,
                                                     color: Colors.black,
                                                   ),
                                                 ),
@@ -885,7 +885,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                             child: Icon(
                                                               FontAwesomeIcons.triangleExclamation, // Hazard icon
                                                               color: Colors.red, // Red color for hazard
-                                                              size: 14, // Icon size
+                                                              size: AppData.text14, // Icon size
                                                             ),
                                                           ),
 
@@ -894,7 +894,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                     Text(
                                                       '${gear.weight} lb x$remainingQuantity',
                                                       style: TextStyle(
-                                                        fontSize: 14,
+                                                        fontSize: AppData.text14,
                                                         color: Colors.black,
                                                       ),
                                                     ),

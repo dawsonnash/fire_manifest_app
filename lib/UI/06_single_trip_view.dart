@@ -287,8 +287,8 @@ class _SingleTripViewState extends State<SingleTripView> {
                                           selectedIndex = index;
                                         },
                                         children: [
-                                          Center(child: Text('Helicopter Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
-                                          if (!isExternal!) Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                                          Center(child: Text('Helicopter Manifest', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary))),
+                                          if (!isExternal!) Center(child: Text('Fixed-Wing Manifest', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary))),
                                         ],
                                       ),
                                     ),
@@ -507,7 +507,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                       Text(
                                         'Weight: ${load.weight} lb',
                                         style: TextStyle(
-                                          fontSize: 18,
+                                          fontSize: AppData.text18,
                                           color: AppColors.textColorPrimary,
                                         ),
                                       )
