@@ -558,7 +558,8 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                             },
                                             child: Text(
                                               'Cancel',
-                                              style: TextStyle(color: AppColors.cancelButton),
+                                              style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize,
+                                              ),
                                             ),
                                           ),
                                           if (selectedTool != null)
@@ -569,7 +570,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                               },
                                               child: Text(
                                                 'Add',
-                                                style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold),
+                                                style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold,  fontSize: AppData.bottomDialogTextSize,),
                                               ),
                                             ),
                                         ],

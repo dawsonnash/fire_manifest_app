@@ -358,7 +358,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                   onPressed: () {
                                                                     Navigator.of(context).pop();
                                                                   },
-                                                                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                                                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                                                                 ),
                                                                 TextButton(
                                                                   onPressed: () {
@@ -369,7 +369,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                     });
                                                                     Navigator.of(context).pop();
                                                                   },
-                                                                  child: Text('Confirm', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
+                                                                  child: Text('Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize,color: AppColors.saveButtonAllowableWeight)),
                                                                 ),
                                                               ],
                                                             );
@@ -496,9 +496,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                 },
                                                 child: Text(
                                                   'Cancel',
-                                                  style: TextStyle(
-                                                    color: AppColors.cancelButton,
-                                                  ),
+                                                  style: TextStyle(color: AppColors.cancelButton,     fontSize: AppData.bottomDialogTextSize),
                                                 ),
                                               ),
                                             ),
@@ -581,7 +579,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                   },
                   child: Text(
                     'Cancel',
-                    style: TextStyle(color: AppColors.cancelButton),
+                    style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                   ),
                 ),
                 TextButton(
@@ -674,7 +672,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                     });
                     sortLoadItems(loads[selectedLoadIndex]);
                   },
-                  child: Text('Add', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
+                  child: Text('Add', style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize)),
                 ),
               ],
             );
@@ -982,7 +980,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       onPressed: () {
                                         Navigator.of(context).pop(false); // Cancel deletion
                                       },
-                                      child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
+                                      child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                                     ),
                                     TextButton(
                                       onPressed: () {
@@ -1414,7 +1412,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                                   onPressed: () {
                                                                                     Navigator.of(context).pop(); // Cancel action
                                                                                   },
-                                                                                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                                                                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                                                                                 ),
                                                                                 TextButton(
                                                                                   onPressed: () {

@@ -161,7 +161,7 @@ class _EditGearState extends State<EditGear> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.cancelButton),
+                  style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                 ),
               ),
             ],
@@ -204,7 +204,7 @@ class _EditGearState extends State<EditGear> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.cancelButton),
+                  style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                 ),
               ),
             ],
@@ -243,7 +243,7 @@ class _EditGearState extends State<EditGear> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.cancelButton),
+                  style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                 ),
               ),
             ],
@@ -291,7 +291,7 @@ class _EditGearState extends State<EditGear> {
                 onPressed: () {
                   Navigator.of(context).pop(); // Close dialog
                 },
-                child: Text('OK', style: TextStyle(color: AppColors.cancelButton)),
+                child: Text('OK', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
               ),
             ],
           );
@@ -432,7 +432,7 @@ class _EditGearState extends State<EditGear> {
                                         },
                                         child: Text(
                                           'Cancel',
-                                          style: TextStyle(color: AppColors.cancelButton),
+                                          style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                         ),
                                       ),
                                       TextButton(
@@ -474,9 +474,9 @@ class _EditGearState extends State<EditGear> {
                                           Navigator.of(context).pop(); // Dismiss the dialog
                                           Navigator.of(context).pop(); // Return to previous screen
                                         },
-                                        child: const Text(
+                                        child:  Text(
                                           'Delete',
-                                          style: TextStyle(color: Colors.red),
+                                          style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                         ),
                                       ),
                                     ],

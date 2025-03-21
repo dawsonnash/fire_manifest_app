@@ -311,7 +311,7 @@ class _MyHomePageState extends State<MyHomePage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
+                  child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                 ),
                 TextButton(
                   onPressed: () async {
@@ -367,7 +367,7 @@ class _MyHomePageState extends State<MyHomePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false), // Return false
-              child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
+              child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true), // Return true
@@ -550,14 +550,14 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.of(context).pop(); // Cancel
               },
-              child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+              child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the warning dialog
                 importCrewData(filePath); // Pass filePath instead of callback
               },
-              child: Text('Confirm', style: TextStyle(color: Colors.red)),
+              child: Text('Confirm', style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize)),
             ),
           ],
         );

@@ -69,6 +69,9 @@ class _SettingsState extends State<SettingsView> {
 
   @override
   void initState() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
     super.initState();
     isDarkMode = widget.isDarkMode;
     enableBackgroundImage = widget.enableBackgroundImage;
@@ -611,7 +614,7 @@ class _SettingsState extends State<SettingsView> {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(color: AppColors.cancelButton),
+                style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
               ),
             ),
             TextButton(
@@ -643,8 +646,7 @@ class _SettingsState extends State<SettingsView> {
                 );
               },
               child: Text(
-                'Confirm',
-                style: TextStyle(color: Colors.red),
+                'Confirm', style: TextStyle(color: Colors.red),
               ),
             ),
           ],
@@ -782,7 +784,7 @@ class _SettingsState extends State<SettingsView> {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(color: AppColors.cancelButton),
+                style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
               ),
             ),
             TextButton(
@@ -856,7 +858,7 @@ class _SettingsState extends State<SettingsView> {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(color: AppColors.cancelButton),
+                style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
               ),
             ),
             TextButton(
@@ -1074,7 +1076,7 @@ class _SettingsState extends State<SettingsView> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
+                  child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                 ),
                 TextButton(
                   onPressed: () async {
@@ -1996,9 +1998,9 @@ class _SettingsState extends State<SettingsView> {
                                                       // Close the dialogs
                                                       Navigator.of(context).pop(); // Close confirmation dialog
                                                     },
-                                                    child: const Text(
+                                                    child:   Text(
                                                       'Delete',
-                                                      style: TextStyle(color: Colors.red),
+                                                      style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                                     ),
                                                   ),
                                                 ],
@@ -2031,7 +2033,7 @@ class _SettingsState extends State<SettingsView> {
                                                       },
                                                       child: Text(
                                                         'Cancel',
-                                                        style: TextStyle(color: AppColors.cancelButton),
+                                                        style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                       ),
                                                     ),
                                                     TextButton(
@@ -2082,7 +2084,7 @@ class _SettingsState extends State<SettingsView> {
                                                       },
                                                       child: Text(
                                                         'Cancel',
-                                                        style: TextStyle(color: AppColors.cancelButton),
+                                                        style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                       ),
                                                     ),
                                                     TextButton(
@@ -2091,7 +2093,7 @@ class _SettingsState extends State<SettingsView> {
                                                       },
                                                       child: Text(
                                                         'Confirm',
-                                                        style: TextStyle(color: Colors.red),
+                                                        style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                                       ),
                                                     ),
                                                   ],
@@ -2134,7 +2136,7 @@ class _SettingsState extends State<SettingsView> {
                                                       },
                                                       child: Text(
                                                         'Cancel',
-                                                        style: TextStyle(color: AppColors.cancelButton),
+                                                        style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                       ),
                                                     ),
                                                     TextButton(
@@ -2143,7 +2145,7 @@ class _SettingsState extends State<SettingsView> {
                                                       },
                                                       child: Text(
                                                         'Confirm',
-                                                        style: TextStyle(color: Colors.red),
+                                                        style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                                       ),
                                                     ),
                                                   ],
@@ -2191,7 +2193,7 @@ class _SettingsState extends State<SettingsView> {
                                                     },
                                                     child: Text(
                                                       'Cancel',
-                                                      style: TextStyle(color: AppColors.cancelButton),
+                                                      style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                     ),
                                                   ),
                                                   TextButton(
@@ -2200,7 +2202,7 @@ class _SettingsState extends State<SettingsView> {
                                                     },
                                                     child: Text(
                                                       'Confirm',
-                                                      style: TextStyle(color: Colors.red),
+                                                      style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                                     ),
                                                   ),
                                                 ],
@@ -2239,7 +2241,7 @@ class _SettingsState extends State<SettingsView> {
                                                     },
                                                     child: Text(
                                                       'Cancel',
-                                                      style: TextStyle(color: AppColors.cancelButton),
+                                                      style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                     ),
                                                   ),
                                                   TextButton(
@@ -2248,7 +2250,7 @@ class _SettingsState extends State<SettingsView> {
                                                     },
                                                     child: Text(
                                                       'Confirm',
-                                                      style: TextStyle(color: Colors.red),
+                                                      style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                                     ),
                                                   ),
                                                 ],
@@ -2316,7 +2318,7 @@ class _SettingsState extends State<SettingsView> {
                                                   },
                                                   child: Text(
                                                     'Cancel',
-                                                    style: TextStyle(color: AppColors.cancelButton),
+                                                    style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                   ),
                                                 ),
                                                 TextButton(
@@ -2325,7 +2327,7 @@ class _SettingsState extends State<SettingsView> {
                                                   },
                                                   child: Text(
                                                     'Confirm',
-                                                    style: TextStyle(color: AppColors.saveButtonAllowableWeight),
+                                                    style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize),
                                                   ),
                                                 ),
                                               ],
@@ -2457,7 +2459,7 @@ class _SettingsState extends State<SettingsView> {
                                         },
                                         child: Text(
                                           'Close',
-                                          style: TextStyle(color: AppColors.textColorPrimary),
+                                          style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize),
                                         ),
                                       ),
                                     ],

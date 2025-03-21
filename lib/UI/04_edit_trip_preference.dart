@@ -67,7 +67,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                   },
                   child: Text(
                     "Cancel",
-                    style: TextStyle(color: AppColors.cancelButton),
+                    style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                   ),
                 ),
                 TextButton(

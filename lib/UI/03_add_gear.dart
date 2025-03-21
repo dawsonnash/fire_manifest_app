@@ -158,7 +158,7 @@ class _AddGearState extends State<AddGear> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.cancelButton),
+                  style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                 ),
               ),
             ],
@@ -236,7 +236,7 @@ class _AddGearState extends State<AddGear> {
                   },
                   child: Text(
                     'Cancel',
-                    style: TextStyle(color: AppColors.cancelButton),
+                    style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                   ),
                 ),
               ],
@@ -289,7 +289,7 @@ class _AddGearState extends State<AddGear> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.cancelButton),
+                  style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                 ),
               ),
             ],

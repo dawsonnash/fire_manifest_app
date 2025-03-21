@@ -388,7 +388,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                         },
                                         child: Text(
                                           'Cancel',
-                                          style: TextStyle(color: AppColors.cancelButton),
+                                          style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                         ),
                                       ),
                                       TextButton(
@@ -399,9 +399,9 @@ class _SingleTripViewState extends State<SingleTripView> {
                                           Navigator.of(context).pop(); // Close the dialog after deletion
                                           Navigator.of(context).pop();
                                         },
-                                        child: const Text(
+                                        child:   Text(
                                           'Delete',
-                                          style: TextStyle(color: Colors.red),
+                                          style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                         ),
                                       ),
                                     ],
@@ -663,8 +663,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
             Navigator.of(context).pop();
           },
           child: Text(
-            'Confirm',
-            style: TextStyle(fontSize: AppData.text16, color: AppColors.saveButtonAllowableWeight),
+            'Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight),
           ),
         ),
       ],

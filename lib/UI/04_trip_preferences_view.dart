@@ -206,11 +206,11 @@ class _TripPreferencesState extends State<TripPreferences> {
                                             actions: [
                                               TextButton(
                                                 onPressed: () => Navigator.of(context).pop(false), // Cancel dismissal
-                                                child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                                child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                                               ),
                                               TextButton(
                                                 onPressed: () => Navigator.of(context).pop(true), // Confirm dismissal
-                                                child: Text('Delete', style: TextStyle(color: Colors.red)),
+                                                child: Text('Delete', style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize)),
                                               ),
                                             ],
                                           );
@@ -318,7 +318,7 @@ class _TripPreferencesState extends State<TripPreferences> {
                                                                           },
                                                                           child: Text(
                                                                             'Cancel',
-                                                                            style: TextStyle(color: AppColors.cancelButton),
+                                                                            style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                                           ),
                                                                         ),
                                                                         TextButton(
@@ -347,9 +347,9 @@ class _TripPreferencesState extends State<TripPreferences> {
                                                                             Navigator.of(context).pop(); // Dismiss the dialog
                                                                             loadTripPreferenceList();
                                                                           },
-                                                                          child: const Text(
+                                                                          child:   Text(
                                                                             'Delete',
-                                                                            style: TextStyle(color: Colors.red),
+                                                                            style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                                                           ),
                                                                         ),
                                                                       ],

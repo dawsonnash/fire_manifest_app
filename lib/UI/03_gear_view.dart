@@ -63,7 +63,8 @@ class _GearViewState extends State<GearView> {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(color: AppColors.cancelButton),
+                style: TextStyle(color: AppColors.cancelButton,     fontSize: AppData.bottomDialogTextSize,
+                ),
               ),
             ),
             TextButton(
@@ -73,7 +74,7 @@ class _GearViewState extends State<GearView> {
               },
               child: Text(
                 'Delete',
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
               ),
             ),
           ],
@@ -204,7 +205,8 @@ class _GearViewState extends State<GearView> {
                                           },
                                           child: Text(
                                             'Cancel',
-                                            style: TextStyle(color: AppColors.cancelButton),
+                                            style: TextStyle(color: AppColors.cancelButton,     fontSize: AppData.bottomDialogTextSize,
+                                            ),
                                           ),
                                         ),
                                         TextButton(
@@ -214,9 +216,9 @@ class _GearViewState extends State<GearView> {
                                             Navigator.of(context).pop();
                                             Navigator.of(context).pop();
                                           },
-                                          child: const Text(
+                                          child: Text(
                                             'Delete',
-                                            style: TextStyle(color: Colors.red),
+                                            style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                           ),
                                         ),
                                       ],

@@ -69,7 +69,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(color: AppColors.cancelButton),
+                style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize,),
               ),
             ),
             TextButton(
@@ -79,7 +79,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
               },
               child: Text(
                 'Delete',
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
               ),
             ),
           ],
@@ -206,7 +206,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                           },
                                           child: Text(
                                             'Cancel',
-                                            style: TextStyle(color: AppColors.cancelButton),
+                                            style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize,),
                                           ),
                                         ),
                                         TextButton(
@@ -216,9 +216,9 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                             Navigator.of(context).pop(); // Close the dialog after deletion
                                             Navigator.of(context).pop(); // Home screen
                                           },
-                                          child: const Text(
+                                          child:  Text(
                                             'Delete',
-                                            style: TextStyle(color: Colors.red),
+                                            style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                           ),
                                         ),
                                       ],

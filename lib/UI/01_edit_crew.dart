@@ -721,7 +721,8 @@ class _EditCrewState extends State<EditCrew> {
                                                       },
                                                       child: Text(
                                                         'Cancel',
-                                                        style: TextStyle(color: AppColors.cancelButton),
+                                                        style: TextStyle(color: AppColors.cancelButton,     fontSize: AppData.bottomDialogTextSize,
+                                                        ),
                                                       ),
                                                     ),
                                                     if (selectedTool != null && selectedTool != '+ New Tool')
@@ -749,7 +750,8 @@ class _EditCrewState extends State<EditCrew> {
                                                                       },
                                                                       child: Text(
                                                                         'Cancel',
-                                                                        style: TextStyle(color: AppColors.cancelButton),
+                                                                        style: TextStyle(color: AppColors.cancelButton,     fontSize: AppData.bottomDialogTextSize,
+                                                                        ),
                                                                       ),
                                                                     ),
                                                                     TextButton(
@@ -782,9 +784,9 @@ class _EditCrewState extends State<EditCrew> {
                                                                           ),
                                                                         );
                                                                       },
-                                                                      child: const Text(
+                                                                      child:  Text(
                                                                         'Delete',
-                                                                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: AppData.bottomDialogTextSize),
                                                                       ),
                                                                     ),
                                                                   ],
@@ -793,9 +795,8 @@ class _EditCrewState extends State<EditCrew> {
                                                             );
                                                           }
                                                         },
-                                                        child: const Text(
-                                                          'Delete',
-                                                          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                        child: Text(
+                                                          'Delete', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: AppData.bottomDialogTextSize),
                                                         ),
                                                       ),
                                                     TextButton(
@@ -921,7 +922,8 @@ class _EditCrewState extends State<EditCrew> {
                                                                       },
                                                                       child: Text(
                                                                         'Cancel',
-                                                                        style: TextStyle(color: AppColors.cancelButton),
+                                                                        style: TextStyle(color: AppColors.cancelButton,     fontSize: AppData.bottomDialogTextSize,
+                                                                        ),
                                                                       ),
                                                                     ),
                                                                   ],
@@ -1038,7 +1040,8 @@ class _EditCrewState extends State<EditCrew> {
                                                                     },
                                                                     child: Text(
                                                                       'Cancel',
-                                                                      style: TextStyle(color: AppColors.cancelButton),
+                                                                      style: TextStyle(color: AppColors.cancelButton,     fontSize: AppData.bottomDialogTextSize,
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                   TextButton(
@@ -1164,7 +1167,7 @@ class _EditCrewState extends State<EditCrew> {
                                                                     },
                                                                     child: Text(
                                                                       'Update',
-                                                                      style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold),
+                                                                      style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold, fontSize: AppData.bottomDialogTextSize),
                                                                     ),
                                                                   ),
                                                                 ],
@@ -1175,7 +1178,8 @@ class _EditCrewState extends State<EditCrew> {
                                                       },
                                                       child: Text(
                                                         'Save',
-                                                        style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold),
+                                                        style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontWeight: FontWeight.bold,     fontSize: AppData.bottomDialogTextSize,
+                                                        ),
                                                       ),
                                                     ),
                                                   ],

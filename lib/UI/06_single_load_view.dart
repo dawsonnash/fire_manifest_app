@@ -1554,8 +1554,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
             Navigator.of(context).pop();
           },
           child: Text(
-            'Confirm',
-            style: TextStyle(fontSize: AppData.text16, color: AppColors.saveButtonAllowableWeight),
+            'Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight),
           ),
         ),
       ],

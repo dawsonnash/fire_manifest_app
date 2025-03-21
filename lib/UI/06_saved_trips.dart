@@ -138,9 +138,9 @@ class _SavedTripsState extends State<SavedTripsView> {
                                           // Close the dialogs
                                           Navigator.of(context).pop(); // Close confirmation dialog
                                         },
-                                        child: const Text(
+                                        child:   Text(
                                           'Delete',
-                                          style: TextStyle(color: Colors.red),
+                                          style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                         ),
                                       ),
                                     ],
@@ -291,9 +291,9 @@ class _SavedTripsState extends State<SavedTripsView> {
                                             // Close the dialogs
                                             Navigator.of(context).pop(); // Close confirmation dialog
                                           },
-                                          child: const Text(
+                                          child:   Text(
                                             'Delete',
-                                            style: TextStyle(color: Colors.red),
+                                            style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                           ),
                                         ),
                                       ],

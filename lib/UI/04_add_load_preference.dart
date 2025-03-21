@@ -300,7 +300,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('Save', style: TextStyle(color: AppColors.saveButtonAllowableWeight),),
+                  child: Text('Save', style: TextStyle(color: AppColors.saveButtonAllowableWeight,     fontSize: AppData.bottomDialogTextSize,
+                  ),),
                 ),
               ],
             );
@@ -458,7 +459,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                             onPressed: () {
                                               Navigator.of(context).pop();
                                             },
-                                            child:  Text('Select', style: TextStyle(color: AppColors.textColorPrimary),),
+                                            child:  Text('Select', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize),),
                                           ),
                                         ],
                                       );
@@ -517,7 +518,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                     });
                     Navigator.of(context).pop(tempSelectedGear);
                   },
-                  child:  Text('Save', style: TextStyle(color: AppColors.saveButtonAllowableWeight),),
+                  child:  Text('Save', style: TextStyle(color: AppColors.saveButtonAllowableWeight,     fontSize: AppData.bottomDialogTextSize,
+                  ),),
                 ),
               ],
             );
@@ -858,7 +860,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                                       Navigator.of(context)
                                                           .pop();
                                                     },
-                                                    child:  Text('Close', style: TextStyle(color: AppColors.cancelButton),),
+                                                    child:  Text('Close', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),),
                                                   ),
                                                 ],
                                               );
@@ -1010,7 +1012,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                                       Navigator.of(context)
                                                           .pop();
                                                     },
-                                                    child:  Text('Close', style: TextStyle(color: AppColors.cancelButton),),
+                                                    child:  Text('Close', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),),
                                                   ),
                                                 ],
                                               );

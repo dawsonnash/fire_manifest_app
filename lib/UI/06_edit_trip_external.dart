@@ -401,7 +401,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                   onPressed: () {
                                                                     Navigator.of(context).pop();
                                                                   },
-                                                                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                                                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                                                                 ),
                                                                 TextButton(
                                                                   onPressed: () {
@@ -413,7 +413,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                     });
                                                                     Navigator.of(context).pop();
                                                                   },
-                                                                  child: Text('Confirm', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
+                                                                  child: Text('Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize,color: AppColors.saveButtonAllowableWeight)),
                                                                 ),
                                                               ],
                                                             );
@@ -542,9 +542,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                 },
                                                 child: Text(
                                                   'Cancel',
-                                                  style: TextStyle(
-                                                    color: AppColors.cancelButton,
-                                                  ),
+                                                 style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                 ),
                                               ),
                                             ),
@@ -627,7 +625,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                   },
                   child: Text(
                     'Cancel',
-                    style: TextStyle(color: AppColors.cancelButton),
+                    style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                   ),
                 ),
                 TextButton(
@@ -695,7 +693,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                     });
                     sortSlingItems(loads[selectedLoadIndex].slings as Sling);
                   },
-                  child: Text('Add', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
+                  child: Text('Add', style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize)),
                 ),
               ],
             );
@@ -1006,7 +1004,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                       onPressed: () {
                                         Navigator.of(context).pop(false); // Cancel deletion
                                       },
-                                      child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
+                                      child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                                     ),
                                     TextButton(
                                       onPressed: () {
@@ -1235,7 +1233,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                       },
                                                       child: Text(
                                                         "Cancel",
-                                                        style: TextStyle(color: AppColors.cancelButton),
+                                                        style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                       ),
                                                     ),
                                                     TextButton(
@@ -1463,7 +1461,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                                                   onPressed: () {
                                                                                                     Navigator.of(context).pop(); // Cancel action
                                                                                                   },
-                                                                                                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                                                                                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                                                                                                 ),
                                                                                                 TextButton(
                                                                                                   onPressed: () {

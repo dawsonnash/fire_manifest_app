@@ -527,7 +527,8 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                   keyboardController.text = originalValue;
                                                   Navigator.of(context).pop();
                                                 },
-                                                child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                                child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton,     fontSize: AppData.bottomDialogTextSize,
+                                                )),
                                               ),
                                               TextButton(
                                                 onPressed: isSaveEnabled
@@ -544,7 +545,8 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                 child: Text(
                                                   'Save',
                                                   style: TextStyle(
-                                                    color: isSaveEnabled ? AppColors.saveButtonAllowableWeight : Colors.grey, // Show enabled/disabled state
+                                                    color: isSaveEnabled ? AppColors.saveButtonAllowableWeight : Colors.grey,     fontSize: AppData.bottomDialogTextSize,
+                                                    // Show enabled/disabled state
                                                   ),
                                                 ),
                                               ),
