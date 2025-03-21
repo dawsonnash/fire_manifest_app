@@ -7,7 +7,9 @@ import 'package:fire_app/UI/04_trip_preferences_view.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hive/hive.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../CodeShare/keyboardActions.dart';
 import '03_add_gear.dart';
 import '../CodeShare/variables.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -34,6 +36,7 @@ class _EditCrewState extends State<EditCrew> {
   String? toolNameErrorMessage;
   String? toolWeightErrorMessage;
   String? lastUsedLoadout;
+  final FocusNode _toolWeightFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -625,30 +628,38 @@ class _EditCrewState extends State<EditCrew> {
                                                 SizedBox(height: AppData.spacingStandard),
 
                                                 // Tool weight
-                                                TextField(
-                                                  controller: toolWeightController,
-                                                  keyboardType: TextInputType.number,
-                                                  inputFormatters: [LengthLimitingTextInputFormatter(2), FilteringTextInputFormatter.digitsOnly],
-                                                  decoration: InputDecoration(
-                                                    labelText: 'Tool Weight (lb)',
-                                                    labelStyle: TextStyle(color: AppColors.textColorPrimary),
-                                                    filled: true,
-                                                    fillColor: AppColors.textFieldColor2,
-                                                    errorText: toolWeightErrorMessage,
-                                                    enabledBorder: OutlineInputBorder(
-                                                      borderRadius: BorderRadius.circular(8),
-                                                      borderSide: BorderSide(color: AppColors.textColorPrimary, width: 2),
-                                                    ),
-                                                    focusedBorder: OutlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                        color: AppColors.primaryColor,
-                                                        // Border color when the TextField is focused
-                                                        width: 2.0, // Border width
-                                                      ),
-                                                      borderRadius: BorderRadius.circular(8.0),
-                                                    ),
+                                                KeyboardActions(
+                                                  config: keyboardActionsConfig(
+                                                    focusNodes: [_toolWeightFocusNode],
                                                   ),
-                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
+                                                  disableScroll: true,
+                                                  child: TextField(
+                                                    focusNode: _toolWeightFocusNode,
+                                                    controller: toolWeightController,
+                                                    keyboardType: TextInputType.number,
+                                                    textInputAction: TextInputAction.done,
+                                                    inputFormatters: [LengthLimitingTextInputFormatter(2), FilteringTextInputFormatter.digitsOnly],
+                                                    decoration: InputDecoration(
+                                                      labelText: 'Tool Weight (lb)',
+                                                      labelStyle: TextStyle(color: AppColors.textColorPrimary),
+                                                      filled: true,
+                                                      fillColor: AppColors.textFieldColor2,
+                                                      errorText: toolWeightErrorMessage,
+                                                      enabledBorder: OutlineInputBorder(
+                                                        borderRadius: BorderRadius.circular(8),
+                                                        borderSide: BorderSide(color: AppColors.textColorPrimary, width: 2),
+                                                      ),
+                                                      focusedBorder: OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                          color: AppColors.primaryColor,
+                                                          // Border color when the TextField is focused
+                                                          width: 2.0, // Border width
+                                                        ),
+                                                        borderRadius: BorderRadius.circular(8.0),
+                                                      ),
+                                                    ),
+                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
+                                                  ),
                                                 ),
 
                                                 SizedBox(height: AppData.spacingStandard),

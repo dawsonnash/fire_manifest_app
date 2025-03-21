@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
+import '../CodeShare/keyboardActions.dart';
 import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
 import '../Data/gear.dart';
@@ -42,6 +44,9 @@ class _EditGearState extends State<EditGear> {
   late int oldGearWeight;
   late int oldGearQuantity;
   late bool oldGearHazmatValue;
+
+  final FocusNode _weightFocusNode = FocusNode();
+  final FocusNode _quantityFocusNode = FocusNode();
 
   // initialize HiveBox for Gear
   late final Box<Gear> gearBox;
@@ -590,62 +595,70 @@ class _EditGearState extends State<EditGear> {
                         // Edit Weight
                         Padding(
                             padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                            child: TextField(
-                              controller: gearWeightController,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(3),
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              onChanged: (value) {
-                                int? weight = int.tryParse(value);
-                                setState(() {
-                                  // Validate the input and set error message
-                                  if (weight! > 500) {
-                                    weightErrorMessage = 'Weight must be less than 500.';
-                                  } else if (weight == 0) {
-                                    weightErrorMessage = 'Weight must be greater than 0.';
-                                  }
-                                  else{
-                                    weightErrorMessage = null;
-                                  }
-                                });
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Edit weight',
-                                hintText: 'Up to 500 lb',
-                                hintStyle: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: 20,
-                                ),
-                                errorText: weightErrorMessage,
-                                labelStyle: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: 22,
-                                  //fontWeight: FontWeight.bold,
-                                ),
-                                filled: true,
-                                fillColor: AppColors.textFieldColor,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppColors.borderPrimary,
-                                    // Border color when the TextField is not focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0), // Rounded corners
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppColors.primaryColor,
-                                    // Border color when the TextField is focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
+                            child: KeyboardActions(
+                              config: keyboardActionsConfig(
+                                focusNodes: [_weightFocusNode],
                               ),
-                              style: TextStyle(
-                                color: AppColors.textColorPrimary,
-                                fontSize: 28,
+                              disableScroll: true,
+                              child: TextField(
+                                focusNode: _weightFocusNode,
+                                controller: gearWeightController,
+                                keyboardType: TextInputType.number,
+                                textInputAction: TextInputAction.done,
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(3),
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                onChanged: (value) {
+                                  int? weight = int.tryParse(value);
+                                  setState(() {
+                                    // Validate the input and set error message
+                                    if (weight! > 500) {
+                                      weightErrorMessage = 'Weight must be less than 500.';
+                                    } else if (weight == 0) {
+                                      weightErrorMessage = 'Weight must be greater than 0.';
+                                    }
+                                    else{
+                                      weightErrorMessage = null;
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Edit weight',
+                                  hintText: 'Up to 500 lb',
+                                  hintStyle: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: 20,
+                                  ),
+                                  errorText: weightErrorMessage,
+                                  labelStyle: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: 22,
+                                    //fontWeight: FontWeight.bold,
+                                  ),
+                                  filled: true,
+                                  fillColor: AppColors.textFieldColor,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.borderPrimary,
+                                      // Border color when the TextField is not focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.primaryColor,
+                                      // Border color when the TextField is focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                ),
+                                style: TextStyle(
+                                  color: AppColors.textColorPrimary,
+                                  fontSize: 28,
+                                ),
                               ),
                             )),
 
@@ -654,59 +667,67 @@ class _EditGearState extends State<EditGear> {
                         // Edit Quantity
                         Padding(
                             padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 4.0, bottom: 4.0),
-                            child: TextField(
-                              controller: gearQuantityController,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(2),
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              onChanged: (value) {
-                                int? weight = int.tryParse(value);
-                                setState(() {
-                                  if (weight == 0) {
-                                    quantityErrorMessage = 'Quantity must be greater than 0.';
-                                  }
-                                  else{
-                                    quantityErrorMessage = null;
-                                  }
-                                });
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Edit quantity',
-                                hintText: 'Up to 99',
-                                hintStyle: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: 20,
-                                ),
-                                errorText: quantityErrorMessage,
-                                labelStyle: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: 22,
-                                  //fontWeight: FontWeight.bold,
-                                ),
-                                filled: true,
-                                fillColor: AppColors.textFieldColor,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppColors.borderPrimary,
-                                    // Border color when the TextField is not focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0), // Rounded corners
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppColors.primaryColor,
-                                    // Border color when the TextField is focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
+                            child: KeyboardActions(
+                              config: keyboardActionsConfig(
+                                focusNodes: [_quantityFocusNode],
                               ),
-                              style: TextStyle(
-                                color: AppColors.textColorPrimary,
-                                fontSize: 28,
+                              disableScroll: true,
+                              child: TextField(
+                                focusNode: _quantityFocusNode,
+                                controller: gearQuantityController,
+                                keyboardType: TextInputType.number,
+                                textInputAction: TextInputAction.done,
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(2),
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                onChanged: (value) {
+                                  int? weight = int.tryParse(value);
+                                  setState(() {
+                                    if (weight == 0) {
+                                      quantityErrorMessage = 'Quantity must be greater than 0.';
+                                    }
+                                    else{
+                                      quantityErrorMessage = null;
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Edit quantity',
+                                  hintText: 'Up to 99',
+                                  hintStyle: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: 20,
+                                  ),
+                                  errorText: quantityErrorMessage,
+                                  labelStyle: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: 22,
+                                    //fontWeight: FontWeight.bold,
+                                  ),
+                                  filled: true,
+                                  fillColor: AppColors.textFieldColor,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.borderPrimary,
+                                      // Border color when the TextField is not focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.primaryColor,
+                                      // Border color when the TextField is focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                ),
+                                style: TextStyle(
+                                  color: AppColors.textColorPrimary,
+                                  fontSize: 28,
+                                ),
                               ),
                             )),
 

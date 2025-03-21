@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
+import '../CodeShare/keyboardActions.dart';
 import '../Data/crew.dart';
 import '../Data/gear.dart';
 import '../Data/trip.dart';
@@ -38,6 +40,10 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
 
   bool isCalculateButtonEnabled = false; // Controls whether the save button shows
   bool isExternalManifest = false; // Default to internal manifest (personnel + cargo)
+
+  final FocusNode _allowableFocusNode = FocusNode();
+  final FocusNode _safetyBufferFocusNode = FocusNode();
+  final FocusNode _availableSeatsFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -296,53 +302,61 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                             padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
                             child: Container(
                               width: AppData.inputFieldWidth,
-                              child: TextField(
-                                controller: availableSeatsController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  LengthLimitingTextInputFormatter(1),
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    // Validate the input and set error message
-                                    if (value == '0') {
-                                      availableSeatsErrorMessage = 'Available seats cannot be 0.';
-                                    } else {
-                                      availableSeatsErrorMessage = null;
-                                    }
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  labelText: 'Enter # of Available Seats',
-                                  labelStyle: TextStyle(
-                                    color: AppColors.textColorPrimary, // Label color when not focused
-                                    fontSize: AppData.text18, // Label font size
-                                  ),
-                                  errorText: availableSeatsErrorMessage,
-                                  filled: true,
-                                  fillColor: AppColors.textFieldColor,
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: AppColors.borderPrimary,
-                                      // Border color when the TextField is not focused
-                                      width: 2.0, // Border width
-                                    ),
-                                    borderRadius: BorderRadius.circular(4.0), // Rounded corners
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: AppColors.primaryColor,
-                                      // Border color when the TextField is focused
-                                      width: 2.0, // Border width
-                                    ),
-                                    borderRadius: BorderRadius.circular(4.0),
-                                  ),
+                              child: KeyboardActions(
+                                config: keyboardActionsConfig(
+                                  focusNodes: [_availableSeatsFocusNode],
                                 ),
-                                style: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: AppData.text24,
-                                  fontWeight: FontWeight.bold,
+                                disableScroll: true,
+                                child: TextField(
+                                  focusNode: _availableSeatsFocusNode,
+                                  textInputAction: TextInputAction.done,
+                                  controller: availableSeatsController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    LengthLimitingTextInputFormatter(1),
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      // Validate the input and set error message
+                                      if (value == '0') {
+                                        availableSeatsErrorMessage = 'Available seats cannot be 0.';
+                                      } else {
+                                        availableSeatsErrorMessage = null;
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Enter # of Available Seats',
+                                    labelStyle: TextStyle(
+                                      color: AppColors.textColorPrimary, // Label color when not focused
+                                      fontSize: AppData.text18, // Label font size
+                                    ),
+                                    errorText: availableSeatsErrorMessage,
+                                    filled: true,
+                                    fillColor: AppColors.textFieldColor,
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: AppColors.borderPrimary,
+                                        // Border color when the TextField is not focused
+                                        width: 2.0, // Border width
+                                      ),
+                                      borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: AppColors.primaryColor,
+                                        // Border color when the TextField is focused
+                                        width: 2.0, // Border width
+                                      ),
+                                      borderRadius: BorderRadius.circular(4.0),
+                                    ),
+                                  ),
+                                  style: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: AppData.text24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             )),
@@ -353,46 +367,54 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                             padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
                             child: Container(
                               width: AppData.inputFieldWidth,
-                              child: TextField(
-                                controller: safetyBufferController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  LengthLimitingTextInputFormatter(3),
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                onChanged: (value) {
-                                  setState(() {});
-                                },
-                                decoration: InputDecoration(
-                                  labelText: 'Enter Safety Buffer (lb)',
-                                  labelStyle: TextStyle(
-                                    color: AppColors.textColorPrimary, // Label color when not focused
-                                    fontSize: AppData.text18, // Label font size
-                                  ),
-                                  errorText: safetyBufferErrorMessage,
-                                  filled: true,
-                                  fillColor: AppColors.textFieldColor,
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: AppColors.borderPrimary,
-                                      // Border color when the TextField is not focused
-                                      width: 2.0, // Border width
-                                    ),
-                                    borderRadius: BorderRadius.circular(4.0), // Rounded corners
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: AppColors.primaryColor,
-                                      // Border color when the TextField is focused
-                                      width: 2.0, // Border width
-                                    ),
-                                    borderRadius: BorderRadius.circular(4.0),
-                                  ),
+                              child: KeyboardActions(
+                                config: keyboardActionsConfig(
+                                  focusNodes: [_safetyBufferFocusNode],
                                 ),
-                                style: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: AppData.text24,
-                                  fontWeight: FontWeight.bold,
+                                disableScroll: true,
+                                child: TextField(
+                                  focusNode: _safetyBufferFocusNode,
+                                  textInputAction: TextInputAction.done,
+                                  controller: safetyBufferController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    LengthLimitingTextInputFormatter(3),
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {});
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Enter Safety Buffer (lb)',
+                                    labelStyle: TextStyle(
+                                      color: AppColors.textColorPrimary, // Label color when not focused
+                                      fontSize: AppData.text18, // Label font size
+                                    ),
+                                    errorText: safetyBufferErrorMessage,
+                                    filled: true,
+                                    fillColor: AppColors.textFieldColor,
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: AppColors.borderPrimary,
+                                        // Border color when the TextField is not focused
+                                        width: 2.0, // Border width
+                                      ),
+                                      borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: AppColors.primaryColor,
+                                        // Border color when the TextField is focused
+                                        width: 2.0, // Border width
+                                      ),
+                                      borderRadius: BorderRadius.circular(4.0),
+                                    ),
+                                  ),
+                                  style: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: AppData.text24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             )),
@@ -463,31 +485,39 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                           return AlertDialog(
                                             backgroundColor: AppColors.textFieldColor2,
                                             title: Text('Enter Allowable Weight', style: TextStyle(color: AppColors.textColorPrimary)),
-                                            content: TextField(
-                                              controller: keyboardController,
-                                              keyboardType: TextInputType.number,
-                                              maxLength: 4,
-                                              inputFormatters: [
-                                                FilteringTextInputFormatter.digitsOnly,
-                                              ],
-                                              onChanged: (value) {
-                                                validateInput(value); // Validate the input
-                                                setState(() {
-                                                  lastInputFromSlider = false;
-                                                });
-                                              },
-                                              decoration: InputDecoration(
-                                                hintText: 'Up to 9,999 lb',
-                                                hintStyle: TextStyle(color: AppColors.textColorPrimary),
-                                                filled: true,
-                                                fillColor: AppColors.textFieldColor,
-                                                // Background color of the text field
-                                                counterText: '',
-                                                border: const OutlineInputBorder(),
+                                            content: KeyboardActions(
+                                              config: keyboardActionsConfig(
+                                                focusNodes: [_allowableFocusNode],
                                               ),
-                                              style: TextStyle(
-                                                color: AppColors.textColorPrimary, // Color of the typed text
-                                                fontSize: 18, // Font size for the typed text
+                                              disableScroll: true,
+                                              child: TextField(
+                                                focusNode: _allowableFocusNode,
+                                                textInputAction: TextInputAction.done,
+                                                controller: keyboardController,
+                                                keyboardType: TextInputType.number,
+                                                maxLength: 4,
+                                                inputFormatters: [
+                                                  FilteringTextInputFormatter.digitsOnly,
+                                                ],
+                                                onChanged: (value) {
+                                                  validateInput(value); // Validate the input
+                                                  setState(() {
+                                                    lastInputFromSlider = false;
+                                                  });
+                                                },
+                                                decoration: InputDecoration(
+                                                  hintText: 'Up to 9,999 lb',
+                                                  hintStyle: TextStyle(color: AppColors.textColorPrimary),
+                                                  filled: true,
+                                                  fillColor: AppColors.textFieldColor,
+                                                  // Background color of the text field
+                                                  counterText: '',
+                                                  border: const OutlineInputBorder(),
+                                                ),
+                                                style: TextStyle(
+                                                  color: AppColors.textColorPrimary, // Color of the typed text
+                                                  fontSize: 18, // Font size for the typed text
+                                                ),
                                               ),
                                             ),
                                             actions: [

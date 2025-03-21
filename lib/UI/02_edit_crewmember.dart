@@ -2,11 +2,13 @@ import 'dart:ui';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
 import '../../Data/crew.dart';
 import '../../Data/crewmember.dart';
 import 'package:hive/hive.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import '../CodeShare/keyboardActions.dart';
 import '../CodeShare/variables.dart';
 import '../Data/gear.dart';
 
@@ -30,6 +32,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
   late final Box<Gear> personalToolsBox;
   List<Gear> personalToolsList = [];
   String? weightErrorMessage;
+  final FocusNode _weightFocusNode = FocusNode();
 
   // Variables to store user input
   late TextEditingController nameController;
@@ -517,65 +520,73 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                         // Edit Flight Weight
                         Padding(
                             padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                            child: TextField(
-                              controller: flightWeightController,
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(3),
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              keyboardType: TextInputType.number,
-                              // Only show numeric keyboard
-                              onChanged: (value) {
-                                int? weight = int.tryParse(value);
-                                setState(() {
-                                  // Validate the input and set error message
-                                  if (weight! > 500) {
-                                    weightErrorMessage = 'Weight must be less than 500.';
-                                  } else if (weight == 0) {
-                                    weightErrorMessage = 'Weight must be greater than 0.';
-                                  }
-                                  else{
-                                    weightErrorMessage = null;
-                                  }
-                                });
-                              },
-
-                              decoration: InputDecoration(
-                                labelText: 'Edit flight weight',
-                                labelStyle:  TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: 22,
-                                  //fontWeight: FontWeight.bold,
-                                ),
-                                errorText: weightErrorMessage,
-
-                                hintText: 'Up to 500 lb',
-                                hintStyle: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: 20, // Optional: Customize hint text size
-                                ),
-                                filled: true,
-                                fillColor: AppColors.textFieldColor,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide:  BorderSide(
-                                    color: AppColors.textFieldColor,
-                                    // Border color when the TextField is not focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0), // Rounded corners
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide:  BorderSide(
-                                    color: AppColors.primaryColor,
-                                    // Border color when the TextField is focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
+                            child: KeyboardActions(
+                              config: keyboardActionsConfig(
+                                focusNodes: [_weightFocusNode],
                               ),
-                              style:  TextStyle(
-                                color: AppColors.textColorPrimary,
-                                fontSize: 28,
+                              disableScroll: true,
+                              child: TextField(
+                                focusNode: _weightFocusNode,
+                                controller: flightWeightController,
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(3),
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                textInputAction: TextInputAction.done,
+                                keyboardType: TextInputType.number,
+                                // Only show numeric keyboard
+                                onChanged: (value) {
+                                  int? weight = int.tryParse(value);
+                                  setState(() {
+                                    // Validate the input and set error message
+                                    if (weight! > 500) {
+                                      weightErrorMessage = 'Weight must be less than 500.';
+                                    } else if (weight == 0) {
+                                      weightErrorMessage = 'Weight must be greater than 0.';
+                                    }
+                                    else{
+                                      weightErrorMessage = null;
+                                    }
+                                  });
+                                },
+
+                                decoration: InputDecoration(
+                                  labelText: 'Edit flight weight',
+                                  labelStyle:  TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: 22,
+                                    //fontWeight: FontWeight.bold,
+                                  ),
+                                  errorText: weightErrorMessage,
+
+                                  hintText: 'Up to 500 lb',
+                                  hintStyle: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: 20, // Optional: Customize hint text size
+                                  ),
+                                  filled: true,
+                                  fillColor: AppColors.textFieldColor,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide:  BorderSide(
+                                      color: AppColors.textFieldColor,
+                                      // Border color when the TextField is not focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide:  BorderSide(
+                                      color: AppColors.primaryColor,
+                                      // Border color when the TextField is focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                ),
+                                style:  TextStyle(
+                                  color: AppColors.textColorPrimary,
+                                  fontSize: 28,
+                                ),
                               ),
                             )),
 
