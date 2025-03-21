@@ -304,7 +304,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                                   color: AppColors.textColorPrimary,
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
-                                                maxLines: 1,
+                                                maxLines: 2,
                                               ),
                                             ),
                                           ],

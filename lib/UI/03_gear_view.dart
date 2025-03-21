@@ -374,38 +374,33 @@ class _GearViewState extends State<GearView> {
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Row(
-                                                children: [
-                                                  // Gear name with ellipsis
-                                                  Flexible(
-                                                    child: Row(
-                                                      children: [
-                                                        Text(
-                                                          '${gear.name} ',
-                                                          style: TextStyle(
-                                                            fontSize: 22,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: AppColors.textColorPrimary,
-                                                          ),
-                                                          maxLines: 1, // Limit to one line
-                                                          overflow: TextOverflow.ellipsis, // Show ellipsis if text overflows
-                                                        ),
-                                                        if (gear.isHazmat)
-                                                          Tooltip(
-                                                            message: 'HAZMAT', // The hint displayed on long-press
-                                                            waitDuration: const Duration(milliseconds: 500), // Time before the tooltip shows
-                                                            child: Icon(
-                                                              FontAwesomeIcons.triangleExclamation, // Hazard icon
-                                                              color: Colors.red, // Red color for hazard
-                                                              size: 18, // Icon size
-                                                            ),
-                                                          ),
-                                                      ],
+                                              RichText(
+                                                text: TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: '${gear.name} ',
+                                                      style: TextStyle(
+                                                        fontSize: 22,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: AppColors.textColorPrimary,
+                                                      ),
                                                     ),
-                                                  ),
-                                                  // Hazard icon (conditionally rendered)
-                                                  // Hazard icon with Tooltip
-                                                ],
+                                                    if (gear.isHazmat)
+                                                      WidgetSpan(
+                                                        alignment: PlaceholderAlignment.baseline,
+                                                        baseline: TextBaseline.alphabetic,
+                                                        child: Tooltip(
+                                                          message: 'HAZMAT',
+                                                          waitDuration: const Duration(milliseconds: 100),
+                                                          child: Icon(
+                                                            FontAwesomeIcons.triangleExclamation,
+                                                            color: Colors.red,
+                                                            size: 18,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
                                               ),
                                               Text(
                                                 '${gear.weight} lb x ${gear.quantity}',

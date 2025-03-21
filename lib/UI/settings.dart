@@ -1915,6 +1915,17 @@ class _SettingsState extends State<SettingsView> {
                                               ],
                                             ),
                                           ),
+                                        if (selectedLoadout != null)
+                                        DropdownMenuItem<String>(
+                                          value: 'Delete Current Loadout',
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.delete_forever, color: Colors.red), // Reset icon
+                                              SizedBox(width: 8),
+                                              Text('Delete Current Loadout', style: TextStyle(color: Colors.red, fontWeight: FontWeight.normal)),
+                                            ],
+                                          ),
+                                        ),
                                         // Save Current Loadout Option
                                         DropdownMenuItem<String>(
                                           value: 'Save Current',
@@ -1940,7 +1951,48 @@ class _SettingsState extends State<SettingsView> {
                                       ],
                                       onChanged: (String? newValue) async {
                                         String? previousLoadout = selectedLoadout;
-
+                                        if (newValue == 'Delete Current Loadout'){
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                backgroundColor: AppColors.textFieldColor2,
+                                                title: Text(
+                                                  'Confirm Deletion',
+                                                  style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                                ),
+                                                content: Text(
+                                                  'Are you sure you want to delete this loadout ($selectedLoadout)?',
+                                                  style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop(); // Close the dialog without deleting
+                                                    },
+                                                    child: Text(
+                                                      'Cancel',
+                                                      style: TextStyle(color: AppColors.textColorPrimary),
+                                                    ),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      // Perform deletion
+                                                      _deleteLoadout(selectedLoadout!);
+                                                      // Close the dialogs
+                                                      Navigator.of(context).pop(); // Close confirmation dialog
+                                                    },
+                                                    child: const Text(
+                                                      'Delete',
+                                                      style: TextStyle(color: Colors.red),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                          return;
+                                        }
                                         if (newValue == 'Reset Last') {
                                           if (selectedLoadout != null) {
                                             // Confirm reset before applying
@@ -2281,91 +2333,48 @@ class _SettingsState extends State<SettingsView> {
                           ],
                         ),
                         if (selectedLoadout != null && selectedLoadout!.isNotEmpty)
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  if (isOutOfSync) {
-                                    _showSyncDifferencesDialog();
-                                  }
-                                },
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      !isOutOfSync ? Icons.check : Icons.sync_disabled_outlined, // Info icon
-                                      color: !isOutOfSync ? Colors.green : Colors.red,
-                                      size: AppData.text22, // Adjust size if needed
-                                    ),
-                                    FittedBox(
-                                      fit: BoxFit.scaleDown, // Shrinks text if needed
-                                      child: Text(
-                                        ' Last Updated: $lastSavedTimestamp ',
-                                        style: TextStyle(
-                                          fontSize: AppData.text14,
-                                          color: isOutOfSync ? Colors.red : Colors.green.withOpacity(0.8),
-                                          fontWeight: isOutOfSync ? FontWeight.bold : FontWeight.normal,
-                                        ),
-                                      ),
-                                    ),
-                                    if (isOutOfSync)
-                                      Icon(
-                                        Icons.info_outline, // Info icon
-                                        color: Colors.red,
-                                        size: AppData.text22, // Adjust size if needed
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              Spacer(),
-                              // Delete Button
-                              IconButton(
-                                icon: Icon(Icons.delete, color: selectedLoadout != null ? Colors.red : Colors.grey, size: AppData.text18),
-                                onPressed: selectedLoadout != null && selectedLoadout != 'Save Current'
-                                    ? () => {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                backgroundColor: AppColors.textFieldColor2,
-                                                title: Text(
-                                                  'Confirm Deletion',
-                                                  style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                                ),
-                                                content: Text(
-                                                  'Are you sure you want to delete this loadout?',
-                                                  style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
-                                                ),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context).pop(); // Close the dialog without deleting
-                                                    },
-                                                    child: Text(
-                                                      'Cancel',
-                                                      style: TextStyle(color: AppColors.textColorPrimary),
-                                                    ),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      // Perform deletion
-                                                      _deleteLoadout(selectedLoadout!);
-                                                      // Close the dialogs
-                                                      Navigator.of(context).pop(); // Close confirmation dialog
-                                                    },
-                                                    child: const Text(
-                                                      'Delete',
-                                                      style: TextStyle(color: Colors.red),
-                                                    ),
-                                                  ),
-                                                ],
-                                              );
-                                            },
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    if (isOutOfSync) {
+                                      _showSyncDifferencesDialog();
+                                    }
+                                  },
+                                  child: Expanded(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            !isOutOfSync ? Icons.check : Icons.sync_disabled_outlined, // Info icon
+                                            color: !isOutOfSync ? Colors.green : Colors.red,
+                                            size: AppData.text22, // Adjust size if needed
                                           ),
-                                        }
-                                    : null,
-                              ),
-                            ],
+                                          Text(
+                                            ' Last Updated: $lastSavedTimestamp ',
+                                            style: TextStyle(
+                                              fontSize: AppData.text14,
+                                              color: isOutOfSync ? Colors.red : Colors.green.withOpacity(0.8),
+                                              fontWeight: isOutOfSync ? FontWeight.bold : FontWeight.normal,
+                                            ),
+                                          ),
+                                          if (isOutOfSync)
+                                            Icon(
+                                              Icons.info_outline, // Info icon
+                                              color: Colors.red,
+                                              size: AppData.text22, // Adjust size if needed
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                       ],
                     ),

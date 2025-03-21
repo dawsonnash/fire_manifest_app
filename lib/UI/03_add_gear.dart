@@ -20,6 +20,8 @@ class _AddGearState extends State<AddGear> {
   List<Gear> personalToolsList = [];
   String? weightErrorMessage;
   String? quantityErrorMessage;
+  String? irpgWeightErrorMessage;
+  String? irpgQuantityErrorMessage;
 
   // Variables to store user input
   final TextEditingController gearNameController = TextEditingController();
@@ -591,7 +593,7 @@ class _AddGearState extends State<AddGear> {
                                       int? weight = int.tryParse(value);
                                       setState(() {
                                       if (weight == 0) {
-                                          quantityErrorMessage = 'Weight must be greater than 0.';
+                                          quantityErrorMessage = 'Quantity must be greater than 0.';
                                         }
                                         else{
                                         quantityErrorMessage = null;
@@ -707,7 +709,6 @@ class _AddGearState extends State<AddGear> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              // Enter Name
                               Padding(
                                 padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
                                 child: Column(
@@ -738,6 +739,7 @@ class _AddGearState extends State<AddGear> {
                                           ),
                                           isExpanded: true,
                                           underline: SizedBox(),
+
                                           items: irpgItems.map((item) {
                                             return DropdownMenuItem<String>(
                                               value: item['name'],
@@ -810,6 +812,20 @@ class _AddGearState extends State<AddGear> {
                                       LengthLimitingTextInputFormatter(3),
                                       FilteringTextInputFormatter.digitsOnly,
                                     ],
+                                    onChanged: (value) {
+                                      int? weight = int.tryParse(value);
+                                      setState(() {
+                                        // Validate the input and set error message
+                                        if (weight! > 500) {
+                                          irpgWeightErrorMessage = 'Weight must be less than 500.';
+                                        } else if (weight == 0) {
+                                          irpgWeightErrorMessage = 'Weight must be greater than 0.';
+                                        }
+                                        else{
+                                          irpgWeightErrorMessage = null;
+                                        }
+                                      });
+                                    },
                                     decoration: InputDecoration(
                                       labelText: 'Weight',
                                       hintText: 'Up to 500 lb',
@@ -817,6 +833,7 @@ class _AddGearState extends State<AddGear> {
                                         color: AppColors.textColorPrimary,
                                         fontSize: 20,
                                       ),
+                                      errorText: irpgWeightErrorMessage,
                                       labelStyle: TextStyle(
                                         color: AppColors.textColorPrimary,
                                         fontSize: 22,
@@ -859,6 +876,17 @@ class _AddGearState extends State<AddGear> {
                                       LengthLimitingTextInputFormatter(2),
                                       FilteringTextInputFormatter.digitsOnly,
                                     ],
+                                    onChanged: (value) {
+                                      int? weight = int.tryParse(value);
+                                      setState(() {
+                                        if (weight == 0) {
+                                          irpgQuantityErrorMessage = 'Quantity must be greater than 0.';
+                                        }
+                                        else{
+                                          irpgQuantityErrorMessage = null;
+                                        }
+                                      });
+                                    },
                                     decoration: InputDecoration(
                                       labelText: 'Quantity',
                                       hintText: 'Up to 99',
@@ -866,6 +894,7 @@ class _AddGearState extends State<AddGear> {
                                         color: AppColors.textColorPrimary,
                                         fontSize: 20,
                                       ),
+                                      errorText: irpgQuantityErrorMessage,
                                       labelStyle: TextStyle(
                                         color: AppColors.textColorPrimary,
                                         fontSize: 22,
@@ -919,6 +948,9 @@ class _AddGearState extends State<AddGear> {
                                       ),
                                       Spacer(),
                                       Text(
+                                        selectedGearName == null
+                                        ? ''
+                                        :
                                         isHazmatIRPG ? 'Yes' : 'No', // Dynamic label
                                         style: TextStyle(
                                           fontSize: 18,
@@ -929,21 +961,23 @@ class _AddGearState extends State<AddGear> {
                                       // Toggle Switch
                                       Switch(
                                         value: isHazmatIRPG,
-                                        onChanged: (bool value) {
+                                        onChanged: selectedGearName == null
+                                            ? (_) {}  // Prevent interaction but keep the track visible
+                                            : (bool value) {
                                           setState(() {
                                             isHazmatIRPG = value; // Update the toggle state
-
-                                            // Find the selected gear item and update its isHazmat attribute
-                                            final selectedGear = irpgItems.firstWhere(
-                                              (item) => item['name'] == selectedGearName,
-                                            );
-                                            selectedGear['hazmat'] = value; // Update the isHazmat attribute
-                                                                                    });
+                                          });
                                         },
                                         activeColor: Colors.red,
-                                        inactiveThumbColor: AppColors.textColorPrimary,
-                                        inactiveTrackColor: AppColors.textFieldColor,
+                                        inactiveThumbColor: selectedGearName == null
+                                            ? Colors.grey[400] // Gray out thumb when disabled
+                                            : AppColors.textColorPrimary,
+                                        inactiveTrackColor: selectedGearName == null
+                                            ? Colors.grey[600] // Keep track visible when disabled
+                                            : AppColors.textFieldColor,
                                       ),
+
+
                                     ],
                                   ),
                                 ),

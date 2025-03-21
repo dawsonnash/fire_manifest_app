@@ -7,6 +7,7 @@ import '../Data/gear.dart';
 import 'package:hive/hive.dart';
 import '../CodeShare/functions.dart';
 import '../Data/saved_preferences.dart';
+import 'package:collection/collection.dart';
 
 class EditGear extends StatefulWidget {
   // THis page requires a gear item to be passed to it - to edit it
@@ -122,9 +123,17 @@ class _EditGearState extends State<EditGear> {
     );
 
     bool personalToolExists = personalToolsList.any((gear) => gear.name.toLowerCase() == newGearName.toLowerCase());
-    bool quantityChanged = (oldGearName.toLowerCase() == newGearName.toLowerCase()) && (oldGearHazmatValue == newHazmatValue) && (oldGearQuantity.toString() != newGearQuantity);
 
-    if (personalToolExists && !quantityChanged && !gearNameExists) {
+    bool onlyQuantityChanged = (oldGearName.toLowerCase() == newGearName.toLowerCase()) && (oldGearHazmatValue == newHazmatValue) && (oldGearQuantity.toString() != newGearQuantity);
+    final matchingTool = personalToolsList.firstWhereOrNull(
+          (tool) => tool.name.toLowerCase() == newGearName.toLowerCase(),
+    );
+
+    final bool weightMatches = matchingTool?.weight == int.tryParse(gearWeightController.text);
+    final bool hazmatMatches = matchingTool?.isHazmat == newHazmatValue;
+    final bool matchesPersonalToolValues = weightMatches && hazmatMatches;
+
+    if (personalToolExists && !onlyQuantityChanged && !gearNameExists && !matchesPersonalToolValues) {
 
       // Show a single AlertDialog
       showDialog(
@@ -137,7 +146,7 @@ class _EditGearState extends State<EditGear> {
               style: TextStyle(color: AppColors.textColorPrimary),
             ),
             content: Text(
-              '$capitalizedGearName also exists as a tool. Any gear that is also a personal tool must be edited within the Tool panel under the Crew tab.',
+              '$capitalizedGearName also exists as a tool. Any gear that is also a personal tool can be added to your gear inventory, but it must be of the same weight (${matchingTool?.weight} lb) and HAZMAT value (${matchingTool?.isHazmat}).',
               style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
             ),
             actions: [
@@ -166,7 +175,8 @@ class _EditGearState extends State<EditGear> {
 
       return;
     }
-    if (personalToolExists && !quantityChanged && gearNameExists) {
+
+    if (personalToolExists && !onlyQuantityChanged && gearNameExists) {
 
       // Show a single AlertDialog
       showDialog(
@@ -208,6 +218,7 @@ class _EditGearState extends State<EditGear> {
 
       return;
     }
+
     if (gearNameExists) {
       String matchingGearName = crew.gear.firstWhere((gear) => gear.name.toLowerCase() == newGearName.toLowerCase()).name;
       showDialog(
