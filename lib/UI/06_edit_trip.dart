@@ -167,12 +167,12 @@ class _EditTripState extends State<EditTrip> {
                                       //
                                       title: Text(
                                         '${crew.name}, ${crew.flightWeight} lb',
-                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                         textAlign: TextAlign.start,
                                       ),
                                       subtitle: Text(
                                         crew.getPositionTitle(crew.position),
-                                        style: TextStyle(color: AppColors.textColorPrimary),
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text14),
                                       ),
                                       value: selectedItems.contains(crew),
                                       onChanged: (bool? isChecked) {
@@ -334,7 +334,7 @@ class _EditTripState extends State<EditTrip> {
                                                               backgroundColor: AppColors.textFieldColor2,
                                                               title: Text(
                                                                 'Select Quantity for ${gear.name}',
-                                                                style: TextStyle(color: AppColors.textColorPrimary),
+                                                                style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.miniDialogTitleTextSize, ),
                                                               ),
                                                               content: SizedBox(
                                                                 height: 150,
@@ -353,7 +353,7 @@ class _EditTripState extends State<EditTrip> {
                                                                     // Use the full quantity for selection
                                                                     (int index) {
                                                                       return Center(
-                                                                        child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                        child: Text('${index + 1}', style: TextStyle( fontSize: AppData.text14, color: AppColors.textColorPrimary)),
                                                                       );
                                                                     },
                                                                   ),
@@ -529,7 +529,7 @@ class _EditTripState extends State<EditTrip> {
                                     TextField(
                                       decoration: InputDecoration(
                                         labelText: ' Item Name',
-                                        labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
+                                        labelStyle: TextStyle( fontSize: AppData.text16, color: AppColors.textColorPrimary), // Label color
                                       ),
                                       textCapitalization: TextCapitalization.words,
                                       focusNode: customItemNameFocus,
@@ -543,7 +543,7 @@ class _EditTripState extends State<EditTrip> {
                                       onChanged: (value) {
                                         customItemName = value;
                                       },
-                                      style: TextStyle(color: AppColors.textColorPrimary),
+                                      style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.text16,  ),
                                     ),
                                     const SizedBox(height: 8),
 
@@ -1001,11 +1001,11 @@ class _EditTripState extends State<EditTrip> {
                                   backgroundColor: AppColors.textFieldColor2,
                                   title: Text(
                                     "Confirm Deletion",
-                                    style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                    style: TextStyle( fontSize: AppData.miniDialogTitleTextSize,color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
                                   ),
                                   content: Text(
                                     "Are you sure you want to delete Load #${index + 1}?",
-                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                    style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.miniDialogBodyTextSize, ),
                                   ),
                                   actions: [
                                     TextButton(
@@ -1415,7 +1415,7 @@ class _EditTripState extends State<EditTrip> {
                                                                                 children: [
                                                                                   Text(
                                                                                     'Select the quantity to remove:',
-                                                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text14, ),
                                                                                   ),
                                                                                   SizedBox(height: 8),
                                                                                   DropdownButton<int>(
@@ -1428,7 +1428,7 @@ class _EditTripState extends State<EditTrip> {
                                                                                         child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                                       ),
                                                                                     ),
-                                                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                                                    style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.text14, ),
                                                                                     onChanged: (value) {
                                                                                       setDialogState(() {
                                                                                         quantityToRemove = value ?? 1; // Update dialog state

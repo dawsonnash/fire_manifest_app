@@ -737,7 +737,7 @@ class _EditCrewState extends State<EditCrew> {
                                                                 backgroundColor: AppColors.textFieldColor2,
                                                                 title: Text(
                                                                   'Confirm Deletion',
-                                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
                                                                 ),
                                                                 content: Text(
                                                                   'The tool, $selectedTool, will be removed from all crew members who have it. Do you want to proceed?',
@@ -912,7 +912,7 @@ class _EditCrewState extends State<EditCrew> {
                                                                 backgroundColor: AppColors.textFieldColor2,
                                                                 title: Text(
                                                                   'Gear Conflict',
-                                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize:  AppData.miniDialogTitleTextSize),
                                                                 ),
                                                                 content: Text(
                                                                   combinedError,
@@ -1032,7 +1032,7 @@ class _EditCrewState extends State<EditCrew> {
                                                               backgroundColor: AppColors.textFieldColor2,
                                                               title: Text(
                                                                 'Confirm Update',
-                                                                style: TextStyle(color: AppColors.textColorPrimary),
+                                                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
                                                               ),
                                                               content: Text(
                                                                 'Updating $selectedTool will modify this tool for all crew members who have it, and will update it in your gear inventory if it exists. Do you want to proceed?',

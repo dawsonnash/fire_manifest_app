@@ -368,7 +368,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                               backgroundColor: AppColors.textFieldColor2,
                                                               title: Text(
                                                                 'Select Quantity for ${gear.name}',
-                                                                style: TextStyle(color: AppColors.textColorPrimary),
+                                                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18),
                                                               ),
                                                               content: SizedBox(
                                                                 height: 150,
@@ -581,7 +581,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                       onChanged: (value) {
                                         customItemName = value;
                                       },
-                                      style: TextStyle(color: AppColors.textColorPrimary),
+                                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                     ),
                                     const SizedBox(height: 8),
 
@@ -992,7 +992,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                   ),
                                   content: Text(
                                     "Are you sure you want to delete Load #${loadIndex + 1}?",
-                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                                   ),
                                   actions: [
                                     TextButton(
@@ -1429,7 +1429,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                                                 children: [
                                                                                                   Text(
                                                                                                     'Select the quantity to remove:',
-                                                                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text14),
                                                                                                   ),
                                                                                                   SizedBox(height: 8),
                                                                                                   DropdownButton<int>(
@@ -1442,7 +1442,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                                                         child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                                                       ),
                                                                                                     ),
-                                                                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text14),
                                                                                                     onChanged: (value) {
                                                                                                       setDialogState(() {
                                                                                                         quantityToRemove = value ?? 1; // Update dialog state

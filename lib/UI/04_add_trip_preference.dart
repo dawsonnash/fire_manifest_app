@@ -65,7 +65,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
               backgroundColor: AppColors.textFieldColor2,
               title: Text(
                 "Edit Trip Preference Name",
-                style: TextStyle(color: AppColors.textColorPrimary),
+                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
               ),
               content: TextField(
                 controller: titleController,
@@ -73,10 +73,10 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                 textCapitalization: TextCapitalization.words,
                 decoration: InputDecoration(
                   labelText: "Trip Preference Name",
-                  labelStyle: TextStyle(color: AppColors.textColorPrimary),
+                  labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                   errorText: errorMessage, // Display error if exists
                 ),
-                style: TextStyle(color: AppColors.textColorPrimary),
+                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
               ),
               actions: [
                 TextButton(
@@ -126,7 +126,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                   },
                   child: Text(
                     "Save",
-                    style: TextStyle(color: AppColors.saveButtonAllowableWeight),
+                    style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize),
                   ),
                 ),
               ],

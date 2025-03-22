@@ -174,7 +174,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                               leading: Icon(Icons.person_remove, color: Colors.red),
                               title: Text(
                                 'Select Delete',
-                                style: TextStyle(color: AppColors.textColorPrimary),
+                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.modalTextSize),
                               ),
                               onTap: () {
                                 Navigator.of(context).pop();
@@ -187,7 +187,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                               leading: Icon(Icons.delete, color: Colors.red),
                               title: Text(
                                 'Delete All Crew Members',
-                                style: TextStyle(color: AppColors.textColorPrimary),
+                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.modalTextSize),
                               ),
                               onTap: () {
                                 Navigator.of(context).pop(); // Close the dialog without deleting

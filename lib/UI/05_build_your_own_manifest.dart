@@ -163,12 +163,12 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       //
                                       title: Text(
                                         '${crew.name}, ${crew.flightWeight} lb',
-                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                         textAlign: TextAlign.start,
                                       ),
                                       subtitle: Text(
                                         crew.getPositionTitle(crew.position),
-                                        style: TextStyle(color: AppColors.textColorPrimary),
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text14),
                                       ),
                                       value: selectedItems.contains(crew),
                                       onChanged: (bool? isChecked) {
@@ -330,7 +330,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                               backgroundColor: AppColors.textFieldColor2,
                                                               title: Text(
                                                                 'Select Quantity for ${gear.name}',
-                                                                style: TextStyle(color: AppColors.textColorPrimary),
+                                                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18),
                                                               ),
                                                               content: SizedBox(
                                                                 height: 150,
@@ -539,7 +539,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       onChanged: (value) {
                                         customItemName = value;
                                       },
-                                      style: TextStyle(color: AppColors.textColorPrimary),
+                                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                     ),
                                     const SizedBox(height: 8),
 
@@ -973,7 +973,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                   ),
                                   content: Text(
                                     "Are you sure you want to delete Load #${index + 1}?",
-                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                                   ),
                                   actions: [
                                     TextButton(
@@ -1377,13 +1377,13 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                           builder: (BuildContext context, StateSetter setDialogState) {
                                                                             return AlertDialog(
                                                                               backgroundColor: AppColors.textFieldColor2,
-                                                                              title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                              title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18)),
                                                                               content: Column(
                                                                                 mainAxisSize: MainAxisSize.min,
                                                                                 children: [
                                                                                   Text(
                                                                                     'Select the quantity to remove:',
-                                                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text14),
                                                                                   ),
                                                                                   SizedBox(height: 8),
                                                                                   DropdownButton<int>(
@@ -1396,7 +1396,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                                         child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                                       ),
                                                                                     ),
-                                                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text14),
                                                                                     onChanged: (value) {
                                                                                       setDialogState(() {
                                                                                         quantityToRemove = value ?? 1; // Update dialog state

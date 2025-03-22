@@ -703,7 +703,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                 backgroundColor: AppColors.textFieldColor2,
                                                 title: Text(
                                                   'No Gear Available',
-                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
                                                 ),
                                                 content: Text('There is no existing gear. Create at least one to begin manifesting.', style: TextStyle(color: AppColors.textColorPrimary)),
                                                 actions: [
@@ -731,7 +731,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                 backgroundColor: AppColors.textFieldColor2,
                                                 title: Text(
                                                   'Input Error',
-                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
                                                 ),
                                                 content: Text('Safety Buffer must be lower than the allowable load weight.', style: TextStyle(color: AppColors.textColorPrimary)),
                                                 actions: [
@@ -759,7 +759,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                                 backgroundColor: AppColors.textFieldColor2,
                                                 title: Text(
                                                   'Weight Error',
-                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
                                                 ),
                                                 content: Text(
                                                     'The remaining allowable weight with the safety buffer ($remainingWeight lb) is less than the heaviest gear item (${heaviestGearItem?.name}: ${heaviestGearItem?.weight} lb). Adjust values and try again.',

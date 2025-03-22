@@ -94,7 +94,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                             leading: Icon(Icons.delete, color: Colors.red),
                             title: Text(
                               'Delete All Trips',
-                              style: TextStyle(color: AppColors.textColorPrimary),
+                              style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.modalTextSize, ),
                             ),
                             onTap: () {
                               if (savedTrips.savedTrips.isEmpty) {
@@ -123,7 +123,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                         },
                                         child: Text(
                                           'Cancel',
-                                          style: TextStyle(color: AppColors.textColorPrimary),
+                                          style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.bottomDialogTextSize, ),
                                         ),
                                       ),
                                       TextButton(
@@ -263,11 +263,11 @@ class _SavedTripsState extends State<SavedTripsView> {
                                       backgroundColor: AppColors.textFieldColor2,
                                       title: Text(
                                         'Confirm Deletion',
-                                        style: TextStyle(color: AppColors.textColorPrimary),
+                                        style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.miniDialogTitleTextSize, ),
                                       ),
                                       content: Text(
                                         'Are you sure you want to delete this trip?',
-                                        style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                        style: TextStyle(fontSize: AppData.miniDialogBodyTextSize, color: AppColors.textColorPrimary),
                                       ),
                                       actions: [
                                         TextButton(
@@ -276,7 +276,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                           },
                                           child: Text(
                                             'Cancel',
-                                            style: TextStyle(color: AppColors.textColorPrimary),
+                                            style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.bottomDialogTextSize, ),
                                           ),
                                         ),
                                         TextButton(

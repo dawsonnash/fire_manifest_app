@@ -406,7 +406,7 @@ class _EditGearState extends State<EditGear> {
                             leading: Icon(Icons.delete, color: Colors.red),
                             title: Text(
                               'Delete Gear',
-                              style: TextStyle(color: AppColors.textColorPrimary),
+                              style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.modalTextSize),
                             ),
                             onTap: () {
                               Navigator.of(context).pop(); // Close the dialog without deleting

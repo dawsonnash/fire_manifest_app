@@ -81,6 +81,7 @@ class AppData {
   static double get _scalingFactorSizedBox => (screenWidth / 400).clamp(0.9, 2);
   static double get _heightScalingFactor => (screenHeight / 800).clamp(0.9, 1.5);
   static double get _textScalingFactor => (screenWidth / 400).clamp(0.95, 1.75); // Normalized to 400 dp width
+  static double get _userScalingFactor => 1; // Normalized to 400 dp width
   static double get _textOrientationFactor => isLandscape ? 0.9 : 1.0;
   static double get checkboxScalingFactor => (screenWidth / 400).clamp(0.9, 1.2);
 
@@ -118,27 +119,28 @@ class AppData {
 
 
   // **Predefined Scaled Text Sizes**
-  static double get text10 => 10 * _textScalingFactor * _textOrientationFactor;
-  static double get text12 => 12 * _textScalingFactor * _textOrientationFactor;
-  static double get text14 => 14 * _textScalingFactor * _textOrientationFactor;
-  static double get text16 => 16 * _textScalingFactor * _textOrientationFactor;
-  static double get text18 => 18 * _textScalingFactor * _textOrientationFactor;
-  static double get text20 => 20 * _textScalingFactor * _textOrientationFactor;
-  static double get text22 => 22 * _textScalingFactor * _textOrientationFactor;
-  static double get text24 => 24 * _textScalingFactor * _textOrientationFactor;
-  static double get text28 => 28 * _textScalingFactor * _textOrientationFactor;
-  static double get text30 => 30 * _textScalingFactor * _textOrientationFactor;
-  static double get text32 => 32 * _textScalingFactor * _textOrientationFactor;
-  static double get text36 => 36 * _textScalingFactor * _textOrientationFactor;
-  static double get text48 => 48 * _textScalingFactor * _textOrientationFactor;
-  static double get tabBarTextSize => 14 * _textScalingFactor * _textOrientationFactor;
-  static double get tabBarIconSize => 24 * _textScalingFactor * _textOrientationFactor;
-  static double get bottomDialogTextSize => 14 * _textScalingFactor * _textOrientationFactor;
-  static double get dropDownArrowSize => 14 * _textScalingFactor * _textOrientationFactor;
-  static double get cupertinoPickerItemSize => 24 * _textScalingFactor * _textOrientationFactor;
-  static double get miniDialogTitleTextSize => 22 * _textScalingFactor * _textOrientationFactor;
-  static double get miniDialogBodyTextSize => 18 * _textScalingFactor * _textOrientationFactor;
-  static double get quickGuideContentTextSize => 16 * _textScalingFactor * _textOrientationFactor;
+  static double get text10 => 10 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text12 => 12 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text14 => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text16 => 16 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text18 => 18 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text20 => 20 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text22 => 22 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text24 => 24 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text28 => 28 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text30 => 30 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text32 => 32 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text36 => 36 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text48 => 48 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get tabBarTextSize => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get tabBarIconSize => 24 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get bottomDialogTextSize => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get dropDownArrowSize => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get cupertinoPickerItemSize => 24 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get miniDialogTitleTextSize => 22 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get miniDialogBodyTextSize => 18 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get quickGuideContentTextSize => 16 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get modalTextSize => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
 
 }
 

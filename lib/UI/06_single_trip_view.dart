@@ -260,7 +260,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                             leading: Icon(Icons.ios_share, color: AppColors.textColorPrimary),
                             title: Text(
                               'Export',
-                              style: TextStyle(color: AppColors.textColorPrimary),
+                              style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.bottomDialogTextSize,),
                             ),
                             onTap: () {
                               Navigator.of(context).pop();
@@ -340,7 +340,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                             leading: Icon(Icons.edit, color: AppColors.textColorPrimary),
                             title: Text(
                               'Edit Trip',
-                              style: TextStyle(color: AppColors.textColorPrimary),
+                              style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.modalTextSize, ),
                             ),
                             onTap: () {
                               Navigator.of(context).pop();
@@ -363,7 +363,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                             leading: Icon(Icons.delete, color: Colors.red),
                             title: Text(
                               'Delete trip',
-                              style: TextStyle(color: AppColors.textColorPrimary),
+                              style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.modalTextSize, ),
                             ),
                             onTap: () {
                               Navigator.of(context).pop();
@@ -375,11 +375,11 @@ class _SingleTripViewState extends State<SingleTripView> {
                                     backgroundColor: AppColors.textFieldColor2,
                                     title: Text(
                                       'Confirm Deletion',
-                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                      style: TextStyle(fontSize: AppData.miniDialogTitleTextSize, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                     ),
                                     content: Text(
                                       'Are you sure you want to delete this trip?',
-                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                      style: TextStyle(fontSize: AppData.miniDialogBodyTextSize, color: AppColors.textColorPrimary),
                                     ),
                                     actions: [
                                       TextButton(

@@ -375,7 +375,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                               backgroundColor: AppColors.textFieldColor2,
                                                               title: Text(
                                                                 'Select Quantity for ${gear.name}',
-                                                                style: TextStyle(color: AppColors.textColorPrimary),
+                                                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18),
                                                               ),
                                                               content: SizedBox(
                                                                 height: 150,
@@ -591,7 +591,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                       onChanged: (value) {
                                         customItemName = value;
                                       },
-                                      style: TextStyle(color: AppColors.textColorPrimary),
+                                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                     ),
                                     const SizedBox(height: 8),
 
@@ -967,11 +967,11 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                   backgroundColor: AppColors.textFieldColor2,
                                   title: Text(
                                     "Confirm Deletion",
-                                    style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                    style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold, fontSize: AppData.miniDialogTitleTextSize),
                                   ),
                                   content: Text(
                                     "Are you sure you want to delete Load #${loadIndex + 1}?",
-                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize:AppData.miniDialogBodyTextSize),
                                   ),
                                   actions: [
                                     TextButton(
@@ -1408,7 +1408,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                                                 children: [
                                                                                                   Text(
                                                                                                     'Select the quantity to remove:',
-                                                                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text14),
                                                                                                   ),
                                                                                                   SizedBox(height: 8),
                                                                                                   DropdownButton<int>(
@@ -1421,7 +1421,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                                                         child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                                                       ),
                                                                                                     ),
-                                                                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text14),
                                                                                                     onChanged: (value) {
                                                                                                       setDialogState(() {
                                                                                                         quantityToRemove = value ?? 1; // Update dialog state

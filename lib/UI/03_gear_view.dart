@@ -175,7 +175,7 @@ class _GearViewState extends State<GearView> {
                               leading: Icon(Icons.person_remove, color: Colors.red),
                               title: Text(
                                 'Select Delete',
-                                style: TextStyle(color: AppColors.textColorPrimary),
+                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.modalTextSize),
                               ),
                               onTap: () {
                                 Navigator.of(context).pop();

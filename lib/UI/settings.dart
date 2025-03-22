@@ -955,7 +955,7 @@ class _SettingsState extends State<SettingsView> {
                               },
                               child: Text(
                                 "OK",
-                                style: TextStyle(color: AppColors.textColorPrimary),
+                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize ),
                               ),
                             ),
                           ],
@@ -1005,7 +1005,7 @@ class _SettingsState extends State<SettingsView> {
                             backgroundColor: AppColors.textFieldColor2,
                             title: Text(
                               "No crew to export",
-                              style: TextStyle(color: AppColors.textColorPrimary),
+                              style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.miniDialogTitleTextSize, ),
                             ),
                             content: Text("There are no Crew Members or Gear in your inventory.", style: TextStyle(color: AppColors.textColorPrimary)),
                             actions: [
@@ -1015,7 +1015,7 @@ class _SettingsState extends State<SettingsView> {
                                 },
                                 child: Text(
                                   "OK",
-                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                  style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.bottomDialogTextSize, ),
                                 ),
                               ),
                             ],
@@ -1554,10 +1554,10 @@ class _SettingsState extends State<SettingsView> {
                                         backgroundColor: AppColors.textFieldColor2,
                                         title: Text(
                                           "Crew Details Info",
-                                          style: TextStyle(color: AppColors.textColorPrimary),
+                                          style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.miniDialogTitleTextSize, ),
                                         ),
                                         content:
-                                            Text("This information is used to fill in the respective portions in the generated PDF manifests.", style: TextStyle(color: AppColors.textColorPrimary)),
+                                            Text("This information is used to fill in the respective portions in the generated PDF manifests.", style: TextStyle(fontSize: AppData.miniDialogBodyTextSize,color: AppColors.textColorPrimary)),
                                         actions: [
                                           TextButton(
                                             onPressed: () {
@@ -1565,7 +1565,7 @@ class _SettingsState extends State<SettingsView> {
                                             },
                                             child: Text(
                                               "OK",
-                                              style: TextStyle(color: AppColors.textColorPrimary),
+                                              style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize,),
                                             ),
                                           ),
                                         ],
@@ -1837,7 +1837,7 @@ class _SettingsState extends State<SettingsView> {
                                 //                             },
                                 //                             child: Text(
                                 //                               "OK",
-                                //                               style: TextStyle(color: AppColors.textColorPrimary),
+                                //                               style: TextStyle(color: AppColors.textColorPrimary, fontSize: ),
                                 //                             ),
                                 //                           ),
                                 //                         ],
@@ -1896,7 +1896,7 @@ class _SettingsState extends State<SettingsView> {
                                       value: selectedLoadout,
                                       hint: Text(
                                         'Select a Loadout',
-                                        style: TextStyle(color: AppColors.textColorPrimary),
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16,),
                                       ),
                                       style: TextStyle(
                                         color: AppColors.textColorPrimary,
@@ -1987,7 +1987,7 @@ class _SettingsState extends State<SettingsView> {
                                                     },
                                                     child: Text(
                                                       'Cancel',
-                                                      style: TextStyle(color: AppColors.textColorPrimary),
+                                                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize, ),
                                                     ),
                                                   ),
                                                   TextButton(
@@ -2019,11 +2019,11 @@ class _SettingsState extends State<SettingsView> {
                                                   backgroundColor: AppColors.textFieldColor2,
                                                   title: Text(
                                                     'Confirm Reset',
-                                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                    style: TextStyle(fontSize: AppData.miniDialogTitleTextSize, color: Colors.red, fontWeight: FontWeight.bold),
                                                   ),
                                                   content: Text(
                                                     'Resetting will revert your crew loadout to the last saved version. This will erase any unsaved changes. Proceed?',
-                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize, ),
                                                   ),
                                                   actions: [
                                                     TextButton(
@@ -2041,7 +2041,7 @@ class _SettingsState extends State<SettingsView> {
                                                       },
                                                       child: Text(
                                                         'Reset',
-                                                        style: TextStyle(color: AppColors.textColorPrimary),
+                                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize, ),
                                                       ),
                                                     ),
                                                   ],
@@ -2069,12 +2069,12 @@ class _SettingsState extends State<SettingsView> {
                                                   backgroundColor: AppColors.textFieldColor2,
                                                   title: Text(
                                                     'Confirm Save Current',
-                                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                    style: TextStyle(fontSize: AppData.miniDialogTitleTextSize, color: Colors.red, fontWeight: FontWeight.bold),
                                                   ),
                                                   content: Text(
                                                     'Saving a new loadout will erase any recent changes made to your current crew loadout.'
                                                     'This action is irreversible. Proceed?',
-                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize, ),
                                                   ),
                                                   actions: [
                                                     TextButton(
@@ -2121,12 +2121,12 @@ class _SettingsState extends State<SettingsView> {
                                                   backgroundColor: AppColors.textFieldColor2,
                                                   title: Text(
                                                     'Confirm Save Current',
-                                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                    style: TextStyle(fontSize: AppData.miniDialogTitleTextSize,color: Colors.red, fontWeight: FontWeight.bold),
                                                   ),
                                                   content: Text(
                                                     'Saving a new loadout will erase any recent changes made to your current crew loadout.'
                                                     'This action is irreversible. Proceed?',
-                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize,),
                                                   ),
                                                   actions: [
                                                     TextButton(
@@ -2178,12 +2178,12 @@ class _SettingsState extends State<SettingsView> {
                                                 backgroundColor: AppColors.textFieldColor2,
                                                 title: Text(
                                                   'Confirm Switch',
-                                                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                  style: TextStyle(fontSize: AppData.miniDialogTitleTextSize,color: Colors.red, fontWeight: FontWeight.bold),
                                                 ),
                                                 content: Text(
                                                   'Switching to the loadout, $newValue, will erase any recent changes made to your current crew loadout.'
                                                   'This action is irreversible. Proceed?',
-                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize, ),
                                                 ),
                                                 actions: [
                                                   TextButton(
@@ -2226,12 +2226,12 @@ class _SettingsState extends State<SettingsView> {
                                                 backgroundColor: AppColors.textFieldColor2,
                                                 title: Text(
                                                   'Confirm Switch',
-                                                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                  style: TextStyle(fontSize: AppData.miniDialogTitleTextSize,color: Colors.red, fontWeight: FontWeight.bold),
                                                 ),
                                                 content: Text(
                                                   'Switching to the loadout, $newValue, will erase your current crew data which is not saved to any loadouts.'
                                                   'This action is irreversible. Proceed?',
-                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize, ),
                                                 ),
                                                 actions: [
                                                   TextButton(
@@ -2303,12 +2303,12 @@ class _SettingsState extends State<SettingsView> {
                                               backgroundColor: AppColors.textFieldColor2,
                                               title: Text(
                                                 'Confirm Update',
-                                                style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                                style: TextStyle(fontSize: AppData.miniDialogTitleTextSize, color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
                                               ),
                                               content: Text(
                                                 'Updating this loadout will overwrite all previously saved crew data (Crew Members, Gear, Trip Preferences) '
                                                 'from $lastSavedTimestamp with your current crew data. This action is irreversible. Proceed?',
-                                                style: TextStyle(color: AppColors.textColorPrimary),
+                                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize, ),
                                               ),
                                               actions: [
                                                 TextButton(

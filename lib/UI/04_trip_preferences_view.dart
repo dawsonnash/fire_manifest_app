@@ -274,7 +274,7 @@ class _TripPreferencesState extends State<TripPreferences> {
                                                                 leading: Icon(Icons.edit, color: AppColors.textColorPrimary),
                                                                 title: Text(
                                                                   'Edit Trip Preference',
-                                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.modalTextSize),
                                                                 ),
                                                                 onTap: () async {
                                                                   Navigator.of(context).pop(); //
@@ -294,7 +294,7 @@ class _TripPreferencesState extends State<TripPreferences> {
                                                                 leading: Icon(Icons.delete, color: Colors.red),
                                                                 title: Text(
                                                                   'Delete Trip Preference',
-                                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.modalTextSize),
                                                                 ),
                                                                 onTap: () {
                                                                   Navigator.of(context).pop(); // Close the dialog without deleting

@@ -328,7 +328,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                             leading: Icon(Icons.delete, color: Colors.red),
                             title: Text(
                               'Delete Crew Member',
-                              style: TextStyle(color: AppColors.textColorPrimary),
+                              style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.modalTextSize),
                             ),
                             onTap: () {
                               Navigator.of(context).pop(); // Close the dialog without deleting

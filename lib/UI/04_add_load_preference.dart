@@ -399,7 +399,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                                         backgroundColor: AppColors.textFieldColor2,
                                         title: Text(
                                           'Select Quantity for ${gear.name}',
-                                          style: TextStyle(color: AppColors.textColorPrimary),
+                                          style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18),
                                         ),
                                         content: Container(
                                           height: 150,
@@ -791,7 +791,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                                     children: [
                                       Text(
                                         entry.value,
-                                        style: TextStyle(color: AppColors.textColorPrimary),
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text22),
                                       ),
                                       IconButton(
                                         icon: Icon(
@@ -806,10 +806,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                                             builder: (BuildContext context) {
                                               return AlertDialog(
                                                 backgroundColor: AppColors.textFieldColor2,
-                                                title: Text('${entry.value} Load Preference', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary)),
+                                                title: Text('${entry.value} Load Preference', style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.miniDialogTitleTextSize, color: AppColors.textColorPrimary)),
                                                 content: Text(
                                                   getPreferenceInfo(entry.key), //Load Preference explanation
-                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize ),
                                                 ),
                                                 actions: [
                                                   TextButton(
@@ -944,10 +944,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                                             builder: (BuildContext context) {
                                               return AlertDialog(
                                                 backgroundColor: AppColors.textFieldColor2,
-                                                title: Text('${entry.value} Load Preference', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary)),
+                                                title: Text('${entry.value} Load Preference', style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.miniDialogTitleTextSize, color: AppColors.textColorPrimary)),
                                                 content: Text(
                                                   getPreferenceInfo(entry.key), //Load Preference explanation
-                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                                                 ),
                                                 actions: [
                                                   TextButton(
@@ -990,7 +990,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                         child: ElevatedButton(
                           onPressed: isGearSaveButtonEnabled ? () => saveGearLoadPreference(widget.tripPreference) : null,
                           style: style, // Main button theme
-                          child: const Text('Save'),
+                          child:  Text('Save'),
                         ),
                       ),
                     ],
