@@ -191,7 +191,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                 'Select Crew Members',
                 style: TextStyle(
                   color: AppColors.textColorPrimary,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.bold, fontSize: AppData.text20
                 ),
               ),
               content: SizedBox(
@@ -211,7 +211,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                           ),
                           title: Text(
                             option['name'],
-                            style: TextStyle(color: AppColors.textColorPrimary),
+                            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                           ),
                           value: isSelected,
                           onChanged: (bool? isChecked) {
@@ -245,12 +245,14 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                             style: TextStyle(
                               color: AppColors.textColorPrimary,
                               fontWeight: FontWeight.bold,
+                              fontSize: AppData.text16
                             ),
                           ),
                           subtitle: Text(
                             member.getPositionTitle(member.position),
                             style: TextStyle(
                               color: AppColors.textColorPrimary,
+                                fontSize: AppData.text14
                             ),
                           ),
                           value: isSelected,
@@ -350,7 +352,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
               title: Text(
                 'Select Gear',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary,
+                    fontSize: AppData.text20),
               ),
               content: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.8, // 80% of the screen width
@@ -380,7 +383,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                                 Text(
                                   ' (x$remainingQuantity)  ',
                                   style: TextStyle(
-                                    fontSize: AppData.text12,
+                                    fontSize: AppData.text14,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey,
                                   ),

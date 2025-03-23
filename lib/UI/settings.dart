@@ -932,7 +932,7 @@ class _SettingsState extends State<SettingsView> {
                           backgroundColor: AppColors.textFieldColor2,
                           title: Text(
                             "Crew Sharing",
-                            style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal),
+                            style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal, fontSize: AppData.miniDialogTitleTextSize),
                           ),
                           content: SingleChildScrollView(
                             child: Column(
@@ -940,11 +940,11 @@ class _SettingsState extends State<SettingsView> {
                               mainAxisSize: MainAxisSize.min, // Prevents excessive height
                               children: [
                                 Text("Crew sharing allows you to share your crew data (Crew Members, Gear, and Tools) with other users. To share:\n",
-                                    style: TextStyle(color: AppColors.textColorPrimary)),
+                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
                                 Text(
                                     "1. For exporting, select the 'Export' option, save to your files, and then send to the  other user. If on iOS, this can be done directly through Air Drop, but must still be saved to your files. The exported file will be be titled CrewData along with today's date and will have a .json extension.\n",
-                                    style: TextStyle(color: AppColors.textColorPrimary)),
-                                Text("2. For importing, select the 'Import' option and find the CrewData JSON file in your files.", style: TextStyle(color: AppColors.textColorPrimary)),
+                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
+                                Text("2. For importing, select the 'Import' option and find the CrewData JSON file in your files.", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
                               ],
                             ),
                           ),
@@ -976,8 +976,8 @@ class _SettingsState extends State<SettingsView> {
                   });
                 },
                 children: [
-                  Center(child: Text('Export', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary))),
-                  Center(child: Text('Import', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary))),
+                  Center(child: Text('Export', style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary))),
+                  Center(child: Text('Import', style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary))),
                 ],
               ),
             ),
@@ -988,7 +988,7 @@ class _SettingsState extends State<SettingsView> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(fontSize: AppData.text16, color: AppColors.cancelButton),
+                  style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.cancelButton),
                 ),
               ),
               TextButton(
@@ -1007,7 +1007,7 @@ class _SettingsState extends State<SettingsView> {
                               "No crew to export",
                               style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.miniDialogTitleTextSize, ),
                             ),
-                            content: Text("There are no Crew Members or Gear in your inventory.", style: TextStyle(color: AppColors.textColorPrimary)),
+                            content: Text("There are no Crew Members or Gear in your inventory.", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
                             actions: [
                               TextButton(
                                 onPressed: () {
@@ -1033,7 +1033,7 @@ class _SettingsState extends State<SettingsView> {
                 },
                 child: Text(
                   selectedIndex == 0 ? 'Export' : 'Import',
-                  style: TextStyle(fontSize: AppData.text16, color: AppColors.saveButtonAllowableWeight),
+                  style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight),
                 ),
               ),
             ],
@@ -1056,7 +1056,7 @@ class _SettingsState extends State<SettingsView> {
               backgroundColor: AppColors.textFieldColor2,
               title: Text(
                 isEdit ? 'Edit Loadout Name' : 'Save New Loadout',
-                style: TextStyle(color: AppColors.textColorPrimary),
+                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1067,9 +1067,9 @@ class _SettingsState extends State<SettingsView> {
                     decoration: InputDecoration(
                       errorText: errorMessage,
                       hintText: "Enter Loadout Name",
-                      hintStyle: TextStyle(color: AppColors.textColorPrimary),
+                      hintStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                     ),
-                    style: TextStyle(color: AppColors.textColorPrimary),
+                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                   ),
                 ],
               ),
@@ -1136,7 +1136,7 @@ class _SettingsState extends State<SettingsView> {
                       });
                     }
                   },
-                  child: Text("Save", style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
+                  child: Text("Save", style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize)),
                 ),
               ],
             );
