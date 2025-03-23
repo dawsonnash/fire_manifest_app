@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:fire_app/Data/load_accoutrements.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 
@@ -174,9 +175,9 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                               backgroundColor: AppColors.fireColor,
                               headerBuilder: (context, isExpanded) {
                                 return ListTile(
-                                  title: const Text(
+                                  title: Text(
                                     'Load Accoutrements',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text18),
                                   ),
                                 );
                               },
@@ -252,9 +253,9 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                 return Container(
                                   //color: Colors.deepOrangeAccent, // Set the background color for the header
                                   child: ListTile(
-                                    title: const Text(
+                                    title: Text(
                                       'Gear',
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text18),
                                     ),
                                   ),
                                 );
@@ -561,10 +562,10 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                   );
                                 },
                                 child: ListTile(
-                                  title: const Text(
+                                  title:  Text(
                                     'Custom Item',
                                     style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.bold, fontSize: AppData.text18
                                     ),
                                   ),
                                 ),
@@ -577,7 +578,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                     TextField(
                                       decoration: InputDecoration(
                                         labelText: ' Item Name',
-                                        labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
+                                        labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16), // Label color
                                       ),
                                       textCapitalization: TextCapitalization.words,
                                       focusNode: customItemNameFocus,
@@ -599,11 +600,13 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                     TextField(
                                         decoration: InputDecoration(
                                           labelText: ' Weight (lb)',
-                                          labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
+                                          labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16), // Label color
                                         ),
                                         keyboardType: TextInputType.number,
-                                        maxLength: 3,
-                                        focusNode: customItemWeightFocus,
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(3),
+                                          FilteringTextInputFormatter.digitsOnly,
+                                        ],                                        focusNode: customItemWeightFocus,
                                         // Attach focus node
                                         textInputAction: TextInputAction.next,
                                         // Specify the action
@@ -614,7 +617,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                         onChanged: (value) {
                                           customItemWeight = int.tryParse(value) ?? 0;
                                         },
-                                        style: TextStyle(color: AppColors.textColorPrimary)),
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16)),
                                   ],
                                 ),
                               ),
@@ -1473,7 +1476,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                                                   },
                                                                                                   child: Text(
                                                                                                     'Remove',
-                                                                                                    style: TextStyle(color: Colors.red),
+                                                                                                    style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                                                                                   ),
                                                                                                 ),
                                                                                               ],

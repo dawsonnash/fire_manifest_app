@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:fire_app/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 
@@ -127,9 +128,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                               headerBuilder: (context, isExpanded) {
                                 return Container(
                                   child: ListTile(
-                                    title: const Text(
+                                    title: Text(
                                       'Crew Members',
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text18),
                                     ),
                                   ),
                                 );
@@ -207,9 +208,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                 return Container(
                                   //color: Colors.deepOrangeAccent, // Set the background color for the header
                                   child: ListTile(
-                                    title: const Text(
+                                    title: Text(
                                       'Gear',
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text18),
                                     ),
                                   ),
                                 );
@@ -509,10 +510,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                   );
                                 },
                                 child: ListTile(
-                                  title: const Text(
+                                  title: Text(
                                     'Custom Item',
                                     style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.bold, fontSize: AppData.text18
                                     ),
                                   ),
                                 ),
@@ -525,7 +526,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                     TextField(
                                       decoration: InputDecoration(
                                         labelText: ' Item Name',
-                                        labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
+                                        labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16), // Label color
                                       ),
                                       textCapitalization: TextCapitalization.words,
                                       focusNode: customItemNameFocus,
@@ -547,10 +548,13 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                     TextField(
                                         decoration: InputDecoration(
                                           labelText: ' Weight (lb)',
-                                          labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
+                                          labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16), // Label color
                                         ),
                                         keyboardType: TextInputType.number,
-                                        maxLength: 3,
+                                        inputFormatters: [
+                                    LengthLimitingTextInputFormatter(3),
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
                                         focusNode: customItemWeightFocus,
                                         // Attach focus node
                                         textInputAction: TextInputAction.next,
@@ -562,7 +566,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         onChanged: (value) {
                                           customItemWeight = int.tryParse(value) ?? 0;
                                         },
-                                        style: TextStyle(color: AppColors.textColorPrimary)),
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16)),
                                   ],
                                 ),
                               ),
@@ -1447,7 +1451,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                                   },
                                                                                   child: Text(
                                                                                     'Remove',
-                                                                                    style: TextStyle(color: Colors.red),
+                                                                                    style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                                                                   ),
                                                                                 ),
                                                                               ],
