@@ -440,20 +440,23 @@ class _EditCrewState extends State<EditCrew> {
                                           alignment: Alignment.center,
                                           child: FittedBox(
                                             fit: BoxFit.scaleDown, // Ensures content shrinks but never grows
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
-                                              children: [
-                                                Icon(
-                                                  Icons.edit, // Add icon
-                                                  color: AppColors.primaryColor,
-                                                  size: AppData.text32, // Adjust size as needed
-                                                ),
-                                                const SizedBox(width: 8), // Space between the icon and text
-                                                Text(
-                                                  'Edit Crew Member',
-                                                  style: panelTextStyle,
-                                                ),
-                                              ],
+                                            child: Padding(
+                                              padding:  EdgeInsets.all(AppData.padding16),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                                                children: [
+                                                  Icon(
+                                                    Icons.edit, // Add icon
+                                                    color: AppColors.primaryColor,
+                                                    size: AppData.text32, // Adjust size as needed
+                                                  ),
+                                                  const SizedBox(width: 8), // Space between the icon and text
+                                                  Text(
+                                                    'Edit Crew Member',
+                                                    style: panelTextStyle,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -477,20 +480,23 @@ class _EditCrewState extends State<EditCrew> {
                                           alignment: Alignment.center,
                                           child: FittedBox(
                                             fit: BoxFit.scaleDown, // Ensures content shrinks but never grows
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
-                                              children: [
-                                                Icon(
-                                                  Icons.edit, // Add icon
-                                                  color: AppColors.primaryColor,
-                                                  size: AppData.text32, // Adjust size as needed
-                                                ),
-                                                const SizedBox(width: 8), // Space between the icon and text
-                                                Text(
-                                                  'Edit Gear',
-                                                  style: panelTextStyle,
-                                                ),
-                                              ],
+                                            child: Padding(
+                                              padding:  EdgeInsets.all(AppData.padding16),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                                                children: [
+                                                  Icon(
+                                                    Icons.edit, // Add icon
+                                                    color: AppColors.primaryColor,
+                                                    size: AppData.text32, // Adjust size as needed
+                                                  ),
+                                                  const SizedBox(width: 8), // Space between the icon and text
+                                                  Text(
+                                                    'Edit Gear',
+                                                    style: panelTextStyle,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -1224,27 +1230,30 @@ class _EditCrewState extends State<EditCrew> {
                               child: FittedBox(
                                 fit: BoxFit.scaleDown, // Ensures content shrinks but never grows
 
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                                child: Padding(
+                                  padding:  EdgeInsets.all(AppData.padding16),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
 
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 16.0),
-                                      child: Transform.scale(
-                                        scale: 2,
-                                        child: SvgPicture.asset(
-                                          'assets/icons/tools_icon.svg', // Your SVG file path
-                                          width: 24, // Adjust size as needed
-                                          height: 24,
-                                          colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 16.0),
+                                        child: Transform.scale(
+                                          scale: 2,
+                                          child: SvgPicture.asset(
+                                            'assets/icons/tools_icon.svg', // Your SVG file path
+                                            width: 24, // Adjust size as needed
+                                            height: 24,
+                                            colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Text(
-                                      ' Tools',
-                                      style: TextStyle(fontSize: AppData.text22, color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
+                                      Text(
+                                        ' Tools',
+                                        style: TextStyle(fontSize: AppData.text22, color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -1270,22 +1279,25 @@ class _EditCrewState extends State<EditCrew> {
                               alignment: Alignment.center,
                               child: FittedBox(
                                 fit: BoxFit.scaleDown, // Ensures content shrinks but never grows
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
-                                  children: [
-                                    Icon(
-                                      FontAwesomeIcons.sliders, // Add icon
-                                      color: AppColors.primaryColor,
-                                      size: AppData.text28, // Adjust size as needed
-                                    ),
-                                    const SizedBox(width: 8), // Space between the icon and text
-                                    Text(
-                                      'Trip Preferences',
-                                      style: panelTextStyle,
-                                      textAlign: TextAlign.center,
-                                      softWrap: true,
-                                    ),
-                                  ],
+                                child: Padding(
+                                  padding:  EdgeInsets.all(AppData.padding16),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                                    children: [
+                                      Icon(
+                                        FontAwesomeIcons.sliders, // Add icon
+                                        color: AppColors.primaryColor,
+                                        size: AppData.text28, // Adjust size as needed
+                                      ),
+                                      const SizedBox(width: 8), // Space between the icon and text
+                                      Text(
+                                        'Trip Preferences',
+                                        style: panelTextStyle,
+                                        textAlign: TextAlign.center,
+                                        softWrap: true,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),

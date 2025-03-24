@@ -767,7 +767,7 @@ class _SettingsState extends State<SettingsView> {
           backgroundColor: AppColors.textFieldColor2,
           title: Text(
             'Report Bugs',
-            style: TextStyle(color: AppColors.textColorPrimary),
+            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
           ),
           content: TextField(
             controller: feedbackController,
@@ -822,7 +822,7 @@ class _SettingsState extends State<SettingsView> {
               },
               child: Text(
                 'Send',
-                style: TextStyle(color: AppColors.saveButtonAllowableWeight),
+                style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize),
               ),
             ),
           ],
@@ -841,7 +841,7 @@ class _SettingsState extends State<SettingsView> {
           backgroundColor: AppColors.textFieldColor2,
           title: Text(
             'Submit Feedback',
-            style: TextStyle(color: AppColors.textColorPrimary),
+            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
           ),
           content: TextField(
             controller: feedbackController,
@@ -896,7 +896,7 @@ class _SettingsState extends State<SettingsView> {
               },
               child: Text(
                 'Send',
-                style: TextStyle(color: AppColors.saveButtonAllowableWeight),
+                style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize),
               ),
             ),
           ],
@@ -914,64 +914,67 @@ class _SettingsState extends State<SettingsView> {
         return StatefulBuilder(builder: (context, setState) {
           return AlertDialog(
             backgroundColor: AppColors.textFieldColor2,
-            title: Row(
-              children: [
-                Text(
-                  'Select an option',
-                  style: TextStyle(
-                    fontSize: AppData.text22,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textColorPrimary,
+            title: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                children: [
+                  Text(
+                    'Select an option',
+                    style: TextStyle(
+                      fontSize: AppData.miniDialogTitleTextSize,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textColorPrimary,
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.info_outline, // Info icon
-                    color: Colors.white,
-                    size: AppData.text22, // Adjust size if needed
-                  ),
-                  onPressed: () {
-                    // Show an info dialog or tooltip when clicked
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          backgroundColor: AppColors.textFieldColor2,
-                          title: Text(
-                            "Crew Sharing",
-                            style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal, fontSize: AppData.miniDialogTitleTextSize),
-                          ),
-                          content: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min, // Prevents excessive height
-                              children: [
-                                Text("Crew sharing allows you to share your crew data (Crew Members, Gear, and Tools) with other users. To share:\n",
-                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
-                                Text(
-                                    "1. For exporting, select the 'Export' option, save to your files, and then send to the  other user. If on iOS, this can be done directly through Air Drop, but must still be saved to your files. The exported file will be be titled CrewData along with today's date and will have a .json extension.\n",
-                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
-                                Text("2. For importing, select the 'Import' option and find the CrewData JSON file in your files.", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
-                              ],
+                  IconButton(
+                    icon: Icon(
+                      Icons.info_outline, // Info icon
+                      color: Colors.white,
+                      size: AppData.text22, // Adjust size if needed
+                    ),
+                    onPressed: () {
+                      // Show an info dialog or tooltip when clicked
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            backgroundColor: AppColors.textFieldColor2,
+                            title: Text(
+                              "Crew Sharing",
+                              style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal, fontSize: AppData.miniDialogTitleTextSize),
                             ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(); // Close the dialog
-                              },
-                              child: Text(
-                                "OK",
-                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize ),
+                            content: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min, // Prevents excessive height
+                                children: [
+                                  Text("Crew sharing allows you to share your crew data (Crew Members, Gear, and Tools) with other users. To share:\n",
+                                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
+                                  Text(
+                                      "1. For exporting, select the 'Export' option, save to your files, and then send to the  other user. If on iOS, this can be done directly through Air Drop, but must still be saved to your files. The exported file will be be titled CrewData along with today's date and will have a .json extension.\n",
+                                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
+                                  Text("2. For importing, select the 'Import' option and find the CrewData JSON file in your files.", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
+                                ],
                               ),
                             ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                ),
-              ],
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // Close the dialog
+                                },
+                                child: Text(
+                                  "OK",
+                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
             content: SizedBox(
               height: MediaQuery.of(context).size.height * 0.15, // Dynamic height

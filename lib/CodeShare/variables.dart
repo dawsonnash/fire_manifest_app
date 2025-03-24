@@ -88,7 +88,7 @@ class AppData {
   // **User Text Scaling**
   static double get _userScalingFactor => AppData.textScale; // Normalized to 400 dp width
   static double get minTextFactor => 0.8; // Normalized to 400 dp width
-  static double get maxTextFactor => 1.7; // Normalized to 400 dp width
+  static double get maxTextFactor => 1.3; // Normalized to 400 dp width
 
 
   // **Dynamic Widths (Orientation+ScreenSize-Dependent)**
