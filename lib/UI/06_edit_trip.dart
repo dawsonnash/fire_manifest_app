@@ -1105,46 +1105,39 @@ class _EditTripState extends State<EditTrip> {
                                     },
                                     child: Container(
                                       padding: const EdgeInsets.all(12),
+                                      width: double.infinity,
                                       decoration: BoxDecoration(
-                                        color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                            ? Colors.black // Warning color
-                                            : AppColors.fireColor, // Normal color
+                                        color: (calculateAvailableWeight(loads[index]) > widget.trip.allowable ||
+                                            calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
+                                            ? Colors.black
+                                            : AppColors.fireColor,
                                         borderRadius: _isExpanded[index]
                                             ? const BorderRadius.vertical(top: Radius.circular(10))
-                                            : const BorderRadius.all(
-                                                Radius.circular(10),
-                                              ),
+                                            : const BorderRadius.all(Radius.circular(10)),
                                       ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                'LOAD #${index + 1}',
-                                                style: TextStyle(
-                                                  color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                      ? Colors.white // Warning color
-                                                      : Colors.black,
-                                                  fontSize: AppData.text22,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Column(
-                                            children: [
-                                              Container(
-                                                padding: const EdgeInsets.only(left: 4.0, right: 4.0),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.transparent,
-                                                  // Background color
-                                                  borderRadius: BorderRadius.circular(10), // Rounded corners
-                                                ),
-                                                height: 30,
+                                      child: LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          return FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: ConstrainedBox(
+                                              constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                                              child: IntrinsicWidth(
                                                 child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
                                                   children: [
+                                                    Text(
+                                                      'LOAD #${index + 1}',
+                                                      style: TextStyle(
+                                                        color: (calculateAvailableWeight(loads[index]) > widget.trip.allowable ||
+                                                            calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
+                                                            ? Colors.white
+                                                            : Colors.black,
+                                                        fontSize: AppData.text22,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 20),
                                                     Row(
                                                       children: [
                                                         Text(
@@ -1152,60 +1145,50 @@ class _EditTripState extends State<EditTrip> {
                                                           style: TextStyle(
                                                             fontSize: AppData.text20,
                                                             fontWeight: FontWeight.bold,
-                                                            color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                                ? Colors.white // Warning color
+                                                            color: (calculateAvailableWeight(loads[index]) > widget.trip.allowable ||
+                                                                calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
+                                                                ? Colors.white
+                                                                : Colors.black,
+                                                          ),
+                                                        ),
+                                                        SizedBox(width: 10),
+                                                        Container(
+                                                          height: AppData.text22,
+                                                          width: 1,
+                                                          color: (calculateAvailableWeight(loads[index]) > widget.trip.allowable ||
+                                                              calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
+                                                              ? Colors.white
+                                                              : Colors.black,
+                                                        ),
+                                                        SizedBox(width: 10),
+                                                        Text(
+                                                          '${calculateAvailableSeats(loads[index])}/${widget.trip.availableSeats} seats',
+                                                          style: TextStyle(
+                                                            fontSize: AppData.text20,
+                                                            fontWeight: FontWeight.bold,
+                                                            color: (calculateAvailableWeight(loads[index]) > widget.trip.allowable ||
+                                                                calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
+                                                                ? Colors.white
                                                                 : Colors.black,
                                                           ),
                                                         ),
                                                       ],
                                                     ),
-                                                    VerticalDivider(
-                                                      width: 20,
-                                                      // Space between text and divider
-                                                      thickness: 1,
-                                                      // Thickness of the divider
-                                                      color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                          ? Colors.white // Warning color
-                                                          : Colors.black, // Divider color
-                                                    ),
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          '${calculateAvailableSeats(loads[index])}',
-                                                          style: TextStyle(
-                                                            fontSize: AppData.text20,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                                ? Colors.white // Warning color
-                                                                : Colors.black,
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          '/${widget.trip.availableSeats} seats',
-                                                          style: TextStyle(
-                                                            fontSize: AppData.text20,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                                ? Colors.white // Warning color
-                                                                : Colors.black,
-                                                          ),
-                                                        ),
-                                                      ],
+                                                    SizedBox(width: 20),
+                                                    Icon(
+                                                      isExpanded ? Icons.expand_less : Icons.expand_more,
+                                                      color: (calculateAvailableWeight(loads[index]) > widget.trip.allowable ||
+                                                          calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                      size: AppData.text36,
                                                     ),
                                                   ],
                                                 ),
                                               ),
-                                            ],
-                                          ),
-                                          // Expansion Icon
-                                          Icon(
-                                            isExpanded ? Icons.expand_less : Icons.expand_more,
-                                            color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                ? Colors.white // Warning color
-                                                : Colors.black,
-                                            size: AppData.text36,
-                                          ),
-                                        ],
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ),
                                   ),
@@ -1377,26 +1360,29 @@ class _EditTripState extends State<EditTrip> {
                                                   child: Row(
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Text(
-                                                            itemDisplay(item),
-                                                            style: TextStyle(
-                                                              fontSize: AppData.text16,
-                                                              fontWeight: FontWeight.bold,
-                                                              color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
-                                                            ),
-                                                          ),
-                                                          if (item is! CustomItem)
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
                                                             Text(
-                                                              item is Gear ? 'Quantity: ${item.quantity} x ${item.weight} lb' : item.getPositionTitle(item.position),
+                                                              itemDisplay(item),
+                                                              overflow: TextOverflow.ellipsis,
                                                               style: TextStyle(
-                                                                fontSize: AppData.text14,
+                                                                fontSize: AppData.text16,
+                                                                fontWeight: FontWeight.bold,
                                                                 color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
                                                               ),
                                                             ),
-                                                        ],
+                                                            if (item is! CustomItem)
+                                                              Text(
+                                                                item is Gear ? 'Quantity: ${item.quantity} x ${item.weight} lb' : item.getPositionTitle(item.position),
+                                                                style: TextStyle(
+                                                                  fontSize: AppData.text14,
+                                                                  color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
+                                                                ),
+                                                              ),
+                                                          ],
+                                                        ),
                                                       ),
 
                                                       // Single Item Deletion

@@ -1920,6 +1920,7 @@ class _SettingsState extends State<SettingsView> {
                             // Dropdown Container
                             Expanded(
                               child: Container(
+                                width: double.infinity,
                                 padding: EdgeInsets.symmetric(horizontal: AppData.padding8),
                                 decoration: BoxDecoration(
                                   color: AppColors.textFieldColor,
@@ -1958,23 +1959,30 @@ class _SettingsState extends State<SettingsView> {
                                         if (isOutOfSync)
                                           DropdownMenuItem<String>(
                                             value: 'Reset Last',
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.refresh, color: Colors.orange), // Reset icon
-                                                SizedBox(width: 8),
-                                                Text('Reset to Last Saved', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.normal)),
-                                              ],
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Row(
+                                                children: [
+                                                  Icon(Icons.refresh, color: Colors.orange), // Reset icon
+                                                  SizedBox(width: 8),
+                                                  Text('Reset to Last Saved', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.normal)),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         if (selectedLoadout != null)
                                           DropdownMenuItem<String>(
                                             value: 'Delete Current Loadout',
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.delete_forever, color: Colors.red), // Reset icon
-                                                SizedBox(width: 8),
-                                                Text('Delete Current Loadout', style: TextStyle(color: Colors.red, fontWeight: FontWeight.normal)),
-                                              ],
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+
+                                              child: Row(
+                                                children: [
+                                                  Icon(Icons.delete_forever, color: Colors.red), // Reset icon
+                                                  SizedBox(width: 8),
+                                                  Text('Delete Current Loadout', style: TextStyle(color: Colors.red, fontWeight: FontWeight.normal)),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         // Save Current Loadout Option
@@ -1991,12 +1999,15 @@ class _SettingsState extends State<SettingsView> {
                                         // Save Empty Crew (Start Fresh)
                                         DropdownMenuItem<String>(
                                           value: 'Start Empty',
-                                          child: Row(
-                                            children: [
-                                              Icon(Icons.add, color: Colors.blue), // Fresh start icon
-                                              SizedBox(width: 8),
-                                              Text('Start Empty Crew', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.normal)),
-                                            ],
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.add, color: Colors.blue), // Fresh start icon
+                                                SizedBox(width: 8),
+                                                Text('Start Empty Crew', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.normal)),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -2010,11 +2021,11 @@ class _SettingsState extends State<SettingsView> {
                                                 backgroundColor: AppColors.textFieldColor2,
                                                 title: Text(
                                                   'Confirm Deletion',
-                                                  style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                                  style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
                                                 ),
                                                 content: Text(
                                                   'Are you sure you want to delete this loadout ($selectedLoadout)?',
-                                                  style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                                  style: TextStyle(fontSize: AppData.miniDialogBodyTextSize, color: AppColors.textColorPrimary),
                                                 ),
                                                 actions: [
                                                   TextButton(
@@ -2096,54 +2107,6 @@ class _SettingsState extends State<SettingsView> {
                                           return;
                                         }
                                         if (newValue == 'Save Current') {
-                                          if (isOutOfSync) {
-                                            // Ask for confirmation before switching
-                                            bool? confirmed = await showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AlertDialog(
-                                                  backgroundColor: AppColors.textFieldColor2,
-                                                  title: Text(
-                                                    'Confirm Save Current',
-                                                    style: TextStyle(fontSize: AppData.miniDialogTitleTextSize, color: Colors.red, fontWeight: FontWeight.bold),
-                                                  ),
-                                                  content: Text(
-                                                    'Saving a new loadout will erase any recent changes made to your current crew loadout.'
-                                                    'This action is irreversible. Proceed?',
-                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize, ),
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.of(context).pop(false); // Return false to cancel
-                                                      },
-                                                      child: Text(
-                                                        'Cancel',
-                                                        style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
-                                                      ),
-                                                    ),
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.of(context).pop(true); // Return true to confirm
-                                                      },
-                                                      child: Text(
-                                                        'Confirm',
-                                                        style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
-
-                                            // If the user cancels, restore the previous selection
-                                            if (confirmed == false || confirmed == null) {
-                                              setState(() {
-                                                selectedLoadout = previousLoadout;
-                                              });
-                                              return;
-                                            }
-                                          }
                                           _promptNewLoadoutName(previousLoadout ?? "New Loadout", false, false);
                                           return;
                                         }
@@ -2156,11 +2119,11 @@ class _SettingsState extends State<SettingsView> {
                                                 return AlertDialog(
                                                   backgroundColor: AppColors.textFieldColor2,
                                                   title: Text(
-                                                    'Confirm Save Current',
+                                                    'Confirm Start Empty Crew',
                                                     style: TextStyle(fontSize: AppData.miniDialogTitleTextSize,color: Colors.red, fontWeight: FontWeight.bold),
                                                   ),
                                                   content: Text(
-                                                    'Saving a new loadout will erase any recent changes made to your current crew loadout.'
+                                                    'Starting a new empty crew will erase any recent changes made to your current crew loadout.'
                                                     'This action is irreversible. Proceed?',
                                                     style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize,),
                                                   ),

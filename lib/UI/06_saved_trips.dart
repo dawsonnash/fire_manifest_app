@@ -372,11 +372,14 @@ class _SavedTripsState extends State<SavedTripsView> {
                                                       ),
                                                     ],
                                                   ),
-                                                  Text(
-                                                    'Allowable: ${trip.allowable} lb',
-                                                    style: TextStyle(
-                                                      fontSize: AppData.text18,
-                                                      color: AppColors.textColorPrimary,
+                                                  FittedBox(
+                                                    fit: BoxFit.scaleDown,
+                                                    child: Text(
+                                                      'Allowable: ${trip.allowable} lb',
+                                                      style: TextStyle(
+                                                        fontSize: AppData.text18,
+                                                        color: AppColors.textColorPrimary,
+                                                      ),
                                                     ),
                                                   )
                                                 ],

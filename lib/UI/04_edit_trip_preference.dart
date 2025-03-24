@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/UI/04_add_load_preference.dart';
 import 'package:flutter/material.dart';
@@ -254,7 +255,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
-                                        child: Text(
+                                        child: AutoSizeText(
                                           'No Load Preferences added...',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
@@ -262,8 +263,9 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                             fontWeight: FontWeight.bold,
                                             color: AppColors.textColorPrimary,
                                           ),
-                                          overflow: TextOverflow.ellipsis,
                                           maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          minFontSize: 10, // Optional: shrink down to this size
                                         ),
                                       ),
                                     ],

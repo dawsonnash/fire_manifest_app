@@ -842,7 +842,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lb',
-              style: TextStyle(fontSize: AppData.text18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
           ],
         ),
@@ -1046,52 +1046,42 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.all(12),
+                                    width: double.infinity, // Ensure container fills width
                                     decoration: BoxDecoration(
                                       color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
-                                          ? Colors.black // Warning color
-                                          : AppColors.fireColor, // Normal color
-                                      // If overweight or safety buffer
-                                      borderRadius: ((calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable) ||
-                                              (calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable - safetyBuffer) && isExpanded)
+                                          ? Colors.black
+                                          : AppColors.fireColor,
+                                      borderRadius: ((calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable && isExpanded) ||
+                                          (calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable - safetyBuffer) && isExpanded)
                                           ? const BorderRadius.vertical(top: Radius.circular(8))
-                                          : const BorderRadius.all(
-                                              Radius.circular(10),
-                                            ),
+                                          : const BorderRadius.all(Radius.circular(10)),
                                       border: Border.all(
-                                        color: Colors.black, // Black outline
-                                        width: 0.5, // Adjust thickness as needed
+                                        color: Colors.black,
+                                        width: 0.5,
                                       ),
                                     ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'LOAD #${loadIndex + 1}',
-                                              style: TextStyle(
-                                                color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
-                                                    ? Colors.white // Warning color
-                                                    : Colors.black,
-                                                fontSize: AppData.text22,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          children: [
-                                            Container(
-                                              padding: const EdgeInsets.only(left: 4.0, right: 4.0),
-                                              decoration: BoxDecoration(
-                                                color: Colors.transparent,
-                                                // Background color
-                                                borderRadius: BorderRadius.circular(10), // Rounded corners
-                                              ),
-                                              height: 30,
+                                    child: LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        return FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: ConstrainedBox(
+                                            constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                                            child: IntrinsicWidth(
                                               child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
+                                                  Text(
+                                                    'LOAD #${loadIndex + 1}',
+                                                    style: TextStyle(
+                                                      color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                      fontSize: AppData.text22,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 20),
                                                   Row(
                                                     children: [
                                                       Text(
@@ -1100,26 +1090,26 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                           fontSize: AppData.text20,
                                                           fontWeight: FontWeight.bold,
                                                           color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
-                                                              ? Colors.white // Warning color
+                                                              ? Colors.white
                                                               : Colors.black,
                                                         ),
                                                       ),
                                                     ],
                                                   ),
+                                                  const SizedBox(width: 20),
+                                                  Icon(
+                                                    isExpanded ? Icons.expand_less : Icons.expand_more,
+                                                    color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
+                                                        ? Colors.white
+                                                        : Colors.black,
+                                                    size: AppData.text36,
+                                                  ),
                                                 ],
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                        // Expansion Icon
-                                        Icon(
-                                          isExpanded ? Icons.expand_less : Icons.expand_more,
-                                          color: calculateAvailableWeight(loads[loadIndex]) > widget.trip.allowable
-                                              ? Colors.white // Warning color
-                                              : Colors.black,
-                                          size: AppData.text36,
-                                        ),
-                                      ],
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
                                 ),
@@ -1365,34 +1355,37 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                       child: Row(
                                                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                         children: [
-                                                                          Column(
-                                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                                            children: [
-                                                                              Text(
-                                                                                itemDisplayEditTrip(item),
-                                                                                style: TextStyle(
-                                                                                  color: item is LoadAccoutrement ? Colors.black : Colors.black,
-                                                                                  fontSize: AppData.text16,
-                                                                                  fontWeight: FontWeight.bold,
-                                                                                ),
-                                                                              ),
-                                                                              if (item is Gear)
+                                                                          Expanded(
+                                                                            child: Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
                                                                                 Text(
-                                                                                  'Quantity: ${item.quantity} x ${item.weight} lb',
+                                                                                  itemDisplayEditTrip(item),
+                                                                                  overflow: TextOverflow.ellipsis,
                                                                                   style: TextStyle(
-                                                                                    fontSize: AppData.text14,
-                                                                                    color: Colors.black,
+                                                                                    color: item is LoadAccoutrement ? Colors.black : Colors.black,
+                                                                                    fontSize: AppData.text16,
+                                                                                    fontWeight: FontWeight.bold,
                                                                                   ),
                                                                                 ),
-                                                                              if (item is LoadAccoutrement)
-                                                                                Text(
-                                                                                  'Quantity: 1',
-                                                                                  style: TextStyle(
-                                                                                    fontSize: AppData.text14,
-                                                                                    color: Colors.black,
+                                                                                if (item is Gear)
+                                                                                  Text(
+                                                                                    'Quantity: ${item.quantity} x ${item.weight} lb',
+                                                                                    style: TextStyle(
+                                                                                      fontSize: AppData.text14,
+                                                                                      color: Colors.black,
+                                                                                    ),
                                                                                   ),
-                                                                                ),
-                                                                            ],
+                                                                                if (item is LoadAccoutrement)
+                                                                                  Text(
+                                                                                    'Quantity: 1',
+                                                                                    style: TextStyle(
+                                                                                      fontSize: AppData.text14,
+                                                                                      color: Colors.black,
+                                                                                    ),
+                                                                                  ),
+                                                                              ],
+                                                                            ),
                                                                           ),
                                                                           IconButton(
                                                                             icon: const Icon(Icons.delete, color: Colors.red),

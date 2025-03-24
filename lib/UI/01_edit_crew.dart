@@ -347,22 +347,25 @@ class _EditCrewState extends State<EditCrew> {
                                           alignment: Alignment.center,
                                           child: FittedBox(
                                             fit: BoxFit.scaleDown, // Ensures content shrinks but never grows
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
-                                              children: [
-                                                Icon(
-                                                  Icons.add, // Add icon
-                                                  color: AppColors.primaryColor,
-                                                  size: AppData.text32, // Adjust size as needed
-                                                ),
-                                                const SizedBox(width: 8), // Space between the icon and text
-                                                Text(
-                                                  'Add Crew Member',
-                                                  style: panelTextStyle,
-                                                  textAlign: TextAlign.center,
-                                                  softWrap: true,
-                                                ),
-                                              ],
+                                            child: Padding(
+                                              padding:  EdgeInsets.all(AppData.padding16),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                                                children: [
+                                                  Icon(
+                                                    Icons.add, // Add icon
+                                                    color: AppColors.primaryColor,
+                                                    size: AppData.text32, // Adjust size as needed
+                                                  ),
+                                                  const SizedBox(width: 8), // Space between the icon and text
+                                                  Text(
+                                                    'Add Crew Member',
+                                                    style: panelTextStyle,
+                                                    textAlign: TextAlign.center,
+                                                    softWrap: true,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -386,22 +389,25 @@ class _EditCrewState extends State<EditCrew> {
                                           alignment: Alignment.center,
                                           child: FittedBox(
                                             fit: BoxFit.scaleDown, // Ensures content shrinks but never grows
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
-                                              children: [
-                                                Icon(
-                                                  Icons.add, // Add icon
-                                                  color: AppColors.primaryColor,
-                                                  size: AppData.text32, // Adjust size as needed
-                                                ),
-                                                const SizedBox(width: 8), // Space between the icon and text
-                                                Text(
-                                                  'Add Gear',
-                                                  style: panelTextStyle,
-                                                  textAlign: TextAlign.center,
-                                                  softWrap: true,
-                                                ),
-                                              ],
+                                            child: Padding(
+                                              padding:  EdgeInsets.all(AppData.padding16),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center, // Center the content horizontally
+                                                children: [
+                                                  Icon(
+                                                    Icons.add, // Add icon
+                                                    color: AppColors.primaryColor,
+                                                    size: AppData.text32, // Adjust size as needed
+                                                  ),
+                                                  const SizedBox(width: 8), // Space between the icon and text
+                                                  Text(
+                                                    'Add Gear',
+                                                    style: panelTextStyle,
+                                                    textAlign: TextAlign.center,
+                                                    softWrap: true,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),

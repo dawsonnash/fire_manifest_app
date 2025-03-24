@@ -2566,7 +2566,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                         color: AppColors.primaryColor,
                                         size: AppData.text24,
                                       ),
-                                SizedBox(width: 8), // Add spacing between icon and switch
+                                SizedBox(width: isExternalManifest ? 8 : 16), // Add spacing between icon and switch
                                 Switch(
                                   value: isExternalManifest,
                                   activeColor: AppColors.primaryColor,

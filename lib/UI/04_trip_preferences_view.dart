@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/UI/04_add_trip_preference.dart';
 import 'package:flutter/material.dart';
@@ -144,7 +145,7 @@ class _TripPreferencesState extends State<TripPreferences> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
-                                        child: Text(
+                                        child: AutoSizeText(
                                           'No Trip Preferences created...',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
@@ -152,8 +153,9 @@ class _TripPreferencesState extends State<TripPreferences> {
                                             fontWeight: FontWeight.bold,
                                             color: AppColors.textColorPrimary,
                                           ),
-                                          overflow: TextOverflow.ellipsis,
                                           maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          minFontSize: 10, // Optional: shrink down to this size
                                         ),
                                       ),
                                     ],
@@ -248,16 +250,19 @@ class _TripPreferencesState extends State<TripPreferences> {
                                         child: ListTile(
                                           iconColor: AppColors.primaryColor,
                                           title: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Expanded(
-                                                child: Text(
-                                                  tripPreference.tripPreferenceName,
-                                                  style: TextStyle(fontSize: AppData.text22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                                  overflow: TextOverflow.ellipsis, // Add this
-                                                  maxLines: 1,
+                                                child: FittedBox(
+                                                  fit: BoxFit.scaleDown,
+                                                  child: Text(
+                                                    tripPreference.tripPreferenceName,
+                                                    style: TextStyle(fontSize: AppData.text22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                                    overflow: TextOverflow.ellipsis, // Add this
+                                                    maxLines: 1,
+                                                  ),
                                                 ),
                                               ),
+
                                               IconButton(
                                                   icon: Icon(Icons.more_vert, color: AppColors.textColorPrimary, size: AppData.text32),
                                                   onPressed: () {

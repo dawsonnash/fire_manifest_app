@@ -751,7 +751,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                                     }).join(', '),
                               style: TextStyle(
                                 color: AppColors.textColorPrimary,
-                                fontSize: AppData.text22,
+                                fontSize: AppData.text20,
                               ),
                             ),
                           ),
@@ -777,13 +777,13 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                                 'Choose load preference',
                                 style: TextStyle(
                                   color: AppColors.textColorPrimary,
-                                  fontSize: AppData.text22,
+                                  fontSize: AppData.text20,
                                 ),
                               ),
                               dropdownColor: AppColors.textFieldColor2,
                               style: TextStyle(
                                 color: AppColors.textColorPrimary,
-                                fontSize: AppData.text22,
+                                fontSize: AppData.text20,
                               ),
                               iconEnabledColor: AppColors.textColorPrimary,
                               items: loadPreferenceMap.entries.map((entry) {
@@ -891,7 +891,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                                     }).join(', '),
                               style: TextStyle(
                                 color: AppColors.textColorPrimary,
-                                fontSize: AppData.text22,
+                                fontSize: AppData.text20,
                               ),
                             ),
                           ),
@@ -918,13 +918,13 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                                 'Choose load preference',
                                 style: TextStyle(
                                   color: AppColors.textColorPrimary,
-                                  fontSize: AppData.text22,
+                                  fontSize: AppData.text20,
                                 ),
                               ),
                               dropdownColor: AppColors.textFieldColor2,
                               style: TextStyle(
                                 color: AppColors.textColorPrimary,
-                                fontSize: AppData.text22,
+                                fontSize: AppData.text20,
                               ),
                               iconEnabledColor: AppColors.textColorPrimary,
                               items: loadPreferenceMap.entries.map((entry) {
