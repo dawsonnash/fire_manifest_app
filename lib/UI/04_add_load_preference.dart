@@ -419,7 +419,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                                               return Center(
                                                 child: Text(
                                                   '${index + 1}',
-                                                  style: TextStyle(fontSize: AppData.text20, color: AppColors.textColorPrimary),
+                                                  style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary),
                                                 ),
                                               );
                                             }),
@@ -443,7 +443,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                                 child: Row(
                                   children: [
                                     Text(
-                                      'Qty: ${selectedGearQuantities[gear] ?? 1}',
+                                      '   Qty: ${selectedGearQuantities[gear] ?? 1}',
                                       style: TextStyle(
                                         fontSize: AppData.text16,
                                         color: AppColors.textColorPrimary,
@@ -661,7 +661,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
         backgroundColor: AppColors.appBarColor,
         title: Text(
           'Add Load Preference',
-          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         bottom: TabBar(
           unselectedLabelColor: AppColors.tabIconColor,

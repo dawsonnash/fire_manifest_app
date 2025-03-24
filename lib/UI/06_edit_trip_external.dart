@@ -498,7 +498,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                         child: Text(
                                                                             '${index + 1}',
                                                                             style:
-                                                                                TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16)),
+                                                                                TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18)),
                                                                       );
                                                                     },
                                                                   ),
@@ -556,7 +556,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                       children: [
                                                         if (gear.quantity > 1)
                                                           Text(
-                                                            'Qty: ${selectedGearQuantities[gear] ?? 1}',
+                                                            '   Qty: ${selectedGearQuantities[gear] ?? 1}',
                                                             style: TextStyle(
                                                                 fontSize:
                                                                     AppData
@@ -738,6 +738,9 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                             color: AppColors
                                                 .textColorPrimary, fontSize: AppData.text16), // Label color
                                       ),
+                                      inputFormatters: [
+                                        LengthLimitingTextInputFormatter(20),
+                                      ],
                                       textCapitalization:
                                           TextCapitalization.words,
                                       focusNode: customItemNameFocus,
@@ -1065,14 +1068,14 @@ class _EditTripExternalState extends State<EditTripExternal> {
             Text(
               widget.trip.tripName,
               style: TextStyle(
-                  fontSize: AppData.text24,
+                  fontSize: AppData.appBarText,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textColorPrimary),
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lb',
               style: TextStyle(
-                  fontSize: AppData.text18,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textColorPrimary),
             ),
@@ -1242,7 +1245,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                       child: Text("Delete",
                                           style: TextStyle(
                                               color: Colors.red,
-                                              fontWeight: FontWeight.bold)),
+                                              fontWeight: FontWeight.bold, fontSize: AppData.bottomDialogTextSize)),
                                     ),
                                   ],
                                 );
@@ -1557,7 +1560,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                             color: Colors.red,
                                                             fontWeight:
                                                                 FontWeight
-                                                                    .bold),
+                                                                    .bold, fontSize: AppData.bottomDialogTextSize),
                                                       ),
                                                     ),
                                                   ],

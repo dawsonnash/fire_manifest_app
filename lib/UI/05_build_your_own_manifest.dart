@@ -350,7 +350,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                     // Use the full quantity for selection
                                                                     (int index) {
                                                                       return Center(
-                                                                        child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                        child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18)),
                                                                       );
                                                                     },
                                                                   ),
@@ -384,7 +384,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                       children: [
                                                         if (gear.quantity > 1)
                                                           Text(
-                                                            'Qty: ${selectedGearQuantities[gear] ?? 1}',
+                                                            '   Qty: ${selectedGearQuantities[gear] ?? 1}',
                                                             style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorSecondary),
                                                           ),
                                                         if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
@@ -528,6 +528,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                         labelText: ' Item Name',
                                         labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16), // Label color
                                       ),
+                                      inputFormatters: [
+                                        LengthLimitingTextInputFormatter(20),
+                                      ],
                                       textCapitalization: TextCapitalization.words,
                                       focusNode: customItemNameFocus,
                                       // Attach focus node
@@ -844,11 +847,11 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
           children: [
             Text(
               widget.trip.tripName,
-              style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lb',
-              style: TextStyle(fontSize: AppData.text18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
           ],
         ),
@@ -990,7 +993,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                       onPressed: () {
                                         Navigator.of(context).pop(true); // Confirm deletion
                                       },
-                                      child: Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                                      child: Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: AppData.bottomDialogTextSize)),
                                     ),
                                   ],
                                 );

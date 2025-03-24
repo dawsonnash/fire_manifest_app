@@ -102,6 +102,7 @@ void main() async {
   AppData.crewName = await ThemePreferences.getCrewName(); // Initialize AppData.crewName
   AppData.userName = await ThemePreferences.getUserName();
   AppData.safetyBuffer = await ThemePreferences.getSafetyBuffer();
+  AppData.textScale = await ThemePreferences.getTextScale();
 
   // start app
   runApp(MyApp(showDisclaimer: !agreedToTerms, initialJsonFilePath: initialJsonFilePath));
@@ -159,11 +160,13 @@ class _MyHomePageState extends State<MyHomePage> {
       crewName: AppData.crewName,
       userName: AppData.userName,
       safetyBuffer: AppData.safetyBuffer,
+      textScale: AppData.textScale,
       onThemeChanged: _toggleTheme,
       onBackgroundImageChange: _toggleBackgroundImage,
       onCrewNameChanged: _changeCrewName,
       onUserNameChanged: _changeUserName,
       onSafetyBufferChange: _changeSafetyBuffer,
+      onTextScaleChange: _changeTextScale,
     ),
   ];
 
@@ -714,6 +717,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     await ThemePreferences.setSafetyBuffer(safetyBuffer);
   }
+  void _changeTextScale(double textScale) async {
+    setState(() {
+      AppData.textScale = textScale;
+    });
+    await ThemePreferences.setTextScale(textScale);
+  }
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -790,7 +799,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Center(
-          child:  Text('Terms and Conditions', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary)),
+          child:  Text('Terms and Conditions', style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary)),
         ),
         backgroundColor: AppColors.appBarColor,
       ),

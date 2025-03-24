@@ -335,7 +335,7 @@ class _EditTripState extends State<EditTrip> {
                                                               backgroundColor: AppColors.textFieldColor2,
                                                               title: Text(
                                                                 'Select Quantity for ${gear.name}',
-                                                                style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.miniDialogTitleTextSize, ),
+                                                                style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.text18, ),
                                                               ),
                                                               content: SizedBox(
                                                                 height: 150,
@@ -354,7 +354,7 @@ class _EditTripState extends State<EditTrip> {
                                                                     // Use the full quantity for selection
                                                                     (int index) {
                                                                       return Center(
-                                                                        child: Text('${index + 1}', style: TextStyle( fontSize: AppData.text14, color: AppColors.textColorPrimary)),
+                                                                        child: Text('${index + 1}', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary)),
                                                                       );
                                                                     },
                                                                   ),
@@ -388,7 +388,7 @@ class _EditTripState extends State<EditTrip> {
                                                       children: [
                                                         if (gear.quantity > 1)
                                                           Text(
-                                                            'Qty: ${selectedGearQuantities[gear] ?? 1}',
+                                                            '   Qty: ${selectedGearQuantities[gear] ?? 1}',
                                                             style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorSecondary),
                                                           ),
                                                         if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
@@ -532,6 +532,9 @@ class _EditTripState extends State<EditTrip> {
                                         labelText: ' Item Name',
                                         labelStyle: TextStyle( fontSize: AppData.text16, color: AppColors.textColorPrimary), // Label color
                                       ),
+                                      inputFormatters: [
+                                        LengthLimitingTextInputFormatter(15),
+                                      ],
                                       textCapitalization: TextCapitalization.words,
                                       focusNode: customItemNameFocus,
                                       // Attach focus node
@@ -876,11 +879,11 @@ class _EditTripState extends State<EditTrip> {
           children: [
             Text(
               widget.trip.tripName,
-              style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lb',
-              style: TextStyle(fontSize: AppData.text18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
           ],
         ),
@@ -1022,7 +1025,7 @@ class _EditTripState extends State<EditTrip> {
                                       onPressed: () {
                                         Navigator.of(context).pop(true); // Confirm deletion
                                       },
-                                      child: Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                                      child: Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: AppData.bottomDialogTextSize)),
                                     ),
                                   ],
                                 );

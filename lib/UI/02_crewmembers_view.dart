@@ -148,7 +148,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
               ),
         title: Text(
           isSelectionMode ? "Delete Crew Members" : "Crew Members",
-          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
           if (isSelectionMode)

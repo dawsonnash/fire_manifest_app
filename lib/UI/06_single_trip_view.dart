@@ -235,7 +235,7 @@ class _SingleTripViewState extends State<SingleTripView> {
         ),
         title: Text(
           widget.trip.tripName,
-          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
           overflow: TextOverflow.ellipsis, // Add this
           maxLines: 1,
         ),

@@ -23,7 +23,7 @@ KeyboardActionsConfig keyboardActionsConfig({
                   style: TextStyle(
                     color: const Color(0xFF0978ED),
                     fontWeight: FontWeight.bold,
-                    fontSize: AppData.text16
+                    fontSize: 16
                   ),
                 ),
               ),

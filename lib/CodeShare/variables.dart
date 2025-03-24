@@ -39,6 +39,7 @@ class AppData {
   static String crewName = '';
   static String userName = '';
   static int safetyBuffer = 0;
+  static double textScale = 1;
 
 
   // Standardized Spacing & Max Constraints to be phased out
@@ -81,9 +82,14 @@ class AppData {
   static double get _scalingFactorSizedBox => (screenWidth / 400).clamp(0.9, 2);
   static double get _heightScalingFactor => (screenHeight / 800).clamp(0.9, 1.5);
   static double get _textScalingFactor => (screenWidth / 400).clamp(0.95, 1.75); // Normalized to 400 dp width
-  static double get _userScalingFactor => 1.3; // Normalized to 400 dp width
   static double get _textOrientationFactor => isLandscape ? 0.9 : 1.0;
   static double get checkboxScalingFactor => (screenWidth / 400).clamp(0.9, 1.2);
+
+  // **User Text Scaling**
+  static double get _userScalingFactor => AppData.textScale; // Normalized to 400 dp width
+  static double get minTextFactor => 0.8; // Normalized to 400 dp width
+  static double get maxTextFactor => 1.7; // Normalized to 400 dp width
+
 
   // **Dynamic Widths (Orientation+ScreenSize-Dependent)**
   static double get inputFieldWidth => isLandscape ? (screenWidth * 0.50) : (double.infinity);
@@ -132,6 +138,7 @@ class AppData {
   static double get text32 => 32 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get text36 => 36 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get text48 => 48 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get appBarText => 24;
   static double get tabBarTextSize => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get tabBarIconSize => 24 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get bottomDialogTextSize => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
@@ -150,6 +157,7 @@ class ThemePreferences {
   static const _crewNameKey = 'crewName';
   static const _userNameKey = 'userName';
   static const _safetyBufferKey = 'safetyBuffer';
+  static const _textScaleKey = 'textScale';
 
   static Future<bool> getTheme() async {
     final prefs = await SharedPreferences.getInstance();
@@ -199,6 +207,15 @@ class ThemePreferences {
   static Future<void> setSafetyBuffer(int safetyBuffer) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_safetyBufferKey, safetyBuffer);
+  }
+  static Future<double> getTextScale() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getDouble(_textScaleKey) ?? 1;
+  }
+
+  static Future<void> setTextScale(double textScale) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_textScaleKey, textScale);
   }
 }
 

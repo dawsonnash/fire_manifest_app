@@ -388,7 +388,7 @@ class _AddGearState extends State<AddGear> {
           backgroundColor: AppColors.appBarColor,
           title: Text(
             'Add Gear',
-            style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+            style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
           ),
           bottom: TabBar(
             labelColor: AppColors.primaryColor,

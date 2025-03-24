@@ -179,7 +179,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
           onDoubleTap: _editTitle,
           child: Text(
             widget.tripPreference.tripPreferenceName,
-            style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+            style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
           ),
         ),
         actions: [
@@ -263,7 +263,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                                             color: AppColors.textColorPrimary,
                                           ),
                                           overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
+                                          maxLines: 2,
                                         ),
                                       ),
                                     ],

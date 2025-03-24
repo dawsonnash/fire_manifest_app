@@ -141,7 +141,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
         shadowColor: Colors.black,
         side: const BorderSide(color: Colors.black, width: 2),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        fixedSize: Size(min(MediaQuery.of(context).size.width / 2, AppData.buttonMax), MediaQuery.of(context).size.height / 10));
+);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -585,67 +585,76 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.only(top: 20.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: _decrementSlider,
-                                          style: ElevatedButton.styleFrom(
-                                            foregroundColor: Colors.black,
-                                            backgroundColor: AppColors.fireColor,
-                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                            elevation: 15,
-                                            shadowColor: Colors.black,
-                                            side: const BorderSide(color: Colors.black, width: 2),
-                                            shape: CircleBorder(),
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          // Minus Button
+                                          ElevatedButton(
+                                            onPressed: _decrementSlider,
+                                            style: ElevatedButton.styleFrom(
+                                              foregroundColor: Colors.black,
+                                              backgroundColor: AppColors.fireColor,
+                                              padding: EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
+                                              elevation: 15,
+                                              shadowColor: Colors.black,
+                                              side: BorderSide(color: Colors.black, width: 2),
+                                              shape: CircleBorder(),
+                                            ),
+                                            child: Icon(Icons.remove, color: Colors.black, size: AppData.text32),
                                           ),
-                                          child: Icon(Icons.remove, color: Colors.black, size: AppData.text32),
-                                        ),
-                                        const Spacer(),
-                                        Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            // Slider value
-                                            Visibility(
-                                              visible: lastInputFromSlider,
-                                              child: Text(
-                                                '${_sliderValue.toStringAsFixed(0)} lb',
-                                                style: TextStyle(
-                                                  fontSize: AppData.text32,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.textColorPrimary,
+
+                                          const SizedBox(width: 20), // Spacer is too greedy for a FittedBox
+
+                                          Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              // Slider value
+                                              Visibility(
+                                                visible: lastInputFromSlider,
+                                                child: Text(
+                                                  '${_sliderValue.toStringAsFixed(0)} lb',
+                                                  style: TextStyle(
+                                                    fontSize: AppData.text32,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: AppColors.textColorPrimary,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            // Keyboard input value
-                                            Visibility(
-                                              visible: !lastInputFromSlider,
-                                              child: Text(
-                                                '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lb',
-                                                style: TextStyle(
-                                                  fontSize: AppData.text32,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.textColorPrimary,
+                                              // Keyboard input value
+                                              Visibility(
+                                                visible: !lastInputFromSlider,
+                                                child: Text(
+                                                  '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lb',
+                                                  style: TextStyle(
+                                                    fontSize: AppData.text32,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: AppColors.textColorPrimary,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        const Spacer(),
-                                        ElevatedButton(
-                                          onPressed: _incrementSlider,
-                                          style: ElevatedButton.styleFrom(
-                                            foregroundColor: Colors.black,
-                                            backgroundColor: AppColors.fireColor,
-                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                            elevation: 15,
-                                            shadowColor: Colors.black,
-                                            side: const BorderSide(color: Colors.black, width: 2),
-                                            shape: CircleBorder(),
+                                            ],
                                           ),
-                                          child: Icon(Icons.add, color: Colors.black, size: AppData.text32),
-                                        ),
-                                      ],
+
+                                          const SizedBox(width: 20),
+
+                                          // Add Button
+                                          ElevatedButton(
+                                            onPressed: _incrementSlider,
+                                            style: ElevatedButton.styleFrom(
+                                              foregroundColor: Colors.black,
+                                              backgroundColor: AppColors.fireColor,
+                                              padding: EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
+                                              elevation: 15,
+                                              shadowColor: Colors.black,
+                                              side: BorderSide(color: Colors.black, width: 2),
+                                              shape: CircleBorder(),
+                                            ),
+                                            child: Icon(Icons.add, color: Colors.black, size: AppData.text32),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                   Slider(
@@ -797,7 +806,10 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                 }
                               : null,
                           style: style,
-                          child: const Text('Build'),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            child: const Text('Build'),
+                          ),
                         ),
                       ),
                     ],

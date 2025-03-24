@@ -237,7 +237,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
         backgroundColor: AppColors.appBarColor,
         title: Text(
           'Add Crew Member',
-          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
       ),
       body: GestureDetector(

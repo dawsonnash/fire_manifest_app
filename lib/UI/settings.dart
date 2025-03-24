@@ -35,9 +35,11 @@ class SettingsView extends StatefulWidget {
   final String crewName;
   final String userName;
   final int safetyBuffer;
+  final double textScale;
   final Function(String) onCrewNameChanged;
   final Function(String) onUserNameChanged;
   final Function(int) onSafetyBufferChange;
+  final Function(double) onTextScaleChange;
 
   const SettingsView({
     super.key,
@@ -48,9 +50,12 @@ class SettingsView extends StatefulWidget {
     required this.crewName,
     required this.userName,
     required this.safetyBuffer,
+    required this.textScale,
     required this.onCrewNameChanged,
     required this.onUserNameChanged,
     required this.onSafetyBufferChange,
+    required this.onTextScaleChange,
+
   });
 
   @override
@@ -60,6 +65,7 @@ class SettingsView extends StatefulWidget {
 class _SettingsState extends State<SettingsView> {
   late bool isDarkMode;
   late bool enableBackgroundImage;
+  late double textScale;
   late TextEditingController crewNameController;
   late TextEditingController userNameController;
   late TextEditingController safetyBufferController;
@@ -79,6 +85,7 @@ class _SettingsState extends State<SettingsView> {
     crewNameController = TextEditingController(text: widget.crewName); // Initialize with the current crew name
     userNameController = TextEditingController(text: widget.userName); // Initialize with the current user name
     safetyBufferController = TextEditingController(text: widget.safetyBuffer.toString());
+    textScale = widget.textScale;
 
     _loadLoadoutNames().then((_) {
       if (selectedLoadout != null) {
@@ -1362,7 +1369,7 @@ class _SettingsState extends State<SettingsView> {
         title: Center(
           child: Text(
             'Settings',
-            style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+            style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
           ),
         ),
         backgroundColor: AppColors.appBarColor,
@@ -1526,6 +1533,35 @@ class _SettingsState extends State<SettingsView> {
                                 activeColor: Colors.green,
                                 inactiveThumbColor: Colors.grey,
                                 inactiveTrackColor: Colors.white24,
+                              ),
+                            ),
+                            // 🔠 Text Scale Slider
+                            ListTile(
+                              title: Text(
+                                'Text Size',
+                                style: TextStyle(fontSize: AppData.text18, color: Colors.white),
+                              ),
+                              subtitle: Row(
+                                children: [
+                                  Text('Aa', style: TextStyle(fontSize: 14.8, color: Colors.white70)),
+                                  Expanded(
+                                    child: Slider(
+                                      value: widget.textScale,
+                                      onChanged: (value) {
+                                        setState(() {
+                                            widget.onTextScaleChange(value);
+                                            ThemePreferences.setTextScale(value);
+                                        });
+                                      },
+                                      min: AppData.minTextFactor,
+                                      max: AppData.maxTextFactor,
+                                      divisions: 3, // 4 options total
+                                      activeColor: AppColors.fireColor,
+                                      inactiveColor: Colors.white30,
+                                    ),
+                                  ),
+                                  Text('Aa', style: TextStyle(fontSize: 23.4, color: Colors.white)),
+                                ],
                               ),
                             ),
                           ],
@@ -2353,39 +2389,41 @@ class _SettingsState extends State<SettingsView> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    if (isOutOfSync) {
-                                      _showSyncDifferencesDialog();
-                                    }
-                                  },
-                                  child: Expanded(
+                                Flexible(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      if (isOutOfSync) {
+                                        _showSyncDifferencesDialog();
+                                      }
+                                    },
                                     child: FittedBox(
                                       fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
                                       child: Row(
                                         children: [
                                           Icon(
-                                            !isOutOfSync ? Icons.check : Icons.sync_disabled_outlined, // Info icon
+                                            !isOutOfSync ? Icons.check : Icons.sync_disabled_outlined,
                                             color: !isOutOfSync ? Colors.green : Colors.red,
-                                            size: AppData.text22, // Adjust size if needed
+                                            size: AppData.text22,
                                           ),
                                           Text(
                                             ' Last Updated: $lastSavedTimestamp ',
                                             style: TextStyle(
                                               fontSize: AppData.text14,
-                                              color: isOutOfSync ? Colors.red : Colors.green.withValues(alpha: 0.8),
+                                              color: isOutOfSync ? Colors.red : Colors.green.withOpacity(0.8),
                                               fontWeight: isOutOfSync ? FontWeight.bold : FontWeight.normal,
                                             ),
                                           ),
                                           if (isOutOfSync)
                                             Icon(
-                                              Icons.info_outline, // Info icon
+                                              Icons.info_outline,
                                               color: Colors.red,
-                                              size: AppData.text22, // Adjust size if needed
+                                              size: AppData.text22,
                                             ),
                                         ],
                                       ),
-                                    ),
+                                    )
+                                  
                                   ),
                                 ),
                               ],

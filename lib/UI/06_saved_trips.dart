@@ -72,7 +72,7 @@ class _SavedTripsState extends State<SavedTripsView> {
         // Centers the title
         title: Text(
           'Saved Trips',
-          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
           IconButton(
@@ -217,6 +217,8 @@ class _SavedTripsState extends State<SavedTripsView> {
                             ),
                           ],
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
               ),
             ),

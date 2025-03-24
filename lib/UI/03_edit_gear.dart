@@ -388,7 +388,7 @@ class _EditGearState extends State<EditGear> {
         backgroundColor: AppColors.appBarColor,
         title: Text(
           'Edit Gear',
-          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
           IconButton(

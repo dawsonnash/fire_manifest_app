@@ -396,7 +396,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                     // Use the full quantity for selection
                                                                     (int index) {
                                                                       return Center(
-                                                                        child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                        child: Text('${index + 1}', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary)),
                                                                       );
                                                                     },
                                                                   ),
@@ -431,7 +431,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                       children: [
                                                         if (gear.quantity > 1)
                                                           Text(
-                                                            'Qty: ${selectedGearQuantities[gear] ?? 1}',
+                                                            '   Qty: ${selectedGearQuantities[gear] ?? 1}',
                                                             style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorSecondary),
                                                           ),
                                                         if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
@@ -580,6 +580,9 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                         labelText: ' Item Name',
                                         labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16), // Label color
                                       ),
+                                      inputFormatters: [
+                                        LengthLimitingTextInputFormatter(20),
+                                      ],
                                       textCapitalization: TextCapitalization.words,
                                       focusNode: customItemNameFocus,
                                       // Attach focus node
@@ -835,7 +838,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
           children: [
             Text(
               widget.trip.tripName,
-              style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lb',
@@ -987,7 +990,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                       onPressed: () {
                                         Navigator.of(context).pop(true); // Confirm deletion
                                       },
-                                      child: Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                                      child: Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: AppData.bottomDialogTextSize)),
                                     ),
                                   ],
                                 );
@@ -1220,7 +1223,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                       },
                                                       child: Text(
                                                         "Delete",
-                                                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: AppData.bottomDialogTextSize),
                                                       ),
                                                     ),
                                                   ],

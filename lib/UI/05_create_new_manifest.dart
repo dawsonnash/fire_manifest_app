@@ -488,7 +488,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                   children: [
                                                     if (gear.quantity > 1)
                                                       Text(
-                                                        'Qty: ${selectedGearQuantitiesExternal[gear] ?? 1}',
+                                                        '   Qty: ${selectedGearQuantitiesExternal[gear] ?? 1}',
                                                         style: TextStyle(
                                                           fontSize: AppData.text14,
                                                           color: Colors.black,
@@ -922,7 +922,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                                     // Use the full quantity for selection
                                                                     (int index) {
                                                                       return Center(
-                                                                        child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.cupertinoPickerItemSize)),
+                                                                        child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18)),
                                                                       );
                                                                     },
                                                                   ),
@@ -957,7 +957,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                       children: [
                                                         if (gear.quantity > 1)
                                                           Text(
-                                                            'Qty: ${selectedGearQuantities[gear] ?? 1}',
+                                                            '   Qty: ${selectedGearQuantities[gear] ?? 1}',
                                                             style: TextStyle(
                                                               fontSize: AppData.text14,
                                                               color: Colors.black,
@@ -1363,17 +1363,21 @@ class _QuickManifestState extends State<QuickManifest> {
                         children: [
                           Expanded(
                             flex: 2,
-                            child: Row(
-                              children: [
-                                Text(
-                                  "Cargo Net",
-                                  style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary),
-                                ),
-                                Text(
-                                  " (12'x12')",
-                                  style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary.withValues(alpha: 0.9)),
-                                ),
-                              ],
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "Cargo Net",
+                                    style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary),
+                                  ),
+                                  Text(
+                                    " (12'x12') ",
+                                    style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary.withValues(alpha: 0.9)),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           Expanded(
@@ -1390,7 +1394,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                 11,
                                 (index) => DropdownMenuItem<int>(
                                   value: index,
-                                  child: Text(index.toString(), style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary)),
+                                  child: Text(index.toString(), style: TextStyle(fontSize: AppData.text16, height: 0.5, color: AppColors.textColorPrimary)),
                                 ),
                               ),
                               onChanged: (int? newValue) {
@@ -1566,17 +1570,21 @@ class _QuickManifestState extends State<QuickManifest> {
                         children: [
                           Expanded(
                             flex: 2,
-                            child: Row(
-                              children: [
-                                Text(
-                                  "Cargo Net",
-                                  style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary),
-                                ),
-                                Text(
-                                  " (20'x20')",
-                                  style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary.withValues(alpha: 0.9)),
-                                ),
-                              ],
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "Cargo Net",
+                                    style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary),
+                                  ),
+                                  Text(
+                                    " (20'x20') ",
+                                    style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary.withValues(alpha: 0.9)),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           Expanded(
@@ -1587,13 +1595,13 @@ class _QuickManifestState extends State<QuickManifest> {
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.borderPrimary)),
                                 focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor, width: 2.0)),
-                                contentPadding: EdgeInsets.all(4),
+                                contentPadding: EdgeInsets.all(6),
                               ),
                               items: List.generate(
                                 11,
                                 (index) => DropdownMenuItem<int>(
                                   value: index,
-                                  child: Text(index.toString(), style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary)),
+                                  child: Text(index.toString(), style: TextStyle(fontSize: AppData.text16, height: .5, color: AppColors.textColorPrimary)),
                                 ),
                               ),
                               onChanged: (int? newValue) {
@@ -1795,7 +1803,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                   value: leadLineValue,
                                   child: Text(
                                     leadLineValue.toString(),
-                                    style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                    style: TextStyle(fontSize: AppData.text16, height: 0.5, color: AppColors.textColorPrimary),
                                   ),
                                 ),
                               ],
@@ -1922,7 +1930,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                   value: index + minimumSwivels, // Start from minimumSwivels
                                   child: Text(
                                     (index + minimumSwivels).toString(),
-                                    style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                    style: TextStyle(fontSize: AppData.text16, height: 0.5, color: AppColors.textColorPrimary),
                                   ),
                                 ),
                               ),
@@ -2283,10 +2291,6 @@ class _QuickManifestState extends State<QuickManifest> {
       Gear? heaviestGearItem;
       num maxGearWeight = 0;
 
-      heaviestGearItem = gearListExternal.reduce((a, b) => a.weight > b.weight ? a : b);
-      maxGearWeight = heaviestGearItem.weight;
-      num remainingWeight = allowable - safetyBuffer;
-
       if (gearListExternal.isEmpty) {
         showDialog(
           context: context,
@@ -2315,6 +2319,7 @@ class _QuickManifestState extends State<QuickManifest> {
         );
         return;
       }
+
       if (newTrip.gear.isEmpty) {
         showDialog(
           context: context,
@@ -2372,6 +2377,10 @@ class _QuickManifestState extends State<QuickManifest> {
         );
         return;
       }
+
+      heaviestGearItem = gearListExternal.reduce((a, b) => a.weight > b.weight ? a : b);
+      maxGearWeight = heaviestGearItem.weight;
+      num remainingWeight = allowable - safetyBuffer;
 
       if (remainingWeight < maxGearWeight) {
         showDialog(
@@ -2536,7 +2545,6 @@ class _QuickManifestState extends State<QuickManifest> {
                               isExternalManifest ? "External" : "Internal",
                               style: TextStyle(
                                 fontSize: AppData.text18,
-                                fontWeight: FontWeight.bold,
                                 color: AppColors.textColorPrimary,
                               ),
                             ),
@@ -3107,60 +3115,78 @@ class _QuickManifestState extends State<QuickManifest> {
                                 children: [
                                   Padding(
                                     padding: EdgeInsets.only(top: AppData.padding20),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: _decrementSlider,
-                                          style: ElevatedButton.styleFrom(
-                                            foregroundColor: Colors.black,
-                                            backgroundColor: AppColors.fireColor,
-                                            padding: EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
-                                            elevation: 15,
-                                            shadowColor: Colors.black,
-                                            side: BorderSide(color: Colors.black, width: 2),
-                                            shape: CircleBorder(),
-                                          ),
-                                          child: Icon(Icons.remove, color: Colors.black, size: AppData.text32),
-                                        ),
-                                        const Spacer(),
-                                        Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            // Slider value
-                                            Visibility(
-                                              visible: lastInputFromSlider,
-                                              child: Text(
-                                                '${_sliderValue.toStringAsFixed(0)} lb',
-                                                style: TextStyle(fontSize: AppData.text32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                              ),
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          // Minus Button
+                                          ElevatedButton(
+                                            onPressed: _decrementSlider,
+                                            style: ElevatedButton.styleFrom(
+                                              foregroundColor: Colors.black,
+                                              backgroundColor: AppColors.fireColor,
+                                              padding: EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
+                                              elevation: 15,
+                                              shadowColor: Colors.black,
+                                              side: BorderSide(color: Colors.black, width: 2),
+                                              shape: CircleBorder(),
                                             ),
-                                            // Keyboard input value
-                                            Visibility(
-                                              visible: !lastInputFromSlider,
-                                              child: Text(
-                                                '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lb',
-                                                style: TextStyle(fontSize: AppData.text32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const Spacer(),
-                                        ElevatedButton(
-                                          onPressed: _incrementSlider,
-                                          style: ElevatedButton.styleFrom(
-                                            foregroundColor: Colors.black,
-                                            backgroundColor: AppColors.fireColor,
-                                            padding: EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
-                                            elevation: 15,
-                                            shadowColor: Colors.black,
-                                            side: const BorderSide(color: Colors.black, width: 2),
-                                            shape: CircleBorder(),
+                                            child: Icon(Icons.remove, color: Colors.black, size: AppData.text32),
                                           ),
-                                          child: Icon(Icons.add, color: Colors.black, size: AppData.text32),
-                                        ),
-                                      ],
+
+                                          const SizedBox(width: 20), // Spacer is too greedy for a FittedBox
+
+                                          Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              // Slider value
+                                              Visibility(
+                                                visible: lastInputFromSlider,
+                                                child: Text(
+                                                  '${_sliderValue.toStringAsFixed(0)} lb',
+                                                  style: TextStyle(
+                                                    fontSize: AppData.text32,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: AppColors.textColorPrimary,
+                                                  ),
+                                                ),
+                                              ),
+                                              // Keyboard input value
+                                              Visibility(
+                                                visible: !lastInputFromSlider,
+                                                child: Text(
+                                                  '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lb',
+                                                  style: TextStyle(
+                                                    fontSize: AppData.text32,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: AppColors.textColorPrimary,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+
+                                          const SizedBox(width: 20),
+
+                                          // Add Button
+                                          ElevatedButton(
+                                            onPressed: _incrementSlider,
+                                            style: ElevatedButton.styleFrom(
+                                              foregroundColor: Colors.black,
+                                              backgroundColor: AppColors.fireColor,
+                                              padding: EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
+                                              elevation: 15,
+                                              shadowColor: Colors.black,
+                                              side: BorderSide(color: Colors.black, width: 2),
+                                              shape: CircleBorder(),
+                                            ),
+                                            child: Icon(Icons.add, color: Colors.black, size: AppData.text32),
+                                          ),
+                                        ],
+                                      ),
                                     ),
+
                                   ),
                                   Slider(
                                     value: _sliderValue,
@@ -3213,9 +3239,11 @@ class _QuickManifestState extends State<QuickManifest> {
                             shadowColor: Colors.black,
                             side: const BorderSide(color: Colors.black, width: 2),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            fixedSize: Size(AppData.buttonWidth, AppData.buttonHeight),
                           ),
-                          child: const Text('Calculate'),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                            child: const Text('Calculate'),
+                          ),
                         ),
                       ),
                     ],

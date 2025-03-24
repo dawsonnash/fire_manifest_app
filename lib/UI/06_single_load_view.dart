@@ -890,11 +890,11 @@ class _SingleLoadViewState extends State<SingleLoadView> {
           children: [
             Text(
               'Load ${widget.load.loadNumber}',
-              style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
               ' • ${widget.load.weight} lb',
-              style: TextStyle(fontSize: AppData.text20, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary),
             ),
           ],
         ),
@@ -1051,37 +1051,42 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                     title: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Sling #${sling.slingNumber}',
-                                              style: TextStyle(
-                                                fontSize: AppData.text22,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.textColorPrimary,
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Sling #${sling.slingNumber}',
+                                                style: TextStyle(
+                                                  fontSize: AppData.text22,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.textColorPrimary,
+                                                ),
                                               ),
-                                            ),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  'Weight: ${sling.weight} lb',
-                                                  style: TextStyle(
-                                                    fontSize: AppData.text18,
-                                                    color: AppColors.textColorPrimary,
-                                                  ),
+                                              FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: Row(
+                                                  children: [
+                                                    Text(
+                                                      'Weight: ${sling.weight} lb',
+                                                      style: TextStyle(
+                                                        fontSize: AppData.text18,
+                                                        color: AppColors.textColorPrimary,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      ' • ${sling.loadGear.fold(0, (sum, gear) => sum + gear.quantity)} items',
+                                                      style: TextStyle(
+                                                        fontSize: AppData.text18,
+                                                        fontWeight: FontWeight.normal,
+                                                        color: AppColors.textColorPrimary,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                                Text(
-                                                  ' • ${sling.loadGear.fold(0, (sum, gear) => sum + gear.quantity)} items',
-                                                  style: TextStyle(
-                                                    fontSize: AppData.text18,
-                                                    fontWeight: FontWeight.normal,
-                                                    color: AppColors.textColorPrimary,
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          ],
+                                              )
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -1100,6 +1105,8 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                 leading: Icon(Icons.link),
                                                 title: Text(
                                                   accoutrement.name,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  maxLines: 2,
                                                   style: TextStyle(fontSize: AppData.text20, color: Colors.black, fontWeight: FontWeight.bold),
                                                 ),
                                                 subtitle: Text(
@@ -1126,32 +1133,37 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                 title: Row(
                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
-                                                    Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        Row(
-                                                          children: [
-                                                            Text(
-                                                              '${gearItem.name} ',
-                                                              style: TextStyle(fontSize: AppData.text20, color: Colors.black, fontWeight: FontWeight.bold),
-                                                            ),
-                                                            if (gearItem.isHazmat)
-                                                              Icon(
-                                                                FontAwesomeIcons.triangleExclamation, // Hazard icon
-                                                                color: Colors.red,
-                                                                size: AppData.text18,
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              Flexible(
+                                                                child: Text(
+                                                                  '${gearItem.name} ',
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                  style: TextStyle(fontSize: AppData.text20, color: Colors.black, fontWeight: FontWeight.bold),
+                                                                ),
                                                               ),
-                                                            Text(
-                                                              ' (x${gearItem.quantity})',
-                                                              style: TextStyle(fontSize: AppData.text18),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Text(
-                                                          'Weight: ${gearItem.totalGearWeight} lb',
-                                                          style: TextStyle(fontSize: AppData.text18),
-                                                        ),
-                                                      ],
+                                                              if (gearItem.isHazmat)
+                                                                Icon(
+                                                                  FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                                  color: Colors.red,
+                                                                  size: AppData.text18,
+                                                                ),
+                                                              Text(
+                                                                ' (x${gearItem.quantity})',
+                                                                style: TextStyle(fontSize: AppData.text18),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Text(
+                                                            'Weight: ${gearItem.totalGearWeight} lb',
+                                                            style: TextStyle(fontSize: AppData.text18),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -1167,17 +1179,35 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                           children: sling.customItems.map((customItem) {
                                             return Container(
                                               decoration: BoxDecoration(
-                                                color: Colors.white,
+                                                color: AppColors.gearYellow,
                                                 border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
                                               ),
                                               child: ListTile(
+                                                iconColor: Colors.black,
                                                 leading: Icon(Icons.inventory_2_outlined),
-                                                title: Text(
-                                                  customItem.name,
-                                                  style: TextStyle(fontSize: AppData.text20, fontWeight: FontWeight.bold),
+                                                title: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      customItem.name,
+                                                      overflow: TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                      style: TextStyle(
+                                                        fontSize: AppData.text22,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'Weight: ${customItem.weight} lb',
+                                                      style: TextStyle(
+                                                        fontSize: AppData.text18,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                                subtitle: Text('Weight: ${customItem.weight} lb'),
                                               ),
+
                                             );
                                           }).toList(),
                                         ),
@@ -1278,32 +1308,38 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                       title: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    '${gearItem.name} ',
-                                                    style: TextStyle(fontSize: AppData.text22, fontWeight: FontWeight.bold, color: Colors.black),
-                                                  ),
-                                                  if (gearItem.isHazmat)
-                                                    Icon(
-                                                      FontAwesomeIcons.triangleExclamation, // Hazard icon
-                                                      color: Colors.red, // Red color for hazard
-                                                      size: AppData.text18, // Icon size
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Flexible(
+                                                      child: Text(
+                                                        '${gearItem.name} ',
+                                                        overflow: TextOverflow.ellipsis,
+                                                        maxLines: 1,
+                                                        style: TextStyle(fontSize: AppData.text22, fontWeight: FontWeight.bold, color: Colors.black),
+                                                      ),
                                                     ),
-                                                  Text(
-                                                    ' (x${gearItem.quantity})',
-                                                    style: TextStyle(fontSize: AppData.text18, color: Colors.black),
-                                                  ),
-                                                ],
-                                              ),
-                                              Text(
-                                                'Weight: ${gearItem.totalGearWeight} lb',
-                                                style: TextStyle(fontSize: AppData.text18, color: Colors.black),
-                                              ),
-                                            ],
+                                                    if (gearItem.isHazmat)
+                                                      Icon(
+                                                        FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                        color: Colors.red, // Red color for hazard
+                                                        size: AppData.text18, // Icon size
+                                                      ),
+                                                    Text(
+                                                      ' (x${gearItem.quantity})',
+                                                      style: TextStyle(fontSize: AppData.text18, color: Colors.black),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Text(
+                                                  'Weight: ${gearItem.totalGearWeight} lb',
+                                                  style: TextStyle(fontSize: AppData.text18, color: Colors.black),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -1317,39 +1353,33 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                 final customItem = widget.load.customItems[customItemIndex];
                                 return Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.white, // Background color
+                                    color: AppColors.gearYellow, // Background color
                                     border: Border(bottom: BorderSide(color: Colors.black, width: 1)), // Add a border
                                   ),
                                   child: ListTile(
                                     iconColor: Colors.black,
-                                    title: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    leading: Icon(Icons.inventory_2_outlined),
+                                    title: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  customItem.name,
-                                                  style:   TextStyle(
-                                                    fontSize: AppData.text22,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Text(
-                                              'Weight: ${customItem.weight} lb',
-                                              style: TextStyle(
-                                                fontSize: AppData.text18,
-                                              ),
-                                            ),
-                                          ],
+                                        Text(
+                                          customItem.name,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            fontSize: AppData.text22,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Weight: ${customItem.weight} lb',
+                                          style: TextStyle(
+                                            fontSize: AppData.text18,
+                                          ),
                                         ),
                                       ],
                                     ),
-                                    leading: Icon(Icons.inventory_2_outlined),
                                   ),
                                 );
                               }

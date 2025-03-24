@@ -186,7 +186,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
         ),
         title: Text(
           tripPreference.tripPreferenceName,
-          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
           IconButton(
@@ -274,7 +274,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                                             color: AppColors.textColorPrimary,
                                           ),
                                           overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
+                                          maxLines: 2,
                                         ),
                                       ),
                                     ],

@@ -81,7 +81,7 @@ class _TripPreferencesState extends State<TripPreferences> {
         backgroundColor: AppColors.appBarColor,
         title: Text(
           'Trip Preferences',
-          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
       ),
       body: Stack(
@@ -153,7 +153,7 @@ class _TripPreferencesState extends State<TripPreferences> {
                                             color: AppColors.textColorPrimary,
                                           ),
                                           overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
+                                          maxLines: 2,
                                         ),
                                       ),
                                     ],

@@ -310,7 +310,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
         ),
         title: Text(
           'Edit Crew Member',
-          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
           IconButton(
