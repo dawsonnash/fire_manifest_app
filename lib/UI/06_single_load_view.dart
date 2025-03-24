@@ -504,7 +504,7 @@ pw.Widget fillFormFieldsOF252(
           top: 15,
           child: pw.Text(
             formattedDate,
-            style: pw.TextStyle(fontSize: AppData.text14),
+            style: pw.TextStyle(fontSize: 14),
           ),
         ),
 
@@ -514,7 +514,7 @@ pw.Widget fillFormFieldsOF252(
           top: 15,
           child: pw.Text(
             formattedTime,
-            style: pw.TextStyle(fontSize: AppData.text14),
+            style: pw.TextStyle(fontSize: 14),
           ),
         ),
 
@@ -526,14 +526,14 @@ pw.Widget fillFormFieldsOF252(
                 ? pw.Text(
                     'Load #${load.loadNumber}, Sling #${sling?.slingNumber}, Page $pageIndex of $totalPages',
                     style: pw.TextStyle(
-                      fontSize: AppData.text16,
+                      fontSize: 16,
                       color: PdfColors.black,
                     ),
                   )
                 : pw.Text(
                     'Load #${load.loadNumber}, Page $pageIndex of $totalPages',
                     style: pw.TextStyle(
-                      fontSize: AppData.text16,
+                      fontSize: 16,
                       color: PdfColors.black,
                     ),
                   )),
@@ -574,7 +574,7 @@ pw.Widget fillFormFieldsOF252(
           top: yOffset + 656,
           child: pw.Text(
             manifestPreparer!,
-            style: pw.TextStyle(fontSize: AppData.text16),
+            style: pw.TextStyle(fontSize: 16),
           ),
         ),
       ],
@@ -639,7 +639,7 @@ pw.Widget fillFormFieldsOF252(
           top: 15,
           child: pw.Text(
             formattedDate,
-            style: pw.TextStyle(fontSize: AppData.text14),
+            style: pw.TextStyle(fontSize: 14),
           ),
         ),
 
@@ -649,7 +649,7 @@ pw.Widget fillFormFieldsOF252(
           top: 15,
           child: pw.Text(
             formattedTime,
-            style: pw.TextStyle(fontSize: AppData.text14),
+            style: pw.TextStyle(fontSize: 14),
           ),
         ),
 
@@ -660,7 +660,7 @@ pw.Widget fillFormFieldsOF252(
           child: pw.Text(
             'Load #${load.loadNumber}, Page $pageIndex of $totalPages',
             style: pw.TextStyle(
-              fontSize: AppData.text16,
+              fontSize: 16,
               color: PdfColors.black,
             ),
           ),
@@ -672,7 +672,7 @@ pw.Widget fillFormFieldsOF252(
           top: 13,
           child: pw.Text(
             helicopterNum!,
-            style: pw.TextStyle(fontSize: AppData.text16),
+            style: pw.TextStyle(fontSize: 16),
           ),
         ),
 
@@ -682,7 +682,7 @@ pw.Widget fillFormFieldsOF252(
           top: 55,
           child: pw.Text(
             departure!,
-            style: pw.TextStyle(fontSize: AppData.text16),
+            style: pw.TextStyle(fontSize: 16),
           ),
         ),
 
@@ -692,7 +692,7 @@ pw.Widget fillFormFieldsOF252(
           top: 55,
           child: pw.Text(
             destination!,
-            style: pw.TextStyle(fontSize: AppData.text16),
+            style: pw.TextStyle(fontSize: 16),
           ),
         ),
 
@@ -702,7 +702,7 @@ pw.Widget fillFormFieldsOF252(
           top: yOffset + 656,
           child: pw.Text(
             manifestPreparer!,
-            style: pw.TextStyle(fontSize: AppData.text16),
+            style: pw.TextStyle(fontSize: 16),
           ),
         ),
       ],
@@ -728,7 +728,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         top: yOffset - 58,
         child: pw.Text(
           AppData.crewName,
-          style: pw.TextStyle(fontSize: AppData.text10),
+          style: pw.TextStyle(fontSize: 10),
         ),
       ),
       // Crew Members
@@ -738,7 +738,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           top: yOffset + 150 + (i * itemSpacing),
           child: pw.Text(
             load.loadPersonnel[i].name,
-            style: pw.TextStyle(fontSize: AppData.text12),
+            style: pw.TextStyle(fontSize: 12),
           ),
         ),
       // Gear
@@ -748,7 +748,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           top: yOffset + 150 + ((load.loadPersonnel.length + j) * itemSpacing),
           child: pw.Text(
             "${load.loadGear[j].name} (x${load.loadGear[j].quantity})",
-            style: pw.TextStyle(fontSize: AppData.text12),
+            style: pw.TextStyle(fontSize: 12),
           ),
         ),
 
@@ -759,7 +759,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           top: yOffset + 150 + ((load.loadPersonnel.length + load.loadGear.length + k) * itemSpacing),
           child: pw.Text(
             load.customItems[k].name,
-            style: pw.TextStyle(fontSize: AppData.text12),
+            style: pw.TextStyle(fontSize: 12),
           ),
         ),
 
@@ -770,7 +770,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           top: yOffset + 150 + (i * itemSpacing),
           child: pw.Text(
             "${load.loadPersonnel[i].flightWeight} lb",
-            style: pw.TextStyle(fontSize: AppData.text12),
+            style: pw.TextStyle(fontSize: 12),
           ),
         ),
 
@@ -781,7 +781,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           top: yOffset + 150 + ((load.loadPersonnel.length + j) * itemSpacing),
           child: pw.Text(
             "${load.loadGear[j].totalGearWeight} lb",
-            style: pw.TextStyle(fontSize: AppData.text12),
+            style: pw.TextStyle(fontSize: 12),
           ),
         ),
       for (var k = 0; k < load.customItems.length; k++)
@@ -790,7 +790,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
           top: yOffset + 150 + ((load.loadPersonnel.length + load.loadGear.length + k) * itemSpacing),
           child: pw.Text(
             "${load.customItems[k].weight} lb",
-            style: pw.TextStyle(fontSize: AppData.text12),
+            style: pw.TextStyle(fontSize: 12),
           ),
         ),
 
@@ -800,7 +800,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         top: yOffset + 545,
         child: pw.Text(
           '${load.weight.toString()} lb',
-          style: pw.TextStyle(fontSize: AppData.text12),
+          style: pw.TextStyle(fontSize: 12),
         ),
       ),
 
@@ -810,7 +810,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         top: yOffset + 545,
         child: pw.Text(
           load.loadPersonnel.length.toString(),
-          style: pw.TextStyle(fontSize: AppData.text12),
+          style: pw.TextStyle(fontSize: 12),
         ),
       ),
 
@@ -820,7 +820,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         top: yOffset + 545,
         child: pw.Text(
           '${subtotalCrewMemberWeight.toString()} lb',
-          style: pw.TextStyle(fontSize: AppData.text12),
+          style: pw.TextStyle(fontSize: 12),
         ),
       ),
 
@@ -830,7 +830,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         top: yOffset + 545,
         child: pw.Text(
           '${subtotalGearWeight.toString()} lb',
-          style: pw.TextStyle(fontSize: AppData.text12),
+          style: pw.TextStyle(fontSize: 12),
         ),
       ),
 
@@ -840,7 +840,7 @@ pw.Widget fillFormFieldsPMS245(Load load) {
         top: yOffset + 580,
         child: pw.Text(
           formattedDate.toString(),
-          style: pw.TextStyle(fontSize: AppData.text12),
+          style: pw.TextStyle(fontSize: 12),
         ),
       ),
     ],
