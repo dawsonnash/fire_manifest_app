@@ -91,6 +91,7 @@ flutter:
     - assets/images/crew_manifest_form.png
     - assets/pdfs/crew_manifest_form.pdf
     - assets/images/helicopter_manifest_form.jpg
+    - assets/images/of_252.png
     - assets/icons/sling_icon.svg
     - assets/icons/tools_icon.svg
     - assets/images/logo_transparent.png

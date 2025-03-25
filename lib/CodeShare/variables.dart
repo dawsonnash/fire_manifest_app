@@ -43,10 +43,6 @@ class AppData {
 
 
   // Standardized Spacing & Max Constraints to be phased out
-  static double inputFieldMax = 450;
-  static double termsNConditionsMax = 500;
-  static double buttonMax = 200;
-  static double savedTripsMax = 450;
 
   // Screen Size & Orientation
   static Size _screenSize = Size.zero;

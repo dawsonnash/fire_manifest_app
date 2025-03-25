@@ -328,9 +328,6 @@ class _SavedTripsState extends State<SavedTripsView> {
                                         color: AppColors.textFieldColor,
                                         borderRadius: BorderRadius.circular(9),
                                       ),
-                                      constraints: BoxConstraints(
-                                        maxWidth: AppData.savedTripsMax,
-                                      ),
                                       child: ListTile(
                                         title: Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,

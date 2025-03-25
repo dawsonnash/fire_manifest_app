@@ -30,10 +30,10 @@ Future<Uint8List> generateTripPDF(Trip trip, String manifestForm, bool isExterna
     fillFormFields = (load, pageIndex, totalPages, pageItems) => fillFormFieldsPMS245(load);
     pageFormat = PdfPageFormat.letter;
   } else if (manifestForm == 'of252') {
-    imagePath = 'assets/images/helicopter_manifest_form.jpg';
+    imagePath = 'assets/images/of_252.png';
     fillFormFields = (load, pageIndex, totalPages, pageItems) =>
         fillFormFieldsOF252(load, trip.isExternal ?? false, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer, null);
-    pageFormat = PdfPageFormat.a4;
+    pageFormat = PdfPageFormat.letter;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
   }
@@ -178,7 +178,7 @@ void previewTripPDF(BuildContext context, Trip trip, String manifestForm, bool? 
     pageFormat = PdfPageFormat.letter; // PMS245 requires Letter format
   } else if (manifestForm == 'of252') {
     pdfBytes = await generateTripPDF(trip, 'of252', isExternal!, helicopterNum, departure, destination, manifestPreparer);
-    pageFormat = PdfPageFormat.a4; // OF252 requires A4 format
+    pageFormat = PdfPageFormat.letter;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
   }

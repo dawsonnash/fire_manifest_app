@@ -2880,6 +2880,7 @@ class _QuickManifestState extends State<QuickManifest> {
 
                       SizedBox(height: AppData.spacingStandard),
 
+                      if(!isExternalManifest)
                       // Choose Trip Preference text box
                       Padding(
                         padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
@@ -2911,6 +2912,7 @@ class _QuickManifestState extends State<QuickManifest> {
                         ),
                       ),
 
+                      if (!isExternalManifest)
                       // Choose Trip Preference
                       Padding(
                         padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
@@ -2954,6 +2956,7 @@ class _QuickManifestState extends State<QuickManifest> {
                         ),
                       ),
 
+                      if (!isExternalManifest)
                       SizedBox(height: AppData.spacingStandard),
 
                       // Choose allowable text box

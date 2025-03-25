@@ -63,9 +63,9 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, bool isExternal, S
     fillFormFields = (load, pageIndex, totalPages, pageItems) => fillFormFieldsPMS245(load);
     pageFormat = PdfPageFormat.letter;
   } else if (manifestForm == 'of252') {
-    imagePath = 'assets/images/helicopter_manifest_form.jpg';
+    imagePath = 'assets/images/of_252.png';
     fillFormFields = (load, pageIndex, totalPages, pageItems) => fillFormFieldsOF252(load, isExternal, pageIndex, totalPages, pageItems, helicopterNum, departure, destination, manifestPreparer, null);
-    pageFormat = PdfPageFormat.a4;
+    pageFormat = PdfPageFormat.letter;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
   }
@@ -338,7 +338,7 @@ void previewPDF(
     pageFormat = PdfPageFormat.letter; // PMS245 requires Letter format
   } else if (manifestForm == 'of252') {
     pdfBytes = await generatePDF(load, 'of252', isExternal, helicopterNum, departure, destination, manifestPreparer, exportAsLoad);
-    pageFormat = PdfPageFormat.a4; // OF252 requires A4 format
+    pageFormat = PdfPageFormat.letter;
   } else {
     throw Exception('Invalid manifest form type: $manifestForm');
   }
@@ -356,11 +356,11 @@ void previewPDF(
 // Helicopter/External Manifest
 pw.Widget fillFormFieldsOF252(
     Load load, bool isExternal, int pageIndex, int totalPages, List<dynamic> pageItems, String? helicopterNum, String? departure, String? destination, String? manifestPreparer, Sling? sling) {
-  const double yOffset = 112; // Adjust this value to move everything vertically
-  const double xOffset = 6; // Adjust this value to move everything horizontally
-  const double itemSpacing = 27.4; // Adjust spacing between items
+  const double yOffset = 98; // Adjust this value to move everything vertically
+  const double xOffset = 52; // Adjust this value to move everything horizontally
+  const double itemSpacing = 25.5; // Adjust spacing between items
   const double fontSizeOF252 = 18.0;
-  const double bottomOffset = 610; // Position for the total load weight
+  const double bottomOffset = 600; // Position for the total load weight
   const int maxHazmatSlots = 2; // Number of hazmat slots per page
   bool exportAsLoad = sling == null ? true : false;
 
@@ -386,7 +386,7 @@ pw.Widget fillFormFieldsOF252(
 
   List<pw.Widget> hazmatWidgets = [];
 
-  double adjustedPosition = yOffset + 606; // Start from the bottom of the page
+  double adjustedPosition = yOffset + 571; // Start from the bottom of the page
 
 // **Hazmat Items and Weights (Bottom-Up)**
   for (var i = 0; i < hazmatItems.length; i++) {
@@ -425,7 +425,7 @@ pw.Widget fillFormFieldsOF252(
     // **Hazmat Item Weight**
     hazmatWidgets.add(
       pw.Positioned(
-        left: xOffset + 442, // Right-side placement for weights
+        left: xOffset + 415, // Right-side placement for weights
         top: adjustedPosition,
         child: pw.Text(
           "${hazmatItems[i].totalGearWeight} lb",
@@ -458,7 +458,7 @@ pw.Widget fillFormFieldsOF252(
         // **Weights for All Items**
         for (var i = 0; i < normalItems.length; i++)
           pw.Positioned(
-            left: xOffset + 442,
+            left: xOffset + 415,
             top: yOffset + 150 + (i * itemSpacing),
             child: pw.Text(
               "${normalItems[i] is LoadAccoutrement ? normalItems[i].weight : normalItems[i] is Gear ? normalItems[i].totalGearWeight : normalItems[i].weight} lb",
@@ -482,16 +482,16 @@ pw.Widget fillFormFieldsOF252(
         if (pageIndex == totalPages)
           !exportAsLoad
               ? pw.Positioned(
-                  left: xOffset + 442,
-                  top: yOffset + 610,
+                  left: xOffset + 415,
+                  top: yOffset + 573,
                   child: pw.Text(
                     '${sling?.weight.toString()} lb',
                     style: pw.TextStyle(fontSize: fontSizeOF252),
                   ),
                 )
               : pw.Positioned(
-                  left: xOffset + 442,
-                  top: yOffset + 610,
+                  left: xOffset + 415,
+                  top: yOffset + 573,
                   child: pw.Text(
                     '${load.weight.toString()} lb',
                     style: pw.TextStyle(fontSize: fontSizeOF252),
@@ -500,8 +500,8 @@ pw.Widget fillFormFieldsOF252(
 
         // **Current Date**
         pw.Positioned(
-          left: xOffset + 459,
-          top: 15,
+          left: xOffset + 422,
+          top: 21,
           child: pw.Text(
             formattedDate,
             style: pw.TextStyle(fontSize: 14),
@@ -510,8 +510,8 @@ pw.Widget fillFormFieldsOF252(
 
         // **Current Time**
         pw.Positioned(
-          left: xOffset + 350,
-          top: 15,
+          left: xOffset + 319,
+          top: 21,
           child: pw.Text(
             formattedTime,
             style: pw.TextStyle(fontSize: 14),
@@ -521,7 +521,7 @@ pw.Widget fillFormFieldsOF252(
         // **Page Number**
         pw.Positioned(
             left: xOffset - 6,
-            top: yOffset + 610,
+            top: yOffset + 575,
             child: !exportAsLoad
                 ? pw.Text(
                     'Load #${load.loadNumber}, Sling #${sling?.slingNumber}, Page $pageIndex of $totalPages',
@@ -540,8 +540,8 @@ pw.Widget fillFormFieldsOF252(
 
         // **Helicopter Tail Number**
         pw.Positioned(
-          left: xOffset + 70,
-          top: 13,
+          left: xOffset + 63,
+          top: 22,
           child: pw.Text(
             helicopterNum!,
             style: pw.TextStyle(fontSize: AppData.text16),
@@ -550,8 +550,8 @@ pw.Widget fillFormFieldsOF252(
 
         // **Departure Location**
         pw.Positioned(
-          left: xOffset + 56,
-          top: 55,
+          left: xOffset + 50,
+          top: 58,
           child: pw.Text(
             departure!,
             style: pw.TextStyle(fontSize: AppData.text16),
@@ -560,8 +560,8 @@ pw.Widget fillFormFieldsOF252(
 
         // **Destination**
         pw.Positioned(
-          left: xOffset + 336,
-          top: 55,
+          left: xOffset + 320,
+          top: 57,
           child: pw.Text(
             destination!,
             style: pw.TextStyle(fontSize: AppData.text16),
@@ -570,8 +570,8 @@ pw.Widget fillFormFieldsOF252(
 
         // **Manifest Preparer**
         pw.Positioned(
-          left: xOffset + 135,
-          top: yOffset + 656,
+          left: xOffset + 125,
+          top: yOffset + 610,
           child: pw.Text(
             manifestPreparer!,
             style: pw.TextStyle(fontSize: 16),
@@ -602,7 +602,7 @@ pw.Widget fillFormFieldsOF252(
         // **Weights for All Items**
         for (var i = 0; i < normalItems.length; i++)
           pw.Positioned(
-            left: xOffset + 442,
+            left: xOffset + 415,
             top: yOffset + 150 + (i * itemSpacing),
             child: pw.Text(
               "${normalItems[i] is CrewMember ? normalItems[i].flightWeight : normalItems[i] is Gear ? normalItems[i].totalGearWeight : normalItems[i].totalGearWeight} lb",
@@ -625,8 +625,8 @@ pw.Widget fillFormFieldsOF252(
         // **Total Load Weight (Last Page Only)**
         if (pageIndex == totalPages)
           pw.Positioned(
-            left: xOffset + 442,
-            top: yOffset + 610,
+            left: xOffset + 415,
+            top: yOffset + 573,
             child: pw.Text(
               '${load.weight.toString()} lb',
               style: pw.TextStyle(fontSize: fontSizeOF252),
@@ -635,8 +635,8 @@ pw.Widget fillFormFieldsOF252(
 
         // **Current Date**
         pw.Positioned(
-          left: xOffset + 459,
-          top: 15,
+          left: xOffset + 422 ,
+          top: 21,
           child: pw.Text(
             formattedDate,
             style: pw.TextStyle(fontSize: 14),
@@ -645,8 +645,8 @@ pw.Widget fillFormFieldsOF252(
 
         // **Current Time**
         pw.Positioned(
-          left: xOffset + 350,
-          top: 15,
+          left: xOffset + 319,
+          top: 21,
           child: pw.Text(
             formattedTime,
             style: pw.TextStyle(fontSize: 14),
@@ -656,7 +656,7 @@ pw.Widget fillFormFieldsOF252(
         // **Page Number**
         pw.Positioned(
           left: xOffset - 6,
-          top: yOffset + 610,
+          top: yOffset + 575,
           child: pw.Text(
             'Load #${load.loadNumber}, Page $pageIndex of $totalPages',
             style: pw.TextStyle(
@@ -668,8 +668,8 @@ pw.Widget fillFormFieldsOF252(
 
         // **Helicopter Tail Number**
         pw.Positioned(
-          left: xOffset + 70,
-          top: 13,
+          left: xOffset + 63,
+          top: 22,
           child: pw.Text(
             helicopterNum!,
             style: pw.TextStyle(fontSize: 16),
@@ -678,8 +678,8 @@ pw.Widget fillFormFieldsOF252(
 
         // **Departure Location**
         pw.Positioned(
-          left: xOffset + 56,
-          top: 55,
+          left: xOffset + 50,
+          top: 58,
           child: pw.Text(
             departure!,
             style: pw.TextStyle(fontSize: 16),
@@ -688,8 +688,8 @@ pw.Widget fillFormFieldsOF252(
 
         // **Destination**
         pw.Positioned(
-          left: xOffset + 336,
-          top: 55,
+          left: xOffset + 320,
+          top: 57,
           child: pw.Text(
             destination!,
             style: pw.TextStyle(fontSize: 16),
@@ -698,8 +698,8 @@ pw.Widget fillFormFieldsOF252(
 
         // **Manifest Preparer**
         pw.Positioned(
-          left: xOffset + 135,
-          top: yOffset + 656,
+          left: xOffset + 125,
+          top: yOffset + 610,
           child: pw.Text(
             manifestPreparer!,
             style: pw.TextStyle(fontSize: 16),
@@ -938,7 +938,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                         },
                         child: Text(
                           'Cancel',
-                          style: TextStyle(fontSize: AppData.text16, color: AppColors.cancelButton),
+                          style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.cancelButton),
                         ),
                       ),
                       TextButton(
@@ -969,7 +969,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                         },
                         child: Text(
                           'Export',
-                          style: TextStyle(fontSize: AppData.text16, color: AppColors.saveButtonAllowableWeight),
+                          style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight),
                         ),
                       ),
                     ],
@@ -1566,7 +1566,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
           },
           child: Text(
             'Cancel',
-            style: TextStyle(fontSize: AppData.text16, color: AppColors.cancelButton),
+            style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.cancelButton),
           ),
         ),
         TextButton(

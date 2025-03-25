@@ -227,9 +227,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                       Padding(
                           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: Container(
-                            constraints: BoxConstraints(
-                              maxWidth: AppData.inputFieldMax,
-                            ),
+
                             child: TextField(
                               controller: tripNameController,
                               inputFormatters: [
@@ -419,9 +417,6 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Container(
-                          constraints: BoxConstraints(
-                            maxWidth: AppData.inputFieldMax,
-                          ),
                           width: double.infinity,
                           decoration: BoxDecoration(
                             color: AppColors.fireColor,
@@ -565,9 +560,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                       Padding(
                         padding: const EdgeInsets.only(top: 0.0, right: 16.0, left: 16.0),
                         child: Container(
-                          constraints: BoxConstraints(
-                            maxWidth: AppData.inputFieldMax,
-                          ),
+
                           child: Stack(
                             children: [
                               // Background container with white background, black outline, and rounded corners
