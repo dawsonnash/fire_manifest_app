@@ -1,11 +1,12 @@
 import 'dart:ui';
-import 'package:fire_app/CodeShare/colors.dart';
+
+import 'package:fire_app/CodeShare/variables.dart';
 import 'package:fire_app/Data/trip.dart';
 import 'package:fire_app/UI/06_single_trip_view.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart';
 
 class SavedTripsView extends StatefulWidget {
   const SavedTripsView({super.key});
@@ -71,7 +72,7 @@ class _SavedTripsState extends State<SavedTripsView> {
         // Centers the title
         title: Text(
           'Saved Trips',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
           IconButton(
@@ -84,70 +85,73 @@ class _SavedTripsState extends State<SavedTripsView> {
                   backgroundColor: AppColors.textFieldColor2,
                   context: context,
                   builder: (BuildContext context) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        ListTile(
-                          leading: Icon(Icons.delete, color: Colors.red),
-                          title: Text(
-                            'Delete All Trips',
-                            style: TextStyle(color: AppColors.textColorPrimary),
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: AppData.bottomModalPadding),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            leading: Icon(Icons.delete, color: Colors.red),
+                            title: Text(
+                              'Delete All Trips',
+                              style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.modalTextSize, ),
+                            ),
+                            onTap: () {
+                              if (savedTrips.savedTrips.isEmpty) {
+                                Navigator.of(context).pop(); // Close confirmation dialog
+                                return;
+                              }
+                              Navigator.of(context).pop(); // Close the dialog without deleting
+
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: AppColors.textFieldColor2,
+                                    title: Text(
+                                      'Confirm Deletion',
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                    ),
+                                    content: Text(
+                                      'Are you sure you want to delete all trips?',
+                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Close the dialog without deleting
+                                        },
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.bottomDialogTextSize, ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          // Perform deletion
+                                          savedTrips.deleteAllTrips();
+
+                                          // Update the parent widget state
+                                          setState(() {
+                                            loadTripList();
+                                          });
+
+                                          // Close the dialogs
+                                          Navigator.of(context).pop(); // Close confirmation dialog
+                                        },
+                                        child: Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
                           ),
-                          onTap: () {
-                            if (savedTrips.savedTrips.isEmpty) {
-                              Navigator.of(context).pop(); // Close confirmation dialog
-                              return;
-                            }
-                            Navigator.of(context).pop(); // Close the dialog without deleting
-
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  backgroundColor: AppColors.textFieldColor2,
-                                  title: Text(
-                                    'Confirm Deletion',
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                  ),
-                                  content: Text(
-                                    'Are you sure you want to delete all trips?',
-                                    style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(); // Close the dialog without deleting
-                                      },
-                                      child: Text(
-                                        'Cancel',
-                                        style: TextStyle(color: AppColors.textColorPrimary),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        // Perform deletion
-                                        savedTrips.deleteAllTrips();
-
-                                        // Update the parent widget state
-                                        setState(() {
-                                          loadTripList();
-                                        });
-
-                                        // Close the dialogs
-                                        Navigator.of(context).pop(); // Close confirmation dialog
-                                      },
-                                      child: const Text(
-                                        'Delete',
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ],
+                        ],
+                      ),
                     );
                   },
                 );
@@ -201,7 +205,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                   "No trips created...",
                   style: TextStyle(
                     color: AppColors.textColorPrimary,
-                    fontSize: 20,
+                    fontSize: AppData.text20,
                     fontWeight: AppColors.isDarkMode ? FontWeight.normal : FontWeight.bold,
                     shadows: AppColors.isDarkMode
                         ? null // No shadow in dark mode
@@ -213,6 +217,8 @@ class _SavedTripsState extends State<SavedTripsView> {
                             ),
                           ],
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
               ),
             ),
@@ -244,10 +250,10 @@ class _SavedTripsState extends State<SavedTripsView> {
                                 color: Colors.red, // Background color when swiped
                                 alignment: Alignment.centerRight,
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.delete,
                                   color: Colors.white,
-                                  size: 32,
+                                  size: AppData.text32,
                                 ),
                               ),
                               confirmDismiss: (direction) async {
@@ -259,11 +265,11 @@ class _SavedTripsState extends State<SavedTripsView> {
                                       backgroundColor: AppColors.textFieldColor2,
                                       title: Text(
                                         'Confirm Deletion',
-                                        style: TextStyle(color: AppColors.textColorPrimary),
+                                        style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.miniDialogTitleTextSize, ),
                                       ),
                                       content: Text(
                                         'Are you sure you want to delete this trip?',
-                                        style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                        style: TextStyle(fontSize: AppData.miniDialogBodyTextSize, color: AppColors.textColorPrimary),
                                       ),
                                       actions: [
                                         TextButton(
@@ -272,7 +278,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                           },
                                           child: Text(
                                             'Cancel',
-                                            style: TextStyle(color: AppColors.textColorPrimary),
+                                            style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.bottomDialogTextSize, ),
                                           ),
                                         ),
                                         TextButton(
@@ -288,9 +294,9 @@ class _SavedTripsState extends State<SavedTripsView> {
                                             // Close the dialogs
                                             Navigator.of(context).pop(); // Close confirmation dialog
                                           },
-                                          child: const Text(
+                                          child: Text(
                                             'Delete',
-                                            style: TextStyle(color: Colors.red),
+                                            style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                           ),
                                         ),
                                       ],
@@ -322,9 +328,6 @@ class _SavedTripsState extends State<SavedTripsView> {
                                         color: AppColors.textFieldColor,
                                         borderRadius: BorderRadius.circular(9),
                                       ),
-                                      constraints: BoxConstraints(
-                                        maxWidth: AppData.savedTripsMax,
-                                      ),
                                       child: ListTile(
                                         title: Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -339,7 +342,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                                         child: Text(
                                                           trip.tripName,
                                                           style: TextStyle(
-                                                            fontSize: 22,
+                                                            fontSize: AppData.text22,
                                                             fontWeight: FontWeight.bold,
                                                             color: AppColors.textColorPrimary,
                                                           ),
@@ -351,7 +354,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                                       Text(
                                                         '•',
                                                         style: TextStyle(
-                                                          fontSize: 22,
+                                                          fontSize: AppData.text22,
                                                           color: AppColors.textColorPrimary,
                                                         ),
                                                       ),
@@ -366,11 +369,14 @@ class _SavedTripsState extends State<SavedTripsView> {
                                                       ),
                                                     ],
                                                   ),
-                                                  Text(
-                                                    'Allowable: ${trip.allowable} lb',
-                                                    style: TextStyle(
-                                                      fontSize: 18,
-                                                      color: AppColors.textColorPrimary,
+                                                  FittedBox(
+                                                    fit: BoxFit.scaleDown,
+                                                    child: Text(
+                                                      'Allowable: ${trip.allowable} lb',
+                                                      style: TextStyle(
+                                                        fontSize: AppData.text18,
+                                                        color: AppColors.textColorPrimary,
+                                                      ),
                                                     ),
                                                   )
                                                 ],
@@ -380,7 +386,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                               icon: Icon(
                                                 Icons.arrow_forward_ios,
                                                 color: AppColors.textColorPrimary,
-                                                size: 28,
+                                                size: AppData.text28,
                                               ),
                                               onPressed: () {
                                                 Navigator.push(

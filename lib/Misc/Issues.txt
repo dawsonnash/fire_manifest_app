@@ -1,2 +1,3 @@
--- How can Trip Preferences be updated for EDITED gear?
----- Switching saw teams? Differing gear quantities, no fix right now.
+BUGS
+--  Issue very infrequently when you mess around with switching total number of nets up
+    (setting to 0) after you get a minimum loads update

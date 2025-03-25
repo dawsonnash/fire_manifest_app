@@ -1,12 +1,14 @@
 import 'dart:ui';
+
+import 'package:fire_app/UI/03_add_gear.dart';
 import 'package:fire_app/UI/03_edit_gear.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
-import 'package:fire_app/UI/03_add_gear.dart';
-import '../CodeShare/colors.dart';
+
+import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
 import '../Data/gear.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class GearView extends StatefulWidget {
   const GearView({super.key});
@@ -63,7 +65,10 @@ class _GearViewState extends State<GearView> {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(color: AppColors.cancelButton),
+                style: TextStyle(
+                  color: AppColors.cancelButton,
+                  fontSize: AppData.bottomDialogTextSize,
+                ),
               ),
             ),
             TextButton(
@@ -73,7 +78,7 @@ class _GearViewState extends State<GearView> {
               },
               child: Text(
                 'Delete',
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
               ),
             ),
           ],
@@ -114,7 +119,7 @@ class _GearViewState extends State<GearView> {
     List<Gear> sortedGearList = sortGearListAlphabetically(gearList);
 
     TextStyle panelTextStyle = TextStyle(
-      fontSize: 22,
+      fontSize: AppData.text22,
       fontWeight: FontWeight.bold,
       color: AppColors.textColorPrimary,
     );
@@ -144,7 +149,7 @@ class _GearViewState extends State<GearView> {
               ),
         title: Text(
           isSelectionMode ? "Delete Gear" : "Gear",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
           if (isSelectionMode)
@@ -161,69 +166,75 @@ class _GearViewState extends State<GearView> {
                     backgroundColor: AppColors.textFieldColor2,
                     context: context,
                     builder: (BuildContext context) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          ListTile(
-                            leading: Icon(Icons.person_remove, color: Colors.red),
-                            title: Text(
-                              'Delete Select Gear',
-                              style: TextStyle(color: AppColors.textColorPrimary),
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: AppData.bottomModalPadding),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            ListTile(
+                              leading: Icon(Icons.person_remove, color: Colors.red),
+                              title: Text(
+                                'Select Delete',
+                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.modalTextSize),
+                              ),
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                setState(() {
+                                  isSelectionMode = true;
+                                });
+                              },
                             ),
-                            onTap: () {
-                              Navigator.of(context).pop();
-                              setState(() {
-                                isSelectionMode = true;
-                              });
-                            },
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.delete, color: Colors.red),
-                            title: Text('Delete All Gear', style: TextStyle(color: AppColors.textColorPrimary)),
-                            onTap: () {
-                              Navigator.of(context).pop(); // Close the dialog without deleting
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    backgroundColor: AppColors.textFieldColor2,
-                                    title: Text(
-                                      'Confirm Deletion',
-                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                    ),
-                                    content: Text(
-                                      'Are you sure you want to delete all gear? All gear and gear preference data will be erased.',
-                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(); // Close the dialog without deleting
-                                        },
-                                        child: Text(
-                                          'Cancel',
-                                          style: TextStyle(color: AppColors.cancelButton),
-                                        ),
+                            ListTile(
+                              leading: Icon(Icons.delete, color: Colors.red),
+                              title: Text('Delete All Gear', style: TextStyle(color: AppColors.textColorPrimary)),
+                              onTap: () {
+                                Navigator.of(context).pop(); // Close the dialog without deleting
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      backgroundColor: AppColors.textFieldColor2,
+                                      title: Text(
+                                        'Confirm Deletion',
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                       ),
-                                      TextButton(
-                                        onPressed: () {
-                                          crew.deleteAllGear();
-                                          setState(() {});
-                                          Navigator.of(context).pop();
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text(
-                                          'Delete',
-                                          style: TextStyle(color: Colors.red),
-                                        ),
+                                      content: Text(
+                                        'Are you sure you want to delete all gear? All gear and gear preference data will be erased.',
+                                        style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                       ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ],
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop(); // Close the dialog without deleting
+                                          },
+                                          child: Text(
+                                            'Cancel',
+                                            style: TextStyle(
+                                              color: AppColors.cancelButton,
+                                              fontSize: AppData.bottomDialogTextSize,
+                                            ),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            crew.deleteAllGear();
+                                            setState(() {});
+                                            Navigator.of(context).pop();
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text(
+                                            'Delete',
+                                            style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       );
                     },
                   );
@@ -297,7 +308,7 @@ class _GearViewState extends State<GearView> {
                                                 'No gear created...',
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
-                                                  fontSize: 22,
+                                                  fontSize: AppData.text22,
                                                   fontWeight: FontWeight.bold,
                                                   color: AppColors.textColorPrimary,
                                                 ),
@@ -374,38 +385,33 @@ class _GearViewState extends State<GearView> {
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Row(
-                                                children: [
-                                                  // Gear name with ellipsis
-                                                  Flexible(
-                                                    child: Row(
-                                                      children: [
-                                                        Text(
-                                                          '${gear.name} ',
-                                                          style: TextStyle(
-                                                            fontSize: 22,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: AppColors.textColorPrimary,
-                                                          ),
-                                                          maxLines: 1, // Limit to one line
-                                                          overflow: TextOverflow.ellipsis, // Show ellipsis if text overflows
-                                                        ),
-                                                        if (gear.isHazmat)
-                                                          Tooltip(
-                                                            message: 'HAZMAT', // The hint displayed on long-press
-                                                            waitDuration: const Duration(milliseconds: 500), // Time before the tooltip shows
-                                                            child: Icon(
-                                                              FontAwesomeIcons.triangleExclamation, // Hazard icon
-                                                              color: Colors.red, // Red color for hazard
-                                                              size: 18, // Icon size
-                                                            ),
-                                                          ),
-                                                      ],
+                                              RichText(
+                                                text: TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: '${gear.name} ',
+                                                      style: TextStyle(
+                                                        fontSize: AppData.text22,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: AppColors.textColorPrimary,
+                                                      ),
                                                     ),
-                                                  ),
-                                                  // Hazard icon (conditionally rendered)
-                                                  // Hazard icon with Tooltip
-                                                ],
+                                                    if (gear.isHazmat)
+                                                      WidgetSpan(
+                                                        alignment: PlaceholderAlignment.baseline,
+                                                        baseline: TextBaseline.alphabetic,
+                                                        child: Tooltip(
+                                                          message: 'HAZMAT',
+                                                          waitDuration: const Duration(milliseconds: 100),
+                                                          child: Icon(
+                                                            FontAwesomeIcons.triangleExclamation,
+                                                            color: Colors.red,
+                                                            size: AppData.text18,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
                                               ),
                                               Text(
                                                 '${gear.weight} lb x ${gear.quantity}',
@@ -421,7 +427,7 @@ class _GearViewState extends State<GearView> {
                                     trailing: isSelectionMode
                                         ? null
                                         : IconButton(
-                                            icon: Icon(Icons.edit, color: AppColors.textColorPrimary, size: 32),
+                                            icon: Icon(Icons.edit, color: AppColors.textColorPrimary, size: AppData.text32),
                                             onPressed: () {
                                               Navigator.push(
                                                 context,

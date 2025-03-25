@@ -1,11 +1,16 @@
 import 'dart:ui';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../CodeShare/colors.dart';
+import 'package:hive/hive.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
+
+import '../CodeShare/functions.dart';
+import '../CodeShare/keyboardActions.dart';
+import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
 import '../Data/gear.dart';
-import 'package:hive/hive.dart';
-import '../CodeShare/functions.dart';
 import '../Data/saved_preferences.dart';
 
 class EditGear extends StatefulWidget {
@@ -26,6 +31,8 @@ class EditGear extends StatefulWidget {
 class _EditGearState extends State<EditGear> {
   late final Box<Gear> personalToolsBox;
   List<Gear> personalToolsList = [];
+  String? weightErrorMessage;
+  String? quantityErrorMessage;
 
   // Variables to store user input
   late TextEditingController gearNameController;
@@ -39,6 +46,9 @@ class _EditGearState extends State<EditGear> {
   late int oldGearWeight;
   late int oldGearQuantity;
   late bool oldGearHazmatValue;
+
+  final FocusNode _weightFocusNode = FocusNode();
+  final FocusNode _quantityFocusNode = FocusNode();
 
   // initialize HiveBox for Gear
   late final Box<Gear> gearBox;
@@ -120,10 +130,17 @@ class _EditGearState extends State<EditGear> {
     );
 
     bool personalToolExists = personalToolsList.any((gear) => gear.name.toLowerCase() == newGearName.toLowerCase());
-    bool quantityChanged = (oldGearName.toLowerCase() == newGearName.toLowerCase()) && (oldGearHazmatValue == newHazmatValue) && (oldGearQuantity.toString() != newGearQuantity);
 
-    if (personalToolExists && !quantityChanged && !gearNameExists) {
+    bool onlyQuantityChanged = (oldGearName.toLowerCase() == newGearName.toLowerCase()) && (oldGearHazmatValue == newHazmatValue) && (oldGearQuantity.toString() != newGearQuantity);
+    final matchingTool = personalToolsList.firstWhereOrNull(
+      (tool) => tool.name.toLowerCase() == newGearName.toLowerCase(),
+    );
 
+    final bool weightMatches = matchingTool?.weight == int.tryParse(gearWeightController.text);
+    final bool hazmatMatches = matchingTool?.isHazmat == newHazmatValue;
+    final bool matchesPersonalToolValues = weightMatches && hazmatMatches;
+
+    if (personalToolExists && !onlyQuantityChanged && !gearNameExists && !matchesPersonalToolValues) {
       // Show a single AlertDialog
       showDialog(
         context: context,
@@ -135,7 +152,7 @@ class _EditGearState extends State<EditGear> {
               style: TextStyle(color: AppColors.textColorPrimary),
             ),
             content: Text(
-              '$capitalizedGearName also exists as a tool. Any gear that is also a personal tool must be edited within the Tool panel under the Crew tab.',
+              '$capitalizedGearName also exists as a tool. Any gear that is also a personal tool can be added to your gear inventory, but it must be of the same weight (${matchingTool?.weight} lb) and HAZMAT value (${matchingTool?.isHazmat}).',
               style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
             ),
             actions: [
@@ -145,7 +162,7 @@ class _EditGearState extends State<EditGear> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.cancelButton),
+                  style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                 ),
               ),
             ],
@@ -164,8 +181,8 @@ class _EditGearState extends State<EditGear> {
 
       return;
     }
-    if (personalToolExists && !quantityChanged && gearNameExists) {
 
+    if (personalToolExists && !onlyQuantityChanged && gearNameExists) {
       // Show a single AlertDialog
       showDialog(
         context: context,
@@ -187,7 +204,7 @@ class _EditGearState extends State<EditGear> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.cancelButton),
+                  style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                 ),
               ),
             ],
@@ -206,6 +223,7 @@ class _EditGearState extends State<EditGear> {
 
       return;
     }
+
     if (gearNameExists) {
       String matchingGearName = crew.gear.firstWhere((gear) => gear.name.toLowerCase() == newGearName.toLowerCase()).name;
       showDialog(
@@ -225,7 +243,7 @@ class _EditGearState extends State<EditGear> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.cancelButton),
+                  style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                 ),
               ),
             ],
@@ -248,7 +266,6 @@ class _EditGearState extends State<EditGear> {
     widget.gear.weight = int.parse(gearWeightController.text);
     widget.gear.isHazmat = newHazmatValue;
 
-
     // Check if any GearPreference prevents reducing quantity
     bool quantityConflict = savedPreferences.updateGearInPreferences(oldGearName, newGearQuantity, widget.gear);
 
@@ -265,7 +282,7 @@ class _EditGearState extends State<EditGear> {
             ),
             content: Text(
               'The quantity you are trying to set ($newGearQuantity) is less than the quantity used in an existing gear preference. '
-                  'You must first delete the affected gear preference before reducing the quantity. All other fields have been updated.',
+              'You must first delete the affected gear preference before reducing the quantity. All other fields have been updated.',
               style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
             ),
             actions: [
@@ -273,7 +290,7 @@ class _EditGearState extends State<EditGear> {
                 onPressed: () {
                   Navigator.of(context).pop(); // Close dialog
                 },
-                child: Text('OK', style: TextStyle(color: AppColors.cancelButton)),
+                child: Text('OK', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
               ),
             ],
           );
@@ -284,13 +301,12 @@ class _EditGearState extends State<EditGear> {
       setState(() {
         gearQuantityController.text = oldGearQuantity.toString();
         // Update the gear's attributes
-        oldGearName= capitalizedGearName;
+        oldGearName = capitalizedGearName;
         oldGearWeight = int.parse(gearWeightController.text);
         oldGearHazmatValue = newHazmatValue;
         _checkInput(); // Re-validate inputs
       });
-    }
-    else {
+    } else {
       widget.gear.quantity = int.parse(gearQuantityController.text);
     }
 
@@ -317,23 +333,24 @@ class _EditGearState extends State<EditGear> {
     // Show successful save popup
     if (!quantityConflict) {
       ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Center(
-          child: Text(
-            'Gear Updated!',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
+        SnackBar(
+          content: Center(
+            child: Text(
+              'Gear Updated!',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: AppData.text32,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Colors.green,
         ),
-        duration: Duration(seconds: 1),
-        backgroundColor: Colors.green,
-      ),
-    );}
+      );
+    }
 
-    if(!quantityConflict) {
+    if (!quantityConflict) {
       Navigator.of(context).pop(); // Return to previous screen
     }
   }
@@ -343,7 +360,7 @@ class _EditGearState extends State<EditGear> {
     // Main theme button style
     final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
-        textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        textStyle: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold),
         backgroundColor: Colors.deepOrangeAccent,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         //surfaceTintColor: Colors.grey,
@@ -371,7 +388,7 @@ class _EditGearState extends State<EditGear> {
         backgroundColor: AppColors.appBarColor,
         title: Text(
           'Edit Gear',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         actions: [
           IconButton(
@@ -380,92 +397,95 @@ class _EditGearState extends State<EditGear> {
                   backgroundColor: AppColors.textFieldColor2,
                   context: context,
                   builder: (BuildContext context) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        ListTile(
-                          leading: Icon(Icons.delete, color: Colors.red),
-                          title: Text(
-                            'Delete Gear',
-                            style: TextStyle(color: AppColors.textColorPrimary),
-                          ),
-                          onTap: () {
-                            Navigator.of(context).pop(); // Close the dialog without deleting
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: AppData.bottomModalPadding),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            leading: Icon(Icons.delete, color: Colors.red),
+                            title: Text(
+                              'Delete Gear',
+                              style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.modalTextSize),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop(); // Close the dialog without deleting
 
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  backgroundColor: AppColors.textFieldColor2,
-                                  title: Text(
-                                    'Confirm Deletion',
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                  ),
-                                  content: Text(
-                                    'This gear data ($oldGearName) and any gear preference data containing it will be erased!',
-                                    style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(); // Close the dialog without deleting
-                                      },
-                                      child: Text(
-                                        'Cancel',
-                                        style: TextStyle(color: AppColors.cancelButton),
-                                      ),
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: AppColors.textFieldColor2,
+                                    title: Text(
+                                      'Confirm Deletion',
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                     ),
-                                    TextButton(
-                                      onPressed: () {
-                                        // Remove item from the Hive box
-                                        final keyToRemove = gearBox.keys.firstWhere(
-                                          (key) => gearBox.get(key) == widget.gear,
-                                          orElse: () => null,
-                                        );
+                                    content: Text(
+                                      'This gear data ($oldGearName) and any gear preference data containing it will be erased!',
+                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Close the dialog without deleting
+                                        },
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          // Remove item from the Hive box
+                                          final keyToRemove = gearBox.keys.firstWhere(
+                                            (key) => gearBox.get(key) == widget.gear,
+                                            orElse: () => null,
+                                          );
 
-                                        if (keyToRemove != null) {
-                                          gearBox.delete(keyToRemove);
-                                        }
+                                          if (keyToRemove != null) {
+                                            gearBox.delete(keyToRemove);
+                                          }
 
-                                        // Remove the crew member from local memory
-                                        crew.removeGear(widget.gear);
+                                          // Remove the crew member from local memory
+                                          crew.removeGear(widget.gear);
 
-                                        widget.onUpdate(); // Callback function to update UI with new data
+                                          widget.onUpdate(); // Callback function to update UI with new data
 
-                                        // Show deletion pop-up
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Center(
-                                              child: Text(
-                                                '$oldGearName Deleted!',
-                                                // Maybe change look
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 32,
-                                                  fontWeight: FontWeight.bold,
+                                          // Show deletion pop-up
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Center(
+                                                child: Text(
+                                                  '$oldGearName Deleted!',
+                                                  // Maybe change look
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: AppData.text32,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
                                               ),
+                                              duration: Duration(seconds: 2),
+                                              backgroundColor: Colors.red,
                                             ),
-                                            duration: Duration(seconds: 2),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
+                                          );
 
-                                        Navigator.of(context).pop(); // Dismiss the dialog
-                                        Navigator.of(context).pop(); // Return to previous screen
-                                      },
-                                      child: const Text(
-                                        'Delete',
-                                        style: TextStyle(color: Colors.red),
+                                          Navigator.of(context).pop(); // Dismiss the dialog
+                                          Navigator.of(context).pop(); // Return to previous screen
+                                        },
+                                        child: Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ],
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     );
                   },
                 );
@@ -545,7 +565,7 @@ class _EditGearState extends State<EditGear> {
                                 labelText: 'Edit gear name',
                                 labelStyle: TextStyle(
                                   color: AppColors.textColorPrimary,
-                                  fontSize: 22,
+                                  fontSize: AppData.text22,
                                 ),
                                 filled: true,
                                 fillColor: AppColors.textFieldColor,
@@ -568,7 +588,7 @@ class _EditGearState extends State<EditGear> {
                               ),
                               style: TextStyle(
                                 color: AppColors.textColorPrimary,
-                                fontSize: 28,
+                                fontSize: AppData.text28,
                               ),
                             )),
 
@@ -577,47 +597,69 @@ class _EditGearState extends State<EditGear> {
                         // Edit Weight
                         Padding(
                             padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                            child: TextField(
-                              controller: gearWeightController,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(3),
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              decoration: InputDecoration(
-                                labelText: 'Edit weight',
-                                hintText: 'Up to 500 lb',
-                                hintStyle: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: 20,
-                                ),
-                                labelStyle: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: 22,
-                                  //fontWeight: FontWeight.bold,
-                                ),
-                                filled: true,
-                                fillColor: AppColors.textFieldColor,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppColors.borderPrimary,
-                                    // Border color when the TextField is not focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0), // Rounded corners
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppColors.primaryColor,
-                                    // Border color when the TextField is focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
+                            child: KeyboardActions(
+                              config: keyboardActionsConfig(
+                                focusNodes: [_weightFocusNode],
                               ),
-                              style: TextStyle(
-                                color: AppColors.textColorPrimary,
-                                fontSize: 28,
+                              disableScroll: true,
+                              child: TextField(
+                                focusNode: _weightFocusNode,
+                                controller: gearWeightController,
+                                keyboardType: TextInputType.number,
+                                textInputAction: TextInputAction.done,
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(3),
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                onChanged: (value) {
+                                  int? weight = int.tryParse(value);
+                                  setState(() {
+                                    // Validate the input and set error message
+                                    if (weight! > 500) {
+                                      weightErrorMessage = 'Weight must be less than 500.';
+                                    } else if (weight == 0) {
+                                      weightErrorMessage = 'Weight must be greater than 0.';
+                                    } else {
+                                      weightErrorMessage = null;
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Edit weight',
+                                  hintText: 'Up to 500 lb',
+                                  hintStyle: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: AppData.text20,
+                                  ),
+                                  errorText: weightErrorMessage,
+                                  labelStyle: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: AppData.text22,
+                                    //fontWeight: FontWeight.bold,
+                                  ),
+                                  filled: true,
+                                  fillColor: AppColors.textFieldColor,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.borderPrimary,
+                                      // Border color when the TextField is not focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.primaryColor,
+                                      // Border color when the TextField is focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                ),
+                                style: TextStyle(
+                                  color: AppColors.textColorPrimary,
+                                  fontSize: AppData.text28,
+                                ),
                               ),
                             )),
 
@@ -626,47 +668,66 @@ class _EditGearState extends State<EditGear> {
                         // Edit Quantity
                         Padding(
                             padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 4.0, bottom: 4.0),
-                            child: TextField(
-                              controller: gearQuantityController,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(2),
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              decoration: InputDecoration(
-                                labelText: 'Edit quantity',
-                                hintText: 'Up to 99',
-                                hintStyle: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: 20,
-                                ),
-                                labelStyle: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: 22,
-                                  //fontWeight: FontWeight.bold,
-                                ),
-                                filled: true,
-                                fillColor: AppColors.textFieldColor,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppColors.borderPrimary,
-                                    // Border color when the TextField is not focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0), // Rounded corners
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppColors.primaryColor,
-                                    // Border color when the TextField is focused
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
+                            child: KeyboardActions(
+                              config: keyboardActionsConfig(
+                                focusNodes: [_quantityFocusNode],
                               ),
-                              style: TextStyle(
-                                color: AppColors.textColorPrimary,
-                                fontSize: 28,
+                              disableScroll: true,
+                              child: TextField(
+                                focusNode: _quantityFocusNode,
+                                controller: gearQuantityController,
+                                keyboardType: TextInputType.number,
+                                textInputAction: TextInputAction.done,
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(2),
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                onChanged: (value) {
+                                  int? weight = int.tryParse(value);
+                                  setState(() {
+                                    if (weight == 0) {
+                                      quantityErrorMessage = 'Quantity must be greater than 0.';
+                                    } else {
+                                      quantityErrorMessage = null;
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Edit quantity',
+                                  hintText: 'Up to 99',
+                                  hintStyle: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: AppData.text20,
+                                  ),
+                                  errorText: quantityErrorMessage,
+                                  labelStyle: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: AppData.text22,
+                                    //fontWeight: FontWeight.bold,
+                                  ),
+                                  filled: true,
+                                  fillColor: AppColors.textFieldColor,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.borderPrimary,
+                                      // Border color when the TextField is not focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.primaryColor,
+                                      // Border color when the TextField is focused
+                                      width: 2.0, // Border width
+                                    ),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                ),
+                                style: TextStyle(
+                                  color: AppColors.textColorPrimary,
+                                  fontSize: AppData.text28,
+                                ),
                               ),
                             )),
 
@@ -689,7 +750,7 @@ class _EditGearState extends State<EditGear> {
                                 Text(
                                   'HAZMAT',
                                   style: TextStyle(
-                                    fontSize: 22,
+                                    fontSize: AppData.text22,
                                     color: AppColors.textColorPrimary,
                                   ),
                                 ),
@@ -697,7 +758,7 @@ class _EditGearState extends State<EditGear> {
                                 Text(
                                   newHazmatValue ? 'Yes' : 'No', // Dynamic label
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: AppData.text18,
                                     color: AppColors.textColorPrimary,
                                   ),
                                 ),

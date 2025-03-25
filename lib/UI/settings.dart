@@ -1,5 +1,9 @@
-import 'dart:ui';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math' as math; // Import this at the top of your file
+import 'dart:ui';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/Data/trip_preferences.dart';
 import 'package:fire_app/UI/quick_guide.dart';
@@ -7,18 +11,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../CodeShare/colors.dart';
-import 'dart:convert';
-import 'dart:io';
+import 'package:intl/intl.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../CodeShare/keyboardActions.dart';
+import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../Data/crew_loadout.dart';
 import '../Data/crewmember.dart';
 import '../Data/gear.dart';
@@ -31,9 +35,11 @@ class SettingsView extends StatefulWidget {
   final String crewName;
   final String userName;
   final int safetyBuffer;
+  final double textScale;
   final Function(String) onCrewNameChanged;
   final Function(String) onUserNameChanged;
   final Function(int) onSafetyBufferChange;
+  final Function(double) onTextScaleChange;
 
   const SettingsView({
     super.key,
@@ -44,9 +50,12 @@ class SettingsView extends StatefulWidget {
     required this.crewName,
     required this.userName,
     required this.safetyBuffer,
+    required this.textScale,
     required this.onCrewNameChanged,
     required this.onUserNameChanged,
     required this.onSafetyBufferChange,
+    required this.onTextScaleChange,
+
   });
 
   @override
@@ -56,6 +65,7 @@ class SettingsView extends StatefulWidget {
 class _SettingsState extends State<SettingsView> {
   late bool isDarkMode;
   late bool enableBackgroundImage;
+  late double textScale;
   late TextEditingController crewNameController;
   late TextEditingController userNameController;
   late TextEditingController safetyBufferController;
@@ -66,12 +76,16 @@ class _SettingsState extends State<SettingsView> {
 
   @override
   void initState() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
     super.initState();
     isDarkMode = widget.isDarkMode;
     enableBackgroundImage = widget.enableBackgroundImage;
     crewNameController = TextEditingController(text: widget.crewName); // Initialize with the current crew name
     userNameController = TextEditingController(text: widget.userName); // Initialize with the current user name
     safetyBufferController = TextEditingController(text: widget.safetyBuffer.toString());
+    textScale = widget.textScale;
 
     _loadLoadoutNames().then((_) {
       if (selectedLoadout != null) {
@@ -283,7 +297,6 @@ class _SettingsState extends State<SettingsView> {
   }
 
   Future<void> _checkSyncStatus(String loadoutName) async {
-
     Map<String, dynamic>? lastSavedData = await CrewLoadoutStorage.loadLoadout(loadoutName);
 
     if (lastSavedData == null) {
@@ -309,7 +322,6 @@ class _SettingsState extends State<SettingsView> {
     setState(() {
       isOutOfSync = (lastSavedCrewJson != currentCrewJson) || (lastSavedPreferencesJson != currentPreferencesJson);
     });
-
   }
 
   void _showSyncDifferencesDialog() async {
@@ -608,7 +620,7 @@ class _SettingsState extends State<SettingsView> {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(color: AppColors.cancelButton),
+                style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
               ),
             ),
             TextButton(
@@ -622,14 +634,14 @@ class _SettingsState extends State<SettingsView> {
 
                 // Show successful save popup
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                    SnackBar(
                     content: Center(
                       child: Text(
                         'Crew Imported!',
                         // Maybe change look
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 22,
+                          fontSize: AppData.text22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -755,7 +767,7 @@ class _SettingsState extends State<SettingsView> {
           backgroundColor: AppColors.textFieldColor2,
           title: Text(
             'Report Bugs',
-            style: TextStyle(color: AppColors.textColorPrimary),
+            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
           ),
           content: TextField(
             controller: feedbackController,
@@ -779,7 +791,7 @@ class _SettingsState extends State<SettingsView> {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(color: AppColors.cancelButton),
+                style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
               ),
             ),
             TextButton(
@@ -810,7 +822,7 @@ class _SettingsState extends State<SettingsView> {
               },
               child: Text(
                 'Send',
-                style: TextStyle(color: AppColors.saveButtonAllowableWeight),
+                style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize),
               ),
             ),
           ],
@@ -829,7 +841,7 @@ class _SettingsState extends State<SettingsView> {
           backgroundColor: AppColors.textFieldColor2,
           title: Text(
             'Submit Feedback',
-            style: TextStyle(color: AppColors.textColorPrimary),
+            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
           ),
           content: TextField(
             controller: feedbackController,
@@ -853,7 +865,7 @@ class _SettingsState extends State<SettingsView> {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(color: AppColors.cancelButton),
+                style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
               ),
             ),
             TextButton(
@@ -884,7 +896,7 @@ class _SettingsState extends State<SettingsView> {
               },
               child: Text(
                 'Send',
-                style: TextStyle(color: AppColors.saveButtonAllowableWeight),
+                style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize),
               ),
             ),
           ],
@@ -902,64 +914,67 @@ class _SettingsState extends State<SettingsView> {
         return StatefulBuilder(builder: (context, setState) {
           return AlertDialog(
             backgroundColor: AppColors.textFieldColor2,
-            title: Row(
-              children: [
-                Text(
-                  'Select an option',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textColorPrimary,
+            title: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                children: [
+                  Text(
+                    'Select an option',
+                    style: TextStyle(
+                      fontSize: AppData.miniDialogTitleTextSize,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textColorPrimary,
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.info_outline, // Info icon
-                    color: Colors.white,
-                    size: 22, // Adjust size if needed
-                  ),
-                  onPressed: () {
-                    // Show an info dialog or tooltip when clicked
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          backgroundColor: AppColors.textFieldColor2,
-                          title: Text(
-                            "Crew Sharing",
-                            style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal),
-                          ),
-                          content: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min, // Prevents excessive height
-                              children: [
-                                Text("Crew sharing allows you to share your crew data (Crew Members, Gear, and Tools) with other users. To share:\n",
-                                    style: TextStyle(color: AppColors.textColorPrimary)),
-                                Text(
-                                    "1. For exporting, select the 'Export' option, save to your files, and then send to the  other user. If on iOS, this can be done directly through Air Drop, but must still be saved to your files. The exported file will be be titled CrewData along with today's date and will have a .json extension.\n",
-                                    style: TextStyle(color: AppColors.textColorPrimary)),
-                                Text("2. For importing, select the 'Import' option and find the CrewData JSON file in your files.", style: TextStyle(color: AppColors.textColorPrimary)),
-                              ],
+                  IconButton(
+                    icon: Icon(
+                      Icons.info_outline, // Info icon
+                      color: Colors.white,
+                      size: AppData.text22, // Adjust size if needed
+                    ),
+                    onPressed: () {
+                      // Show an info dialog or tooltip when clicked
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            backgroundColor: AppColors.textFieldColor2,
+                            title: Text(
+                              "Crew Sharing",
+                              style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal, fontSize: AppData.miniDialogTitleTextSize),
                             ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(); // Close the dialog
-                              },
-                              child: Text(
-                                "OK",
-                                style: TextStyle(color: AppColors.textColorPrimary),
+                            content: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min, // Prevents excessive height
+                                children: [
+                                  Text("Crew sharing allows you to share your crew data (Crew Members, Gear, and Tools) with other users. To share:\n",
+                                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
+                                  Text(
+                                      "1. For exporting, select the 'Export' option, save to your files, and then send to the  other user. If on iOS, this can be done directly through Air Drop, but must still be saved to your files. The exported file will be be titled CrewData along with today's date and will have a .json extension.\n",
+                                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
+                                  Text("2. For importing, select the 'Import' option and find the CrewData JSON file in your files.", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
+                                ],
                               ),
                             ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                ),
-              ],
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // Close the dialog
+                                },
+                                child: Text(
+                                  "OK",
+                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
             content: SizedBox(
               height: MediaQuery.of(context).size.height * 0.15, // Dynamic height
@@ -971,8 +986,8 @@ class _SettingsState extends State<SettingsView> {
                   });
                 },
                 children: [
-                  Center(child: Text('Export', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
-                  Center(child: Text('Import', style: TextStyle(fontSize: 18, color: AppColors.textColorPrimary))),
+                  Center(child: Text('Export', style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary))),
+                  Center(child: Text('Import', style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary))),
                 ],
               ),
             ),
@@ -983,7 +998,7 @@ class _SettingsState extends State<SettingsView> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(fontSize: AppData.text16, color: AppColors.cancelButton),
+                  style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.cancelButton),
                 ),
               ),
               TextButton(
@@ -1000,9 +1015,9 @@ class _SettingsState extends State<SettingsView> {
                             backgroundColor: AppColors.textFieldColor2,
                             title: Text(
                               "No crew to export",
-                              style: TextStyle(color: AppColors.textColorPrimary),
+                              style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.miniDialogTitleTextSize, ),
                             ),
-                            content: Text("There are no Crew Members or Gear in your inventory.", style: TextStyle(color: AppColors.textColorPrimary)),
+                            content: Text("There are no Crew Members or Gear in your inventory.", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
                             actions: [
                               TextButton(
                                 onPressed: () {
@@ -1010,7 +1025,7 @@ class _SettingsState extends State<SettingsView> {
                                 },
                                 child: Text(
                                   "OK",
-                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                  style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.bottomDialogTextSize, ),
                                 ),
                               ),
                             ],
@@ -1028,7 +1043,7 @@ class _SettingsState extends State<SettingsView> {
                 },
                 child: Text(
                   selectedIndex == 0 ? 'Export' : 'Import',
-                  style: TextStyle(fontSize: AppData.text16, color: AppColors.saveButtonAllowableWeight),
+                  style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight),
                 ),
               ),
             ],
@@ -1051,7 +1066,7 @@ class _SettingsState extends State<SettingsView> {
               backgroundColor: AppColors.textFieldColor2,
               title: Text(
                 isEdit ? 'Edit Loadout Name' : 'Save New Loadout',
-                style: TextStyle(color: AppColors.textColorPrimary),
+                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1062,16 +1077,16 @@ class _SettingsState extends State<SettingsView> {
                     decoration: InputDecoration(
                       errorText: errorMessage,
                       hintText: "Enter Loadout Name",
-                      hintStyle: TextStyle(color: AppColors.textColorPrimary),
+                      hintStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                     ),
-                    style: TextStyle(color: AppColors.textColorPrimary),
+                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                   ),
                 ],
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
+                  child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                 ),
                 TextButton(
                   onPressed: () async {
@@ -1131,7 +1146,7 @@ class _SettingsState extends State<SettingsView> {
                       });
                     }
                   },
-                  child: Text("Save", style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
+                  child: Text("Save", style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize)),
                 ),
               ],
             );
@@ -1192,7 +1207,7 @@ class _SettingsState extends State<SettingsView> {
             // Maybe change look
             style: TextStyle(
               color: Colors.black,
-              fontSize: 22,
+              fontSize: AppData.text22,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1228,7 +1243,7 @@ class _SettingsState extends State<SettingsView> {
             // Maybe change look
             style: TextStyle(
               color: Colors.black,
-              fontSize: 22,
+              fontSize: AppData.text22,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1264,7 +1279,7 @@ class _SettingsState extends State<SettingsView> {
             // Maybe change look
             style: TextStyle(
               color: Colors.black,
-              fontSize: 22,
+              fontSize: AppData.text22,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1348,6 +1363,8 @@ class _SettingsState extends State<SettingsView> {
     await _applyLoadout(loadoutName, loadoutData);
   }
 
+  final FocusNode _focusNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1355,7 +1372,7 @@ class _SettingsState extends State<SettingsView> {
         title: Center(
           child: Text(
             'Settings',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+            style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
           ),
         ),
         backgroundColor: AppColors.appBarColor,
@@ -1413,9 +1430,9 @@ class _SettingsState extends State<SettingsView> {
                   // Help Title
                   ListTile(
                     leading: Icon(Icons.help_outline, color: Colors.white),
-                    title: const Text(
+                    title: Text(
                       'HELP',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(fontSize: AppData.text18, color: Colors.white),
                     ),
                   ),
 
@@ -1432,15 +1449,15 @@ class _SettingsState extends State<SettingsView> {
                               MaterialPageRoute(builder: (context) => QuickGuide()),
                             );
                           },
-                          child: const Text('Quick Guide', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: 18)),
+                          child: Text('Quick Guide', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: AppData.text18)),
                         ),
                         TextButton(
                           onPressed: _reportBugs,
-                          child: const Text('Report Bugs', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: 18)),
+                          child: Text('Report Bugs', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: AppData.text18)),
                         ),
                         TextButton(
                           onPressed: _submitFeedback,
-                          child: const Text('Submit Feedback', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: 18)),
+                          child: Text('Submit Feedback', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: AppData.text18)),
                         ),
                       ],
                     ),
@@ -1451,9 +1468,9 @@ class _SettingsState extends State<SettingsView> {
                   // App Settings Title
                   ListTile(
                     leading: Icon(Icons.settings, color: Colors.white),
-                    title: const Text(
+                    title: Text(
                       'APP SETTINGS',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(fontSize: AppData.text18, color: Colors.white),
                     ),
                   ),
 
@@ -1467,60 +1484,89 @@ class _SettingsState extends State<SettingsView> {
                         ExpansionTile(
                           title: Text(
                             'Display',
-                            style: TextStyle(fontSize: 18, color: Colors.white), // White text for the label
+                            style: TextStyle(fontSize: AppData.text18, color: Colors.white), // White text for the label
                           ),
                           trailing: Icon(
                             Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
                             color: Colors.white, // Match the arrow color with the text color
-                            size: 24, // Set a fixed size for consistency
+                            size: AppData.text24, // Set a fixed size for consistency
                           ),
                           children: [
                             // Dark Mode Toggle
+                            // ListTile(
+                            //   title: const Text(
+                            //     'Dark Mode',
+                            //     style: TextStyle(fontSize: AppData.text18, color: Colors.white),
+                            //   ),
+                            //   trailing: Switch(
+                            //     value: isDarkMode,
+                            //     onChanged: (value) {
+                            //       widget.onThemeChanged(value); // Notify parent widget
+                            //       setState(() {
+                            //         isDarkMode = value;
+                            //         if (!isDarkMode) {
+                            //           widget.onBackgroundImageChange(value); // Notify parent widget
+                            //           enableBackgroundImage = false;
+                            //           ThemePreferences.setBackgroundImagePreference(value);
+                            //         }
+                            //         ThemePreferences.setTheme(value); // Save dark mode preference
+                            //       });
+                            //     },
+                            //     activeColor: Colors.green,
+                            //     inactiveThumbColor: Colors.grey,
+                            //     inactiveTrackColor: Colors.white24,
+                            //   ),
+                            // ),
+                            // Enable Background Image Toggle (Visible only if Dark Mode is ON)
+                            //  if (isDarkMode)
                             ListTile(
-                              title: const Text(
-                                'Dark Mode',
-                                style: TextStyle(fontSize: 18, color: Colors.white),
+                              title: Text(
+                                'Enable Background Image',
+                                style: TextStyle(fontSize: AppData.text18, color: Colors.white),
                               ),
                               trailing: Switch(
-                                value: isDarkMode,
+                                value: enableBackgroundImage,
                                 onChanged: (value) {
-                                  widget.onThemeChanged(value); // Notify parent widget
+                                  widget.onBackgroundImageChange(value); // Notify parent widget
                                   setState(() {
-                                    isDarkMode = value;
-                                    if (!isDarkMode) {
-                                      widget.onBackgroundImageChange(value); // Notify parent widget
-                                      enableBackgroundImage = false;
-                                      ThemePreferences.setBackgroundImagePreference(value);
-                                    }
-                                    ThemePreferences.setTheme(value); // Save dark mode preference
+                                    enableBackgroundImage = value;
                                   });
+                                  ThemePreferences.setBackgroundImagePreference(value); // Save preference
                                 },
                                 activeColor: Colors.green,
                                 inactiveThumbColor: Colors.grey,
                                 inactiveTrackColor: Colors.white24,
                               ),
                             ),
-                            // Enable Background Image Toggle (Visible only if Dark Mode is ON)
-                            if (isDarkMode)
-                              ListTile(
-                                title: const Text(
-                                  'Enable Background Image',
-                                  style: TextStyle(fontSize: 18, color: Colors.white),
-                                ),
-                                trailing: Switch(
-                                  value: enableBackgroundImage,
-                                  onChanged: (value) {
-                                    widget.onBackgroundImageChange(value); // Notify parent widget
-                                    setState(() {
-                                      enableBackgroundImage = value;
-                                    });
-                                    ThemePreferences.setBackgroundImagePreference(value); // Save preference
-                                  },
-                                  activeColor: Colors.green,
-                                  inactiveThumbColor: Colors.grey,
-                                  inactiveTrackColor: Colors.white24,
-                                ),
+                            // 🔠 Text Scale Slider
+                            ListTile(
+                              title: Text(
+                                'Text Size',
+                                style: TextStyle(fontSize: AppData.text18, color: Colors.white),
                               ),
+                              subtitle: Row(
+                                children: [
+                                  Text('Aa', style: TextStyle(fontSize: 14.8, color: Colors.white70)),
+                                  Expanded(
+                                    child: Slider(
+                                      value: widget.textScale,
+                                      onChanged: (value) {
+                                        setState(() {
+                                            widget.onTextScaleChange(value);
+                                            ThemePreferences.setTextScale(value);
+                                        });
+                                      },
+                                      min: AppData.minTextFactor,
+                                      max: AppData.maxTextFactor,
+                                      divisions: 3, // 4 options total
+                                      activeColor: AppColors.fireColor,
+                                      inactiveColor: Colors.white30,
+                                    ),
+                                  ),
+                                  Text('Aa', style: TextStyle(fontSize: 23.4, color: Colors.white)),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
 
@@ -1530,13 +1576,13 @@ class _SettingsState extends State<SettingsView> {
                             children: [
                               Text(
                                 'Crew Details',
-                                style: TextStyle(color: Colors.white, fontSize: 18),
+                                style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                               ),
                               IconButton(
                                 icon: Icon(
                                   Icons.info_outline, // Info icon
                                   color: Colors.white,
-                                  size: 22, // Adjust size if needed
+                                  size: AppData.text22, // Adjust size if needed
                                 ),
                                 onPressed: () {
                                   // Show an info dialog or tooltip when clicked
@@ -1547,10 +1593,10 @@ class _SettingsState extends State<SettingsView> {
                                         backgroundColor: AppColors.textFieldColor2,
                                         title: Text(
                                           "Crew Details Info",
-                                          style: TextStyle(color: AppColors.textColorPrimary),
+                                          style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.miniDialogTitleTextSize, ),
                                         ),
                                         content:
-                                            Text("This information is used to fill in the respective portions in the generated PDF manifests.", style: TextStyle(color: AppColors.textColorPrimary)),
+                                            Text("This information is used to fill in the respective portions in the generated PDF manifests.", style: TextStyle(fontSize: AppData.miniDialogBodyTextSize,color: AppColors.textColorPrimary)),
                                         actions: [
                                           TextButton(
                                             onPressed: () {
@@ -1558,7 +1604,7 @@ class _SettingsState extends State<SettingsView> {
                                             },
                                             child: Text(
                                               "OK",
-                                              style: TextStyle(color: AppColors.textColorPrimary),
+                                              style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize,),
                                             ),
                                           ),
                                         ],
@@ -1572,7 +1618,7 @@ class _SettingsState extends State<SettingsView> {
                           trailing: Icon(
                             Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
                             color: Colors.white, // Match the arrow color with the text color
-                            size: 24, // Set a fixed size for consistency
+                            size: AppData.text24, // Set a fixed size for consistency
                           ),
                           children: [
                             Column(
@@ -1585,12 +1631,12 @@ class _SettingsState extends State<SettingsView> {
                                     ExpansionTile(
                                       title: Text(
                                         'Crew Name',
-                                        style: TextStyle(color: Colors.white, fontSize: 18),
+                                        style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                                       ),
                                       trailing: Icon(
                                         Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
                                         color: Colors.white, // Match the arrow color with the text color
-                                        size: 24, // Set a fixed size for consistency
+                                        size: AppData.text24, // Set a fixed size for consistency
                                       ),
                                       children: [
                                         ListTile(
@@ -1608,10 +1654,11 @@ class _SettingsState extends State<SettingsView> {
                                               child: TextField(
                                                 controller: crewNameController,
                                                 // Pre-fill with current crew name
-                                                style: const TextStyle(color: Colors.white, fontSize: 18),
+                                                style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                                                 inputFormatters: [
                                                   LengthLimitingTextInputFormatter(30),
                                                 ],
+                                                textCapitalization: TextCapitalization.words,
                                                 decoration: InputDecoration(
                                                   hintText: 'Enter Crew Name',
                                                   hintStyle: const TextStyle(color: Colors.white54),
@@ -1642,12 +1689,12 @@ class _SettingsState extends State<SettingsView> {
                                     ExpansionTile(
                                       title: Text(
                                         'Your Name',
-                                        style: TextStyle(color: Colors.white, fontSize: 18),
+                                        style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                                       ),
                                       trailing: Icon(
                                         Icons.keyboard_arrow_down, // Use a consistent icon for the dropdown
                                         color: Colors.white, // Match the arrow color with the text color
-                                        size: 24, // Set a fixed size for consistency
+                                        size: AppData.text24, // Set a fixed size for consistency
                                       ),
                                       children: [
                                         ListTile(
@@ -1665,10 +1712,11 @@ class _SettingsState extends State<SettingsView> {
                                               child: TextField(
                                                 controller: userNameController,
                                                 // Pre-fill with current user name
-                                                style: const TextStyle(color: Colors.white, fontSize: 18),
+                                                style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                                                 inputFormatters: [
                                                   LengthLimitingTextInputFormatter(30),
                                                 ],
+                                                textCapitalization: TextCapitalization.words,
                                                 decoration: InputDecoration(
                                                   hintText: 'Enter Your Name',
                                                   hintStyle: const TextStyle(color: Colors.white54),
@@ -1705,12 +1753,12 @@ class _SettingsState extends State<SettingsView> {
                         ExpansionTile(
                           title: Text(
                             'External Manifesting',
-                            style: TextStyle(color: Colors.white, fontSize: 18),
+                            style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                           ),
                           trailing: Icon(
                             Icons.keyboard_arrow_down,
                             color: Colors.white,
-                            size: 24,
+                            size: AppData.text24,
                           ),
                           children: [
                             Column(
@@ -1722,13 +1770,13 @@ class _SettingsState extends State<SettingsView> {
                                     'Safety Buffer',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 18,
+                                      fontSize: AppData.text18,
                                     ),
                                   ),
                                   trailing: Icon(
                                     Icons.keyboard_arrow_down,
                                     color: Colors.white,
-                                    size: 24,
+                                    size: AppData.text24,
                                   ),
                                   children: [
                                     ListTile(
@@ -1743,34 +1791,42 @@ class _SettingsState extends State<SettingsView> {
                                         ),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(horizontal: 8),
-                                          child: TextField(
-                                            controller: safetyBufferController,
-                                            // Pre-fill with current user name
-                                            style: const TextStyle(color: Colors.white, fontSize: 18),
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: [
-                                              LengthLimitingTextInputFormatter(3),
-                                              FilteringTextInputFormatter.digitsOnly,
-                                            ],
-                                            decoration: InputDecoration(
-                                              hintText: 'Enter Safety Buffer (lb)',
-                                              hintStyle: const TextStyle(color: Colors.white54),
-                                              enabledBorder: const UnderlineInputBorder(
-                                                borderSide: BorderSide(color: Colors.white54),
-                                              ),
-                                              focusedBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(color: AppColors.fireColor),
-                                              ),
+                                          child: KeyboardActions(
+                                            config: keyboardActionsConfig(
+                                              focusNodes: [_focusNode],
                                             ),
-                                            onSubmitted: (value) {
-                                              setState(() {
-                                                int? parsedValue = int.tryParse(value.trim());
-                                                if (parsedValue != null) {
-                                                  widget.onSafetyBufferChange(parsedValue);
-                                                  ThemePreferences.setSafetyBuffer(parsedValue);
-                                                }
-                                              });
-                                            },
+                                            disableScroll: true,
+                                            child: TextField(
+                                              focusNode: _focusNode,
+                                              controller: safetyBufferController,
+                                              // Pre-fill with current user name
+                                              style: TextStyle(color: Colors.white, fontSize: AppData.text18),
+                                              keyboardType: TextInputType.number,
+                                              textInputAction: TextInputAction.done,
+                                              inputFormatters: [
+                                                LengthLimitingTextInputFormatter(3),
+                                                FilteringTextInputFormatter.digitsOnly,
+                                              ],
+                                              decoration: InputDecoration(
+                                                hintText: 'Enter Safety Buffer (lb)',
+                                                hintStyle: const TextStyle(color: Colors.white54),
+                                                enabledBorder: const UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: Colors.white54),
+                                                ),
+                                                focusedBorder: UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: AppColors.fireColor),
+                                                ),
+                                              ),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  int? parsedValue = int.tryParse(value.trim());
+                                                  if (parsedValue != null) {
+                                                    widget.onSafetyBufferChange(parsedValue);
+                                                    ThemePreferences.setSafetyBuffer(parsedValue);
+                                                  }
+                                                });
+                                              },
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -1792,13 +1848,13 @@ class _SettingsState extends State<SettingsView> {
                                 //             children: [
                                 //               Text(
                                 //                 'Load Accoutrements ',
-                                //                 style: TextStyle(color: Colors.white, fontSize: 18),
+                                //                 style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                                 //               ),
                                 //               IconButton(
                                 //                 icon: Icon(
                                 //                   Icons.info_outline, // Info icon
                                 //                   color: Colors.white,
-                                //                   size: 22, // Adjust size if needed
+                                //                   size: AppData.text22, // Adjust size if needed
                                 //                 ),
                                 //                 onPressed: () {
                                 //                   showDialog(
@@ -1820,7 +1876,7 @@ class _SettingsState extends State<SettingsView> {
                                 //                             },
                                 //                             child: Text(
                                 //                               "OK",
-                                //                               style: TextStyle(color: AppColors.textColorPrimary),
+                                //                               style: TextStyle(color: AppColors.textColorPrimary, fontSize: ),
                                 //                             ),
                                 //                           ),
                                 //                         ],
@@ -1849,9 +1905,9 @@ class _SettingsState extends State<SettingsView> {
                   // Crew Loadout Title
                   ListTile(
                     leading: Icon(Icons.swap_horiz, color: Colors.white),
-                    title: const Text(
+                    title: Text(
                       'CREW LOADOUTS',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(fontSize: AppData.text18, color: Colors.white),
                     ),
                   ),
 
@@ -1867,6 +1923,7 @@ class _SettingsState extends State<SettingsView> {
                             // Dropdown Container
                             Expanded(
                               child: Container(
+                                width: double.infinity,
                                 padding: EdgeInsets.symmetric(horizontal: AppData.padding8),
                                 decoration: BoxDecoration(
                                   color: AppColors.textFieldColor,
@@ -1879,7 +1936,7 @@ class _SettingsState extends State<SettingsView> {
                                       value: selectedLoadout,
                                       hint: Text(
                                         'Select a Loadout',
-                                        style: TextStyle(color: AppColors.textColorPrimary),
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16,),
                                       ),
                                       style: TextStyle(
                                         color: AppColors.textColorPrimary,
@@ -1905,12 +1962,30 @@ class _SettingsState extends State<SettingsView> {
                                         if (isOutOfSync)
                                           DropdownMenuItem<String>(
                                             value: 'Reset Last',
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.refresh, color: Colors.orange), // Reset icon
-                                                SizedBox(width: 8),
-                                                Text('Reset to Last Saved', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.normal)),
-                                              ],
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Row(
+                                                children: [
+                                                  Icon(Icons.refresh, color: Colors.orange), // Reset icon
+                                                  SizedBox(width: 8),
+                                                  Text('Reset to Last Saved', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.normal)),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        if (selectedLoadout != null)
+                                          DropdownMenuItem<String>(
+                                            value: 'Delete Current Loadout',
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+
+                                              child: Row(
+                                                children: [
+                                                  Icon(Icons.delete_forever, color: Colors.red), // Reset icon
+                                                  SizedBox(width: 8),
+                                                  Text('Delete Current Loadout', style: TextStyle(color: Colors.red, fontWeight: FontWeight.normal)),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         // Save Current Loadout Option
@@ -1927,18 +2002,62 @@ class _SettingsState extends State<SettingsView> {
                                         // Save Empty Crew (Start Fresh)
                                         DropdownMenuItem<String>(
                                           value: 'Start Empty',
-                                          child: Row(
-                                            children: [
-                                              Icon(Icons.add, color: Colors.blue), // Fresh start icon
-                                              SizedBox(width: 8),
-                                              Text('Start Empty Crew', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.normal)),
-                                            ],
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.add, color: Colors.blue), // Fresh start icon
+                                                SizedBox(width: 8),
+                                                Text('Start Empty Crew', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.normal)),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ],
                                       onChanged: (String? newValue) async {
                                         String? previousLoadout = selectedLoadout;
-
+                                        if (newValue == 'Delete Current Loadout') {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                backgroundColor: AppColors.textFieldColor2,
+                                                title: Text(
+                                                  'Confirm Deletion',
+                                                  style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
+                                                ),
+                                                content: Text(
+                                                  'Are you sure you want to delete this loadout ($selectedLoadout)?',
+                                                  style: TextStyle(fontSize: AppData.miniDialogBodyTextSize, color: AppColors.textColorPrimary),
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop(); // Close the dialog without deleting
+                                                    },
+                                                    child: Text(
+                                                      'Cancel',
+                                                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize, ),
+                                                    ),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      // Perform deletion
+                                                      _deleteLoadout(selectedLoadout!);
+                                                      // Close the dialogs
+                                                      Navigator.of(context).pop(); // Close confirmation dialog
+                                                    },
+                                                    child: Text(
+                                                      'Delete',
+                                                      style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                          return;
+                                        }
                                         if (newValue == 'Reset Last') {
                                           if (selectedLoadout != null) {
                                             // Confirm reset before applying
@@ -1950,11 +2069,11 @@ class _SettingsState extends State<SettingsView> {
                                                   backgroundColor: AppColors.textFieldColor2,
                                                   title: Text(
                                                     'Confirm Reset',
-                                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                    style: TextStyle(fontSize: AppData.miniDialogTitleTextSize, color: Colors.red, fontWeight: FontWeight.bold),
                                                   ),
                                                   content: Text(
                                                     'Resetting will revert your crew loadout to the last saved version. This will erase any unsaved changes. Proceed?',
-                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize, ),
                                                   ),
                                                   actions: [
                                                     TextButton(
@@ -1963,7 +2082,7 @@ class _SettingsState extends State<SettingsView> {
                                                       },
                                                       child: Text(
                                                         'Cancel',
-                                                        style: TextStyle(color: AppColors.cancelButton),
+                                                        style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                       ),
                                                     ),
                                                     TextButton(
@@ -1972,7 +2091,7 @@ class _SettingsState extends State<SettingsView> {
                                                       },
                                                       child: Text(
                                                         'Reset',
-                                                        style: TextStyle(color: AppColors.textColorPrimary),
+                                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize, ),
                                                       ),
                                                     ),
                                                   ],
@@ -1991,54 +2110,6 @@ class _SettingsState extends State<SettingsView> {
                                           return;
                                         }
                                         if (newValue == 'Save Current') {
-                                          if (isOutOfSync) {
-                                            // Ask for confirmation before switching
-                                            bool? confirmed = await showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AlertDialog(
-                                                  backgroundColor: AppColors.textFieldColor2,
-                                                  title: Text(
-                                                    'Confirm Save Current',
-                                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                                                  ),
-                                                  content: Text(
-                                                    'Saving a new loadout will erase any recent changes made to your current crew loadout.'
-                                                    'This action is irreversible. Proceed?',
-                                                    style: TextStyle(color: AppColors.textColorPrimary),
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.of(context).pop(false); // Return false to cancel
-                                                      },
-                                                      child: Text(
-                                                        'Cancel',
-                                                        style: TextStyle(color: AppColors.cancelButton),
-                                                      ),
-                                                    ),
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.of(context).pop(true); // Return true to confirm
-                                                      },
-                                                      child: Text(
-                                                        'Confirm',
-                                                        style: TextStyle(color: Colors.red),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
-
-                                            // If the user cancels, restore the previous selection
-                                            if (confirmed == false || confirmed == null) {
-                                              setState(() {
-                                                selectedLoadout = previousLoadout;
-                                              });
-                                              return;
-                                            }
-                                          }
                                           _promptNewLoadoutName(previousLoadout ?? "New Loadout", false, false);
                                           return;
                                         }
@@ -2051,13 +2122,13 @@ class _SettingsState extends State<SettingsView> {
                                                 return AlertDialog(
                                                   backgroundColor: AppColors.textFieldColor2,
                                                   title: Text(
-                                                    'Confirm Save Current',
-                                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                    'Confirm Start Empty Crew',
+                                                    style: TextStyle(fontSize: AppData.miniDialogTitleTextSize,color: Colors.red, fontWeight: FontWeight.bold),
                                                   ),
                                                   content: Text(
-                                                    'Saving a new loadout will erase any recent changes made to your current crew loadout.'
+                                                    'Starting a new empty crew will erase any recent changes made to your current crew loadout.'
                                                     'This action is irreversible. Proceed?',
-                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize,),
                                                   ),
                                                   actions: [
                                                     TextButton(
@@ -2066,7 +2137,7 @@ class _SettingsState extends State<SettingsView> {
                                                       },
                                                       child: Text(
                                                         'Cancel',
-                                                        style: TextStyle(color: AppColors.cancelButton),
+                                                        style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                       ),
                                                     ),
                                                     TextButton(
@@ -2075,7 +2146,7 @@ class _SettingsState extends State<SettingsView> {
                                                       },
                                                       child: Text(
                                                         'Confirm',
-                                                        style: TextStyle(color: Colors.red),
+                                                        style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                                       ),
                                                     ),
                                                   ],
@@ -2109,12 +2180,12 @@ class _SettingsState extends State<SettingsView> {
                                                 backgroundColor: AppColors.textFieldColor2,
                                                 title: Text(
                                                   'Confirm Switch',
-                                                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                  style: TextStyle(fontSize: AppData.miniDialogTitleTextSize,color: Colors.red, fontWeight: FontWeight.bold),
                                                 ),
                                                 content: Text(
                                                   'Switching to the loadout, $newValue, will erase any recent changes made to your current crew loadout.'
                                                   'This action is irreversible. Proceed?',
-                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize, ),
                                                 ),
                                                 actions: [
                                                   TextButton(
@@ -2123,7 +2194,7 @@ class _SettingsState extends State<SettingsView> {
                                                     },
                                                     child: Text(
                                                       'Cancel',
-                                                      style: TextStyle(color: AppColors.cancelButton),
+                                                      style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                     ),
                                                   ),
                                                   TextButton(
@@ -2132,7 +2203,7 @@ class _SettingsState extends State<SettingsView> {
                                                     },
                                                     child: Text(
                                                       'Confirm',
-                                                      style: TextStyle(color: Colors.red),
+                                                      style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                                     ),
                                                   ),
                                                 ],
@@ -2157,12 +2228,12 @@ class _SettingsState extends State<SettingsView> {
                                                 backgroundColor: AppColors.textFieldColor2,
                                                 title: Text(
                                                   'Confirm Switch',
-                                                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                                  style: TextStyle(fontSize: AppData.miniDialogTitleTextSize,color: Colors.red, fontWeight: FontWeight.bold),
                                                 ),
                                                 content: Text(
                                                   'Switching to the loadout, $newValue, will erase your current crew data which is not saved to any loadouts.'
                                                   'This action is irreversible. Proceed?',
-                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize, ),
                                                 ),
                                                 actions: [
                                                   TextButton(
@@ -2171,7 +2242,7 @@ class _SettingsState extends State<SettingsView> {
                                                     },
                                                     child: Text(
                                                       'Cancel',
-                                                      style: TextStyle(color: AppColors.cancelButton),
+                                                      style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                     ),
                                                   ),
                                                   TextButton(
@@ -2180,7 +2251,7 @@ class _SettingsState extends State<SettingsView> {
                                                     },
                                                     child: Text(
                                                       'Confirm',
-                                                      style: TextStyle(color: Colors.red),
+                                                      style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                                     ),
                                                   ),
                                                 ],
@@ -2234,12 +2305,12 @@ class _SettingsState extends State<SettingsView> {
                                               backgroundColor: AppColors.textFieldColor2,
                                               title: Text(
                                                 'Confirm Update',
-                                                style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                                style: TextStyle(fontSize: AppData.miniDialogTitleTextSize, color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
                                               ),
                                               content: Text(
                                                 'Updating this loadout will overwrite all previously saved crew data (Crew Members, Gear, Trip Preferences) '
                                                 'from $lastSavedTimestamp with your current crew data. This action is irreversible. Proceed?',
-                                                style: TextStyle(color: AppColors.textColorPrimary),
+                                                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize, ),
                                               ),
                                               actions: [
                                                 TextButton(
@@ -2248,7 +2319,7 @@ class _SettingsState extends State<SettingsView> {
                                                   },
                                                   child: Text(
                                                     'Cancel',
-                                                    style: TextStyle(color: AppColors.cancelButton),
+                                                    style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                   ),
                                                 ),
                                                 TextButton(
@@ -2257,7 +2328,7 @@ class _SettingsState extends State<SettingsView> {
                                                   },
                                                   child: Text(
                                                     'Confirm',
-                                                    style: TextStyle(color: AppColors.saveButtonAllowableWeight),
+                                                    style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize),
                                                   ),
                                                 ),
                                               ],
@@ -2279,91 +2350,50 @@ class _SettingsState extends State<SettingsView> {
                           ],
                         ),
                         if (selectedLoadout != null && selectedLoadout!.isNotEmpty)
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  if (isOutOfSync) {
-                                    _showSyncDifferencesDialog();
-                                  }
-                                },
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      !isOutOfSync ? Icons.check : Icons.sync_disabled_outlined, // Info icon
-                                      color: !isOutOfSync ? Colors.green : Colors.red,
-                                      size: AppData.text22, // Adjust size if needed
-                                    ),
-                                    FittedBox(
-                                      fit: BoxFit.scaleDown, // Shrinks text if needed
-                                      child: Text(
-                                        ' Last Updated: $lastSavedTimestamp ',
-                                        style: TextStyle(
-                                          fontSize: AppData.text14,
-                                          color: isOutOfSync ? Colors.red : Colors.green.withOpacity(0.8),
-                                          fontWeight: isOutOfSync ? FontWeight.bold : FontWeight.normal,
-                                        ),
-                                      ),
-                                    ),
-                                    if (isOutOfSync)
-                                      Icon(
-                                        Icons.info_outline, // Info icon
-                                        color: Colors.red,
-                                        size: AppData.text22, // Adjust size if needed
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              Spacer(),
-                              // Delete Button
-                              IconButton(
-                                icon: Icon(Icons.delete, color: selectedLoadout != null ? Colors.red : Colors.grey, size: AppData.text18),
-                                onPressed: selectedLoadout != null && selectedLoadout != 'Save Current'
-                                    ? () => {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                backgroundColor: AppColors.textFieldColor2,
-                                                title: Text(
-                                                  'Confirm Deletion',
-                                                  style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                                ),
-                                                content: Text(
-                                                  'Are you sure you want to delete this loadout?',
-                                                  style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
-                                                ),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context).pop(); // Close the dialog without deleting
-                                                    },
-                                                    child: Text(
-                                                      'Cancel',
-                                                      style: TextStyle(color: AppColors.textColorPrimary),
-                                                    ),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      // Perform deletion
-                                                      _deleteLoadout(selectedLoadout!);
-                                                      // Close the dialogs
-                                                      Navigator.of(context).pop(); // Close confirmation dialog
-                                                    },
-                                                    child: const Text(
-                                                      'Delete',
-                                                      style: TextStyle(color: Colors.red),
-                                                    ),
-                                                  ),
-                                                ],
-                                              );
-                                            },
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      if (isOutOfSync) {
+                                        _showSyncDifferencesDialog();
+                                      }
+                                    },
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            !isOutOfSync ? Icons.check : Icons.sync_disabled_outlined,
+                                            color: !isOutOfSync ? Colors.green : Colors.red,
+                                            size: AppData.text22,
                                           ),
-                                        }
-                                    : null,
-                              ),
-                            ],
+                                          Text(
+                                            ' Last Updated: $lastSavedTimestamp ',
+                                            style: TextStyle(
+                                              fontSize: AppData.text14,
+                                              color: isOutOfSync ? Colors.red : Colors.green.withOpacity(0.8),
+                                              fontWeight: isOutOfSync ? FontWeight.bold : FontWeight.normal,
+                                            ),
+                                          ),
+                                          if (isOutOfSync)
+                                            Icon(
+                                              Icons.info_outline,
+                                              color: Colors.red,
+                                              size: AppData.text22,
+                                            ),
+                                        ],
+                                      ),
+                                    )
+                                  
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                       ],
                     ),
@@ -2379,11 +2409,11 @@ class _SettingsState extends State<SettingsView> {
                           icon: Icon(
                             Icons.people_outline_rounded,
                             color: Colors.white,
-                            size: 28,
+                            size: AppData.text28,
                           )),
                       TextButton(
                         onPressed: importExportDialog,
-                        child: const Text('Crew Sharing', style: TextStyle(color: Colors.white, fontSize: 18)),
+                        child: Text('Crew Sharing', style: TextStyle(color: Colors.white, fontSize: AppData.text18)),
                       ),
                     ],
                   ),
@@ -2393,9 +2423,9 @@ class _SettingsState extends State<SettingsView> {
                   // Legal Section
                   ListTile(
                     leading: Icon(Icons.gavel, color: Colors.white),
-                    title: const Text(
+                    title: Text(
                       'LEGAL',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(fontSize: AppData.text18, color: Colors.white),
                     ),
                   ),
                   GestureDetector(
@@ -2417,12 +2447,13 @@ class _SettingsState extends State<SettingsView> {
                                     ),
                                     content: SingleChildScrollView(
                                       child: Text(
-                                        'The calculations provided by this app are intended for informational purposes only. '
-                                        'While every effort has been made to ensure accuracy, users must independently verify and validate '
-                                        'all data before relying on it for operational or decision-making purposes. The developers assume no '
-                                        'liability for errors, omissions, or any outcomes resulting from the use of this app. By continuing, '
-                                        'you acknowledge and accept full responsibility for reviewing and confirming all calculations.',
-                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: 18),
+                                        'This application is designed to assist wildland fire personnel in creating detailed manifests for internal and external aviation operations. '
+                                            'The calculations and information provided and generated by this app are for INFORMATIONAL PURPOSES ONLY and should not be solely relied upon for ANY operational, legal, safety, or decision-making purpose.\n\n'
+                                            'While reasonable efforts have been made to ensure accuracy in weight calculations, the developers, distributors, and associated entities make no warranties, express or implied, regarding the reliability, completeness, or correctness of the data generated. '
+                                            'Users assume full responsibility for independently verifying and validating all outputs before use.\n\n'
+                                            'By proceeding, you expressly acknowledge and agree that the developers and associated entities shall not be held liable for any direct, indirect, incidental, consequential, or special damages, including but not limited to financial loss, injury, or regulatory non-compliance, arising from or related to the use or misuse of this application. '
+                                            'Continued use constitutes acceptance of these terms and an agreement to waive any claims against the developers or associated parties.',
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18),
                                       ),
                                     ),
                                     actions: [
@@ -2432,7 +2463,7 @@ class _SettingsState extends State<SettingsView> {
                                         },
                                         child: Text(
                                           'Close',
-                                          style: TextStyle(color: AppColors.textColorPrimary),
+                                          style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize),
                                         ),
                                       ),
                                     ],
@@ -2440,9 +2471,9 @@ class _SettingsState extends State<SettingsView> {
                                 },
                               );
                             },
-                            child: const Text(
+                            child: Text(
                               'Terms and Conditions',
-                              style: TextStyle(color: Colors.white, fontSize: 18),
+                              style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                             ),
                           ),
                         ],

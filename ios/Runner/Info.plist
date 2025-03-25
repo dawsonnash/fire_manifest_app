@@ -46,13 +46,18 @@
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
 		<key>UIStatusBarHidden</key>
-		<false/>
+		<true/>
 		<key>NSPhotoLibraryUsageDescription</key>
-			<string>This app does not use photo gallery access.</string>
+		<string>This app does not use photo gallery access.</string>
 		<key>NSDocumentsDirectoryUsageDescription</key>
-			<string>This app needs access to documents to allow file sharing.</string>
+		<string>This app needs access to documents to allow file sharing.</string>
 		<key>NSMicrophoneUsageDescription</key>
-			<string>This app does not record audio or need microphone access.</string>
+		<string>This app does not record audio or need microphone access.</string>
+		<key>UIViewControllerBasedStatusBarAppearance</key>
+		<false/>
+		<key>UISupportedInterfaceOrientations</key>
+        <array>
+            <string>UIInterfaceOrientationPortrait</string>
+        </array>
 	</dict>
 </plist>
-

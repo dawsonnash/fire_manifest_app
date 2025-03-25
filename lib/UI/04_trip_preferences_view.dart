@@ -1,12 +1,15 @@
 import 'dart:ui';
-import 'package:fire_app/UI/04_add_trip_preference.dart';
+
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
+import 'package:fire_app/UI/04_add_trip_preference.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '04_edit_trip_preference.dart';
-import '../CodeShare/colors.dart';
-import '../Data/trip_preferences.dart';
 import 'package:hive/hive.dart';
+
+import '../CodeShare/variables.dart';
+import '../Data/trip_preferences.dart';
+import '04_edit_trip_preference.dart';
 
 class TripPreferences extends StatefulWidget {
   const TripPreferences({super.key});
@@ -60,7 +63,7 @@ class _TripPreferencesState extends State<TripPreferences> {
     );
 
     TextStyle panelTextStyle = TextStyle(
-      fontSize: 22,
+      fontSize: AppData.text22,
       fontWeight: FontWeight.bold,
       color: AppColors.textColorPrimary,
     );
@@ -79,7 +82,7 @@ class _TripPreferencesState extends State<TripPreferences> {
         backgroundColor: AppColors.appBarColor,
         title: Text(
           'Trip Preferences',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
       ),
       body: Stack(
@@ -142,16 +145,17 @@ class _TripPreferencesState extends State<TripPreferences> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
-                                        child: Text(
+                                        child: AutoSizeText(
                                           'No Trip Preferences created...',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
-                                            fontSize: 22,
+                                            fontSize: AppData.text22,
                                             fontWeight: FontWeight.bold,
                                             color: AppColors.textColorPrimary,
                                           ),
+                                          maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
+                                          minFontSize: 10, // Optional: shrink down to this size
                                         ),
                                       ),
                                     ],
@@ -168,7 +172,6 @@ class _TripPreferencesState extends State<TripPreferences> {
                                 // Display TripPreference data in a scrollable list
                                 return GestureDetector(
                                   onTap: () async {
-
                                     // Awaits the result from the next page so it updates in real time
                                     await Navigator.push(
                                       context,
@@ -186,7 +189,7 @@ class _TripPreferencesState extends State<TripPreferences> {
                                       color: Colors.red, // Background color when swiping
                                       alignment: Alignment.centerRight,
                                       padding: EdgeInsets.symmetric(horizontal: 20),
-                                      child: Icon(Icons.delete, color: Colors.white, size: 30), // Delete icon
+                                      child: Icon(Icons.delete, color: Colors.white, size: AppData.text30), // Delete icon
                                     ),
                                     confirmDismiss: (direction) async {
                                       // Show a confirmation dialog before dismissing
@@ -206,11 +209,11 @@ class _TripPreferencesState extends State<TripPreferences> {
                                             actions: [
                                               TextButton(
                                                 onPressed: () => Navigator.of(context).pop(false), // Cancel dismissal
-                                                child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                                child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                                               ),
                                               TextButton(
                                                 onPressed: () => Navigator.of(context).pop(true), // Confirm dismissal
-                                                child: Text('Delete', style: TextStyle(color: Colors.red)),
+                                                child: Text('Delete', style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize)),
                                               ),
                                             ],
                                           );
@@ -229,7 +232,7 @@ class _TripPreferencesState extends State<TripPreferences> {
                                           content: Center(
                                             child: Text(
                                               'Trip Preference Deleted!',
-                                              style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
+                                              style: TextStyle(color: Colors.black, fontSize: AppData.text24, fontWeight: FontWeight.bold),
                                             ),
                                           ),
                                           backgroundColor: Colors.red,
@@ -237,137 +240,143 @@ class _TripPreferencesState extends State<TripPreferences> {
                                         ),
                                       );
                                     },
-                                  child: Card(
-                                    color: AppColors.textFieldColor,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        // Could change color here
-                                        borderRadius: BorderRadius.circular(9),
-                                      ),
-                                      child: ListTile(
-                                        iconColor: AppColors.primaryColor,
-                                        title: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                tripPreference.tripPreferenceName,
-                                                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                                overflow: TextOverflow.ellipsis, // Add this
-                                                maxLines: 1,
+                                    child: Card(
+                                      color: AppColors.textFieldColor,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          // Could change color here
+                                          borderRadius: BorderRadius.circular(9),
+                                        ),
+                                        child: ListTile(
+                                          iconColor: AppColors.primaryColor,
+                                          title: Row(
+                                            children: [
+                                              Expanded(
+                                                child: FittedBox(
+                                                  fit: BoxFit.scaleDown,
+                                                  child: Text(
+                                                    tripPreference.tripPreferenceName,
+                                                    style: TextStyle(fontSize: AppData.text22, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                                    overflow: TextOverflow.ellipsis, // Add this
+                                                    maxLines: 1,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                            IconButton(
-                                                icon: Icon(Icons.more_vert, color: AppColors.textColorPrimary, size: 32),
-                                                onPressed: () {
-                                                  showModalBottomSheet(
-                                                    backgroundColor: AppColors.textFieldColor2,
-                                                    context: context,
-                                                    builder: (BuildContext context) {
-                                                      return Column(
-                                                        mainAxisSize: MainAxisSize.min,
-                                                        children: <Widget>[
-                                                          ListTile(
-                                                            leading: Icon(Icons.edit, color: AppColors.textColorPrimary),
-                                                            title: Text(
-                                                              'Edit Trip Preference',
-                                                              style: TextStyle(color: AppColors.textColorPrimary),
-                                                            ),
-                                                            onTap: () async {
-                                                              Navigator.of(context).pop(); //
 
-                                                              // Awaits the result from the next page so it updates in real time
-                                                              await Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                  builder: (context) => EditTripPreference(tripPreference: tripPreference, onUpdate: loadTripPreferenceList),
+                                              IconButton(
+                                                  icon: Icon(Icons.more_vert, color: AppColors.textColorPrimary, size: AppData.text32),
+                                                  onPressed: () {
+                                                    showModalBottomSheet(
+                                                      backgroundColor: AppColors.textFieldColor2,
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return Padding(
+                                                          padding: EdgeInsets.only(bottom: AppData.bottomModalPadding),
+                                                          child: Column(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            children: <Widget>[
+                                                              ListTile(
+                                                                leading: Icon(Icons.edit, color: AppColors.textColorPrimary),
+                                                                title: Text(
+                                                                  'Edit Trip Preference',
+                                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.modalTextSize),
                                                                 ),
-                                                              );
-                                                              // Calls the update function after returning from AddTripPreference
-                                                              loadTripPreferenceList();
-                                                            },
-                                                          ),
-                                                          ListTile(
-                                                            leading: Icon(Icons.delete, color: Colors.red),
-                                                            title: Text(
-                                                              'Delete Trip Preference',
-                                                              style: TextStyle(color: AppColors.textColorPrimary),
-                                                            ),
-                                                            onTap: () {
-                                                              Navigator.of(context).pop(); // Close the dialog without deleting
+                                                                onTap: () async {
+                                                                  Navigator.of(context).pop(); //
 
-                                                              showDialog(
-                                                                context: context,
-                                                                builder: (BuildContext context) {
-                                                                  return AlertDialog(
-                                                                    backgroundColor: AppColors.textFieldColor2,
-                                                                    title: Text(
-                                                                      'Confirm Deletion',
-                                                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                                                  // Awaits the result from the next page so it updates in real time
+                                                                  await Navigator.push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                      builder: (context) => EditTripPreference(tripPreference: tripPreference, onUpdate: loadTripPreferenceList),
                                                                     ),
-                                                                    content: Text(
-                                                                      'This Trip Preference will be erased!',
-                                                                      style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
-                                                                    ),
-                                                                    actions: [
-                                                                      TextButton(
-                                                                        onPressed: () {
-                                                                          Navigator.of(context).pop(); // Close the dialog without deleting
-                                                                        },
-                                                                        child: Text(
-                                                                          'Cancel',
-                                                                          style: TextStyle(color: AppColors.cancelButton),
+                                                                  );
+                                                                  // Calls the update function after returning from AddTripPreference
+                                                                  loadTripPreferenceList();
+                                                                },
+                                                              ),
+                                                              ListTile(
+                                                                leading: Icon(Icons.delete, color: Colors.red),
+                                                                title: Text(
+                                                                  'Delete Trip Preference',
+                                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.modalTextSize),
+                                                                ),
+                                                                onTap: () {
+                                                                  Navigator.of(context).pop(); // Close the dialog without deleting
+
+                                                                  showDialog(
+                                                                    context: context,
+                                                                    builder: (BuildContext context) {
+                                                                      return AlertDialog(
+                                                                        backgroundColor: AppColors.textFieldColor2,
+                                                                        title: Text(
+                                                                          'Confirm Deletion',
+                                                                          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                                                         ),
-                                                                      ),
-                                                                      TextButton(
-                                                                        onPressed: () {
-                                                                          savedPreferences.removeTripPreference(tripPreference);
-
-                                                                          // Show deletion pop-up
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
-                                                                            SnackBar(
-                                                                              content: Center(
-                                                                                child: Text(
-                                                                                  'Trip Preference Deleted!',
-                                                                                  // Maybe change look
-                                                                                  style: const TextStyle(
-                                                                                    color: Colors.black,
-                                                                                    fontSize: 32,
-                                                                                    fontWeight: FontWeight.bold,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                              duration: Duration(seconds: 2),
-                                                                              backgroundColor: Colors.red,
+                                                                        content: Text(
+                                                                          'This Trip Preference will be erased!',
+                                                                          style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                                                        ),
+                                                                        actions: [
+                                                                          TextButton(
+                                                                            onPressed: () {
+                                                                              Navigator.of(context).pop(); // Close the dialog without deleting
+                                                                            },
+                                                                            child: Text(
+                                                                              'Cancel',
+                                                                              style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                                             ),
-                                                                          );
+                                                                          ),
+                                                                          TextButton(
+                                                                            onPressed: () {
+                                                                              savedPreferences.removeTripPreference(tripPreference);
 
-                                                                          Navigator.of(context).pop(); // Dismiss the dialog
-                                                                          loadTripPreferenceList();
-                                                                        },
-                                                                        child: const Text(
-                                                                          'Delete',
-                                                                          style: TextStyle(color: Colors.red),
-                                                                        ),
-                                                                      ),
-                                                                    ],
+                                                                              // Show deletion pop-up
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                SnackBar(
+                                                                                  content: Center(
+                                                                                    child: Text(
+                                                                                      'Trip Preference Deleted!',
+                                                                                      // Maybe change look
+                                                                                      style: TextStyle(
+                                                                                        color: Colors.black,
+                                                                                        fontSize: AppData.text32,
+                                                                                        fontWeight: FontWeight.bold,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
+                                                                                  backgroundColor: Colors.red,
+                                                                                ),
+                                                                              );
+
+                                                                              Navigator.of(context).pop(); // Dismiss the dialog
+                                                                              loadTripPreferenceList();
+                                                                            },
+                                                                            child: Text(
+                                                                              'Delete',
+                                                                              style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      );
+                                                                    },
                                                                   );
                                                                 },
-                                                              );
-                                                            },
+                                                              ),
+                                                            ],
                                                           ),
-                                                        ],
-                                                      );
-                                                    },
-                                                  );
-                                                })
-                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                  })
+                                            ],
+                                          ),
+                                          leading: FaIcon(FontAwesomeIcons.fire),
                                         ),
-                                        leading: FaIcon(FontAwesomeIcons.fire),
                                       ),
                                     ),
                                   ),
-                                ),
                                 );
                               },
                             ),
@@ -394,18 +403,21 @@ class _TripPreferencesState extends State<TripPreferences> {
                           boxShadow: AppColors.isDarkMode
                               ? [] // No shadow in dark mode
                               : [
-                            BoxShadow(
-                              color: Colors.white.withValues(alpha: 0.5), // Shadow color
-                              spreadRadius: 0, // Spread of the shadow
-                              blurRadius: 20, // Blur effect
-                              offset: Offset(0, 0), // Offset in x and y direction
-                            ),
-                          ],
+                                  BoxShadow(
+                                    color: Colors.white.withValues(alpha: 0.5), // Shadow color
+                                    spreadRadius: 0, // Spread of the shadow
+                                    blurRadius: 20, // Blur effect
+                                    offset: Offset(0, 0), // Offset in x and y direction
+                                  ),
+                                ],
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min, // Ensures the container width is only as wide as its content
                           children: [
-                            Icon(FontAwesomeIcons.circlePlus, color: AppColors.primaryColor,),
+                            Icon(
+                              FontAwesomeIcons.circlePlus,
+                              color: AppColors.primaryColor,
+                            ),
                             SizedBox(width: 8), // Space between the icon and the text
                             Text(
                               'Trip Preference',

@@ -1,31 +1,29 @@
 import 'dart:ui';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 
-import '../CodeShare/colors.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
+import '../Data/crewmember.dart';
 import '../Data/gear.dart';
-import '../Data/saved_preferences.dart';
 import '../Data/gear_preferences.dart';
 import '../Data/positional_preferences.dart';
+import '../Data/saved_preferences.dart';
 import '../Data/trip_preferences.dart';
-import '../Data/crewmember.dart';
-import 'package:flutter/material.dart';
 
 class AddLoadPreference extends StatefulWidget {
   // This page requires a Trip Preference object to be passed to it - to edit it
   final TripPreference tripPreference;
   final VoidCallback onUpdate; // Callback for deletion to update previous page
 
-  const AddLoadPreference(
-      {super.key, required this.tripPreference, required this.onUpdate});
+  const AddLoadPreference({super.key, required this.tripPreference, required this.onUpdate});
 
   @override
   State<AddLoadPreference> createState() => _AddLoadPreferenceState();
 }
 
-class _AddLoadPreferenceState extends State<AddLoadPreference>
-    with TickerProviderStateMixin {
+class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProviderStateMixin {
   late final TabController _tabController;
 
   // Variables to store user input
@@ -37,16 +35,13 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
   List<Gear> selectedGear = [];
   Map<Gear, int> selectedGearQuantities = {};
 
-  bool isPositionalSaveButtonEnabled =
-      false; // Controls whether saving button is showing
-  bool isGearSaveButtonEnabled =
-      false; // Controls whether saving button is showing
+  bool isPositionalSaveButtonEnabled = false; // Controls whether saving button is showing
+  bool isGearSaveButtonEnabled = false; // Controls whether saving button is showing
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-
   }
 
   @override
@@ -68,7 +63,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
         .map((cm) => (cm as CrewMember).name + "_" + cm.position.toString()) // Store "name_position" key
         .toSet();
 
-
     // Populate saw team options
     for (int i = 1; i <= 6; i++) {
       List<CrewMember> sawTeam = crew.getSawTeam(i);
@@ -76,16 +70,11 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
       // Only add the Saw Team if NONE of its members are in usedCrewMembers or selectedCrewMembers
       if (sawTeam.isNotEmpty &&
           sawTeam.every((member) =>
-          !usedCrewMembers.contains(member.name + "_" + member.position.toString()) &&
-              !selectedCrewMembers.any((selected) =>
-              selected is CrewMember &&
-                  selected.name == member.name &&
-                  selected.position == member.position)
-          )) {
+              !usedCrewMembers.contains(member.name + "_" + member.position.toString()) &&
+              !selectedCrewMembers.any((selected) => selected is CrewMember && selected.name == member.name && selected.position == member.position))) {
         sawTeamOptions.add({'name': 'Saw Team $i', 'members': sawTeam});
       }
     }
-
 
     // Populate individual crew member options, so they remain visible and checked if selected
     for (var member in crew.crewMembers) {
@@ -96,9 +85,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
         // Check if the member is part of a fully selected Saw Team
         for (int i = 1; i <= 6; i++) {
           List<CrewMember> sawTeam = crew.getSawTeam(i);
-          if (sawTeam.contains(member) &&
-              selectedCrewMembers.any(
-                  (item) => item is Map && item['name'] == 'Saw Team $i')) {
+          if (sawTeam.contains(member) && selectedCrewMembers.any((item) => item is Map && item['name'] == 'Saw Team $i')) {
             isPartOfSelectedSawTeam = true;
             break;
           }
@@ -118,13 +105,13 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
     if (sawTeamOptions.isEmpty && individualOptions.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+         SnackBar(
           content: Text(
             'No crew members available',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.black,
-              fontSize: 28,
+              fontSize: AppData.text28,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -156,16 +143,13 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
               // Repopulate Saw Team options
               for (int i = 1; i <= 6; i++) {
                 List<CrewMember> sawTeam = crew.getSawTeam(i);
-                List<String> sawTeamKeys = sawTeam.map((m) =>
-                m.name.trim().toLowerCase() + "_" + m.position.toString()).toList();
+                List<String> sawTeamKeys = sawTeam.map((m) => m.name.trim().toLowerCase() + "_" + m.position.toString()).toList();
 
                 if (sawTeam.isNotEmpty &&
                     sawTeam.every((member) =>
-                    !usedCrewMembers.contains(member.name.trim().toLowerCase() + "_" + member.position.toString()) &&
-                        !selectedCrewMembers.any((selected) =>
-                        selected is CrewMember &&
-                            selected.name.trim().toLowerCase() == member.name.trim().toLowerCase() &&
-                            selected.position == member.position))) {
+                        !usedCrewMembers.contains(member.name.trim().toLowerCase() + "_" + member.position.toString()) &&
+                        !selectedCrewMembers
+                            .any((selected) => selected is CrewMember && selected.name.trim().toLowerCase() == member.name.trim().toLowerCase() && selected.position == member.position))) {
                   sawTeamOptions.add({'name': 'Saw Team $i', 'members': sawTeam});
                 }
               }
@@ -179,11 +163,9 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
                   for (int i = 1; i <= 6; i++) {
                     List<CrewMember> sawTeam = crew.getSawTeam(i);
-                    List<String> sawTeamKeys = sawTeam.map((m) =>
-                    m.name.trim().toLowerCase() + "_" + m.position.toString()).toList();
+                    List<String> sawTeamKeys = sawTeam.map((m) => m.name.trim().toLowerCase() + "_" + m.position.toString()).toList();
 
-                    if (sawTeam.contains(member) &&
-                        selectedCrewMembers.any((item) => item is Map && item['name'] == 'Saw Team $i')) {
+                    if (sawTeam.contains(member) && selectedCrewMembers.any((item) => item is Map && item['name'] == 'Saw Team $i')) {
                       isPartOfSelectedSawTeam = true;
                       break;
                     }
@@ -193,10 +175,8 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                     individualOptions.add({
                       'name': member.name,
                       'members': [member],
-                      'isSelected': selectedCrewMembers.any((selected) =>
-                      selected is CrewMember &&
-                          selected.name.trim().toLowerCase() == member.name.trim().toLowerCase() &&
-                          selected.position == member.position)
+                      'isSelected': selectedCrewMembers
+                          .any((selected) => selected is CrewMember && selected.name.trim().toLowerCase() == member.name.trim().toLowerCase() && selected.position == member.position)
                     });
                   }
                 }
@@ -207,11 +187,11 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
             return AlertDialog(
               backgroundColor: AppColors.textFieldColor2,
-              title:  Text(
+              title: Text(
                 'Select Crew Members',
                 style: TextStyle(
                   color: AppColors.textColorPrimary,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.bold, fontSize: AppData.text20
                 ),
               ),
               content: SizedBox(
@@ -220,8 +200,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                   child: Column(
                     children: [
                       ...sawTeamOptions.map((option) {
-                        bool isSelected = selectedCrewMembers.any((item) =>
-                            item is Map && item['name'] == option['name']);
+                        bool isSelected = selectedCrewMembers.any((item) => item is Map && item['name'] == option['name']);
                         return CheckboxListTile(
                           activeColor: AppColors.textColorPrimary,
                           // Checkbox outline color when active
@@ -230,7 +209,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                             color: AppColors.textColorPrimary, // Outline color
                             width: 2.0, // Outline width
                           ),
-                          title: Text(option['name'], style: TextStyle(color: AppColors.textColorPrimary),),
+                          title: Text(
+                            option['name'],
+                            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
+                          ),
                           value: isSelected,
                           onChanged: (bool? isChecked) {
                             setState(() {
@@ -240,21 +222,15 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                   selectedCrewMembers.remove(member);
                                 }
                               } else {
-                                selectedCrewMembers.removeWhere((item) =>
-                                    item is Map &&
-                                    item['name'] == option['name']);
+                                selectedCrewMembers.removeWhere((item) => item is Map && item['name'] == option['name']);
                               }
                               updateSelection();
                             });
                           },
                         );
                       }).toList(),
-                      if (sawTeamOptions.isNotEmpty &&
-                          individualOptions.isNotEmpty)
-                         Divider(color: AppColors.textColorPrimary, thickness: 1),
-                      ...sortCrewListByPosition(
-                          individualOptions.map((option) => option['members'].first as CrewMember).toList()
-                      ).map((CrewMember member) {
+                      if (sawTeamOptions.isNotEmpty && individualOptions.isNotEmpty) Divider(color: AppColors.textColorPrimary, thickness: 1),
+                      ...sortCrewListByPosition(individualOptions.map((option) => option['members'].first as CrewMember).toList()).map((CrewMember member) {
                         bool isSelected = selectedCrewMembers.contains(member);
 
                         return CheckboxListTile(
@@ -269,12 +245,14 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                             style: TextStyle(
                               color: AppColors.textColorPrimary,
                               fontWeight: FontWeight.bold,
+                              fontSize: AppData.text16
                             ),
                           ),
                           subtitle: Text(
                             member.getPositionTitle(member.position),
                             style: TextStyle(
                               color: AppColors.textColorPrimary,
+                                fontSize: AppData.text14
                             ),
                           ),
                           value: isSelected,
@@ -290,7 +268,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                           },
                         );
                       }).toList(),
-
                     ],
                   ),
                 ),
@@ -300,7 +277,13 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('Save', style: TextStyle(color: AppColors.saveButtonAllowableWeight),),
+                  child: Text(
+                    'Save',
+                    style: TextStyle(
+                      color: AppColors.saveButtonAllowableWeight,
+                      fontSize: AppData.bottomDialogTextSize,
+                    ),
+                  ),
                 ),
               ],
             );
@@ -325,8 +308,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     // Calculate total used quantities from all existing gear preferences
     for (var gearPref in widget.tripPreference.gearPreferences) {
       for (var gear in gearPref.gear) {
-        totalQuantities[gear.name] =
-            (totalQuantities[gear.name] ?? 0) + gear.quantity;
+        totalQuantities[gear.name] = (totalQuantities[gear.name] ?? 0) + gear.quantity;
       }
     }
 
@@ -338,19 +320,17 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
     // Initialize selected gear quantities if not already set
     if (selectedGearQuantities.isEmpty) {
-      selectedGearQuantities = {
-        for (var gear in selectedGear) gear: gear.quantity
-      };
+      selectedGearQuantities = {for (var gear in selectedGear) gear: gear.quantity};
     }
     if (availableGear.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+         SnackBar(
           content: Text(
             'No gear available',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.black,
-              fontSize: 28,
+              fontSize: AppData.text28,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -369,10 +349,11 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
           builder: (context, setState) {
             return AlertDialog(
               backgroundColor: AppColors.textFieldColor2,
-              title:  Text(
+              title: Text(
                 'Select Gear',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary,
+                    fontSize: AppData.text20),
               ),
               content: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.8, // 80% of the screen width
@@ -380,8 +361,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                   child: Column(
                     children: availableGear.map((gear) {
                       // Calculate the correct remaining quantity for this gear item
-                      int remainingQuantity =
-                          gear.quantity - (totalQuantities[gear.name] ?? 0);
+                      int remainingQuantity = gear.quantity - (totalQuantities[gear.name] ?? 0);
 
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -397,14 +377,13 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                       fontSize: AppData.text16,
                                       color: AppColors.textColorPrimary,
                                     ),
-                                    overflow: TextOverflow
-                                        .ellipsis, // Use ellipsis if text is too long
+                                    overflow: TextOverflow.ellipsis, // Use ellipsis if text is too long
                                   ),
                                 ),
                                 Text(
                                   ' (x$remainingQuantity)  ',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: AppData.text14,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey,
                                   ),
@@ -422,32 +401,25 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                       return AlertDialog(
                                         backgroundColor: AppColors.textFieldColor2,
                                         title: Text(
-                                            'Select Quantity for ${gear.name}',
-                                        style: TextStyle(color: AppColors.textColorPrimary),),
+                                          'Select Quantity for ${gear.name}',
+                                          style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18),
+                                        ),
                                         content: Container(
                                           height: 150,
                                           child: CupertinoPicker(
-                                            scrollController:
-                                                FixedExtentScrollController(
-                                                    initialItem:
-                                                        (selectedGearQuantities[
-                                                                    gear] ??
-                                                                1) -
-                                                            1),
+                                            scrollController: FixedExtentScrollController(initialItem: (selectedGearQuantities[gear] ?? 1) - 1),
                                             itemExtent: 32.0,
                                             // Height of each item
                                             onSelectedItemChanged: (int value) {
                                               setState(() {
-                                                selectedGearQuantities[gear] =
-                                                    value + 1;
+                                                selectedGearQuantities[gear] = value + 1;
                                               });
                                             },
-                                            children: List<Widget>.generate(
-                                                remainingQuantity, (int index) {
+                                            children: List<Widget>.generate(remainingQuantity, (int index) {
                                               return Center(
                                                 child: Text(
                                                   '${index + 1}',
-                                                  style: TextStyle(fontSize: 20, color: AppColors.textColorPrimary),
+                                                  style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary),
                                                 ),
                                               );
                                             }),
@@ -458,7 +430,10 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                             onPressed: () {
                                               Navigator.of(context).pop();
                                             },
-                                            child:  Text('Select', style: TextStyle(color: AppColors.textColorPrimary),),
+                                            child: Text(
+                                              'Select',
+                                              style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize),
+                                            ),
                                           ),
                                         ],
                                       );
@@ -468,16 +443,13 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                 child: Row(
                                   children: [
                                     Text(
-                                      'Qty: ${selectedGearQuantities[gear] ?? 1}',
+                                      '   Qty: ${selectedGearQuantities[gear] ?? 1}',
                                       style: TextStyle(
                                         fontSize: AppData.text16,
                                         color: AppColors.textColorPrimary,
                                       ),
                                     ),
-                                    Icon(
-                                      Icons.arrow_drop_down,
-                                      color: AppColors.textColorPrimary
-                                    ),
+                                    Icon(Icons.arrow_drop_down, color: AppColors.textColorPrimary),
                                   ],
                                 ),
                               ),
@@ -512,12 +484,17 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                 TextButton(
                   onPressed: () {
                     tempSelectedGear.forEach((gear) {
-                      selectedGearQuantities[gear] =
-                          selectedGearQuantities[gear] ?? 1;
+                      selectedGearQuantities[gear] = selectedGearQuantities[gear] ?? 1;
                     });
                     Navigator.of(context).pop(tempSelectedGear);
                   },
-                  child:  Text('Save', style: TextStyle(color: AppColors.saveButtonAllowableWeight),),
+                  child: Text(
+                    'Save',
+                    style: TextStyle(
+                      color: AppColors.saveButtonAllowableWeight,
+                      fontSize: AppData.bottomDialogTextSize,
+                    ),
+                  ),
                 ),
               ],
             );
@@ -536,15 +513,13 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
   void _checkPositionalInput() {
     setState(() {
-      isPositionalSaveButtonEnabled = selectedCrewMembers.isNotEmpty &&
-          selectedPositionalLoadPreference != null;
+      isPositionalSaveButtonEnabled = selectedCrewMembers.isNotEmpty && selectedPositionalLoadPreference != null;
     });
   }
 
   void _checkGearInput() {
     setState(() {
-      isGearSaveButtonEnabled =
-          selectedGear.isNotEmpty && selectedGearLoadPreference != null;
+      isGearSaveButtonEnabled = selectedGear.isNotEmpty && selectedGearLoadPreference != null;
     });
   }
 
@@ -557,12 +532,12 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
         // Fully detach CrewMembers from Hive before saving
         List<CrewMember> copiedSawTeam = (member['members'] as List<CrewMember>)
             .map((crew) => CrewMember(
-          name: crew.name,
-          flightWeight: crew.flightWeight,
-          position: crew.position,
-          personalTools: crew.personalTools?.map((tool) => tool.copyWith()).toList(),
-          id: crew.id, // Keep ID, but detach from Hive
-        ))
+                  name: crew.name,
+                  flightWeight: crew.flightWeight,
+                  position: crew.position,
+                  personalTools: crew.personalTools?.map((tool) => tool.copyWith()).toList(),
+                  id: crew.id, // Keep ID, but detach from Hive
+                ))
             .toList();
 
         crewMembersToSave.add(copiedSawTeam); // Store detached List<CrewMember>
@@ -592,16 +567,16 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
     // Show a success message
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text(
           'Preference saved!',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 32,
+            fontSize: AppData.text32,
             fontWeight: FontWeight.bold,
           ),
         ),
-        duration: Duration(seconds: 1),
+        duration: const Duration(seconds: 1),
         backgroundColor: Colors.green,
       ),
     );
@@ -636,16 +611,16 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
 
     // Show a success message
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text(
           'Preference saved!',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 32,
+            fontSize: AppData.text32,
             fontWeight: FontWeight.bold,
           ),
         ),
-        duration: Duration(seconds: 1),
+        duration: const Duration(seconds: 1),
         backgroundColor: Colors.green,
       ),
     );
@@ -658,7 +633,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
     // Main theme button style
     final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
-        textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        textStyle: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold),
         backgroundColor: AppColors.fireColor,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         //surfaceTintColor: Colors.grey,
@@ -667,8 +642,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
         side: const BorderSide(color: Colors.black, width: 2),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         // Maybe change? Dynamic button size based on screen size
-        fixedSize: Size(MediaQuery.of(context).size.width / 2,
-            MediaQuery.of(context).size.height / 10));
+        fixedSize: Size(MediaQuery.of(context).size.width / 2, MediaQuery.of(context).size.height / 10));
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -685,9 +659,9 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
           },
         ),
         backgroundColor: AppColors.appBarColor,
-        title:  Text(
+        title: Text(
           'Add Load Preference',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
         bottom: TabBar(
           unselectedLabelColor: AppColors.tabIconColor,
@@ -710,36 +684,35 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
             color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
             child: AppColors.isDarkMode
                 ? (AppColors.enableBackgroundImage
-                ? Stack(
-              children: [
-                ImageFiltered(
-                  imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                  child: Image.asset(
-                    'assets/images/logo1.png',
-                    fit: BoxFit.cover, // Cover the entire background
-                    width: double.infinity,
-                    height: double.infinity,
-                  ),
-                ),
-                Container(
-                  color: AppColors.logoImageOverlay, // Semi-transparent overlay
-                  width: double.infinity,
-                  height: double.infinity,
-                ),
-              ],
-            )
-                : null) // No image if background is disabled
+                    ? Stack(
+                        children: [
+                          ImageFiltered(
+                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                            child: Image.asset(
+                              'assets/images/logo1.png',
+                              fit: BoxFit.cover, // Cover the entire background
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                          Container(
+                            color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ],
+                      )
+                    : null) // No image if background is disabled
                 : ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
-              child: Image.asset(
-                'assets/images/logo1.png',
-                fit: BoxFit.cover, // Cover the entire background
-                width: double.infinity,
-                height: double.infinity,
-              ),
-            ),
+                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+                    child: Image.asset(
+                      'assets/images/logo1.png',
+                      fit: BoxFit.cover, // Cover the entire background
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
           ),
-
           Container(
             color: Colors.white.withValues(alpha: 0.05),
             child: TabBarView(
@@ -759,32 +732,26 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                           // Trigger dialog on tap
                           child: Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 16),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                             decoration: BoxDecoration(
                               color: AppColors.textFieldColor,
                               borderRadius: BorderRadius.circular(12.0),
-                              border:
-                                  Border.all(color: AppColors.borderPrimary, width: 2.0),
+                              border: Border.all(color: AppColors.borderPrimary, width: 2.0),
                             ),
                             child: Text(
                               selectedCrewMembers.isEmpty
                                   ? 'Choose crew member(s)'
                                   : selectedCrewMembers.map((e) {
-                                      if (e is Map &&
-                                          e.containsKey('name') &&
-                                          e['name'].startsWith('Saw Team')) {
-                                        return e[
-                                            'name']; // Display "Saw Team i"
+                                      if (e is Map && e.containsKey('name') && e['name'].startsWith('Saw Team')) {
+                                        return e['name']; // Display "Saw Team i"
                                       } else if (e is CrewMember) {
-                                        return e
-                                            .name; // Display individual crew member name
+                                        return e.name; // Display individual crew member name
                                       }
                                       return '';
                                     }).join(', '),
-                              style:  TextStyle(
+                              style: TextStyle(
                                 color: AppColors.textColorPrimary,
-                                fontSize: 22,
+                                fontSize: AppData.text20,
                               ),
                             ),
                           ),
@@ -810,28 +777,30 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                 'Choose load preference',
                                 style: TextStyle(
                                   color: AppColors.textColorPrimary,
-                                  fontSize: 22,
+                                  fontSize: AppData.text20,
                                 ),
                               ),
                               dropdownColor: AppColors.textFieldColor2,
                               style: TextStyle(
                                 color: AppColors.textColorPrimary,
-                                fontSize: 22,
+                                fontSize: AppData.text20,
                               ),
                               iconEnabledColor: AppColors.textColorPrimary,
                               items: loadPreferenceMap.entries.map((entry) {
                                 return DropdownMenuItem<int>(
                                   value: entry.key,
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(entry.value, style: TextStyle(color: AppColors.textColorPrimary),),
+                                      Text(
+                                        entry.value,
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text22),
+                                      ),
                                       IconButton(
                                         icon: Icon(
                                           Icons.info_outline,
                                           color: AppColors.textColorPrimary,
-                                          size: 24,
+                                          size: AppData.text24,
                                         ),
                                         onPressed: () {
                                           // Info dialog with loadpref explanation
@@ -840,25 +809,20 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                             builder: (BuildContext context) {
                                               return AlertDialog(
                                                 backgroundColor: AppColors.textFieldColor2,
-                                                title: Text(
-                                                    '${entry.value} Load Preference',
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: AppColors.textColorPrimary
-                                                    )),
+                                                title: Text('${entry.value} Load Preference', style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.miniDialogTitleTextSize, color: AppColors.textColorPrimary)),
                                                 content: Text(
-                                                  getPreferenceInfo(entry
-                                                      .key), //Load Preference explanation
-                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                  getPreferenceInfo(entry.key), //Load Preference explanation
+                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize ),
                                                 ),
                                                 actions: [
                                                   TextButton(
                                                     onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop();
+                                                      Navigator.of(context).pop();
                                                     },
-                                                    child:  Text('Close', style: TextStyle(color: AppColors.cancelButton),),
+                                                    child: Text(
+                                                      'Close',
+                                                      style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
+                                                    ),
                                                   ),
                                                 ],
                                               );
@@ -889,12 +853,9 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
-                          onPressed: isPositionalSaveButtonEnabled
-                              ? () => savePositionalLoadPreference(
-                                  widget.tripPreference)
-                              : null,
+                          onPressed: isPositionalSaveButtonEnabled ? () => savePositionalLoadPreference(widget.tripPreference) : null,
                           style: style, // Main button theme
-                          child:  Text('Save'),
+                          child: Text('Save'),
                         ),
                       ),
                     ],
@@ -906,7 +867,6 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-
                       SizedBox(height: 16),
                       // Choose Gear
                       Padding(
@@ -916,26 +876,22 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                           // Trigger dialog on tap
                           child: Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 16),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                             decoration: BoxDecoration(
                               color: AppColors.textFieldColor,
                               borderRadius: BorderRadius.circular(12.0),
-                              border:
-                                  Border.all(color: AppColors.borderPrimary, width: 2.0),
+                              border: Border.all(color: AppColors.borderPrimary, width: 2.0),
                             ),
                             child: Text(
                               selectedGear.isEmpty
                                   ? 'Choose gear'
                                   : selectedGear.map((e) {
-                                      final quantity =
-                                          selectedGearQuantities[e] ??
-                                              1; // Use selected quantity
+                                      final quantity = selectedGearQuantities[e] ?? 1; // Use selected quantity
                                       return '${e.name} (x$quantity)';
                                     }).join(', '),
                               style: TextStyle(
                                 color: AppColors.textColorPrimary,
-                                fontSize: 22,
+                                fontSize: AppData.text20,
                               ),
                             ),
                           ),
@@ -962,28 +918,27 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                 'Choose load preference',
                                 style: TextStyle(
                                   color: AppColors.textColorPrimary,
-                                  fontSize: 22,
+                                  fontSize: AppData.text20,
                                 ),
                               ),
                               dropdownColor: AppColors.textFieldColor2,
                               style: TextStyle(
                                 color: AppColors.textColorPrimary,
-                                fontSize: 22,
+                                fontSize: AppData.text20,
                               ),
                               iconEnabledColor: AppColors.textColorPrimary,
                               items: loadPreferenceMap.entries.map((entry) {
                                 return DropdownMenuItem<int>(
                                   value: entry.key,
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(entry.value),
                                       IconButton(
                                         icon: Icon(
                                           Icons.info_outline,
                                           color: AppColors.textColorPrimary,
-                                          size: 24,
+                                          size: AppData.text24,
                                         ),
                                         onPressed: () {
                                           // Info dialog with loadpref explanation
@@ -992,25 +947,20 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                                             builder: (BuildContext context) {
                                               return AlertDialog(
                                                 backgroundColor: AppColors.textFieldColor2,
-                                                title: Text(
-                                                    '${entry.value} Load Preference',
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: AppColors.textColorPrimary
-                                                    )),
+                                                title: Text('${entry.value} Load Preference', style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.miniDialogTitleTextSize, color: AppColors.textColorPrimary)),
                                                 content: Text(
-                                                  getPreferenceInfo(entry
-                                                      .key), //Load Preference explanation
-                                                  style: TextStyle(color: AppColors.textColorPrimary),
+                                                  getPreferenceInfo(entry.key), //Load Preference explanation
+                                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                                                 ),
                                                 actions: [
                                                   TextButton(
                                                     onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop();
+                                                      Navigator.of(context).pop();
                                                     },
-                                                    child:  Text('Close', style: TextStyle(color: AppColors.cancelButton),),
+                                                    child: Text(
+                                                      'Close',
+                                                      style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
+                                                    ),
                                                   ),
                                                 ],
                                               );
@@ -1041,12 +991,9 @@ class _AddLoadPreferenceState extends State<AddLoadPreference>
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
-                          onPressed: isGearSaveButtonEnabled
-                              ? () =>
-                                  saveGearLoadPreference(widget.tripPreference)
-                              : null,
+                          onPressed: isGearSaveButtonEnabled ? () => saveGearLoadPreference(widget.tripPreference) : null,
                           style: style, // Main button theme
-                          child: const Text('Save'),
+                          child:  Text('Save'),
                         ),
                       ),
                     ],

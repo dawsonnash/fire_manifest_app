@@ -1,34 +1,36 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
-import 'dart:convert';
+
 import 'package:fire_app/Data/load_accoutrement_manager.dart';
+import 'package:fire_app/UI/01_edit_crew.dart';
 import 'package:fire_app/UI/05_create_new_manifest.dart';
 import 'package:fire_app/UI/06_saved_trips.dart';
 import 'package:fire_app/UI/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
-import 'Data/crew_loadout.dart';
-import 'Data/sling.dart';
-import 'package:fire_app/UI/01_edit_crew.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import '../Data/gear.dart';
+import 'package:intl/intl.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../Data/crewmember.dart';
+import '../Data/gear.dart';
+import 'CodeShare/variables.dart';
 import 'Data/crew.dart';
+import 'Data/crewMemberList.dart';
+import 'Data/crew_loadout.dart';
 import 'Data/customItem.dart';
+import 'Data/gear_preferences.dart';
 import 'Data/load.dart';
+import 'Data/load_accoutrements.dart';
+import 'Data/positional_preferences.dart';
+import 'Data/saved_preferences.dart';
+import 'Data/sling.dart';
 import 'Data/trip.dart';
 import 'Data/trip_preferences.dart';
-import 'Data/positional_preferences.dart';
-import 'Data/gear_preferences.dart';
-import 'Data/saved_preferences.dart';
-import 'Data/crewMemberList.dart';
-import 'Data/load_accoutrements.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'CodeShare/colors.dart';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
@@ -36,6 +38,10 @@ void main() async {
   // Set up for Hive that needs to run before starting app
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Disable landscape mode temporarily, until UI is implemented
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   // Declare a variable to store the initial file path
   String? initialJsonFilePath;
 
@@ -96,6 +102,7 @@ void main() async {
   AppData.crewName = await ThemePreferences.getCrewName(); // Initialize AppData.crewName
   AppData.userName = await ThemePreferences.getUserName();
   AppData.safetyBuffer = await ThemePreferences.getSafetyBuffer();
+  AppData.textScale = await ThemePreferences.getTextScale();
 
   // start app
   runApp(MyApp(showDisclaimer: !agreedToTerms, initialJsonFilePath: initialJsonFilePath));
@@ -153,11 +160,13 @@ class _MyHomePageState extends State<MyHomePage> {
       crewName: AppData.crewName,
       userName: AppData.userName,
       safetyBuffer: AppData.safetyBuffer,
+      textScale: AppData.textScale,
       onThemeChanged: _toggleTheme,
       onBackgroundImageChange: _toggleBackgroundImage,
       onCrewNameChanged: _changeCrewName,
       onUserNameChanged: _changeUserName,
       onSafetyBufferChange: _changeSafetyBuffer,
+      onTextScaleChange: _changeTextScale,
     ),
   ];
 
@@ -255,7 +264,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.8),
+              color: Colors.black.withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
@@ -307,7 +316,7 @@ class _MyHomePageState extends State<MyHomePage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
+                  child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                 ),
                 TextButton(
                   onPressed: () async {
@@ -363,7 +372,7 @@ class _MyHomePageState extends State<MyHomePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false), // Return false
-              child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
+              child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true), // Return true
@@ -437,7 +446,7 @@ class _MyHomePageState extends State<MyHomePage> {
         content: Center(
           child: Text(
             'Saved $loadoutName',
-            style: TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.black, fontSize: AppData.text22, fontWeight: FontWeight.bold),
           ),
         ),
         duration: Duration(seconds: 1),
@@ -546,14 +555,14 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.of(context).pop(); // Cancel
               },
-              child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+              child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the warning dialog
                 importCrewData(filePath); // Pass filePath instead of callback
               },
-              child: Text('Confirm', style: TextStyle(color: Colors.red)),
+              child: Text('Confirm', style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize)),
             ),
           ],
         );
@@ -620,7 +629,7 @@ class _MyHomePageState extends State<MyHomePage> {
           content: Center(
             child: Text(
               'Crew Imported!',
-              style: TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.black, fontSize: AppData.text22, fontWeight: FontWeight.bold),
             ),
           ),
           duration: Duration(seconds: 1),
@@ -708,6 +717,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     await ThemePreferences.setSafetyBuffer(safetyBuffer);
   }
+  void _changeTextScale(double textScale) async {
+    setState(() {
+      AppData.textScale = textScale;
+    });
+    await ThemePreferences.setTextScale(textScale);
+  }
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -753,14 +768,38 @@ class DisclaimerScreen extends StatefulWidget {
 
 class _DisclaimerScreenState extends State<DisclaimerScreen> {
   bool userAgreed = false;
+  final ScrollController _scrollController = ScrollController();
+  bool _showScrollIndicator = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_checkScrollPosition);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _checkScrollPosition() {
+    if (_scrollController.hasClients) {
+      bool shouldShow = _scrollController.offset < _scrollController.position.maxScrollExtent;
+      if (_showScrollIndicator != shouldShow) {
+        setState(() {
+          _showScrollIndicator = shouldShow;
+        });
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
     AppData.updateScreenData(context);
     return Scaffold(
       appBar: AppBar(
         title: Center(
-          child:  Text('Terms and Conditions', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary)),
+          child:  Text('Terms and Conditions', style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary)),
         ),
         backgroundColor: AppColors.appBarColor,
       ),
@@ -790,21 +829,53 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
                 child: Column(
                   children: [
                     Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(16.0),
-                        child:  Text(
-                          'The calculations provided by this app are intended for informational purposes only. '
-                              'While every effort has been made to ensure accuracy, users must independently verify and validate '
-                              'all data before relying on it for operational or decision-making purposes. The developers assume no '
-                              'liability for errors, omissions, or any outcomes resulting from the use of this app. By continuing, '
-                              'you acknowledge and accept full responsibility for reviewing and confirming all calculations.',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: AppData.text22,
+                      child: Stack(
+                        alignment: Alignment.bottomCenter,
+                        children: [
+                          Scrollbar(
+                            controller: _scrollController,
+                            thumbVisibility: true,  // Always show scrollbar when scrolling
+                            thickness: 8.0,        // Adjust width of scrollbar
+                            radius: Radius.circular(8.0), // Round edges of scrollbar
+                            child: SingleChildScrollView(
+                              controller: _scrollController,
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                'This application is designed to assist wildland fire personnel in creating detailed manifests for internal and external aviation operations. '
+                                    'The calculations and information provided and generated by this app are for INFORMATIONAL PURPOSES ONLY and should not be solely relied upon for ANY operational, legal, safety, or decision-making purpose.\n\n'
+                                    'While reasonable efforts have been made to ensure accuracy in weight calculations, the developers, distributors, and associated entities make no warranties, express or implied, regarding the reliability, completeness, or correctness of the data generated. '
+                                    'Users assume full responsibility for independently verifying and validating all outputs before use.\n\n'
+                                    'By proceeding, you expressly acknowledge and agree that the developers and associated entities shall not be held liable for any direct, indirect, incidental, consequential, or special damages, including but not limited to financial loss, injury, or regulatory non-compliance, arising from or related to the use or misuse of this application. '
+                                    'Continued use constitutes acceptance of these terms and an agreement to waive any claims against the developers or associated parties.',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: AppData.text16,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                        ],
+                      ),
+                    ),
+                    if (_showScrollIndicator)
+                      Padding(
+                        padding: EdgeInsets.only(top: 8),
+                        child: Positioned(
+                          bottom: 10,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.keyboard_arrow_down,
+                                size: 30,
+                                color: Colors.black.withValues(alpha: 0.6),
+                              ),
+                              Text(' More', style: TextStyle(fontSize: AppData.text16, color: Colors.black),)
+                            ],
                           ),
                         ),
                       ),
-                    ),
                     Row(
                       children: [
                         Transform.scale(
@@ -829,7 +900,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
                             'I agree to the terms and conditions',
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: AppData.text22,
+                              fontSize: AppData.text16,
                               // fontWeight: FontWeight.bold
                             ),
                           ),

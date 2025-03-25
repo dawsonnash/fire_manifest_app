@@ -1,18 +1,17 @@
+// ignore: file_names
 import 'package:fire_app/Data/load_accoutrements.dart';
 import 'package:fire_app/Data/positional_preferences.dart';
 import 'package:flutter/material.dart';
 
-import '../CodeShare/colors.dart';
-import '../Data/sling.dart';
-import '../main.dart';
-import '../Data/crew.dart';
-import '../Data/gear_preferences.dart';
-import '../Data/trip.dart';
-import 'dart:math';
-import '../Data/load.dart';
+import '../CodeShare/variables.dart';
 import '../Data/crewmember.dart';
 import '../Data/gear.dart';
+import '../Data/gear_preferences.dart';
+import '../Data/load.dart';
+import '../Data/sling.dart';
+import '../Data/trip.dart';
 import '../Data/trip_preferences.dart';
+import '../main.dart';
 
 Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference, int safetyBuffer, LoadAccoutrement cargoNet12x12, LoadAccoutrement cargoNet20x20,
     LoadAccoutrement swivel, LoadAccoutrement leadLine) async {
@@ -305,7 +304,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
 
       // **Prioritize 20x20 Nets First**
       bool isTwentyByTwenty = selectedSling.loadAccoutrements.any((acc) => acc.name == "Cargo Net (20'x20')");
-      bool isTwelveByTwelve = selectedSling.loadAccoutrements.any((acc) => acc.name == "Cargo Net (12'x12')");
+      selectedSling.loadAccoutrements.any((acc) => acc.name == "Cargo Net (12'x12')");
 
       // **If a 20x20 net still has space, skip 12x12 nets**
       if (!isTwentyByTwenty && anyTwentyByTwentyHasSpace) {
@@ -448,7 +447,6 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
 
     // **Compute expected gear distribution based on scaled ratio**
     int targetTwentyByTwentyQuantity = ((totalRatio20x20 / (totalRatio20x20 + totalRatio12x12)) * totalGearQuantity).round();
-    num targetTwelveByTwelveQuantity = totalGearQuantity - targetTwentyByTwentyQuantity;
 
 
     // **Current state of slings**
@@ -529,14 +527,12 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
   double balanceRatio = 3.0;  // Balances out 12x12 if one has 3x as many items; primarily for hazmat
   for (var load in loads) {
     List<Sling> twelveByTwelveSlings = [];
-    num totalGearQuantity = 0;
 
     // **Sort slings by type and count total gear**
     for (var sling in load.slings ?? []) {
       if (sling.loadAccoutrements.any((acc) => acc.name == "Cargo Net (12'x12')")) {
         twelveByTwelveSlings.add(sling);
       }
-      totalGearQuantity += sling.loadGear.fold(0, (sum, gear) => sum + gear.quantity);
     }
 
     // **Skip balancing if there is only one or zero 12x12 slings**
@@ -864,6 +860,7 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, TripPrefere
     );
   }
 
+  // ignore: use_build_context_synchronously
   Navigator.of(context).pushAndRemoveUntil(
     MaterialPageRoute(
       builder: (context) => MyHomePage(),

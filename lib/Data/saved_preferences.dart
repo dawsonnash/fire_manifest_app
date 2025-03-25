@@ -1,11 +1,10 @@
-import 'package:fire_app/Data/trip.dart';
+import 'package:hive/hive.dart';
 
 import 'crewmember.dart';
 import 'gear.dart';
-import 'trip_preferences.dart';
 import 'gear_preferences.dart';
 import 'positional_preferences.dart';
-import 'package:hive/hive.dart';
+import 'trip_preferences.dart';
 
 class SavedPreferences {
   List<TripPreference> tripPreferences = []; // In-memory list for TripPreferences
@@ -272,7 +271,6 @@ class SavedPreferences {
 
       // Print Positional Preferences
       for (var posPref in trip.positionalPreferences) {
-        print('  Positional Preference: Priority ${posPref.priority}');
         print('    Load Preference: ${loadPreferenceMap[posPref.loadPreference]}');
         for (var member in posPref.crewMembersDynamic) {
           if (member is CrewMember) {

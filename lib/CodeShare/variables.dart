@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/material.dart';
 
 // Dark Modes on left side
 class AppColors {
@@ -40,13 +39,10 @@ class AppData {
   static String crewName = '';
   static String userName = '';
   static int safetyBuffer = 0;
+  static double textScale = 1;
 
 
   // Standardized Spacing & Max Constraints to be phased out
-  static double inputFieldMax = 450;
-  static double termsNConditionsMax = 500;
-  static double buttonMax = 200;
-  static double savedTripsMax = 450;
 
   // Screen Size & Orientation
   static Size _screenSize = Size.zero;
@@ -85,10 +81,16 @@ class AppData {
   static double get _textOrientationFactor => isLandscape ? 0.9 : 1.0;
   static double get checkboxScalingFactor => (screenWidth / 400).clamp(0.9, 1.2);
 
+  // **User Text Scaling**
+  static double get _userScalingFactor => AppData.textScale; // Normalized to 400 dp width
+  static double get minTextFactor => 0.8; // Normalized to 400 dp width
+  static double get maxTextFactor => 1.3; // Normalized to 400 dp width
+
+
   // **Dynamic Widths (Orientation+ScreenSize-Dependent)**
   static double get inputFieldWidth => isLandscape ? (screenWidth * 0.50) : (double.infinity);
   static double get buttonWidth => isLandscape ? (screenWidth * 0.2) : (screenWidth * 0.4);
-  static double get termsAndConditionsWidth => isLandscape ? (screenWidth * 0.35) : (screenWidth * 0.75);
+  static double get termsAndConditionsWidth => isLandscape ? (screenWidth * 0.35) : (screenWidth * 1);
   static double get selectionDialogWidth => isLandscape ? (screenWidth * 0.5) : (screenWidth * 0.8);
   static double get miniSelectionDialogWidth => isLandscape ? (screenWidth * 0.4) : (screenWidth * 0.7);
   static double get quickGuideImageWidth => isLandscape ? screenWidth * 0.3 : screenWidth * 0.9;
@@ -115,27 +117,33 @@ class AppData {
   static double get padding10 => 10.0 * _scalingFactorPadding;
   static double get padding8 => 8.0 * _scalingFactorPadding;
   static double get padding5 => 5.0 * _scalingFactorPadding;
+  static double get bottomModalPadding => 16.0 * _scalingFactorPadding;
+
 
   // **Predefined Scaled Text Sizes**
-  static double get text10 => 10 * _textScalingFactor * _textOrientationFactor;
-  static double get text12 => 12 * _textScalingFactor * _textOrientationFactor;
-  static double get text14 => 14 * _textScalingFactor * _textOrientationFactor;
-  static double get text16 => 16 * _textScalingFactor * _textOrientationFactor;
-  static double get text18 => 18 * _textScalingFactor * _textOrientationFactor;
-  static double get text20 => 20 * _textScalingFactor * _textOrientationFactor;
-  static double get text22 => 22 * _textScalingFactor * _textOrientationFactor;
-  static double get text24 => 24 * _textScalingFactor * _textOrientationFactor;
-  static double get text28 => 28 * _textScalingFactor * _textOrientationFactor;
-  static double get text32 => 32 * _textScalingFactor * _textOrientationFactor;
-  static double get text48 => 48 * _textScalingFactor * _textOrientationFactor;
-  static double get tabBarTextSize => 14 * _textScalingFactor * _textOrientationFactor;
-  static double get tabBarIconSize => 24 * _textScalingFactor * _textOrientationFactor;
-  static double get bottomDialogTextSize => 12 * _textScalingFactor * _textOrientationFactor;
-  static double get dropDownArrowSize => 14 * _textScalingFactor * _textOrientationFactor;
-  static double get cupertinoPickerItemSize => 24 * _textScalingFactor * _textOrientationFactor;
-  static double get miniDialogTitleTextSize => 22 * _textScalingFactor * _textOrientationFactor;
-  static double get miniDialogBodyTextSize => 18 * _textScalingFactor * _textOrientationFactor;
-  static double get quickGuideContentTextSize => 16 * _textScalingFactor * _textOrientationFactor;
+  static double get text10 => 10 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text12 => 12 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text14 => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text16 => 16 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text18 => 18 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text20 => 20 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text22 => 22 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text24 => 24 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text28 => 28 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text30 => 30 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text32 => 32 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text36 => 36 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get text48 => 48 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get appBarText => 24;
+  static double get tabBarTextSize => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get tabBarIconSize => 24 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get bottomDialogTextSize => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get dropDownArrowSize => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get cupertinoPickerItemSize => 24 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get miniDialogTitleTextSize => 22 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get miniDialogBodyTextSize => 18 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get quickGuideContentTextSize => 16 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get modalTextSize => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
 
 }
 
@@ -145,6 +153,7 @@ class ThemePreferences {
   static const _crewNameKey = 'crewName';
   static const _userNameKey = 'userName';
   static const _safetyBufferKey = 'safetyBuffer';
+  static const _textScaleKey = 'textScale';
 
   static Future<bool> getTheme() async {
     final prefs = await SharedPreferences.getInstance();
@@ -195,6 +204,15 @@ class ThemePreferences {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_safetyBufferKey, safetyBuffer);
   }
+  static Future<double> getTextScale() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getDouble(_textScaleKey) ?? 1;
+  }
+
+  static Future<void> setTextScale(double textScale) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_textScaleKey, textScale);
+  }
 }
 
 // Outlines a text using shadows.
@@ -223,7 +241,7 @@ Widget proxyDecorator(Widget child, int index, Animation<double> animation) {
       return Material(
         elevation: elevation,
         color: Colors.transparent,
-        shadowColor: Colors.black.withOpacity(0.5),
+        shadowColor: Colors.black.withValues(alpha: 0.5),
         child: child,
       );
     },

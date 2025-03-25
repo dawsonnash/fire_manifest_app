@@ -1,10 +1,10 @@
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/Data/trip_preferences.dart';
+import 'package:hive/hive.dart';
 
-import '../CodeShare/colors.dart';
+import '../CodeShare/variables.dart';
 import 'crewmember.dart';
 import 'gear.dart';
-import 'package:hive/hive.dart';
 
 class Crew {
   List<CrewMember> crewMembers = [];        // Contains all crew members
@@ -26,7 +26,7 @@ class Crew {
       "crewMembers": crewMembers.map((member) => member.toJson()).toList(),
       "gear": gear.map((g) => g.toJson()).toList(),
       "personalTools": personalTools.map((p) => p.toJson()).toList(),
-      "totalCrewWeight": totalCrewWeight ?? 0.0,
+      "totalCrewWeight": totalCrewWeight,
     };
   }
 
@@ -52,13 +52,10 @@ class Crew {
 
   void printPersonalTools() {
     if (personalTools.isEmpty) {
-      print('No personal tools found.');
       return;
     }
 
-    print('Personal Tools List:');
     for (var tool in personalTools) {
-      print('- ${tool.name}, Weight: ${tool.weight}, Quantity: ${tool.quantity}');
     }
   }
 

@@ -1,16 +1,17 @@
 import 'dart:ui';
-import 'package:fire_app/UI/06_saved_trips.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import '../CodeShare/colors.dart';
-import '../Data/gear.dart';
-import '../Data/crewmember.dart';
-import '../Data/trip.dart';
-import '../Data/load.dart';
-import '../Data/customItem.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart';
 
+import '../CodeShare/variables.dart';
+import '../Data/crewmember.dart';
+import '../Data/customItem.dart';
+import '../Data/gear.dart';
+import '../Data/load.dart';
+import '../Data/trip.dart';
 import '../main.dart';
 
 // Double integers when calculating quantity dont always work out. a 45 lb QB can become 44
@@ -102,7 +103,7 @@ class _EditTripState extends State<EditTrip> {
               backgroundColor: AppColors.textFieldColor2,
               title: Text(
                 'Add Crew Members and Gear',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textColorPrimary),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text18, color: AppColors.textColorPrimary),
               ),
               contentPadding: const EdgeInsets.all(16),
               content: ConstrainedBox(
@@ -131,9 +132,9 @@ class _EditTripState extends State<EditTrip> {
                               headerBuilder: (context, isExpanded) {
                                 return Container(
                                   child: ListTile(
-                                    title: const Text(
+                                    title: Text(
                                       'Crew Members',
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text18),
                                     ),
                                   ),
                                 );
@@ -148,7 +149,7 @@ class _EditTripState extends State<EditTrip> {
                                       // Rounded corners
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.grey.withOpacity(0.8),
+                                          color: Colors.grey.withValues(alpha: 0.8),
                                           spreadRadius: 1,
                                           blurRadius: 5,
                                           offset: Offset(0, 3), // Shadow position
@@ -167,12 +168,12 @@ class _EditTripState extends State<EditTrip> {
                                       //
                                       title: Text(
                                         '${crew.name}, ${crew.flightWeight} lb',
-                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text16, color: AppColors.textColorPrimary),
                                         textAlign: TextAlign.start,
                                       ),
                                       subtitle: Text(
                                         crew.getPositionTitle(crew.position),
-                                        style: TextStyle(color: AppColors.textColorPrimary),
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text14),
                                       ),
                                       value: selectedItems.contains(crew),
                                       onChanged: (bool? isChecked) {
@@ -211,9 +212,9 @@ class _EditTripState extends State<EditTrip> {
                                 return Container(
                                   //color: Colors.deepOrangeAccent, // Set the background color for the header
                                   child: ListTile(
-                                    title: const Text(
+                                    title:  Text(
                                       'Gear',
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text18),
                                     ),
                                   ),
                                 );
@@ -272,7 +273,7 @@ class _EditTripState extends State<EditTrip> {
                                           // Rounded corners
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.grey.withOpacity(0.8),
+                                              color: Colors.grey.withValues(alpha: 0.8),
                                               spreadRadius: 1,
                                               blurRadius: 5,
                                               offset: Offset(0, 3), // Shadow position
@@ -306,7 +307,7 @@ class _EditTripState extends State<EditTrip> {
                                                             child: Icon(
                                                               FontAwesomeIcons.triangleExclamation, // Hazard icon
                                                               color: Colors.red, // Red color for hazard
-                                                              size: 14, // Icon size
+                                                              size: AppData.text14, // Icon size
                                                             ),
                                                           ),
                                                       ],
@@ -314,7 +315,7 @@ class _EditTripState extends State<EditTrip> {
                                                     Text(
                                                       '${gear.weight} lb x$remainingQuantity',
                                                       style: TextStyle(
-                                                        fontSize: 14,
+                                                        fontSize: AppData.text14,
                                                         color: Colors.black,
                                                       ),
                                                     ),
@@ -334,7 +335,7 @@ class _EditTripState extends State<EditTrip> {
                                                               backgroundColor: AppColors.textFieldColor2,
                                                               title: Text(
                                                                 'Select Quantity for ${gear.name}',
-                                                                style: TextStyle(color: AppColors.textColorPrimary),
+                                                                style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.text18, ),
                                                               ),
                                                               content: SizedBox(
                                                                 height: 150,
@@ -353,7 +354,7 @@ class _EditTripState extends State<EditTrip> {
                                                                     // Use the full quantity for selection
                                                                     (int index) {
                                                                       return Center(
-                                                                        child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                        child: Text('${index + 1}', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary)),
                                                                       );
                                                                     },
                                                                   ),
@@ -364,7 +365,7 @@ class _EditTripState extends State<EditTrip> {
                                                                   onPressed: () {
                                                                     Navigator.of(context).pop();
                                                                   },
-                                                                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                                                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                                                                 ),
                                                                 TextButton(
                                                                   onPressed: () {
@@ -375,7 +376,7 @@ class _EditTripState extends State<EditTrip> {
                                                                     });
                                                                     Navigator.of(context).pop();
                                                                   },
-                                                                  child: Text('Confirm', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
+                                                                  child: Text('Confirm', style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight)),
                                                                 ),
                                                               ],
                                                             );
@@ -387,8 +388,8 @@ class _EditTripState extends State<EditTrip> {
                                                       children: [
                                                         if (gear.quantity > 1)
                                                           Text(
-                                                            'Qty: ${selectedGearQuantities[gear] ?? 1}',
-                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textColorSecondary),
+                                                            '   Qty: ${selectedGearQuantities[gear] ?? 1}',
+                                                            style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorSecondary),
                                                           ),
                                                         if (gear.quantity > 1) Icon(Icons.arrow_drop_down, color: AppColors.textColorSecondary),
                                                       ],
@@ -452,7 +453,7 @@ class _EditTripState extends State<EditTrip> {
                                               'IRPG Item Weights',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 20,
+                                                fontSize: AppData.text20,
                                                 color: AppColors.textColorPrimary,
                                               ),
                                             ),
@@ -502,9 +503,7 @@ class _EditTripState extends State<EditTrip> {
                                                 },
                                                 child: Text(
                                                   'Cancel',
-                                                  style: TextStyle(
-                                                    color: AppColors.cancelButton,
-                                                  ),
+                                                  style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                                                 ),
                                               ),
                                             ),
@@ -515,10 +514,10 @@ class _EditTripState extends State<EditTrip> {
                                   );
                                 },
                                 child: ListTile(
-                                  title: const Text(
+                                  title: Text(
                                     'Custom Item',
                                     style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.bold, fontSize: AppData.text18
                                     ),
                                   ),
                                 ),
@@ -531,8 +530,11 @@ class _EditTripState extends State<EditTrip> {
                                     TextField(
                                       decoration: InputDecoration(
                                         labelText: ' Item Name',
-                                        labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
+                                        labelStyle: TextStyle( fontSize: AppData.text16, color: AppColors.textColorPrimary), // Label color
                                       ),
+                                      inputFormatters: [
+                                        LengthLimitingTextInputFormatter(15),
+                                      ],
                                       textCapitalization: TextCapitalization.words,
                                       focusNode: customItemNameFocus,
                                       // Attach focus node
@@ -545,7 +547,7 @@ class _EditTripState extends State<EditTrip> {
                                       onChanged: (value) {
                                         customItemName = value;
                                       },
-                                      style: TextStyle(color: AppColors.textColorPrimary),
+                                      style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.text16,  ),
                                     ),
                                     const SizedBox(height: 8),
 
@@ -553,10 +555,13 @@ class _EditTripState extends State<EditTrip> {
                                     TextField(
                                         decoration: InputDecoration(
                                           labelText: ' Weight (lb)',
-                                          labelStyle: TextStyle(color: AppColors.textColorPrimary), // Label color
+                                          labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16), // Label color
                                         ),
                                         keyboardType: TextInputType.number,
-                                        maxLength: 3,
+                                        inputFormatters: [
+                                    LengthLimitingTextInputFormatter(3),
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
                                         focusNode: customItemWeightFocus,
                                         // Attach focus node
                                         textInputAction: TextInputAction.next,
@@ -568,7 +573,7 @@ class _EditTripState extends State<EditTrip> {
                                         onChanged: (value) {
                                           customItemWeight = int.tryParse(value) ?? 0;
                                         },
-                                        style: TextStyle(color: AppColors.textColorPrimary)),
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16)),
                                   ],
                                 ),
                               ),
@@ -587,7 +592,7 @@ class _EditTripState extends State<EditTrip> {
                   },
                   child: Text(
                     'Cancel',
-                    style: TextStyle(color: AppColors.cancelButton),
+                    style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                   ),
                 ),
                 TextButton(
@@ -680,7 +685,7 @@ class _EditTripState extends State<EditTrip> {
                     });
                     sortLoadItems(loads[selectedLoadIndex]);
                   },
-                  child: Text('Add', style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
+                  child: Text('Add', style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize)),
                 ),
               ],
             );
@@ -789,30 +794,27 @@ class _EditTripState extends State<EditTrip> {
     // Save under the correct key
     tripBox.put(widget.trip.tripName, widget.trip);
 
-
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Center(
           child: Text(
             'Trip Saved!',
             style: TextStyle(
               color: Colors.black,
-              fontSize: 32,
+              fontSize: AppData.text32,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        duration: Duration(seconds: 1),
+        duration: const Duration(seconds: 1),
         backgroundColor: Colors.green,
       ),
     );
 
-
     Navigator.of(context).pop(); // Go back to the home screen
     Navigator.of(context).pop(); // Go back to the home screen
     selectedIndexNotifier.value = 1; // Switch to "Saved Trips" tab
-
   }
 
   // Function to calculate available weight for a load
@@ -877,7 +879,7 @@ class _EditTripState extends State<EditTrip> {
           children: [
             Text(
               widget.trip.tripName,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+              style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
             ),
             Text(
               'Allowable: ${widget.trip.allowable} lb',
@@ -898,7 +900,7 @@ class _EditTripState extends State<EditTrip> {
                 'Save',
                 style: TextStyle(
                   color: AppColors.textColorSecondary,
-                  fontSize: 20,
+                  fontSize: AppData.text20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1006,24 +1008,24 @@ class _EditTripState extends State<EditTrip> {
                                   backgroundColor: AppColors.textFieldColor2,
                                   title: Text(
                                     "Confirm Deletion",
-                                    style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                    style: TextStyle( fontSize: AppData.miniDialogTitleTextSize,color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
                                   ),
                                   content: Text(
                                     "Are you sure you want to delete Load #${index + 1}?",
-                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                    style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.miniDialogBodyTextSize, ),
                                   ),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
                                         Navigator.of(context).pop(false); // Cancel deletion
                                       },
-                                      child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton)),
+                                      child: Text("Cancel", style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                                     ),
                                     TextButton(
                                       onPressed: () {
                                         Navigator.of(context).pop(true); // Confirm deletion
                                       },
-                                      child: Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                                      child: Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: AppData.bottomDialogTextSize)),
                                     ),
                                   ],
                                 );
@@ -1075,7 +1077,7 @@ class _EditTripState extends State<EditTrip> {
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: Colors.black.withValues(alpha: 0.2),
                                   blurRadius: 5,
                                   offset: const Offset(0, 3),
                                 ),
@@ -1103,107 +1105,90 @@ class _EditTripState extends State<EditTrip> {
                                     },
                                     child: Container(
                                       padding: const EdgeInsets.all(12),
+                                      width: double.infinity,
                                       decoration: BoxDecoration(
-                                        color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                            ? Colors.black // Warning color
-                                            : AppColors.fireColor, // Normal color
+                                        color: (calculateAvailableWeight(loads[index]) > widget.trip.allowable ||
+                                            calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
+                                            ? Colors.black
+                                            : AppColors.fireColor,
                                         borderRadius: _isExpanded[index]
                                             ? const BorderRadius.vertical(top: Radius.circular(10))
-                                            : const BorderRadius.all(
-                                                Radius.circular(10),
-                                              ),
+                                            : const BorderRadius.all(Radius.circular(10)),
                                       ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                'LOAD #${index + 1}',
-                                                style: TextStyle(
-                                                  color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                      ? Colors.white // Warning color
-                                                      : Colors.black,
-                                                  fontSize: 22,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Column(
-                                            children: [
-                                              Container(
-                                                padding: const EdgeInsets.only(left: 4.0, right: 4.0),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.transparent,
-                                                  // Background color
-                                                  borderRadius: BorderRadius.circular(10), // Rounded corners
-                                                ),
-                                                height: 30,
+                                      child: LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          return FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: ConstrainedBox(
+                                              constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                                              child: IntrinsicWidth(
                                                 child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
                                                   children: [
+                                                    Text(
+                                                      'LOAD #${index + 1}',
+                                                      style: TextStyle(
+                                                        color: (calculateAvailableWeight(loads[index]) > widget.trip.allowable ||
+                                                            calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
+                                                            ? Colors.white
+                                                            : Colors.black,
+                                                        fontSize: AppData.text22,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 20),
                                                     Row(
                                                       children: [
                                                         Text(
                                                           '${calculateAvailableWeight(loads[index])} lb',
                                                           style: TextStyle(
-                                                            fontSize: 20,
+                                                            fontSize: AppData.text20,
                                                             fontWeight: FontWeight.bold,
-                                                            color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                                ? Colors.white // Warning color
+                                                            color: (calculateAvailableWeight(loads[index]) > widget.trip.allowable ||
+                                                                calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
+                                                                ? Colors.white
+                                                                : Colors.black,
+                                                          ),
+                                                        ),
+                                                        SizedBox(width: 10),
+                                                        Container(
+                                                          height: AppData.text22,
+                                                          width: 1,
+                                                          color: (calculateAvailableWeight(loads[index]) > widget.trip.allowable ||
+                                                              calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
+                                                              ? Colors.white
+                                                              : Colors.black,
+                                                        ),
+                                                        SizedBox(width: 10),
+                                                        Text(
+                                                          '${calculateAvailableSeats(loads[index])}/${widget.trip.availableSeats} seats',
+                                                          style: TextStyle(
+                                                            fontSize: AppData.text20,
+                                                            fontWeight: FontWeight.bold,
+                                                            color: (calculateAvailableWeight(loads[index]) > widget.trip.allowable ||
+                                                                calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
+                                                                ? Colors.white
                                                                 : Colors.black,
                                                           ),
                                                         ),
                                                       ],
                                                     ),
-                                                    VerticalDivider(
-                                                      width: 20,
-                                                      // Space between text and divider
-                                                      thickness: 1,
-                                                      // Thickness of the divider
-                                                      color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                          ? Colors.white // Warning color
-                                                          : Colors.black, // Divider color
-                                                    ),
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          '${calculateAvailableSeats(loads[index])}',
-                                                          style: TextStyle(
-                                                            fontSize: 20,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                                ? Colors.white // Warning color
-                                                                : Colors.black,
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          '/${widget.trip.availableSeats} seats',
-                                                          style: TextStyle(
-                                                            fontSize: 20,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                                ? Colors.white // Warning color
-                                                                : Colors.black,
-                                                          ),
-                                                        ),
-                                                      ],
+                                                    SizedBox(width: 20),
+                                                    Icon(
+                                                      isExpanded ? Icons.expand_less : Icons.expand_more,
+                                                      color: (calculateAvailableWeight(loads[index]) > widget.trip.allowable ||
+                                                          calculateAvailableSeats(loads[index]) > widget.trip.availableSeats)
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                      size: AppData.text36,
                                                     ),
                                                   ],
                                                 ),
                                               ),
-                                            ],
-                                          ),
-                                          // Expansion Icon
-                                          Icon(
-                                            isExpanded ? Icons.expand_less : Icons.expand_more,
-                                            color: calculateAvailableWeight(loads[index]) > widget.trip.allowable || calculateAvailableSeats(loads[index]) > widget.trip.availableSeats
-                                                ? Colors.white // Warning color
-                                                : Colors.black,
-                                            size: 36,
-                                          ),
-                                        ],
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ),
                                   ),
@@ -1217,7 +1202,7 @@ class _EditTripState extends State<EditTrip> {
                                           // If overweight
                                           if (calculateAvailableWeight(loads[index]) > widget.trip.allowable)
                                             Padding(
-                                              padding: const EdgeInsets.symmetric(vertical:0),
+                                              padding: const EdgeInsets.symmetric(vertical: 0),
                                               child: Container(
                                                 width: double.infinity,
                                                 padding: const EdgeInsets.symmetric(vertical: 4),
@@ -1228,10 +1213,10 @@ class _EditTripState extends State<EditTrip> {
                                                   // Rounded corners
                                                 ),
                                                 alignment: Alignment.center,
-                                                child: const Text(
+                                                child: Text(
                                                   'OVERWEIGHT',
                                                   style: TextStyle(
-                                                    fontSize: 18,
+                                                    fontSize: AppData.text18,
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.black,
                                                   ),
@@ -1252,10 +1237,10 @@ class _EditTripState extends State<EditTrip> {
                                                   // Rounded corners
                                                 ),
                                                 alignment: Alignment.center,
-                                                child: const Text(
+                                                child: Text(
                                                   'NOT ENOUGH SEATS',
                                                   style: TextStyle(
-                                                    fontSize: 18,
+                                                    fontSize: AppData.text18,
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.black,
                                                   ),
@@ -1375,28 +1360,29 @@ class _EditTripState extends State<EditTrip> {
                                                   child: Row(
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Text(
-                                                            itemDisplay(item),
-                                                            style: TextStyle(
-                                                              fontSize: AppData.text16,
-                                                              fontWeight: FontWeight.bold,
-                                                              color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(
+                                                              itemDisplay(item),
+                                                              overflow: TextOverflow.ellipsis,
+                                                              style: TextStyle(
+                                                                fontSize: AppData.text16,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
+                                                              ),
                                                             ),
-                                                          ),
-                                                          if (item is! CustomItem)
-                                                          Text(
-                                                            item is Gear
-                                                                ?  'Quantity: ${ item.quantity} x ${item.weight} lb'
-                                                                : item.getPositionTitle(item.position),
-                                                            style: TextStyle(
-                                                              fontSize: 14,
-                                                              color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
-                                                            ),
-                                                          ),
-                                                        ],
+                                                            if (item is! CustomItem)
+                                                              Text(
+                                                                item is Gear ? 'Quantity: ${item.quantity} x ${item.weight} lb' : item.getPositionTitle(item.position),
+                                                                style: TextStyle(
+                                                                  fontSize: AppData.text14,
+                                                                  color: item is CrewMember ? AppColors.textColorPrimary : Colors.black,
+                                                                ),
+                                                              ),
+                                                          ],
+                                                        ),
                                                       ),
 
                                                       // Single Item Deletion
@@ -1422,7 +1408,7 @@ class _EditTripState extends State<EditTrip> {
                                                                                 children: [
                                                                                   Text(
                                                                                     'Select the quantity to remove:',
-                                                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text14, ),
                                                                                   ),
                                                                                   SizedBox(height: 8),
                                                                                   DropdownButton<int>(
@@ -1435,7 +1421,7 @@ class _EditTripState extends State<EditTrip> {
                                                                                         child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                                       ),
                                                                                     ),
-                                                                                    style: TextStyle(color: AppColors.textColorPrimary),
+                                                                                    style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.text14, ),
                                                                                     onChanged: (value) {
                                                                                       setDialogState(() {
                                                                                         quantityToRemove = value ?? 1; // Update dialog state
@@ -1449,7 +1435,7 @@ class _EditTripState extends State<EditTrip> {
                                                                                   onPressed: () {
                                                                                     Navigator.of(context).pop(); // Cancel action
                                                                                   },
-                                                                                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton)),
+                                                                                  child: Text('Cancel', style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize)),
                                                                                 ),
                                                                                 TextButton(
                                                                                   onPressed: () {
@@ -1486,7 +1472,7 @@ class _EditTripState extends State<EditTrip> {
                                                                                   },
                                                                                   child: Text(
                                                                                     'Remove',
-                                                                                    style: TextStyle(color: Colors.red),
+                                                                                    style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
                                                                                   ),
                                                                                 ),
                                                                               ],
@@ -1562,7 +1548,6 @@ class _EditTripState extends State<EditTrip> {
                                             ),
                                           //const SizedBox(height: 4),
 
-
                                           // Add Item
                                           GestureDetector(
                                             onTap: () => _showSelectionDialog(index),
@@ -1578,7 +1563,7 @@ class _EditTripState extends State<EditTrip> {
                                               alignment: Alignment.center,
                                               child: Text(
                                                 '+ Add Item',
-                                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+                                                style: TextStyle(fontSize: AppData.text18, fontWeight: FontWeight.bold, color: Colors.black),
                                               ),
                                             ),
                                           ),
@@ -1618,7 +1603,7 @@ class _EditTripState extends State<EditTrip> {
                               textAlign: TextAlign.center,
                               softWrap: true,
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: AppData.text22,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textColorPrimary,
                               ),

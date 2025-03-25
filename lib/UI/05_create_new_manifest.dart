@@ -1,21 +1,23 @@
 import 'dart:ui';
+
 import 'package:fire_app/Algorithms/external_load_calculator.dart';
-import 'package:fire_app/CodeShare/colors.dart';
+import 'package:fire_app/CodeShare/variables.dart';
 import 'package:fire_app/Data/load_accoutrements.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
+
 import '../../Data/trip.dart';
-import '../UI/05_define_constraints_manifest.dart';
+import '../CodeShare/keyboardActions.dart';
 import '../Data/crewmember.dart';
 import '../Data/gear.dart';
-import '../Algorithms/load_calculator.dart';
 import '../Data/trip_preferences.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import '../UI/05_define_constraints_manifest.dart';
 import 'calculating_screen.dart';
 
 class CreateNewManifest extends StatelessWidget {
@@ -169,6 +171,10 @@ class _QuickManifestState extends State<QuickManifest> {
   bool isCalculateButtonEnabled = false; // Controls whether saving button is showing
   bool isExternalManifest = false; // Default to internal manifest (personnel + cargo)
 
+  final FocusNode _availableSeatsFocusNode = FocusNode();
+  final FocusNode _allowableFocusNode = FocusNode();
+  final FocusNode _safetyBufferFocusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -234,6 +240,7 @@ class _QuickManifestState extends State<QuickManifest> {
           quantity: gear.quantity,
           weight: gear.weight,
           isPersonalTool: gear.isPersonalTool,
+          isHazmat: gear.isHazmat,
         );
       }).toList();
       gearListExternal = gearBox.values.map((gear) {
@@ -242,6 +249,7 @@ class _QuickManifestState extends State<QuickManifest> {
           quantity: gear.quantity,
           weight: gear.weight,
           isPersonalTool: gear.isPersonalTool,
+          isHazmat: gear.isHazmat,
         );
       }).toList();
 
@@ -370,38 +378,44 @@ class _QuickManifestState extends State<QuickManifest> {
                                   int remainingQuantity = gear.quantity - (selectedGearQuantitiesExternal[gear] ?? 0);
 
                                   return Container(
-                                    color: AppColors.textFieldColor2,
+                                    color: AppColors.gearYellow,
                                     child: CheckboxListTile(
-                                      activeColor: AppColors.textColorPrimary,
-                                      // Checkbox outline color when active
-                                      checkColor: AppColors.textColorSecondary,
-                                      side: BorderSide(
-                                        color: AppColors.textColorPrimary, // Outline color
-                                        width: 2.0, // Outline width
-                                      ),
                                       title: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
-                                            child: Row(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Flexible(
-                                                  child: Text(
-                                                    gear.name,
-                                                    style: TextStyle(
-                                                      fontSize: AppData.text16,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: AppColors.textColorPrimary,
+                                                Row(
+                                                  children: [
+                                                    Flexible(
+                                                      child: Text(
+                                                        gear.name,
+                                                        style: TextStyle(
+                                                          fontSize: AppData.text16,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
                                                     ),
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
+                                                    if (gear.isHazmat == true)
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(left: 4.0),
+                                                        child: Icon(
+                                                          FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                          color: Colors.red, // Red color for hazard
+                                                          size: AppData.text14, // Icon size
+                                                        ),
+                                                      ),
+                                                  ],
                                                 ),
                                                 Text(
-                                                  ' (x$remainingQuantity)  ',
+                                                  '${gear.weight} lb x$remainingQuantity',
                                                   style: TextStyle(
-                                                    fontSize: AppData.text12,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: AppColors.textColorPrimary,
+                                                    fontSize: AppData.text14,
+                                                    color: Colors.black,
                                                   ),
                                                 ),
                                               ],
@@ -474,17 +488,16 @@ class _QuickManifestState extends State<QuickManifest> {
                                                   children: [
                                                     if (gear.quantity > 1)
                                                       Text(
-                                                        'Qty: ${selectedGearQuantitiesExternal[gear] ?? 1}',
+                                                        '   Qty: ${selectedGearQuantitiesExternal[gear] ?? 1}',
                                                         style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
                                                           fontSize: AppData.text14,
-                                                          color: AppColors.textColorPrimary,
+                                                          color: Colors.black,
                                                         ),
                                                       ),
                                                     if (gear.quantity > 1)
                                                       Icon(
                                                         Icons.arrow_drop_down,
-                                                        color: AppColors.textColorPrimary,
+                                                        color: Colors.black,
                                                         size: AppData.dropDownArrowSize,
                                                       ),
                                                   ],
@@ -563,6 +576,7 @@ class _QuickManifestState extends State<QuickManifest> {
                           quantity: selectedQuantity,
                           weight: gear.weight,
                           isPersonalTool: gear.isPersonalTool,
+                          isHazmat: gear.isHazmat,
                         );
                       }).toList();
                     }
@@ -796,19 +810,12 @@ class _QuickManifestState extends State<QuickManifest> {
                               body: Column(
                                 children: [
                                   Container(
-                                    color: AppColors.textFieldColor2,
+                                    color: AppColors.gearYellow,
                                     child: CheckboxListTile(
-                                      activeColor: AppColors.textColorPrimary,
-                                      // Checkbox outline color when active
-                                      checkColor: AppColors.textColorSecondary,
-                                      side: BorderSide(
-                                        color: AppColors.textColorPrimary, // Outline color
-                                        width: 2.0, // Outline width
-                                      ),
                                       // Checkmark color
                                       title: Text(
                                         'Select All',
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppData.text16, color: Colors.black),
                                       ),
                                       value: isSelectAllCheckedGear,
                                       onChanged: (bool? isChecked) {
@@ -839,39 +846,45 @@ class _QuickManifestState extends State<QuickManifest> {
 
                                       return Container(
                                         //margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Add space around the tile
-                                        color: AppColors.textFieldColor2,
+                                        color: AppColors.gearYellow,
 
                                         child: CheckboxListTile(
-                                          activeColor: AppColors.textColorPrimary,
-                                          // Checkbox outline color when active
-                                          checkColor: AppColors.textColorSecondary,
-                                          side: BorderSide(
-                                            color: AppColors.textColorPrimary, // Outline color
-                                            width: 2.0, // Outline width
-                                          ),
                                           title: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Expanded(
-                                                child: Row(
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    Flexible(
-                                                      child: Text(
-                                                        gear.name,
-                                                        style: TextStyle(
-                                                          fontSize: AppData.text16,
-                                                          fontWeight: FontWeight.bold,
-                                                          color: AppColors.textColorPrimary,
+                                                    Row(
+                                                      children: [
+                                                        Flexible(
+                                                          child: Text(
+                                                            gear.name,
+                                                            style: TextStyle(
+                                                              fontSize: AppData.text16,
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                            overflow: TextOverflow.ellipsis,
+                                                          ),
                                                         ),
-                                                        overflow: TextOverflow.ellipsis,
-                                                      ),
+                                                        if (gear.isHazmat == true)
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(left: 4.0),
+                                                            child: Icon(
+                                                              FontAwesomeIcons.triangleExclamation, // Hazard icon
+                                                              color: Colors.red, // Red color for hazard
+                                                              size: AppData.text14, // Icon size
+                                                            ),
+                                                          ),
+                                                      ],
                                                     ),
                                                     Text(
-                                                      ' (x$remainingQuantity)  ',
+                                                      '${gear.weight} lb x$remainingQuantity',
                                                       style: TextStyle(
-                                                        fontSize: AppData.text12,
-                                                        fontWeight: FontWeight.bold,
-                                                        color: AppColors.textColorPrimary,
+                                                        fontSize: AppData.text14,
+                                                        color: Colors.black,
                                                       ),
                                                     ),
                                                   ],
@@ -909,7 +922,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                                     // Use the full quantity for selection
                                                                     (int index) {
                                                                       return Center(
-                                                                        child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.cupertinoPickerItemSize)),
+                                                                        child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18)),
                                                                       );
                                                                     },
                                                                   ),
@@ -944,17 +957,16 @@ class _QuickManifestState extends State<QuickManifest> {
                                                       children: [
                                                         if (gear.quantity > 1)
                                                           Text(
-                                                            'Qty: ${selectedGearQuantities[gear] ?? 1}',
+                                                            '   Qty: ${selectedGearQuantities[gear] ?? 1}',
                                                             style: TextStyle(
-                                                              fontWeight: FontWeight.bold,
                                                               fontSize: AppData.text14,
-                                                              color: AppColors.textColorPrimary,
+                                                              color: Colors.black,
                                                             ),
                                                           ),
                                                         if (gear.quantity > 1)
                                                           Icon(
                                                             Icons.arrow_drop_down,
-                                                            color: AppColors.textColorPrimary,
+                                                            color: Colors.black,
                                                             size: AppData.dropDownArrowSize,
                                                           ),
                                                       ],
@@ -1042,6 +1054,7 @@ class _QuickManifestState extends State<QuickManifest> {
                           quantity: selectedQuantity,
                           weight: gear.weight,
                           isPersonalTool: gear.isPersonalTool,
+                          isHazmat: gear.isHazmat,
                         );
                       }).toList();
                     }
@@ -1350,17 +1363,21 @@ class _QuickManifestState extends State<QuickManifest> {
                         children: [
                           Expanded(
                             flex: 2,
-                            child: Row(
-                              children: [
-                                Text(
-                                  "Cargo Net",
-                                  style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary),
-                                ),
-                                Text(
-                                  " (12'x12')",
-                                  style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary.withOpacity(0.9)),
-                                ),
-                              ],
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "Cargo Net",
+                                    style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary),
+                                  ),
+                                  Text(
+                                    " (12'x12') ",
+                                    style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary.withValues(alpha: 0.9)),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           Expanded(
@@ -1377,7 +1394,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                 11,
                                 (index) => DropdownMenuItem<int>(
                                   value: index,
-                                  child: Text(index.toString(), style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary)),
+                                  child: Text(index.toString(), style: TextStyle(fontSize: AppData.text16, height: 0.5, color: AppColors.textColorPrimary)),
                                 ),
                               ),
                               onChanged: (int? newValue) {
@@ -1553,17 +1570,21 @@ class _QuickManifestState extends State<QuickManifest> {
                         children: [
                           Expanded(
                             flex: 2,
-                            child: Row(
-                              children: [
-                                Text(
-                                  "Cargo Net",
-                                  style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary),
-                                ),
-                                Text(
-                                  " (20'x20')",
-                                  style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary.withOpacity(0.9)),
-                                ),
-                              ],
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "Cargo Net",
+                                    style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary),
+                                  ),
+                                  Text(
+                                    " (20'x20') ",
+                                    style: TextStyle(fontSize: AppData.text14, fontWeight: FontWeight.normal, color: AppColors.textColorPrimary.withValues(alpha: 0.9)),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           Expanded(
@@ -1574,13 +1595,13 @@ class _QuickManifestState extends State<QuickManifest> {
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.borderPrimary)),
                                 focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor, width: 2.0)),
-                                contentPadding: EdgeInsets.all(4),
+                                contentPadding: EdgeInsets.all(6),
                               ),
                               items: List.generate(
                                 11,
                                 (index) => DropdownMenuItem<int>(
                                   value: index,
-                                  child: Text(index.toString(), style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary)),
+                                  child: Text(index.toString(), style: TextStyle(fontSize: AppData.text16, height: .5, color: AppColors.textColorPrimary)),
                                 ),
                               ),
                               onChanged: (int? newValue) {
@@ -1782,7 +1803,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                   value: leadLineValue,
                                   child: Text(
                                     leadLineValue.toString(),
-                                    style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                    style: TextStyle(fontSize: AppData.text16, height: 0.5, color: AppColors.textColorPrimary),
                                   ),
                                 ),
                               ],
@@ -1909,7 +1930,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                   value: index + minimumSwivels, // Start from minimumSwivels
                                   child: Text(
                                     (index + minimumSwivels).toString(),
-                                    style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                    style: TextStyle(fontSize: AppData.text16, height: 0.5, color: AppColors.textColorPrimary),
                                   ),
                                 ),
                               ),
@@ -2270,10 +2291,6 @@ class _QuickManifestState extends State<QuickManifest> {
       Gear? heaviestGearItem;
       num maxGearWeight = 0;
 
-      heaviestGearItem = gearListExternal.reduce((a, b) => a.weight > b.weight ? a : b);
-      maxGearWeight = heaviestGearItem.weight;
-      num remainingWeight = allowable - safetyBuffer;
-
       if (gearListExternal.isEmpty) {
         showDialog(
           context: context,
@@ -2302,6 +2319,7 @@ class _QuickManifestState extends State<QuickManifest> {
         );
         return;
       }
+
       if (newTrip.gear.isEmpty) {
         showDialog(
           context: context,
@@ -2359,6 +2377,10 @@ class _QuickManifestState extends State<QuickManifest> {
         );
         return;
       }
+
+      heaviestGearItem = gearListExternal.reduce((a, b) => a.weight > b.weight ? a : b);
+      maxGearWeight = heaviestGearItem.weight;
+      num remainingWeight = allowable - safetyBuffer;
 
       if (remainingWeight < maxGearWeight) {
         showDialog(
@@ -2523,7 +2545,6 @@ class _QuickManifestState extends State<QuickManifest> {
                               isExternalManifest ? "External" : "Internal",
                               style: TextStyle(
                                 fontSize: AppData.text18,
-                                fontWeight: FontWeight.bold,
                                 color: AppColors.textColorPrimary,
                               ),
                             ),
@@ -2545,7 +2566,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                         color: AppColors.primaryColor,
                                         size: AppData.text24,
                                       ),
-                                SizedBox(width: 8), // Add spacing between icon and switch
+                                SizedBox(width: isExternalManifest ? 8 : 16), // Add spacing between icon and switch
                                 Switch(
                                   value: isExternalManifest,
                                   activeColor: AppColors.primaryColor,
@@ -2637,53 +2658,61 @@ class _QuickManifestState extends State<QuickManifest> {
                             padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
                             child: Container(
                               width: AppData.inputFieldWidth,
-                              child: TextField(
-                                controller: availableSeatsController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  LengthLimitingTextInputFormatter(1),
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    // Validate the input and set error message
-                                    if (value == '0') {
-                                      availableSeatsErrorMessage = 'Available seats cannot be 0.';
-                                    } else {
-                                      availableSeatsErrorMessage = null;
-                                    }
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  labelText: 'Enter # of Available Seats',
-                                  labelStyle: TextStyle(
-                                    color: AppColors.textColorPrimary, // Label color when not focused
-                                    fontSize: AppData.text18, // Label font size
-                                  ),
-                                  errorText: availableSeatsErrorMessage,
-                                  filled: true,
-                                  fillColor: AppColors.textFieldColor,
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: AppColors.borderPrimary,
-                                      // Border color when the TextField is not focused
-                                      width: 2.0, // Border width
-                                    ),
-                                    borderRadius: BorderRadius.circular(4.0), // Rounded corners
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: AppColors.primaryColor,
-                                      // Border color when the TextField is focused
-                                      width: 2.0, // Border width
-                                    ),
-                                    borderRadius: BorderRadius.circular(4.0),
-                                  ),
+                              child: KeyboardActions(
+                                config: keyboardActionsConfig(
+                                  focusNodes: [_availableSeatsFocusNode],
                                 ),
-                                style: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: AppData.text24,
-                                  fontWeight: FontWeight.bold,
+                                disableScroll: true,
+                                child: TextField(
+                                  focusNode: _availableSeatsFocusNode,
+                                  keyboardType: TextInputType.number,
+                                  controller: availableSeatsController,
+                                  textInputAction: TextInputAction.done,
+                                  inputFormatters: [
+                                    LengthLimitingTextInputFormatter(1),
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      // Validate the input and set error message
+                                      if (value == '0') {
+                                        availableSeatsErrorMessage = 'Available seats cannot be 0.';
+                                      } else {
+                                        availableSeatsErrorMessage = null;
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Enter # of Available Seats',
+                                    labelStyle: TextStyle(
+                                      color: AppColors.textColorPrimary, // Label color when not focused
+                                      fontSize: AppData.text18, // Label font size
+                                    ),
+                                    errorText: availableSeatsErrorMessage,
+                                    filled: true,
+                                    fillColor: AppColors.textFieldColor,
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: AppColors.borderPrimary,
+                                        // Border color when the TextField is not focused
+                                        width: 2.0, // Border width
+                                      ),
+                                      borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: AppColors.primaryColor,
+                                        // Border color when the TextField is focused
+                                        width: 2.0, // Border width
+                                      ),
+                                      borderRadius: BorderRadius.circular(4.0),
+                                    ),
+                                  ),
+                                  style: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: AppData.text24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             )),
@@ -2694,46 +2723,54 @@ class _QuickManifestState extends State<QuickManifest> {
                             padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
                             child: Container(
                               width: AppData.inputFieldWidth,
-                              child: TextField(
-                                controller: safetyBufferController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  LengthLimitingTextInputFormatter(3),
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                onChanged: (value) {
-                                  setState(() {});
-                                },
-                                decoration: InputDecoration(
-                                  labelText: 'Enter Safety Buffer (lb)',
-                                  labelStyle: TextStyle(
-                                    color: AppColors.textColorPrimary, // Label color when not focused
-                                    fontSize: AppData.text18, // Label font size
-                                  ),
-                                  errorText: safetyBufferErrorMessage,
-                                  filled: true,
-                                  fillColor: AppColors.textFieldColor,
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: AppColors.borderPrimary,
-                                      // Border color when the TextField is not focused
-                                      width: 2.0, // Border width
-                                    ),
-                                    borderRadius: BorderRadius.circular(4.0), // Rounded corners
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: AppColors.primaryColor,
-                                      // Border color when the TextField is focused
-                                      width: 2.0, // Border width
-                                    ),
-                                    borderRadius: BorderRadius.circular(4.0),
-                                  ),
+                              child: KeyboardActions(
+                                config: keyboardActionsConfig(
+                                  focusNodes: [_safetyBufferFocusNode],
                                 ),
-                                style: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: AppData.text24,
-                                  fontWeight: FontWeight.bold,
+                                disableScroll: true,
+                                child: TextField(
+                                  focusNode: _safetyBufferFocusNode,
+                                  textInputAction: TextInputAction.done,
+                                  controller: safetyBufferController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    LengthLimitingTextInputFormatter(3),
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {});
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Enter Safety Buffer (lb)',
+                                    labelStyle: TextStyle(
+                                      color: AppColors.textColorPrimary, // Label color when not focused
+                                      fontSize: AppData.text18, // Label font size
+                                    ),
+                                    errorText: safetyBufferErrorMessage,
+                                    filled: true,
+                                    fillColor: AppColors.textFieldColor,
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: AppColors.borderPrimary,
+                                        // Border color when the TextField is not focused
+                                        width: 2.0, // Border width
+                                      ),
+                                      borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: AppColors.primaryColor,
+                                        // Border color when the TextField is focused
+                                        width: 2.0, // Border width
+                                      ),
+                                      borderRadius: BorderRadius.circular(4.0),
+                                    ),
+                                  ),
+                                  style: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: AppData.text24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             )),
@@ -2843,6 +2880,7 @@ class _QuickManifestState extends State<QuickManifest> {
 
                       SizedBox(height: AppData.spacingStandard),
 
+                      if(!isExternalManifest)
                       // Choose Trip Preference text box
                       Padding(
                         padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
@@ -2874,6 +2912,7 @@ class _QuickManifestState extends State<QuickManifest> {
                         ),
                       ),
 
+                      if (!isExternalManifest)
                       // Choose Trip Preference
                       Padding(
                         padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
@@ -2917,6 +2956,7 @@ class _QuickManifestState extends State<QuickManifest> {
                         ),
                       ),
 
+                      if (!isExternalManifest)
                       SizedBox(height: AppData.spacingStandard),
 
                       // Choose allowable text box
@@ -2979,31 +3019,39 @@ class _QuickManifestState extends State<QuickManifest> {
                                           return AlertDialog(
                                             backgroundColor: AppColors.textFieldColor2,
                                             title: Text('Enter Allowable Weight', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize)),
-                                            content: TextField(
-                                              controller: keyboardController,
-                                              keyboardType: TextInputType.number,
-                                              maxLength: 4,
-                                              inputFormatters: [
-                                                FilteringTextInputFormatter.digitsOnly,
-                                              ],
-                                              onChanged: (value) {
-                                                validateInput(value); // Validate the input
-                                                setState(() {
-                                                  lastInputFromSlider = false;
-                                                });
-                                              },
-                                              decoration: InputDecoration(
-                                                hintText: 'Up to 9,999 lb',
-                                                hintStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
-                                                filled: true,
-                                                fillColor: AppColors.textFieldColor,
-                                                // Background color of the text field
-                                                counterText: '',
-                                                border: const OutlineInputBorder(),
+                                            content: KeyboardActions(
+                                              config: keyboardActionsConfig(
+                                                focusNodes: [_allowableFocusNode],
                                               ),
-                                              style: TextStyle(
-                                                color: AppColors.textColorPrimary, // Color of the typed text
-                                                fontSize: AppData.miniDialogBodyTextSize, // Font size for the typed text
+                                              disableScroll: true,
+                                              child: TextField(
+                                                focusNode: _allowableFocusNode,
+                                                controller: keyboardController,
+                                                textInputAction: TextInputAction.done,
+                                                keyboardType: TextInputType.number,
+                                                maxLength: 4,
+                                                inputFormatters: [
+                                                  FilteringTextInputFormatter.digitsOnly,
+                                                ],
+                                                onChanged: (value) {
+                                                  validateInput(value); // Validate the input
+                                                  setState(() {
+                                                    lastInputFromSlider = false;
+                                                  });
+                                                },
+                                                decoration: InputDecoration(
+                                                  hintText: 'Up to 9,999 lb',
+                                                  hintStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
+                                                  filled: true,
+                                                  fillColor: AppColors.textFieldColor,
+                                                  // Background color of the text field
+                                                  counterText: '',
+                                                  border: const OutlineInputBorder(),
+                                                ),
+                                                style: TextStyle(
+                                                  color: AppColors.textColorPrimary, // Color of the typed text
+                                                  fontSize: AppData.miniDialogBodyTextSize, // Font size for the typed text
+                                                ),
                                               ),
                                             ),
                                             actions: [
@@ -3070,60 +3118,78 @@ class _QuickManifestState extends State<QuickManifest> {
                                 children: [
                                   Padding(
                                     padding: EdgeInsets.only(top: AppData.padding20),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: _decrementSlider,
-                                          style: ElevatedButton.styleFrom(
-                                            foregroundColor: Colors.black,
-                                            backgroundColor: AppColors.fireColor,
-                                            padding: EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
-                                            elevation: 15,
-                                            shadowColor: Colors.black,
-                                            side: BorderSide(color: Colors.black, width: 2),
-                                            shape: CircleBorder(),
-                                          ),
-                                          child: Icon(Icons.remove, color: Colors.black, size: AppData.text32),
-                                        ),
-                                        const Spacer(),
-                                        Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            // Slider value
-                                            Visibility(
-                                              visible: lastInputFromSlider,
-                                              child: Text(
-                                                '${_sliderValue.toStringAsFixed(0)} lb',
-                                                style: TextStyle(fontSize: AppData.text32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                              ),
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          // Minus Button
+                                          ElevatedButton(
+                                            onPressed: _decrementSlider,
+                                            style: ElevatedButton.styleFrom(
+                                              foregroundColor: Colors.black,
+                                              backgroundColor: AppColors.fireColor,
+                                              padding: EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
+                                              elevation: 15,
+                                              shadowColor: Colors.black,
+                                              side: BorderSide(color: Colors.black, width: 2),
+                                              shape: CircleBorder(),
                                             ),
-                                            // Keyboard input value
-                                            Visibility(
-                                              visible: !lastInputFromSlider,
-                                              child: Text(
-                                                '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lb',
-                                                style: TextStyle(fontSize: AppData.text32, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const Spacer(),
-                                        ElevatedButton(
-                                          onPressed: _incrementSlider,
-                                          style: ElevatedButton.styleFrom(
-                                            foregroundColor: Colors.black,
-                                            backgroundColor: AppColors.fireColor,
-                                            padding: EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
-                                            elevation: 15,
-                                            shadowColor: Colors.black,
-                                            side: const BorderSide(color: Colors.black, width: 2),
-                                            shape: CircleBorder(),
+                                            child: Icon(Icons.remove, color: Colors.black, size: AppData.text32),
                                           ),
-                                          child: Icon(Icons.add, color: Colors.black, size: AppData.text32),
-                                        ),
-                                      ],
+
+                                          const SizedBox(width: 20), // Spacer is too greedy for a FittedBox
+
+                                          Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              // Slider value
+                                              Visibility(
+                                                visible: lastInputFromSlider,
+                                                child: Text(
+                                                  '${_sliderValue.toStringAsFixed(0)} lb',
+                                                  style: TextStyle(
+                                                    fontSize: AppData.text32,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: AppColors.textColorPrimary,
+                                                  ),
+                                                ),
+                                              ),
+                                              // Keyboard input value
+                                              Visibility(
+                                                visible: !lastInputFromSlider,
+                                                child: Text(
+                                                  '${keyboardController.text.isNotEmpty ? keyboardController.text : '----'} lb',
+                                                  style: TextStyle(
+                                                    fontSize: AppData.text32,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: AppColors.textColorPrimary,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+
+                                          const SizedBox(width: 20),
+
+                                          // Add Button
+                                          ElevatedButton(
+                                            onPressed: _incrementSlider,
+                                            style: ElevatedButton.styleFrom(
+                                              foregroundColor: Colors.black,
+                                              backgroundColor: AppColors.fireColor,
+                                              padding: EdgeInsets.symmetric(horizontal: AppData.padding20, vertical: AppData.padding10),
+                                              elevation: 15,
+                                              shadowColor: Colors.black,
+                                              side: BorderSide(color: Colors.black, width: 2),
+                                              shape: CircleBorder(),
+                                            ),
+                                            child: Icon(Icons.add, color: Colors.black, size: AppData.text32),
+                                          ),
+                                        ],
+                                      ),
                                     ),
+
                                   ),
                                   Slider(
                                     value: _sliderValue,
@@ -3176,9 +3242,11 @@ class _QuickManifestState extends State<QuickManifest> {
                             shadowColor: Colors.black,
                             side: const BorderSide(color: Colors.black, width: 2),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            fixedSize: Size(AppData.buttonWidth, AppData.buttonHeight),
                           ),
-                          child: const Text('Calculate'),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                            child: const Text('Calculate'),
+                          ),
                         ),
                       ),
                     ],

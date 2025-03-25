@@ -1,5 +1,6 @@
-import 'package:uuid/uuid.dart';
 import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
+
 part 'gear.g.dart';
 
 final uuid = Uuid(); // Instantiate the UUID generator

@@ -105,7 +105,7 @@
 //         backgroundColor: Colors.deepOrangeAccent,
 //         title: Text(
 //           widget.trip.tripName,
-//           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+//           style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold),
 //         ),
 //         actions: [
 //           Padding(
@@ -120,7 +120,7 @@
 //                 'Save',
 //                 style: TextStyle(
 //                   color: Colors.white,
-//                   fontSize: 20,
+//                   fontSize: AppData.text20,
 //                   fontWeight: FontWeight.bold,
 //                 ),
 //               ),
@@ -148,7 +148,7 @@
 //               Expanded(
 //                 flex: 1,
 //                 child: Container(
-//                   color: Colors.black.withOpacity(0.6),
+//                   color: Colors.black.withValues(alpha: 0.6),
 //                   child: Scrollbar(
 //                     child: ListView.builder(
 //                       padding: const EdgeInsets.all(8.0),
@@ -170,7 +170,7 @@
 //                                     "${item is Gear ? item.name : (item as CrewMember).name}, ${item is Gear ? item.weight : (item as CrewMember).flightWeight} lb",
 //                                     style: const TextStyle(
 //                                       color: Colors.white,
-//                                       fontSize: 18,
+//                                       fontSize: AppData.text18,
 //                                       fontWeight: FontWeight.bold,
 //                                     ),
 //                                   ),
@@ -179,13 +179,13 @@
 //                               childWhenDragging: Container(
 //                                 margin: const EdgeInsets.symmetric(vertical: 4),
 //                                 padding: const EdgeInsets.all(8),
-//                                 color: Colors.deepOrangeAccent.withOpacity(0.3),
+//                                 color: Colors.deepOrangeAccent.withValues(alpha: 0.3),
 //                                 child: Center(
 //                                   child: Text(
 //                                     "${item is Gear ? item.name : (item as CrewMember).name}, ${item is Gear ? item.weight : (item as CrewMember).flightWeight} lb",
 //                                     style: const TextStyle(
 //                                       color: Colors.white,
-//                                       fontSize: 18,
+//                                       fontSize: AppData.text18,
 //                                       fontWeight: FontWeight.bold,
 //                                     ),
 //                                   ),
@@ -209,7 +209,7 @@
 //                                     item is Gear ? item.name : (item as CrewMember).name,
 //                                     style: const TextStyle(
 //                                       color: Colors.white,
-//                                       fontSize: 18,
+//                                       fontSize: AppData.text18,
 //                                       fontWeight: FontWeight.bold,
 //                                     ),
 //                                   ),
@@ -223,7 +223,7 @@
 //                                 "${item is Gear ? item.weight : (item as CrewMember).flightWeight} lb",
 //                                 style: const TextStyle(
 //                                   color: Colors.white,
-//                                   fontSize: 14,
+//                                   fontSize: AppData.text14,
 //                                 ),
 //                               ),
 //                             ),
@@ -238,7 +238,7 @@
 //               Expanded(
 //                 flex: 2,
 //                 child: Container(
-//                   color: Colors.grey.withOpacity(0.8),
+//                   color: Colors.grey.withValues(alpha: 0.8),
 //                   child: Scrollbar(
 //                     child: ListView(
 //                       padding: const EdgeInsets.all(8.0),
@@ -254,7 +254,7 @@
 //                                     'Load ${index + 1}',
 //                                     style: const TextStyle(
 //                                       color: Colors.black,
-//                                       fontSize: 18,
+//                                       fontSize: AppData.text18,
 //                                       fontWeight: FontWeight.bold,
 //                                     ),
 //                                   ),
@@ -274,7 +274,7 @@
 //                                       'Delete Load',
 //                                       style: TextStyle(
 //                                         color: Colors.white,
-//                                         fontSize: 14,
+//                                         fontSize: AppData.text14,
 //                                       ),
 //                                     ),
 //                                   ),
@@ -308,7 +308,7 @@
 //                                     width: double.infinity,
 //                                     height: 150 + (loads[index].length * 40),
 //                                     margin: const EdgeInsets.symmetric(vertical: 8),
-//                                     color: Colors.white.withOpacity(0.2),
+//                                     color: Colors.white.withValues(alpha: 0.2),
 //                                     padding: const EdgeInsets.all(8),
 //                                     child: Column(
 //                                       children: [
@@ -328,7 +328,7 @@
 //                                                 icon: const Icon(
 //                                                   Icons.delete,
 //                                                   color: Colors.red,
-//                                                   size: 20,
+//                                                   size: AppData.text20,
 //                                                 ),
 //                                                 onPressed: () {
 //                                                   setState(() {

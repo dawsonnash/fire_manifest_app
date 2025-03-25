@@ -1,11 +1,15 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
-import '../CodeShare/colors.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
+
+import '../CodeShare/functions.dart';
+import '../CodeShare/keyboardActions.dart';
+import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
 import '../Data/gear.dart';
-import '../CodeShare/functions.dart';
 
 // Tester data
 class AddGear extends StatefulWidget {
@@ -18,6 +22,10 @@ class AddGear extends StatefulWidget {
 class _AddGearState extends State<AddGear> {
   late final Box<Gear> personalToolsBox;
   List<Gear> personalToolsList = [];
+  String? weightErrorMessage;
+  String? quantityErrorMessage;
+  String? irpgWeightErrorMessage;
+  String? irpgQuantityErrorMessage;
 
   // Variables to store user input
   final TextEditingController gearNameController = TextEditingController();
@@ -33,6 +41,11 @@ class _AddGearState extends State<AddGear> {
   String? selectedGearName;
   bool isHazmat = false;
   bool isHazmatIRPG = false;
+
+  final FocusNode _weightFocusNode = FocusNode();
+  final FocusNode _quantityFocusNode = FocusNode();
+  final FocusNode _weightFocusNode2 = FocusNode();
+  final FocusNode _quantityFocusNode2 = FocusNode();
 
   @override
   void initState() {
@@ -125,7 +138,6 @@ class _AddGearState extends State<AddGear> {
     bool personalToolExists = personalToolsList.any((gear) => gear.name.toLowerCase() == gearName.toLowerCase());
 
     if (personalToolExists && gearNameExists) {
-
       // Show a single AlertDialog
       showDialog(
         context: context,
@@ -147,7 +159,7 @@ class _AddGearState extends State<AddGear> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.cancelButton),
+                  style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                 ),
               ),
             ],
@@ -156,24 +168,21 @@ class _AddGearState extends State<AddGear> {
       );
 
       // Reset values for both conditions if applicable
-        setState(() {
-          if(isCustom) {
-            gearNameController.text = '';
-            gearWeightController.text = '';
-            isHazmat = false;
-          }
-          else{
-            irpgGearNameController.text = '';
-            irpgGearWeightController.text = '';
-            selectedGearName = null;
-            isHazmatIRPG = false;
-          }
-          _checkInput(); // Re-validate inputs
-        });
+      setState(() {
+        if (isCustom) {
+          gearNameController.text = '';
+          gearWeightController.text = '';
+          isHazmat = false;
+        } else {
+          irpgGearNameController.text = '';
+          irpgGearWeightController.text = '';
+          selectedGearName = null;
+          isHazmatIRPG = false;
+        }
+        _checkInput(); // Re-validate inputs
+      });
 
-        return;
-
-
+      return;
     }
 
     if (personalToolExists) {
@@ -225,7 +234,7 @@ class _AddGearState extends State<AddGear> {
                   },
                   child: Text(
                     'Cancel',
-                    style: TextStyle(color: AppColors.cancelButton),
+                    style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                   ),
                 ),
               ],
@@ -242,8 +251,7 @@ class _AddGearState extends State<AddGear> {
             if (personalToolisHazmat != isHazmatFinal) {
               isHazmat = personalToolisHazmat;
             }
-          }
-          else{
+          } else {
             if (personalToolWeight != gearWeight) {
               irpgGearWeightController.text = personalToolWeight.toString();
             }
@@ -256,7 +264,6 @@ class _AddGearState extends State<AddGear> {
 
         return;
       }
-
     }
 
     if (gearNameExists) {
@@ -278,7 +285,7 @@ class _AddGearState extends State<AddGear> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.cancelButton),
+                  style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
                 ),
               ),
             ],
@@ -286,13 +293,12 @@ class _AddGearState extends State<AddGear> {
         },
       );
       setState(() {
-        if(isCustom) {
+        if (isCustom) {
           gearNameController.text = '';
           gearWeightController.text = '';
           gearQuantityController.text = '1';
           isHazmat = false;
-        }
-        else{
+        } else {
           irpgGearNameController.text = '';
           irpgGearWeightController.text = '';
           irpgGearQuantityController.text = '1';
@@ -305,26 +311,26 @@ class _AddGearState extends State<AddGear> {
     }
 
     // Creating a new gear object
-    Gear newGearItem =  Gear(name: capitalizedGearName, weight: gearWeight, quantity: gearQuantity, isHazmat: isHazmatFinal);
+    Gear newGearItem = Gear(name: capitalizedGearName, weight: gearWeight, quantity: gearQuantity, isHazmat: isHazmatFinal);
 
     // Add the new member to the global crew object
     crew.addGear(newGearItem);
 
     // Show successful save popup
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Center(
           child: Text(
             'Gear Saved!',
             // Maybe change look
             style: TextStyle(
               color: Colors.black,
-              fontSize: 32,
+              fontSize: AppData.text32,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
         backgroundColor: Colors.green,
       ),
     );
@@ -353,7 +359,7 @@ class _AddGearState extends State<AddGear> {
     // Main theme button style
     final ButtonStyle style = ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
-        textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        textStyle: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold),
         backgroundColor: Colors.deepOrangeAccent,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         //surfaceTintColor: Colors.grey,
@@ -382,7 +388,7 @@ class _AddGearState extends State<AddGear> {
           backgroundColor: AppColors.appBarColor,
           title: Text(
             'Add Gear',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+            style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
           ),
           bottom: TabBar(
             labelColor: AppColors.primaryColor,
@@ -476,7 +482,7 @@ class _AddGearState extends State<AddGear> {
                                       labelText: 'Gear Name',
                                       labelStyle: TextStyle(
                                         color: AppColors.textColorPrimary,
-                                        fontSize: 22,
+                                        fontSize: AppData.text22,
                                         //fontWeight: FontWeight.bold,
                                       ),
                                       filled: true,
@@ -500,7 +506,7 @@ class _AddGearState extends State<AddGear> {
                                     ),
                                     style: TextStyle(
                                       color: AppColors.textColorPrimary,
-                                      fontSize: 28,
+                                      fontSize: AppData.text28,
                                     ),
                                   )),
 
@@ -511,49 +517,71 @@ class _AddGearState extends State<AddGear> {
                                     left: 16.0,
                                     right: 16.0,
                                   ),
-                                  child: TextField(
-                                    controller: gearWeightController,
-                                    keyboardType: TextInputType.number,
-                                    // Only show numeric keyboard
-                                    inputFormatters: <TextInputFormatter>[
-                                      LengthLimitingTextInputFormatter(3),
-                                      FilteringTextInputFormatter.digitsOnly,
-                                      // Allow only digits
-                                    ],
-                                    decoration: InputDecoration(
-                                      labelText: 'Weight',
-                                      hintText: 'Up to 500 lb',
-                                      hintStyle: TextStyle(
-                                        color: AppColors.textColorPrimary,
-                                        fontSize: 20,
-                                      ),
-                                      labelStyle: TextStyle(
-                                        color: AppColors.textColorPrimary,
-                                        fontSize: 22,
-                                        //fontWeight: FontWeight.bold,
-                                      ),
-                                      filled: true,
-                                      fillColor: AppColors.textFieldColor,
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: AppColors.borderPrimary,
-                                          // Border color when the TextField is not focused
-                                          width: 2.0, // Border width
-                                        ),
-                                        borderRadius: BorderRadius.circular(12.0), // Rounded corners
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: AppColors.primaryColor,
-                                          // Border color when the TextField is focused
-                                          width: 2.0, // Border width
-                                        ),
-                                        borderRadius: BorderRadius.circular(12.0),
-                                      ),
+                                  child: KeyboardActions(
+                                    config: keyboardActionsConfig(
+                                      focusNodes: [_weightFocusNode],
                                     ),
-                                    style: TextStyle(
-                                      color: AppColors.textColorPrimary,
-                                      fontSize: 28,
+                                    disableScroll: true,
+                                    child: TextField(
+                                      focusNode: _weightFocusNode,
+                                      textInputAction: TextInputAction.done,
+                                      controller: gearWeightController,
+                                      keyboardType: TextInputType.number,
+                                      // Only show numeric keyboard
+                                      inputFormatters: <TextInputFormatter>[
+                                        LengthLimitingTextInputFormatter(3),
+                                        FilteringTextInputFormatter.digitsOnly,
+                                        // Allow only digits
+                                      ],
+                                      onChanged: (value) {
+                                        int? weight = int.tryParse(value);
+                                        setState(() {
+                                          // Validate the input and set error message
+                                          if (weight! > 500) {
+                                            weightErrorMessage = 'Weight must be less than 500.';
+                                          } else if (weight == 0) {
+                                            weightErrorMessage = 'Weight must be greater than 0.';
+                                          } else {
+                                            weightErrorMessage = null;
+                                          }
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        labelText: 'Weight',
+                                        hintText: 'Up to 500 lb',
+                                        hintStyle: TextStyle(
+                                          color: AppColors.textColorPrimary,
+                                          fontSize: AppData.text20,
+                                        ),
+                                        errorText: weightErrorMessage,
+                                        labelStyle: TextStyle(
+                                          color: AppColors.textColorPrimary,
+                                          fontSize: AppData.text22,
+                                          //fontWeight: FontWeight.bold,
+                                        ),
+                                        filled: true,
+                                        fillColor: AppColors.textFieldColor,
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: AppColors.borderPrimary,
+                                            // Border color when the TextField is not focused
+                                            width: 2.0, // Border width
+                                          ),
+                                          borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: AppColors.primaryColor,
+                                            // Border color when the TextField is focused
+                                            width: 2.0, // Border width
+                                          ),
+                                          borderRadius: BorderRadius.circular(12.0),
+                                        ),
+                                      ),
+                                      style: TextStyle(
+                                        color: AppColors.textColorPrimary,
+                                        fontSize: AppData.text28,
+                                      ),
                                     ),
                                   )),
 
@@ -562,47 +590,66 @@ class _AddGearState extends State<AddGear> {
                               // Enter quantity
                               Padding(
                                   padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                                  child: TextField(
-                                    controller: gearQuantityController,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      LengthLimitingTextInputFormatter(2),
-                                      FilteringTextInputFormatter.digitsOnly,
-                                    ],
-                                    decoration: InputDecoration(
-                                      labelText: 'Quantity',
-                                      hintText: 'Up to 99',
-                                      hintStyle: TextStyle(
-                                        color: AppColors.textColorPrimary,
-                                        fontSize: 20,
-                                      ),
-                                      labelStyle: TextStyle(
-                                        color: AppColors.textColorPrimary,
-                                        fontSize: 22,
-                                        //fontWeight: FontWeight.bold,
-                                      ),
-                                      filled: true,
-                                      fillColor: AppColors.textFieldColor,
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: AppColors.borderPrimary,
-                                          // Border color when the TextField is not focused
-                                          width: 2.0, // Border width
-                                        ),
-                                        borderRadius: BorderRadius.circular(12.0), // Rounded corners
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: AppColors.primaryColor,
-                                          // Border color when the TextField is focused
-                                          width: 2.0, // Border width
-                                        ),
-                                        borderRadius: BorderRadius.circular(12.0),
-                                      ),
+                                  child: KeyboardActions(
+                                    config: keyboardActionsConfig(
+                                      focusNodes: [_quantityFocusNode],
                                     ),
-                                    style: TextStyle(
-                                      color: AppColors.textColorPrimary,
-                                      fontSize: 28,
+                                    disableScroll: true,
+                                    child: TextField(
+                                      focusNode: _quantityFocusNode,
+                                      controller: gearQuantityController,
+                                      keyboardType: TextInputType.number,
+                                      textInputAction: TextInputAction.done,
+                                      inputFormatters: [
+                                        LengthLimitingTextInputFormatter(2),
+                                        FilteringTextInputFormatter.digitsOnly,
+                                      ],
+                                      onChanged: (value) {
+                                        int? weight = int.tryParse(value);
+                                        setState(() {
+                                          if (weight == 0) {
+                                            quantityErrorMessage = 'Quantity must be greater than 0.';
+                                          } else {
+                                            quantityErrorMessage = null;
+                                          }
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        labelText: 'Quantity',
+                                        hintText: 'Up to 99',
+                                        hintStyle: TextStyle(
+                                          color: AppColors.textColorPrimary,
+                                          fontSize: AppData.text20,
+                                        ),
+                                        errorText: quantityErrorMessage,
+                                        labelStyle: TextStyle(
+                                          color: AppColors.textColorPrimary,
+                                          fontSize: AppData.text22,
+                                          //fontWeight: FontWeight.bold,
+                                        ),
+                                        filled: true,
+                                        fillColor: AppColors.textFieldColor,
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: AppColors.borderPrimary,
+                                            // Border color when the TextField is not focused
+                                            width: 2.0, // Border width
+                                          ),
+                                          borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: AppColors.primaryColor,
+                                            // Border color when the TextField is focused
+                                            width: 2.0, // Border width
+                                          ),
+                                          borderRadius: BorderRadius.circular(12.0),
+                                        ),
+                                      ),
+                                      style: TextStyle(
+                                        color: AppColors.textColorPrimary,
+                                        fontSize: AppData.text28,
+                                      ),
                                     ),
                                   )),
                               SizedBox(height: AppData.spacingStandard),
@@ -624,7 +671,7 @@ class _AddGearState extends State<AddGear> {
                                       Text(
                                         'HAZMAT',
                                         style: TextStyle(
-                                          fontSize: 22,
+                                          fontSize: AppData.text22,
                                           color: AppColors.textColorPrimary,
                                         ),
                                       ),
@@ -632,7 +679,7 @@ class _AddGearState extends State<AddGear> {
                                       Text(
                                         isHazmat ? 'Yes' : 'No', // Dynamic label
                                         style: TextStyle(
-                                          fontSize: 18,
+                                          fontSize: AppData.text18,
                                           color: AppColors.textColorPrimary,
                                         ),
                                       ),
@@ -677,7 +724,6 @@ class _AddGearState extends State<AddGear> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              // Enter Name
                               Padding(
                                 padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
                                 child: Column(
@@ -703,7 +749,7 @@ class _AddGearState extends State<AddGear> {
                                             style: TextStyle(
                                               color: AppColors.textColorPrimary,
                                               fontWeight: FontWeight.normal,
-                                              fontSize: 20,
+                                              fontSize: AppData.text20,
                                             ),
                                           ),
                                           isExpanded: true,
@@ -719,7 +765,7 @@ class _AddGearState extends State<AddGear> {
                                                     style: TextStyle(
                                                       color: AppColors.textColorPrimary,
                                                       fontWeight: FontWeight.normal,
-                                                      fontSize: 18,
+                                                      fontSize: AppData.text18,
                                                     ),
                                                   ),
                                                   Text(
@@ -727,7 +773,7 @@ class _AddGearState extends State<AddGear> {
                                                     style: TextStyle(
                                                       color: AppColors.textColorPrimary,
                                                       fontWeight: FontWeight.normal,
-                                                      fontSize: 18,
+                                                      fontSize: AppData.text18,
                                                     ),
                                                   ),
                                                 ],
@@ -756,7 +802,7 @@ class _AddGearState extends State<AddGear> {
                                                   style: TextStyle(
                                                     color: AppColors.textColorPrimary,
                                                     fontWeight: FontWeight.normal,
-                                                    fontSize: 22,
+                                                    fontSize: AppData.text22,
                                                   ),
                                                 ),
                                               );
@@ -773,47 +819,69 @@ class _AddGearState extends State<AddGear> {
                               // Enter Gear Weight
                               Padding(
                                   padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                                  child: TextField(
-                                    controller: irpgGearWeightController,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      LengthLimitingTextInputFormatter(3),
-                                      FilteringTextInputFormatter.digitsOnly,
-                                    ],
-                                    decoration: InputDecoration(
-                                      labelText: 'Weight',
-                                      hintText: 'Up to 500 lb',
-                                      hintStyle: TextStyle(
-                                        color: AppColors.textColorPrimary,
-                                        fontSize: 20,
-                                      ),
-                                      labelStyle: TextStyle(
-                                        color: AppColors.textColorPrimary,
-                                        fontSize: 22,
-                                        //fontWeight: FontWeight.bold,
-                                      ),
-                                      filled: true,
-                                      fillColor: AppColors.textFieldColor,
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: AppColors.borderPrimary,
-                                          // Border color when the TextField is not focused
-                                          width: 2.0, // Border width
-                                        ),
-                                        borderRadius: BorderRadius.circular(12.0), // Rounded corners
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: AppColors.primaryColor,
-                                          // Border color when the TextField is focused
-                                          width: 2.0, // Border width
-                                        ),
-                                        borderRadius: BorderRadius.circular(12.0),
-                                      ),
+                                  child: KeyboardActions(
+                                    config: keyboardActionsConfig(
+                                      focusNodes: [_weightFocusNode2],
                                     ),
-                                    style: TextStyle(
-                                      color: AppColors.textColorPrimary,
-                                      fontSize: 28,
+                                    disableScroll: true,
+                                    child: TextField(
+                                      focusNode: _weightFocusNode2,
+                                      controller: irpgGearWeightController,
+                                      keyboardType: TextInputType.number,
+                                      textInputAction: TextInputAction.done,
+                                      inputFormatters: [
+                                        LengthLimitingTextInputFormatter(3),
+                                        FilteringTextInputFormatter.digitsOnly,
+                                      ],
+                                      onChanged: (value) {
+                                        int? weight = int.tryParse(value);
+                                        setState(() {
+                                          // Validate the input and set error message
+                                          if (weight! > 500) {
+                                            irpgWeightErrorMessage = 'Weight must be less than 500.';
+                                          } else if (weight == 0) {
+                                            irpgWeightErrorMessage = 'Weight must be greater than 0.';
+                                          } else {
+                                            irpgWeightErrorMessage = null;
+                                          }
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        labelText: 'Weight',
+                                        hintText: 'Up to 500 lb',
+                                        hintStyle: TextStyle(
+                                          color: AppColors.textColorPrimary,
+                                          fontSize: AppData.text20,
+                                        ),
+                                        errorText: irpgWeightErrorMessage,
+                                        labelStyle: TextStyle(
+                                          color: AppColors.textColorPrimary,
+                                          fontSize: AppData.text22,
+                                          //fontWeight: FontWeight.bold,
+                                        ),
+                                        filled: true,
+                                        fillColor: AppColors.textFieldColor,
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: AppColors.borderPrimary,
+                                            // Border color when the TextField is not focused
+                                            width: 2.0, // Border width
+                                          ),
+                                          borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: AppColors.primaryColor,
+                                            // Border color when the TextField is focused
+                                            width: 2.0, // Border width
+                                          ),
+                                          borderRadius: BorderRadius.circular(12.0),
+                                        ),
+                                      ),
+                                      style: TextStyle(
+                                        color: AppColors.textColorPrimary,
+                                        fontSize: AppData.text28,
+                                      ),
                                     ),
                                   )),
 
@@ -822,47 +890,66 @@ class _AddGearState extends State<AddGear> {
                               // Enter quantity
                               Padding(
                                   padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                                  child: TextField(
-                                    controller: irpgGearQuantityController,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      LengthLimitingTextInputFormatter(2),
-                                      FilteringTextInputFormatter.digitsOnly,
-                                    ],
-                                    decoration: InputDecoration(
-                                      labelText: 'Quantity',
-                                      hintText: 'Up to 99',
-                                      hintStyle: TextStyle(
-                                        color: AppColors.textColorPrimary,
-                                        fontSize: 20,
-                                      ),
-                                      labelStyle: TextStyle(
-                                        color: AppColors.textColorPrimary,
-                                        fontSize: 22,
-                                        //fontWeight: FontWeight.bold,
-                                      ),
-                                      filled: true,
-                                      fillColor: AppColors.textFieldColor,
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: AppColors.borderPrimary,
-                                          // Border color when the TextField is not focused
-                                          width: 2.0, // Border width
-                                        ),
-                                        borderRadius: BorderRadius.circular(12.0), // Rounded corners
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: AppColors.primaryColor,
-                                          // Border color when the TextField is focused
-                                          width: 2.0, // Border width
-                                        ),
-                                        borderRadius: BorderRadius.circular(12.0),
-                                      ),
+                                  child: KeyboardActions(
+                                    config: keyboardActionsConfig(
+                                      focusNodes: [_quantityFocusNode2],
                                     ),
-                                    style: TextStyle(
-                                      color: AppColors.textColorPrimary,
-                                      fontSize: 28,
+                                    disableScroll: true,
+                                    child: TextField(
+                                      focusNode: _quantityFocusNode2,
+                                      controller: irpgGearQuantityController,
+                                      textInputAction: TextInputAction.done,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [
+                                        LengthLimitingTextInputFormatter(2),
+                                        FilteringTextInputFormatter.digitsOnly,
+                                      ],
+                                      onChanged: (value) {
+                                        int? weight = int.tryParse(value);
+                                        setState(() {
+                                          if (weight == 0) {
+                                            irpgQuantityErrorMessage = 'Quantity must be greater than 0.';
+                                          } else {
+                                            irpgQuantityErrorMessage = null;
+                                          }
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        labelText: 'Quantity',
+                                        hintText: 'Up to 99',
+                                        hintStyle: TextStyle(
+                                          color: AppColors.textColorPrimary,
+                                          fontSize: AppData.text20,
+                                        ),
+                                        errorText: irpgQuantityErrorMessage,
+                                        labelStyle: TextStyle(
+                                          color: AppColors.textColorPrimary,
+                                          fontSize: AppData.text22,
+                                          //fontWeight: FontWeight.bold,
+                                        ),
+                                        filled: true,
+                                        fillColor: AppColors.textFieldColor,
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: AppColors.borderPrimary,
+                                            // Border color when the TextField is not focused
+                                            width: 2.0, // Border width
+                                          ),
+                                          borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: AppColors.primaryColor,
+                                            // Border color when the TextField is focused
+                                            width: 2.0, // Border width
+                                          ),
+                                          borderRadius: BorderRadius.circular(12.0),
+                                        ),
+                                      ),
+                                      style: TextStyle(
+                                        color: AppColors.textColorPrimary,
+                                        fontSize: AppData.text28,
+                                      ),
                                     ),
                                   )),
                               SizedBox(height: AppData.spacingStandard),
@@ -883,15 +970,19 @@ class _AddGearState extends State<AddGear> {
                                       Text(
                                         'HAZMAT',
                                         style: TextStyle(
-                                          fontSize: 22,
+                                          fontSize: AppData.text22,
                                           color: AppColors.textColorPrimary,
                                         ),
                                       ),
                                       Spacer(),
                                       Text(
-                                        isHazmatIRPG ? 'Yes' : 'No', // Dynamic label
+                                        selectedGearName == null
+                                            ? ''
+                                            : isHazmatIRPG
+                                                ? 'Yes'
+                                                : 'No', // Dynamic label
                                         style: TextStyle(
-                                          fontSize: 18,
+                                          fontSize: AppData.text18,
                                           color: AppColors.textColorPrimary,
                                         ),
                                       ),
@@ -899,22 +990,20 @@ class _AddGearState extends State<AddGear> {
                                       // Toggle Switch
                                       Switch(
                                         value: isHazmatIRPG,
-                                        onChanged: (bool value) {
-                                          setState(() {
-                                            isHazmatIRPG = value; // Update the toggle state
-
-                                            // Find the selected gear item and update its isHazmat attribute
-                                            final selectedGear = irpgItems.firstWhere(
-                                              (item) => item['name'] == selectedGearName,
-                                            );
-                                            if (selectedGear != null) {
-                                              selectedGear['hazmat'] = value; // Update the isHazmat attribute
-                                            }
-                                          });
-                                        },
+                                        onChanged: selectedGearName == null
+                                            ? (_) {} // Prevent interaction but keep the track visible
+                                            : (bool value) {
+                                                setState(() {
+                                                  isHazmatIRPG = value; // Update the toggle state
+                                                });
+                                              },
                                         activeColor: Colors.red,
-                                        inactiveThumbColor: AppColors.textColorPrimary,
-                                        inactiveTrackColor: AppColors.textFieldColor,
+                                        inactiveThumbColor: selectedGearName == null
+                                            ? Colors.grey[400] // Gray out thumb when disabled
+                                            : AppColors.textColorPrimary,
+                                        inactiveTrackColor: selectedGearName == null
+                                            ? Colors.grey[600] // Keep track visible when disabled
+                                            : AppColors.textFieldColor,
                                       ),
                                     ],
                                   ),
