@@ -417,7 +417,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Container(
-                          width: double.infinity,
+                          width: AppData.inputFieldWidth,
                           decoration: BoxDecoration(
                             color: AppColors.fireColor,
                             border: Border.all(color: Colors.black, width: 2),
@@ -560,6 +560,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                       Padding(
                         padding: const EdgeInsets.only(top: 0.0, right: 16.0, left: 16.0),
                         child: Container(
+                          width: AppData.inputFieldWidth,
 
                           child: Stack(
                             children: [

@@ -1073,6 +1073,7 @@ class _SettingsState extends State<SettingsView> {
                 children: [
                   TextField(
                     controller: nameController,
+                    textCapitalization: TextCapitalization.words,
                     inputFormatters: [LengthLimitingTextInputFormatter(30)],
                     decoration: InputDecoration(
                       errorText: errorMessage,
