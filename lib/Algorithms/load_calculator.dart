@@ -14,9 +14,9 @@ import '../Data/trip_preferences.dart';
 import '../main.dart';
 
 // TripPreference based sorting algorithm
-Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference, bool isExternalManifest, int safetyBuffer) async {
+Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference) async {
   int availableSeats = trip.availableSeats;
-  int maxLoadWeight = isExternalManifest ? trip.allowable - safetyBuffer : trip.allowable; /// Crews have option to add a safety buffer to minimize error
+  int maxLoadWeight =  trip.allowable; /// Crews have option to add a safety buffer to minimize error
 
   // Get  number of loads based on allowable
   int numLoadsByAllowable = (trip.totalCrewWeight! / maxLoadWeight).ceil();
@@ -28,9 +28,6 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
       ? numLoadsByAllowable
       : numLoadsBySeat;
 
-  if (isExternalManifest){
-    numLoads = numLoadsByAllowable;
-  }
   // Create copies of crew and gear
   var crewMembersCopy = trip.crewMembers.map((member) {
     return CrewMember(
@@ -566,7 +563,7 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
   }
 // Error message setup
   if (crewMembersCopy.isNotEmpty || gearCopy.isNotEmpty || duplicateCrew.isNotEmpty || duplicateGear.isNotEmpty) {
-    String errorMessage = isExternalManifest ? "Not all gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable." : "Not all crew members or gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable.";
+    String errorMessage =  "Not all crew members or gear items were allocated to a load due to tight weight constraints. Try again or pick a higher allowable.";
 
     if (duplicateCrew.isNotEmpty || duplicateGear.isNotEmpty) {
       errorMessage += "\nAdditionally, duplicate items were detected.";
