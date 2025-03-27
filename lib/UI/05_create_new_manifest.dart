@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:fire_app/Algorithms/external_load_calculator.dart';
+import 'package:fire_app/Algorithms/external_load_calculator_ ARCHIVE2.dart';
 import 'package:fire_app/CodeShare/variables.dart';
 import 'package:fire_app/Data/load_accoutrements.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
@@ -13,6 +13,7 @@ import 'package:hive/hive.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 
 import '../../Data/trip.dart';
+import '../Algorithms/external_load_calculator.dart';
 import '../CodeShare/keyboardActions.dart';
 import '../Data/crewmember.dart';
 import '../Data/gear.dart';
@@ -2420,8 +2421,9 @@ class _QuickManifestState extends State<QuickManifest> {
     // Load Calculation with animation
     // Current testing: for internal only, to be used eventually by external
     if (!isExternalManifest) {
-      startCalculation(context, isExternalManifest, newTrip, selectedTripPreference, safetyBuffer);
+      startCalculation(context, newTrip, selectedTripPreference, );
     } else {
+
       // Create Load Accoutrement objecets to pass
 
       LoadAccoutrement cargoNet12x12 = LoadAccoutrement(
@@ -2449,7 +2451,7 @@ class _QuickManifestState extends State<QuickManifest> {
       );
 
       // Testing only -> fast version no animation for external manifesting
-      externalLoadCalculator(context, newTrip, selectedTripPreference, safetyBuffer, cargoNet12x12, cargoNet20x20, swivel, leadLine);
+      startCalculationExternal(context, newTrip, safetyBuffer, cargoNet12x12, cargoNet20x20, swivel, leadLine);
     }
 
     // Load Calculation without animation

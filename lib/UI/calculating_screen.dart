@@ -3,8 +3,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../Algorithms/external_load_calculator.dart';
 import '../Algorithms/load_calculator.dart';
 import '../CodeShare/variables.dart';
+import '../Data/load_accoutrements.dart';
 import '../Data/trip.dart';
 import '../Data/trip_preferences.dart';
 import '../main.dart';
@@ -318,7 +320,7 @@ class _CalculatingScreenState extends State<CalculatingScreen> with SingleTicker
   }
 }
 
-Future<void> startCalculation(BuildContext context, bool isExternalManifest, Trip newTrip, TripPreference? selectedTripPreference, int safetyBuffer) async {
+Future<void> startCalculation(BuildContext context, Trip newTrip, TripPreference? selectedTripPreference) async {
   await showDialog(
     context: context,
     barrierDismissible: false,
@@ -326,7 +328,7 @@ Future<void> startCalculation(BuildContext context, bool isExternalManifest, Tri
   );
 
   try {
-    await loadCalculator(context, newTrip, selectedTripPreference, isExternalManifest, safetyBuffer);
+    await loadCalculator(context, newTrip, selectedTripPreference);
   } finally {
     if (context.mounted && Navigator.canPop(context)) {
       Navigator.pop(context);
@@ -348,7 +350,40 @@ Future<void> startCalculation(BuildContext context, bool isExternalManifest, Tri
 
   // Switch tab globally after delay
   Future.delayed(Duration(milliseconds: 300), () {
-    print("Switching tabs globally...");
+    selectedIndexNotifier.value = 1; // Switch to "Saved Trips"
+  });
+}
+Future<void> startCalculationExternal(BuildContext context, Trip newTrip,  int safetyBuffer, LoadAccoutrement cargoNet12x12, LoadAccoutrement cargoNet20x20, LoadAccoutrement swivel, LoadAccoutrement leadLine) async {
+  await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => CalculatingScreen(),
+  );
+
+  try {
+    await externalLoadCalculator(context, newTrip, safetyBuffer, cargoNet12x12, cargoNet20x20, swivel, leadLine);
+
+  } finally {
+    if (context.mounted && Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
+  }
+
+  scaffoldMessengerKey.currentState?.showSnackBar(
+    SnackBar(
+      content: Center(
+        child: Text(
+          'Trip Saved!',
+          style: TextStyle(color: Colors.black, fontSize: AppData.text32, fontWeight: FontWeight.bold),
+        ),
+      ),
+      duration: const Duration(seconds: 2),
+      backgroundColor: Colors.green,
+    ),
+  );
+
+  // Switch tab globally after delay
+  Future.delayed(Duration(milliseconds: 300), () {
     selectedIndexNotifier.value = 1; // Switch to "Saved Trips"
   });
 }
