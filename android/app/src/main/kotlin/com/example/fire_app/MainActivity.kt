@@ -1,4 +1,4 @@
-package com.example.fire_app
+package com.dawsonnash.firemanifest
 
 import io.flutter.embedding.android.FlutterActivity
 

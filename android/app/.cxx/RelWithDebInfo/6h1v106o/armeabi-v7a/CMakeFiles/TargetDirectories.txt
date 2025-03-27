@@ -1,0 +1,2 @@
+C:/Users/dawso/dev/fire_manifest_app/android/app/.cxx/RelWithDebInfo/6h1v106o/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/dawso/dev/fire_manifest_app/android/app/.cxx/RelWithDebInfo/6h1v106o/armeabi-v7a/CMakeFiles/rebuild_cache.dir
