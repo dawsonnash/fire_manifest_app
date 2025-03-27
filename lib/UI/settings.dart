@@ -798,12 +798,12 @@ class _SettingsState extends State<SettingsView> {
               onPressed: () async {
                 final feedback = feedbackController.text.trim();
                 if (feedback.isNotEmpty) {
-                  final String subject = Uri.encodeComponent('FIRE MANIFESTING APP: Bug Fixes');
+                  final String subject = Uri.encodeComponent('Bug Fixes');
                   final String body = Uri.encodeComponent(feedback);
 
                   final Uri emailUri = Uri(
                     scheme: 'mailto',
-                    path: 'dawsonak85@gmail.com', // Replace with your email address
+                    path: 'dev@firemanifesting.com', // Replace with your email address
                     query: 'subject=$subject&body=$body',
                   );
 
@@ -872,12 +872,12 @@ class _SettingsState extends State<SettingsView> {
               onPressed: () async {
                 final feedback = feedbackController.text.trim();
                 if (feedback.isNotEmpty) {
-                  final String subject = Uri.encodeComponent('FIRE MANIFESTING APP: Feedback/Questions ');
+                  final String subject = Uri.encodeComponent('Feedback/Questions');
                   final String body = Uri.encodeComponent(feedback);
 
                   final Uri emailUri = Uri(
                     scheme: 'mailto',
-                    path: 'dawsonak85@gmail.com', // Replace with your email address
+                    path: 'dev@firemanifesting.com', // Replace with your email address
                     query: 'subject=$subject&body=$body',
                   );
 
