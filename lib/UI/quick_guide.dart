@@ -86,51 +86,49 @@ class _QuickGuideState extends State<QuickGuide> {
           elevation: 4.0,
           color: Colors.grey[900],
           borderRadius: BorderRadius.circular(8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: sectionKeys.map((section) {
-              String sectionNumber = section["number"];
-              List<String> parts = sectionNumber.split('.');
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * .9, // Fixed max height for dropdown
+            child: ListView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: sectionKeys.length,
+              itemBuilder: (context, index) {
+                final section = sectionKeys[index];
+                final String sectionNumber = section["number"];
+                final List<String> parts = sectionNumber.split('.');
 
-              int depth;
-              if (parts.length == 1 || (parts.length == 2 && parts.last == '0')) {
-                // E.g., "1" or "1.0" — top-level
-                depth = 0;
-              } else {
-                depth = parts.length - 1; // E.g., "1.1" = 1, "1.1.1" = 2
-              }
+                int depth = (parts.length == 1 || (parts.length == 2 && parts.last == '0')) ? 0 : parts.length - 1;
+                double leftPadding = AppData.padding16 + (depth * AppData.padding16);
 
-              double leftPadding = AppData.padding16 + (depth * AppData.padding16);
-
-              return ListTile(
-                contentPadding: EdgeInsets.only(left: leftPadding, right: AppData.padding16),
-                title: Row(
-                  children: [
-                    Text(
-                      sectionNumber,
-                      style: TextStyle(
-                        color: depth > 0 ? Colors.grey : Colors.deepOrangeAccent,
-                        fontWeight: FontWeight.bold,
-                        fontSize: AppData.text16,
+                return ListTile(
+                  contentPadding: EdgeInsets.only(left: leftPadding, right: AppData.padding16),
+                  title: Row(
+                    children: [
+                      Text(
+                        sectionNumber,
+                        style: TextStyle(
+                          color: depth > 0 ? Colors.grey : Colors.deepOrangeAccent,
+                          fontWeight: FontWeight.bold,
+                          fontSize: AppData.text16,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      section["title"],
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: AppData.text16,
-                        fontWeight: depth > 0 ? FontWeight.normal : FontWeight.bold,
+                      SizedBox(width: 8),
+                      Text(
+                        section["title"],
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: AppData.text16,
+                          fontWeight: depth > 0 ? FontWeight.normal : FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                onTap: () {
-                  _hideDropdown();
-                  _scrollToSection(section["title"]);
-                },
-              );
-            }).toList(),
+                    ],
+                  ),
+                  onTap: () {
+                    _hideDropdown();
+                    _scrollToSection(section["title"]);
+                  },
+                );
+              },
+            ),
           ),
         ),
       ),
