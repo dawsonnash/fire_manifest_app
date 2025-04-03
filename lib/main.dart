@@ -15,7 +15,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import '../Data/crewmember.dart';
 import '../Data/gear.dart';
 import 'CodeShare/variables.dart';
@@ -37,6 +38,7 @@ final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<Scaffol
 void main() async {
   // Set up for Hive that needs to run before starting app
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 
   // Disable landscape mode temporarily, until UI is implemented
   await SystemChrome.setPreferredOrientations([

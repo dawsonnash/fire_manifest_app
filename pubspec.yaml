@@ -50,6 +50,8 @@ dependencies:
   flutter_svg: ^2.0.17
   receive_sharing_intent: ^1.8.1
   keyboard_actions: ^4.2.0
+  firebase_core: ^3.13.0
+  firebase_analytics: ^11.4.5
 
 dev_dependencies:
   flutter_test:

@@ -4,6 +4,7 @@ import 'package:fire_app/Algorithms/external_load_calculator_ ARCHIVE2.dart';
 import 'package:fire_app/CodeShare/variables.dart';
 import 'package:fire_app/Data/load_accoutrements.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -175,6 +176,8 @@ class _QuickManifestState extends State<QuickManifest> {
   final FocusNode _availableSeatsFocusNode = FocusNode();
   final FocusNode _allowableFocusNode = FocusNode();
   final FocusNode _safetyBufferFocusNode = FocusNode();
+
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   @override
   void initState() {

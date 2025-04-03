@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/Data/trip_preferences.dart';
 import 'package:fire_app/UI/quick_guide.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -1670,7 +1671,8 @@ class _SettingsState extends State<SettingsView> {
                                                     borderSide: BorderSide(color: AppColors.fireColor),
                                                   ),
                                                 ),
-                                                onSubmitted: (value) {
+                                                onSubmitted: (value) async {
+                                                  String trimmedName = value.trim();
                                                   setState(() {
                                                     if (value.trim().isNotEmpty) {
                                                       widget.onCrewNameChanged(value.trim()); // Notify parent widget of the change
@@ -1678,6 +1680,21 @@ class _SettingsState extends State<SettingsView> {
                                                   });
                                                   // Call a callback or save preference
                                                   ThemePreferences.setCrewName(value.trim());
+
+                                                  if (trimmedName.isNotEmpty) {
+                                                    await FirebaseAnalytics.instance.setUserProperty(
+                                                      name: 'crew_name',
+                                                      value: trimmedName,
+                                                    );
+
+                                                    // Add this to make sure it shows up in DebugView
+                                                    await FirebaseAnalytics.instance.logEvent(
+                                                      name: 'crew_name_set',
+                                                      parameters: {
+                                                        'value': trimmedName,
+                                                      },
+                                                    );
+                                                  }
                                                 },
                                               ),
                                             ),
@@ -1728,7 +1745,9 @@ class _SettingsState extends State<SettingsView> {
                                                     borderSide: BorderSide(color: AppColors.fireColor),
                                                   ),
                                                 ),
-                                                onSubmitted: (value) {
+                                                onSubmitted: (value) async {
+                                                  String trimmedName = value.trim();
+
                                                   setState(() {
                                                     if (value.trim().isNotEmpty) {
                                                       widget.onUserNameChanged(value.trim());
@@ -1736,6 +1755,21 @@ class _SettingsState extends State<SettingsView> {
                                                   });
                                                   // Call a callback or save preference
                                                   ThemePreferences.setUserName(value.trim());
+
+                                                  if (trimmedName.isNotEmpty) {
+                                                    await FirebaseAnalytics.instance.setUserProperty(
+                                                      name: 'user_name',
+                                                      value: trimmedName,
+                                                    );
+
+                                                    // Add this to make sure it shows up in DebugView
+                                                    await FirebaseAnalytics.instance.logEvent(
+                                                      name: 'user_name_set',
+                                                      parameters: {
+                                                        'value': trimmedName,
+                                                      },
+                                                    );
+                                                  }
                                                 },
                                               ),
                                             ),
