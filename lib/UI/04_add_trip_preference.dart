@@ -394,6 +394,8 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                               tripPreference: tripPreference,
                               onUpdate: loadPositionalPreferenceList, // refresh list on return
                             ),
+                            settings: RouteSettings(name: 'AddLoadPreferencePage'),
+
                           ),
                         );
                         if (result != null) {

@@ -895,6 +895,8 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, int safetyB
   Navigator.of(context).pushAndRemoveUntil(
     MaterialPageRoute(
       builder: (context) => MyHomePage(),
+      settings: RouteSettings(name: 'HomePage'),
+
     ),
         (Route<dynamic> route) => false, // This clears all the previous routes
   );

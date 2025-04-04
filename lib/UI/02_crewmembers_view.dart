@@ -330,7 +330,9 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                       Navigator.of(context).pop(); // Navigate back when pressed
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => const AddCrewmember()),
+                                        MaterialPageRoute(builder: (context) => const AddCrewmember(),
+                                          settings: RouteSettings(name: 'AddCrewMemberPage'),
+                                        ),
                                       );
                                     },
                                     child: Row(
@@ -422,6 +424,8 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                                     crewMember: crewMember,
                                                     onUpdate: loadCrewMemberList,
                                                   ),
+                                                  settings: RouteSettings(name: 'EditCrewMemberPage'),
+
                                                 ),
                                               );
                                             },

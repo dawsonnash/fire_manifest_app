@@ -19,6 +19,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import '../Data/crewmember.dart';
 import '../Data/gear.dart';
+import 'Analytics/analytics_observer.dart';
 import 'CodeShare/variables.dart';
 import 'Data/crew.dart';
 import 'Data/crewMemberList.dart';
@@ -122,6 +123,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,    // Debug label
       scaffoldMessengerKey: scaffoldMessengerKey,
       title: 'Fire Manifest App',
+      navigatorObservers: [AnalyticsRouteObserver()],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.fireColor),
         useMaterial3: true,
@@ -679,10 +681,34 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void switchTab(int index) {
-    if (!mounted) return; // Prevents calling setState() on disposed widget
-    print("Switching to tab $index");
+    if (!mounted) return;
     selectedIndexNotifier.value = index;
+
+    FirebaseAnalytics.instance.logScreenView(
+      screenName: _getScreenName(index),
+      screenClass: _getScreenClass(index),
+    );
   }
+
+  String _getScreenName(int index) {
+    switch (index) {
+      case 0:
+        return 'ManifestPage';
+      case 1:
+        return 'SavedTripsPage';
+      case 2:
+        return 'EditCrewPage';
+      case 3:
+        return 'SettingsPage';
+      default:
+        return 'UnknownTab';
+    }
+  }
+
+  String _getScreenClass(int index) {
+    return _pages[index].runtimeType.toString(); // Gets the class name of the Widget
+  }
+
 
   void _toggleTheme(bool isDarkMode) async {
     setState(() {
@@ -912,7 +938,9 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
                           await prefs.setBool('agreedToTerms', true);
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => const MyHomePage()),
+                            MaterialPageRoute(builder: (context) => const MyHomePage(),
+                              settings: RouteSettings(name: 'HomePage'),
+                            ),
                           );
                         }
                             : null,

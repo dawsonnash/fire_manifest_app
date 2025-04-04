@@ -693,6 +693,8 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
   Navigator.of(context).pushAndRemoveUntil(
     MaterialPageRoute(
       builder: (context) => MyHomePage(),
+      settings: RouteSettings(name: 'HomePage'),
+
     ),
         (Route<dynamic> route) => false, // This clears all the previous routes
   );

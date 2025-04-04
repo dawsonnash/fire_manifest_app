@@ -353,7 +353,10 @@ class _SingleTripViewState extends State<SingleTripView> {
                                           )
                                         : EditTrip(
                                             trip: widget.trip,
-                                          )),
+                                          ),
+                                  settings: RouteSettings(
+                                    name: widget.trip.isExternal! ? 'EditTripExternalPage' : 'EditTripInternalPage',
+                                  ),),
                               );
                             },
                           ),
@@ -482,6 +485,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                     load: load,
                                     isExternal: widget.trip.isExternal!,
                                   ),
+                                  settings: RouteSettings(name: 'SingleLoadViewPage'),
                                 ),
                               );
                             },

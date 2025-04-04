@@ -1448,7 +1448,9 @@ class _SettingsState extends State<SettingsView> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => QuickGuide()),
+                              MaterialPageRoute(builder: (context) => QuickGuide(),
+                                settings: RouteSettings(name: 'QuickGuidePage'),
+                              ),
                             );
                           },
                           child: Text('Quick Guide', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: AppData.text18)),

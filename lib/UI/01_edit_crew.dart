@@ -337,7 +337,10 @@ class _EditCrewState extends State<EditCrew> {
                                         onTap: () async {
                                           await Navigator.push(
                                             context,
-                                            MaterialPageRoute(builder: (context) => const AddCrewmember()),
+                                            MaterialPageRoute(builder: (context) => const AddCrewmember(),
+                                              settings: RouteSettings(name: 'AddCrewMemberPage'),
+
+                                            ),
                                           );
                                           setState(() {});
                                         },
@@ -379,7 +382,9 @@ class _EditCrewState extends State<EditCrew> {
                                         onTap: () async {
                                           await Navigator.push(
                                             context,
-                                            MaterialPageRoute(builder: (context) => const AddGear()),
+                                            MaterialPageRoute(builder: (context) => const AddGear(),
+                                              settings: RouteSettings(name: 'AddGearPage'),
+                                            ),
                                           );
                                           setState(() {});
                                         },
@@ -430,7 +435,9 @@ class _EditCrewState extends State<EditCrew> {
                                         onTap: () async {
                                           await Navigator.push(
                                             context,
-                                            MaterialPageRoute(builder: (context) => const CrewmembersView()),
+                                            MaterialPageRoute(builder: (context) => const CrewmembersView(),
+                                              settings: RouteSettings(name: 'CrewMembersViewPage'),
+                                            ),
                                           );
                                           setState(() {});
                                         },
@@ -470,7 +477,9 @@ class _EditCrewState extends State<EditCrew> {
                                         onTap: () async {
                                           await Navigator.push(
                                             context,
-                                            MaterialPageRoute(builder: (context) => const GearView()),
+                                            MaterialPageRoute(builder: (context) => const GearView(),
+                                              settings: RouteSettings(name: 'GearViewPage'),
+                                            ),
                                           );
                                           setState(() {});
                                         },
@@ -1270,7 +1279,9 @@ class _EditCrewState extends State<EditCrew> {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const TripPreferences()),
+                                MaterialPageRoute(builder: (context) => const TripPreferences(),
+                                  settings: RouteSettings(name: 'TripPreferencesViewPage'),
+                                ),
                               );
                             },
                             child: Container(

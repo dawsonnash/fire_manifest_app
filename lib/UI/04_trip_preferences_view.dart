@@ -177,6 +177,7 @@ class _TripPreferencesState extends State<TripPreferences> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => EditTripPreference(tripPreference: tripPreference, onUpdate: loadTripPreferenceList),
+                                        settings: RouteSettings(name: 'EditTripPreferencePage'),
                                       ),
                                     );
                                     // Calls the update function after returning from AddTripPreference
@@ -289,6 +290,7 @@ class _TripPreferencesState extends State<TripPreferences> {
                                                                     context,
                                                                     MaterialPageRoute(
                                                                       builder: (context) => EditTripPreference(tripPreference: tripPreference, onUpdate: loadTripPreferenceList),
+                                                                      settings: RouteSettings(name: 'EditTripPreferencePage'),
                                                                     ),
                                                                   );
                                                                   // Calls the update function after returning from AddTripPreference
@@ -390,6 +392,8 @@ class _TripPreferencesState extends State<TripPreferences> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => AddTripPreference(onUpdate: loadTripPreferenceList),
+                            settings: RouteSettings(name: 'AddTripPreferencePage'),
+
                           ),
                         );
                         // Calls the update function after returning from AddTripPreference

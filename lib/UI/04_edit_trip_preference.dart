@@ -370,6 +370,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                               tripPreference: widget.tripPreference,
                               onUpdate: loadPositionalPreferenceList, // refresh list on return
                             ),
+                            settings: RouteSettings(name: 'AddLoadPreferencePage'),
                           ),
                         );
                         if (result != null) {
