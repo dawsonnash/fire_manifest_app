@@ -4,6 +4,7 @@ import 'package:fire_app/UI/02_add_crewmember.dart';
 import 'package:fire_app/UI/02_crewmembers_view.dart';
 import 'package:fire_app/UI/03_gear_view.dart';
 import 'package:fire_app/UI/04_trip_preferences_view.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -982,6 +983,15 @@ class _EditCrewState extends State<EditCrew> {
                                                             duration: Duration(seconds: 1),
                                                             backgroundColor: Colors.green,
                                                           ),
+                                                        );
+                                                        FirebaseAnalytics.instance.logEvent(
+                                                          name: 'tool_added',
+                                                          parameters: {
+                                                            'tool_name': newTool.name,
+                                                            'tool_weight': newTool.weight,
+                                                            'tool_quantity': newTool.quantity,
+                                                            'tool_isHazmat': newTool.isHazmat ? 'true' : 'false',
+                                                          },
                                                         );
                                                       }
 

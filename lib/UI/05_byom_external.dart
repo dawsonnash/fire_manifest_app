@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:fire_app/Data/load_accoutrements.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -779,6 +780,9 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
 
     Navigator.of(context).pop(); // Go back to the home screen
     selectedIndexNotifier.value = 1; // Switch to "Saved Trips" tab
+    FirebaseAnalytics.instance.logEvent(
+      name: 'external_trip_built',
+    );
   }
 
   // Function to calculate available weight for a load

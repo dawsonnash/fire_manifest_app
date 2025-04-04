@@ -1,4 +1,5 @@
 import 'package:fire_app/Data/load_accoutrements.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
 import '../CodeShare/variables.dart';
@@ -891,6 +892,18 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, int safetyB
         );
       },
     );
+    FirebaseAnalytics.instance.logEvent(
+      name: 'external_load_calculation_error',
+      parameters: {
+        'type': 'Unallocated gear',
+        'trip_name': trip.tripName,
+        'total_weight': totalWeight,
+        'trip_allowable': trip.allowable,
+        'trip_safety_buffer': trip.safetyBuffer,
+        'num_loads': numLoads,
+        'num_unallocated_items': unallocatedGear.length,
+      },
+    );
   }
   Navigator.of(context).pushAndRemoveUntil(
     MaterialPageRoute(
@@ -899,6 +912,23 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, int safetyB
 
     ),
         (Route<dynamic> route) => false, // This clears all the previous routes
+  );
+  FirebaseAnalytics.instance.logEvent(
+    name: 'trip_generated_external',
+    parameters: {
+      'trip_name': trip.tripName,
+      'trip_allowable': trip.allowable,
+      'trip_safety_buffer': trip.safetyBuffer,
+      'trip_num_loads': numLoads,
+      'num_12x12_nets': cargoNet12x12.quantity,
+      'num_20x20_nets': cargoNet20x20.quantity,
+      'num_lead_lines': leadLine.quantity,
+      'num_swivels': swivel.quantity,
+      'weight_12x12_nets': cargoNet12x12.weight,
+      'weight_20x20_nets': cargoNet20x20.weight,
+      'weight_lead_lines': leadLine.weight,
+      'weight_swivels': swivel.weight,
+    },
   );
 }
 

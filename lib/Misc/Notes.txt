@@ -7,3 +7,22 @@ Coding Guidelines
 - Trip Editing
 -- BYOMExternal and EditTrip external are like
 the exact same besides saveTrip and loadData. everything else can be copy/pasted
+
+
+Analytics Plan:
+
+User Properties
+-- General location
+-- Crew Name
+-- User Name
+-- Crew Position
+
+General App Usage
+-- Time spent on each each page
+-- Number of generated manifests (internal/external separate)
+    -- Number of times Trip Preference was used
+-- Number of built manifests
+-- Number of exported manifests
+-- Number of times Crew Sharing files imported/exported
+-- Number of Load Calculation Error appears
+-- Background image usage?

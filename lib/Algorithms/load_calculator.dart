@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:fire_app/Data/positional_preferences.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
 import '../CodeShare/variables.dart';
@@ -16,7 +17,9 @@ import '../main.dart';
 // TripPreference based sorting algorithm
 Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tripPreference) async {
   int availableSeats = trip.availableSeats;
-  int maxLoadWeight =  trip.allowable; /// Crews have option to add a safety buffer to minimize error
+  int maxLoadWeight =  trip.allowable;
+
+  bool tripPreferenceUsed = tripPreference == null ? false : true;
 
   // Get  number of loads based on allowable
   int numLoadsByAllowable = (trip.totalCrewWeight! / maxLoadWeight).ceil();
@@ -687,6 +690,21 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
         );
       },
     );
+    FirebaseAnalytics.instance.logEvent(
+      name: 'internal_load_calculation_error',
+      parameters: {
+        'trip_name': trip.tripName,
+        'total_weight': trip.totalCrewWeight!,
+        'trip_allowable': trip.allowable,
+        'trip_available_seats': trip.availableSeats,
+        'tripPreferenceUsed' : tripPreferenceUsed ? 'true' : 'false',
+        'num_loads': numLoads,
+        'num_unallocated_crewmembers': crewMembersCopy.length,
+        'num_unallocated_gear': gearCopy.length,
+        'num_duplicate_crewmembers': duplicateCrew.length,
+        'num_duplicate_gear': duplicateGear.length,
+      },
+    );
   }
 
 
@@ -697,6 +715,15 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
 
     ),
         (Route<dynamic> route) => false, // This clears all the previous routes
+  );
+  FirebaseAnalytics.instance.logEvent(
+    name: 'trip_generated_internal',
+    parameters: {
+      'trip_name': trip.tripName,
+      'trip_allowable': trip.allowable,
+      'trip_available_seats': trip.availableSeats,
+      'tripPreferenceUsed' : tripPreferenceUsed ? 'true' : 'false',
+    },
   );
 }
 

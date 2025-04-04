@@ -565,6 +565,12 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the warning dialog
                 importCrewData(filePath); // Pass filePath instead of callback
+                FirebaseAnalytics.instance.logEvent(
+                  name: 'crewDataFile_imported',
+                  parameters: {
+                    'file_name': filePath,
+                  },
+                );
               },
               child: Text('Confirm', style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize)),
             ),

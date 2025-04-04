@@ -651,6 +651,12 @@ class _SettingsState extends State<SettingsView> {
                     backgroundColor: Colors.green,
                   ),
                 );
+                FirebaseAnalytics.instance.logEvent(
+                  name: 'crewDataFile_imported',
+                  parameters: {
+                    'file_name': 'nonExistent',
+                  },
+                );
               },
               child: Text(
                 'Confirm',
@@ -1035,6 +1041,9 @@ class _SettingsState extends State<SettingsView> {
                       );
                     } else {
                       exportCrewData();
+                      FirebaseAnalytics.instance.logEvent(
+                        name: 'crewDataFile_exported',
+                      );
                     }
                   }
                   // Import
@@ -1860,6 +1869,7 @@ class _SettingsState extends State<SettingsView> {
                                                   if (parsedValue != null) {
                                                     widget.onSafetyBufferChange(parsedValue);
                                                     ThemePreferences.setSafetyBuffer(parsedValue);
+
                                                   }
                                                 });
                                               },

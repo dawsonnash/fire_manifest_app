@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/UI/04_add_load_preference.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -124,6 +125,12 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                       });
                       Navigator.of(context).pop(); // Dismiss dialog
                     }
+                    FirebaseAnalytics.instance.logEvent(
+                      name: 'tripPreference_created',
+                      parameters: {
+                        'tripPreference_name': tripPreference.tripPreferenceName,
+                      },
+                    );
                   },
                   child: Text(
                     "Save",
