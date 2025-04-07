@@ -498,7 +498,6 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, int safetyB
 
     if (!itemPlaced) {
       // Couldn't place the item anywhere
-      debugPrint("debug: ERROR: Could not place item '${item.name}' (weight: ${item.weight}) due to load weight constraints.");
       await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -913,22 +912,40 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, int safetyB
     ),
         (Route<dynamic> route) => false, // This clears all the previous routes
   );
+  final Map<String, Object> slingWeightParams = {
+    'trip_name': trip.tripName,
+    'trip_allowable': trip.allowable,
+    'trip_safety_buffer': trip.safetyBuffer,
+    'trip_num_loads': numLoads,
+    'num_12x12_nets': cargoNet12x12.quantity,
+    'num_20x20_nets': cargoNet20x20.quantity,
+    'num_lead_lines': leadLine.quantity,
+    'num_swivels': swivel.quantity,
+  };
+
+// Add sling weights
+  for (int i = 0; i < trip.loads.length; i++) {
+    final load = trip.loads[i];
+    for (int j = 0; j < (load.slings?.length ?? 0); j++) {
+      final sling = load.slings![j];
+      slingWeightParams['load_${i + 1}_sling_${j + 1}_weight'] = sling.weight;
+    }
+  }
   FirebaseAnalytics.instance.logEvent(
     name: 'trip_generated_external',
+    parameters: slingWeightParams,
+  );
+
+  if (cargoNet12x12.weight != 20 || cargoNet20x20.weight != 45 || leadLine.weight != 10 || swivel.weight != 5) {
+    FirebaseAnalytics.instance.logEvent(
+    name: 'load_accoutrement_weight_change',
     parameters: {
-      'trip_name': trip.tripName,
-      'trip_allowable': trip.allowable,
-      'trip_safety_buffer': trip.safetyBuffer,
-      'trip_num_loads': numLoads,
-      'num_12x12_nets': cargoNet12x12.quantity,
-      'num_20x20_nets': cargoNet20x20.quantity,
-      'num_lead_lines': leadLine.quantity,
-      'num_swivels': swivel.quantity,
       'weight_12x12_nets': cargoNet12x12.weight,
       'weight_20x20_nets': cargoNet20x20.weight,
       'weight_lead_lines': leadLine.weight,
       'weight_swivels': swivel.weight,
     },
   );
+  }
 }
 

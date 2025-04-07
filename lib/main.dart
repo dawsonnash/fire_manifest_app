@@ -588,6 +588,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if (!jsonData.containsKey("crew") || !jsonData.containsKey("savedPreferences")) {
         showErrorDialog("Invalid JSON format. Missing required fields.");
+
+        FirebaseAnalytics.instance.logEvent(
+          name: 'import_error',
+
+          parameters: {
+            'error_message': "Invalid JSON format. Missing required fields.",
+          },
+        );
         return;
       }
 

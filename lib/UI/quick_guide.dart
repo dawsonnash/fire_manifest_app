@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -125,6 +126,14 @@ class _QuickGuideState extends State<QuickGuide> {
                   onTap: () {
                     _hideDropdown();
                     _scrollToSection(section["title"]);
+                    // Log which section was clicked
+                    FirebaseAnalytics.instance.logEvent(
+                      name: 'quick_guide_section_viewed',
+                      parameters: {
+                        'section_title': section["title"],
+                        'section_number': section["number"],
+                      },
+                    );
                   },
                 );
               },

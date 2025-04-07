@@ -678,6 +678,13 @@ class _SettingsState extends State<SettingsView> {
       // Validate required fields
       if (!jsonData.containsKey("crew") || !jsonData.containsKey("savedPreferences")) {
         showErrorDialog("Invalid JSON format. Missing required fields.");
+        FirebaseAnalytics.instance.logEvent(
+          name: 'import_error',
+
+          parameters: {
+            'error_message': "Invalid JSON format. Missing required fields.",
+          },
+        );
         return;
       }
 
@@ -731,6 +738,13 @@ class _SettingsState extends State<SettingsView> {
       //Crew Name
     } catch (e) {
       showErrorDialog("Unexpected error during import: $e");
+      FirebaseAnalytics.instance.logEvent(
+        name: 'import_error',
+
+        parameters: {
+          'error_message': "$e",
+        },
+      );
     }
   }
 
@@ -1142,6 +1156,16 @@ class _SettingsState extends State<SettingsView> {
                           }
                         } else {
                           _saveNewLoadout(loadoutName, isEmptyCrew);
+                          FirebaseAnalytics.instance.logEvent(
+                            name: 'crew_loadout_built',
+
+                            parameters: {
+                              'loadout_name': loadoutName,
+                              'isEmptyCrew': isEmptyCrew ? 'yes' : 'no',
+                              'crew_crewmember_length': crew.crewMembers.length,
+                              'crew_gear_length': crew.gear.length,
+                            },
+                          );
                         }
                         Navigator.of(context).pop();
                       }
@@ -1545,13 +1569,20 @@ class _SettingsState extends State<SettingsView> {
                                     enableBackgroundImage = value;
                                   });
                                   ThemePreferences.setBackgroundImagePreference(value); // Save preference
+
+                                  if (value == true) {
+                                    FirebaseAnalytics.instance.logEvent(
+                                      name: 'background_image_enabled',
+
+                                    );
+                                  }
                                 },
                                 activeColor: Colors.green,
                                 inactiveThumbColor: Colors.grey,
                                 inactiveTrackColor: Colors.white24,
                               ),
                             ),
-                            // 🔠 Text Scale Slider
+                            // Text Scale Slider
                             ListTile(
                               title: Text(
                                 'Text Size',
@@ -2372,6 +2403,9 @@ class _SettingsState extends State<SettingsView> {
                                                 TextButton(
                                                   onPressed: () {
                                                     Navigator.of(context).pop(true); // Return true to confirm
+                                                    FirebaseAnalytics.instance.logEvent(
+                                                      name: 'crew_loadout_synced',
+                                                    );
                                                   },
                                                   child: Text(
                                                     'Confirm',
@@ -2483,6 +2517,10 @@ class _SettingsState extends State<SettingsView> {
                         children: [
                           TextButton(
                             onPressed: () {
+                              // Log which section was clicked
+                              FirebaseAnalytics.instance.logEvent(
+                                name: 'terms_and_conditions_reviewed',
+                              );
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
@@ -2507,6 +2545,7 @@ class _SettingsState extends State<SettingsView> {
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context).pop(); // Close the dialog
+
                                         },
                                         child: Text(
                                           'Close',

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -815,6 +816,24 @@ class _EditTripState extends State<EditTrip> {
     Navigator.of(context).pop(); // Go back to the home screen
     Navigator.of(context).pop(); // Go back to the home screen
     selectedIndexNotifier.value = 1; // Switch to "Saved Trips" tab
+
+
+    final Map<String, Object> analyticsParams = {
+      'trip_name': widget.trip.tripName,
+      'trip_allowable': widget.trip.allowable,
+      'trip_available_seats': widget.trip.availableSeats,
+      'num_loads': widget.trip.loads.length,
+    };
+
+// Add load weights dynamically
+    for (int i = 0; i < widget.trip.loads.length; i++) {
+      analyticsParams['load_${i + 1}_weight'] = widget.trip.loads[i].weight;
+    }
+
+    FirebaseAnalytics.instance.logEvent(
+      name: 'internal_trip_edited',
+      parameters: analyticsParams,
+    );
   }
 
   // Function to calculate available weight for a load
@@ -892,6 +911,7 @@ class _EditTripState extends State<EditTrip> {
             padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
             child: ElevatedButton(
               onPressed: _saveTrip,
+
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.buttonStyle1,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),

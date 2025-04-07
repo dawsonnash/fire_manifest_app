@@ -716,15 +716,24 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
     ),
         (Route<dynamic> route) => false, // This clears all the previous routes
   );
+  final Map<String, Object> analyticsParams = {
+    'trip_name': trip.tripName,
+    'trip_allowable': trip.allowable,
+    'trip_available_seats': trip.availableSeats,
+    'tripPreferenceUsed': tripPreferenceUsed ? 'true' : 'false',
+    'num_loads': numLoads,
+  };
+
+// Add load weights dynamically
+  for (int i = 0; i < trip.loads.length; i++) {
+    analyticsParams['load_${i + 1}_weight'] = trip.loads[i].weight;
+  }
+
   FirebaseAnalytics.instance.logEvent(
     name: 'trip_generated_internal',
-    parameters: {
-      'trip_name': trip.tripName,
-      'trip_allowable': trip.allowable,
-      'trip_available_seats': trip.availableSeats,
-      'tripPreferenceUsed' : tripPreferenceUsed ? 'true' : 'false',
-    },
+    parameters: analyticsParams,
   );
+
 }
 
 void shuffleCrewMembers(List<dynamic> crewMembersCopy) {

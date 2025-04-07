@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1577,6 +1578,17 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
             final manifestPreparer = _manifestPreparerController.text.trim();
             widget.onConfirm(helicopterNum, departure, destination, manifestPreparer, exportAsLoad); // Pass collected data to the callback
             Navigator.of(context).pop();
+            FirebaseAnalytics.instance.logEvent(
+              name: 'load_exported_OF252',
+              parameters: {
+                'trip_type': widget.isExternal ? 'external' : 'internal',
+                'helicopter_number': helicopterNum.isNotEmpty ? helicopterNum : 'unspecified',
+                'departure_location': departure.isNotEmpty ? departure : 'unspecified',
+                'destination_location': destination.isNotEmpty ? destination : 'unspecified',
+                'manifest_preparer': manifestPreparer.isNotEmpty ? manifestPreparer : 'unspecified',
+                'export_type': exportAsLoad ? 'load' : 'slings',
+              },
+            );
           },
           child: Text(
             'Confirm',
