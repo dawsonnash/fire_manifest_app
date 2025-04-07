@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:fire_app/UI/06_edit_trip_external.dart';
 import 'package:fire_app/UI/06_single_load_view.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -315,6 +316,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                                   onConfirm: (String helicopterNum, String departure, String destination, String manifestPreparer) {
                                                     previewTripPDF(context, widget.trip, 'of252', widget.trip.isExternal, helicopterNum, departure, destination, manifestPreparer);
                                                   },
+                                                  isExternal: widget.trip.isExternal!,
                                                 );
                                               },
                                             );
@@ -353,7 +355,10 @@ class _SingleTripViewState extends State<SingleTripView> {
                                           )
                                         : EditTrip(
                                             trip: widget.trip,
-                                          )),
+                                          ),
+                                  settings: RouteSettings(
+                                    name: widget.trip.isExternal! ? 'EditTripExternalPage' : 'EditTripInternalPage',
+                                  ),),
                               );
                             },
                           ),
@@ -482,6 +487,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                                     load: load,
                                     isExternal: widget.trip.isExternal!,
                                   ),
+                                  settings: RouteSettings(name: 'SingleLoadViewPage'),
                                 ),
                               );
                             },
@@ -537,8 +543,8 @@ class _SingleTripViewState extends State<SingleTripView> {
 
 class AdditionalInfoDialog extends StatefulWidget {
   final Function(String helicopterNum, String departure, String destination, String manifestPreparer) onConfirm;
-
-  const AdditionalInfoDialog({required this.onConfirm, super.key});
+  final bool isExternal;
+  const AdditionalInfoDialog({required this.onConfirm, super.key, required this.isExternal});
 
   @override
   State<AdditionalInfoDialog> createState() => _AdditionalInfoDialogState();
@@ -661,6 +667,16 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
             final manifestPreparer = _manifestPreparerController.text.trim();
             widget.onConfirm(helicopterNum, departure, destination, manifestPreparer); // Pass collected data to the callback
             Navigator.of(context).pop();
+            FirebaseAnalytics.instance.logEvent(
+              name: 'trip_exported_OF252',
+              parameters: {
+                'trip_type': widget.isExternal ? 'external' : 'internal',
+                'helicopter_number': helicopterNum.isNotEmpty ? helicopterNum : 'unspecified',
+                'departure_location': departure.isNotEmpty ? departure : 'unspecified',
+                'destination_location': destination.isNotEmpty ? destination : 'unspecified',
+                'manifest_preparer': manifestPreparer.isNotEmpty ? manifestPreparer : 'unspecified',
+              },
+            );
           },
           child: Text(
             'Confirm',

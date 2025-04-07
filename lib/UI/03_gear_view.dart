@@ -328,7 +328,9 @@ class _GearViewState extends State<GearView> {
                                       Navigator.of(context).pop(); // Navigate back when pressed
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => const AddGear()),
+                                        MaterialPageRoute(builder: (context) => const AddGear(),
+                                        settings: RouteSettings(name: 'AddGearPage'),),
+
                                       );
                                     },
                                     child: Row(
@@ -436,6 +438,8 @@ class _GearViewState extends State<GearView> {
                                                     gear: gear,
                                                     onUpdate: loadGearList, // Refresh the list on return
                                                   ),
+                                                  settings: RouteSettings(name: 'EditGearPage'),
+
                                                 ),
                                               );
                                             },

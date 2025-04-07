@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
@@ -334,7 +335,15 @@ class _AddGearState extends State<AddGear> {
         backgroundColor: Colors.green,
       ),
     );
-
+    FirebaseAnalytics.instance.logEvent(
+      name: 'gear_added',
+      parameters: {
+        'gear_name': newGearItem.name,
+        'gear_weight': newGearItem.weight,
+        'gear_quantity': newGearItem.quantity,
+        'gear_isHazmat': newGearItem.isHazmat ? 'true' : 'false',
+      },
+    );
     // Clear the text fields (reset them to empty), so you can add more ppl
     gearNameController.text = '';
     gearWeightController.text = '';
@@ -352,6 +361,8 @@ class _AddGearState extends State<AddGear> {
     // print("Gear Name: $gearName");
     //print("Gear Weight: $gearWeight");
     //crew.printCrewDetails();
+
+
   }
 
   @override

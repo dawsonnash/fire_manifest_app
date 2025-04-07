@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:fire_app/main.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 
 import '../CodeShare/variables.dart';
+import '../Data/crew.dart';
 import '../Data/crewmember.dart';
 import '../Data/customItem.dart';
 import '../Data/gear.dart';
@@ -782,6 +784,26 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
 
     Navigator.of(context).pop(); // Go back to the home screen
     selectedIndexNotifier.value = 1; // Switch to "Saved Trips" tab
+
+    // Flatten all crew and gear used in the trip
+    final allCrewUsedIds = widget.trip.loads
+        .expand((load) => load.loadPersonnel)
+        .map((c) => c.id)
+        .toSet();
+
+    // Compare with all crew and gear in the global crew object
+    final bool allCrewUsed = allCrewUsedIds.length == crew.crewMembers.length;
+
+    FirebaseAnalytics.instance.logEvent(
+      name: 'internal_trip_built',
+      parameters: {
+        'trip_name': widget.trip.tripName,
+        'trip_allowable': widget.trip.allowable,
+        'trip_available_seats': widget.trip.availableSeats,
+        'num_loads': widget.trip.loads.length,
+        'all_crew_used': allCrewUsed ? 'yes' : 'no',
+      },
+    );
   }
 
   // Function to calculate available weight for a load

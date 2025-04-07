@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -189,6 +190,14 @@ class _AddCrewmemberState extends State<AddCrewmember> {
         backgroundColor: Colors.green,
       ),
     );
+    FirebaseAnalytics.instance.logEvent(
+      name: 'crewmember_added',
+      parameters: {
+        'position_title': newCrewMember.getPositionTitle(newCrewMember.position),
+      },
+    );
+
+
 
     // Clear all input fields (reset them to empty), so you can add more ppl
     clearInputs();

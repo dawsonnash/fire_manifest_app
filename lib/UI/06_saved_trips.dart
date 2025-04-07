@@ -316,6 +316,8 @@ class _SavedTripsState extends State<SavedTripsView> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => SingleTripView(trip: trip),
+                                      settings: RouteSettings(name: 'SingleTripViewPage'),
+
                                     ),
                                   );
                                   setState(() {}); // Refresh the list after returning
@@ -395,6 +397,8 @@ class _SavedTripsState extends State<SavedTripsView> {
                                                     builder: (context) => SingleTripView(
                                                       trip: trip,
                                                     ),
+                                                    settings: RouteSettings(name: 'SingleTripViewPage'),
+
                                                   ),
                                                 );
                                               },

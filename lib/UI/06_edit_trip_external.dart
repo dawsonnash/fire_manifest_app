@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:fire_app/Data/load_accoutrements.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -803,6 +804,26 @@ class _EditTripExternalState extends State<EditTripExternal> {
     Navigator.of(context).pop(); // Go back to the home screen
     Navigator.of(context).pop(); // Go back to the home screen
     selectedIndexNotifier.value = 1; // Switch to "Saved Trips" tab
+
+    final Map<String, Object> slingWeightParams = {
+      'trip_name': widget.trip.tripName,
+      'trip_allowable': widget.trip.allowable,
+      'trip_safety_buffer': widget.trip.safetyBuffer,
+      'trip_num_loads': widget.trip.loads.length,
+    };
+
+    // Add sling weights
+    for (int i = 0; i < widget.trip.loads.length; i++) {
+      final load = widget.trip.loads[i];
+      for (int j = 0; j < (load.slings?.length ?? 0); j++) {
+        final sling = load.slings![j];
+        slingWeightParams['load_${i + 1}_sling_${j + 1}_weight'] = sling.weight;
+      }
+    }
+    FirebaseAnalytics.instance.logEvent(
+      name: 'external_trip_edited',
+      parameters: slingWeightParams,
+    );
   }
 
   // Function to calculate available weight for a load

@@ -789,12 +789,15 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) => BuildYourOwnManifestExternal(trip: newTrip, safetyBuffer: int.parse(safetyBufferController.text)),
+                                            settings: RouteSettings(name: 'BYOM_ExternalPage'),
+
                                           ),
                                         )
                                       : Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) => BuildYourOwnManifest(trip: newTrip),
+                                            settings: RouteSettings(name: 'BYOM_InternalPage'),
                                           ),
                                         );
                                 }
