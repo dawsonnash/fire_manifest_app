@@ -2566,6 +2566,63 @@ class _SettingsState extends State<SettingsView> {
                       ),
                     ),
                   ),
+                  GestureDetector(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 48.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              // Log which section was clicked
+                              FirebaseAnalytics.instance.logEvent(
+                                name: 'privacy_policy_reviewed',
+                              );
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: AppColors.textFieldColor2, // Dark grey background
+                                    title: Text(
+                                      'Privacy Policy',
+                                      style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal),
+                                    ),
+                                    content: SingleChildScrollView(
+                                      child: Text(
+                                        "This app collects and uses certain types of data to improve user experience, performance, and reliability. This includes information such as app preferences, crash reports, and general usage analytics (e.g., screen views, button taps, and feature interactions). These analytics help to understand which features of the app are being used so improvements can made and bugs fixed more efficiently.\n\n"
+                                            "No personally identifying information is collected unless you explicitly provide it (such as entering a name or crew label). Your data created within this app is not sold or shared with any third parties.\n\n"
+                                            "All data is handled securely and is used solely for the purpose of making the app better and more reliable for the wildland fire community.\n\n"
+                                            "Having agreed, you have confirmed that you have read and agreed to this privacy policy and consent to the app's data collection practices.\n\n"
+                                            "For questions regarding the privacy policy or data collection, please contact dev@firemanifesting.com.",
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18),
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Close the dialog
+
+                                        },
+                                        child: Text(
+                                          'Close',
+                                          style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            child: Text(
+                              'Privacy Policy',
+                              style: TextStyle(color: Colors.white, fontSize: AppData.text18),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
                 ],
               ),
             ),
