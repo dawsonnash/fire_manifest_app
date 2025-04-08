@@ -12,6 +12,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Data/trip.dart';
 import '../Algorithms/external_load_calculator.dart';
@@ -2535,6 +2536,25 @@ class _QuickManifestState extends State<QuickManifest> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       SizedBox(height: 16),
+
+                      // ElevatedButton(
+                      //   onPressed: () async {
+                      //     final prefs = await SharedPreferences.getInstance();
+                      //     await prefs.remove('termsVersionAccepted');
+                      //     await prefs.remove('privacyVersionAccepted');
+                      //
+                      //     ScaffoldMessenger.of(context).showSnackBar(
+                      //       SnackBar(
+                      //         content: Text('Terms and Privacy agreements have been reset.'),
+                      //         duration: Duration(seconds: 2),
+                      //       ),
+                      //     );
+                      //   },
+                      //   child: Text('Reset Agreements'),
+                      //   style: ElevatedButton.styleFrom(
+                      //     backgroundColor: Colors.redAccent,
+                      //   ),
+                      // ),
 
                       // Internal/External Manifest toggle
                       Padding(

@@ -33,8 +33,11 @@ import 'Data/saved_preferences.dart';
 import 'Data/sling.dart';
 import 'Data/trip.dart';
 import 'Data/trip_preferences.dart';
+import 'UI/privacy_policy.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+const int currentTermsVersion = 1;
+const int currentPrivacyVersion = 1;
 
 void main() async {
   // Set up for Hive that needs to run before starting app
@@ -98,7 +101,22 @@ void main() async {
   //await updateAllTripPreferencesFromBoxes();
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  bool agreedToTerms = prefs.getBool('agreedToTerms') ?? false;
+
+  int acceptedTermsVersion = prefs.getInt('termsVersionAccepted') ?? 0;
+  int acceptedPrivacyVersion = prefs.getInt('privacyVersionAccepted') ?? 0;
+
+  bool needsTerms = acceptedTermsVersion < currentTermsVersion;
+  bool needsPrivacy = acceptedPrivacyVersion < currentPrivacyVersion;
+
+  Widget initialScreen;
+
+  if (needsTerms) {
+    initialScreen = DisclaimerScreen(); // goes to terms screen first
+  } else if (needsPrivacy) {
+    initialScreen = PrivacyPolicyScreen(); // goes to privacy screen second
+  } else {
+    initialScreen = MyHomePage(initialJsonFilePath: initialJsonFilePath);
+  }
   // Initialize the dark mode and background image setting
   AppColors.isDarkMode = await ThemePreferences.getTheme();
   AppColors.enableBackgroundImage = await ThemePreferences.getBackgroundImagePreference();
@@ -108,14 +126,12 @@ void main() async {
   AppData.textScale = await ThemePreferences.getTextScale();
 
   // start app
-  runApp(MyApp(showDisclaimer: !agreedToTerms, initialJsonFilePath: initialJsonFilePath));
+  runApp(MyApp(initialScreen: initialScreen));
 }
 
 class MyApp extends StatelessWidget {
-  final bool showDisclaimer;
-  final String? initialJsonFilePath;
-
-  const MyApp({super.key, required this.showDisclaimer, this.initialJsonFilePath});
+  final Widget initialScreen;
+  const MyApp({super.key, required this.initialScreen});
 
   @override
   Widget build(BuildContext context) {
@@ -129,9 +145,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         // for theme based text-> style: Theme.of(context).textTheme.headlineMedium,
       ),
-      home: showDisclaimer
-          ? const DisclaimerScreen()
-          : MyHomePage(initialJsonFilePath: initialJsonFilePath),
+      home: initialScreen,
     );
   }
 }
@@ -949,15 +963,29 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
                         onPressed: userAgreed
                             ? () async {
                           SharedPreferences prefs = await SharedPreferences.getInstance();
-                          await prefs.setBool('agreedToTerms', true);
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const MyHomePage(),
-                              settings: RouteSettings(name: 'HomePage'),
-                            ),
-                          );
+                          await prefs.setInt('termsVersionAccepted', currentTermsVersion);
+
+                          int acceptedPrivacyVersion = prefs.getInt('privacyVersionAccepted') ?? 0;
+
+                          if (acceptedPrivacyVersion < currentPrivacyVersion) {
+                            // Go to Privacy Policy screen next
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const PrivacyPolicyScreen()),
+                            );
+                          } else {
+                            // Already accepted privacy, go to app
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MyHomePage(),
+                                settings: const RouteSettings(name: 'HomePage'),
+                              ),
+                            );
+                          }
                         }
                             : null,
+
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
