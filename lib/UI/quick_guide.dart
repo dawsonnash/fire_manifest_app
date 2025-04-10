@@ -87,8 +87,10 @@ class _QuickGuideState extends State<QuickGuide> {
           elevation: 4.0,
           color: Colors.grey[900],
           borderRadius: BorderRadius.circular(8),
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height * .9, // Fixed max height for dropdown
+          child:  ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.8,
+              ),
             child: ListView.builder(
               padding: EdgeInsets.zero,
               itemCount: sectionKeys.length,
@@ -112,7 +114,7 @@ class _QuickGuideState extends State<QuickGuide> {
                           fontSize: AppData.text16,
                         ),
                       ),
-                      SizedBox(width: 8),
+                      SizedBox(width: AppData.sizedBox8),
                       Text(
                         section["title"],
                         style: TextStyle(
@@ -205,7 +207,7 @@ class _QuickGuideState extends State<QuickGuide> {
         backgroundColor: AppColors.appBarColor,
         title: Text(
           'Quick Guide',
-          style: TextStyle(fontSize: AppData.text24, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+          style: TextStyle(fontSize: AppData.appBarText, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
         ),
       ),
       body: Stack(

@@ -495,6 +495,7 @@ class _SingleTripViewState extends State<SingleTripView> {
                               leading: Icon(
                                 Icons.numbers,
                                 color: AppColors.primaryColor,
+                                size: AppData.text24
                               ),
                               title: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -590,7 +591,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
                 controller: _helicopterNumController,
-                decoration: InputDecoration(labelText: 'Enter helicopter tail #:', labelStyle: TextStyle(color: AppColors.textColorPrimary)),
+                decoration: InputDecoration(labelText: 'Enter helicopter tail #:', labelStyle: TextStyle(fontSize: AppData.text16,color: AppColors.textColorPrimary)),
                 maxLines: 1,
                 // Single-line input
                 textCapitalization: TextCapitalization.characters,
@@ -598,14 +599,14 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(6), // Limit to 25 characters
                 ],
-                style: TextStyle(color: AppColors.textColorPrimary),
+                style: TextStyle(fontSize: AppData.text16,color: AppColors.textColorPrimary),
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
                 controller: _departureController,
-                decoration: InputDecoration(labelText: 'Enter departure:', labelStyle: TextStyle(color: AppColors.textColorPrimary)),
+                decoration: InputDecoration(labelText: 'Enter departure:', labelStyle: TextStyle(fontSize: AppData.text16,color: AppColors.textColorPrimary)),
                 maxLines: 1,
                 // Single-line input
                 textCapitalization: TextCapitalization.words,
@@ -613,7 +614,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(16), // Limit to 25 characters
                 ],
-                style: TextStyle(color: AppColors.textColorPrimary),
+                style: TextStyle(fontSize: AppData.text16,color: AppColors.textColorPrimary),
               ),
             ),
             Padding(
@@ -622,20 +623,20 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
                 controller: _destinationController,
                 textCapitalization: TextCapitalization.words,
                 // Capitalize only the first character
-                decoration: InputDecoration(labelText: 'Enter destination:', labelStyle: TextStyle(color: AppColors.textColorPrimary)),
+                decoration: InputDecoration(labelText: 'Enter destination:', labelStyle: TextStyle(fontSize: AppData.text16,color: AppColors.textColorPrimary)),
                 maxLines: 1,
                 // Single-line input
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(16), // Limit to 25 characters
                 ],
-                style: TextStyle(color: AppColors.textColorPrimary),
+                style: TextStyle(fontSize: AppData.text16,color: AppColors.textColorPrimary),
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
                 controller: _manifestPreparerController,
-                decoration: InputDecoration(labelText: 'Enter manifest preparer:', labelStyle: TextStyle(color: AppColors.textColorPrimary)),
+                decoration: InputDecoration(labelText: 'Enter manifest preparer:', labelStyle: TextStyle(fontSize: AppData.text16,color: AppColors.textColorPrimary)),
                 maxLines: 1,
                 // Single-line input
                 textCapitalization: TextCapitalization.words,
@@ -643,7 +644,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(20), // Limit to 25 characters
                 ],
-                style: TextStyle(color: AppColors.textColorPrimary),
+                style: TextStyle(fontSize: AppData.text16,color: AppColors.textColorPrimary),
               ),
             ),
           ],

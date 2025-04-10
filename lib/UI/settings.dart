@@ -505,7 +505,7 @@ class _SettingsState extends State<SettingsView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Icon(FontAwesomeIcons.sliders, color: Colors.purple), // Preferences icon
-                      SizedBox(width: 8), // Space between icon and text
+                      SizedBox(width: AppData.sizedBox8), // Space between icon and text
                       Expanded(
                         // Ensures Column takes up the correct space
                         child: Column(
@@ -951,7 +951,7 @@ class _SettingsState extends State<SettingsView> {
                     icon: Icon(
                       Icons.info_outline, // Info icon
                       color: Colors.white,
-                      size: AppData.text22, // Adjust size if needed
+                      size: AppData.text18, // Adjust size if needed
                     ),
                     onPressed: () {
                       // Show an info dialog or tooltip when clicked
@@ -1464,7 +1464,7 @@ class _SettingsState extends State<SettingsView> {
                 children: [
                   // Help Title
                   ListTile(
-                    leading: Icon(Icons.help_outline, color: Colors.white),
+                    leading: Icon(Icons.help_outline, color: Colors.white, size: AppData.text20),
                     title: Text(
                       'HELP',
                       style: TextStyle(fontSize: AppData.text18, color: Colors.white),
@@ -1504,7 +1504,7 @@ class _SettingsState extends State<SettingsView> {
 
                   // App Settings Title
                   ListTile(
-                    leading: Icon(Icons.settings, color: Colors.white),
+                    leading: Icon(Icons.settings, color: Colors.white, size: AppData.text20),
                     title: Text(
                       'APP SETTINGS',
                       style: TextStyle(fontSize: AppData.text18, color: Colors.white),
@@ -1982,7 +1982,7 @@ class _SettingsState extends State<SettingsView> {
 
                   // Crew Loadout Title
                   ListTile(
-                    leading: Icon(Icons.swap_horiz, color: Colors.white),
+                    leading: Icon(Icons.swap_horiz, color: Colors.white, size: AppData.text20),
                     title: Text(
                       'CREW LOADOUTS',
                       style: TextStyle(fontSize: AppData.text18, color: Colors.white),
@@ -2022,6 +2022,7 @@ class _SettingsState extends State<SettingsView> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                       iconEnabledColor: AppColors.textColorPrimary,
+                                      itemHeight: null,
                                       isExpanded: true,
                                       // Ensures the dropdown fills available space
                                       items: [
@@ -2044,8 +2045,8 @@ class _SettingsState extends State<SettingsView> {
                                               fit: BoxFit.scaleDown,
                                               child: Row(
                                                 children: [
-                                                  Icon(Icons.refresh, color: Colors.orange), // Reset icon
-                                                  SizedBox(width: 8),
+                                                  Icon(Icons.refresh, color: Colors.orange, size: AppData.text20), // Reset icon
+                                                  SizedBox(width: AppData.sizedBox8),
                                                   Text('Reset to Last Saved', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.normal)),
                                                 ],
                                               ),
@@ -2059,8 +2060,8 @@ class _SettingsState extends State<SettingsView> {
 
                                               child: Row(
                                                 children: [
-                                                  Icon(Icons.delete_forever, color: Colors.red), // Reset icon
-                                                  SizedBox(width: 8),
+                                                  Icon(Icons.delete_forever, color: Colors.red, size: AppData.text20), // Reset icon
+                                                  SizedBox(width: AppData.sizedBox8),
                                                   Text('Delete Current Loadout', style: TextStyle(color: Colors.red, fontWeight: FontWeight.normal)),
                                                 ],
                                               ),
@@ -2071,8 +2072,8 @@ class _SettingsState extends State<SettingsView> {
                                           value: 'Save Current',
                                           child: Row(
                                             children: [
-                                              Icon(Icons.save_outlined, color: Colors.green), // Save icon
-                                              SizedBox(width: 8), // Space between icon and text
+                                              Icon(Icons.save_outlined, color: Colors.green, size: AppData.text20), // Save icon
+                                              SizedBox(width: AppData.sizedBox8), // Space between icon and text
                                               Text('Save New', style: TextStyle(color: Colors.green, fontWeight: FontWeight.normal)),
                                             ],
                                           ),
@@ -2084,8 +2085,8 @@ class _SettingsState extends State<SettingsView> {
                                             fit: BoxFit.scaleDown,
                                             child: Row(
                                               children: [
-                                                Icon(Icons.add, color: Colors.blue), // Fresh start icon
-                                                SizedBox(width: 8),
+                                                Icon(Icons.add, color: Colors.blue, size: AppData.text20), // Fresh start icon
+                                                SizedBox(width: AppData.sizedBox8),
                                                 Text('Start Empty Crew', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.normal)),
                                               ],
                                             ),
@@ -2489,8 +2490,7 @@ class _SettingsState extends State<SettingsView> {
                           onPressed: importExportDialog,
                           icon: Icon(
                             Icons.people_outline_rounded,
-                            color: Colors.white,
-                            size: AppData.text28,
+                            color: Colors.white, size: AppData.text20
                           )),
                       TextButton(
                         onPressed: importExportDialog,
@@ -2503,7 +2503,7 @@ class _SettingsState extends State<SettingsView> {
 
                   // Legal Section
                   ListTile(
-                    leading: Icon(Icons.gavel, color: Colors.white),
+                    leading: Icon(Icons.gavel, color: Colors.white, size: AppData.text20),
                     title: Text(
                       'LEGAL',
                       style: TextStyle(fontSize: AppData.text18, color: Colors.white),

@@ -59,7 +59,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
           backgroundColor: AppColors.textFieldColor2,
           title: Text(
             'Confirm Deletion',
-            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize, ),
           ),
           content: Text(
             'Are you sure you want to delete these crew members?',
@@ -342,7 +342,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                           FontAwesomeIcons.circlePlus,
                                           color: AppColors.primaryColor,
                                         ),
-                                        SizedBox(width: 8), // Space between the icon and the text
+                                        SizedBox(width: AppData.sizedBox8), // Space between the icon and the text
                                         Text(
                                           'Crew Member',
                                           textAlign: TextAlign.center,
@@ -415,7 +415,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                     trailing: isSelectionMode
                                         ? null
                                         : IconButton(
-                                            icon: Icon(Icons.edit, color: AppColors.textColorPrimary, size: AppData.text32),
+                                            icon: Icon(Icons.edit, color: AppColors.textColorPrimary, size: AppData.text24),
                                             onPressed: () {
                                               Navigator.push(
                                                 context,
@@ -436,7 +436,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                             onChanged: (checked) => toggleSelection(crewMember),
                                             activeColor: AppColors.primaryColor,
                                           )
-                                        : Icon(Icons.person),
+                                        : Icon(Icons.person, size: AppData.text28,),
                                   ),
                                 );
                               },

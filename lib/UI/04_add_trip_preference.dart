@@ -439,8 +439,9 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                             Icon(
                               FontAwesomeIcons.circlePlus,
                               color: AppColors.primaryColor,
+                              size: AppData.text20,
                             ),
-                            SizedBox(width: 8),
+                            SizedBox(width: AppData.sizedBox8),
                             // Space between the icon and the text
                             Text(
                               'Load Preference',

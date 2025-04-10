@@ -920,7 +920,7 @@ class _EditTripState extends State<EditTrip> {
                 'Save',
                 style: TextStyle(
                   color: AppColors.textColorSecondary,
-                  fontSize: AppData.text20,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1018,7 +1018,7 @@ class _EditTripState extends State<EditTrip> {
                             color: Colors.red,
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Icon(Icons.delete, color: Colors.black),
+                            child: Icon(Icons.delete, color: Colors.black, size: AppData.text24,),
                           ),
                           confirmDismiss: (direction) async {
                             return await showDialog(
@@ -1043,7 +1043,7 @@ class _EditTripState extends State<EditTrip> {
                                     ),
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(context).pop(true); // Confirm deletion
+                                        Navigator.of(context).pop(true);
                                       },
                                       child: Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: AppData.bottomDialogTextSize)),
                                     ),
@@ -1291,7 +1291,7 @@ class _EditTripState extends State<EditTrip> {
                                                 // Red background for delete action
                                                 alignment: Alignment.centerRight,
                                                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                                                child: Icon(Icons.delete, color: AppColors.textColorSecondary), // Trash icon
+                                                child: Icon(Icons.delete, color: AppColors.textColorSecondary, size: AppData.text24,), // Trash icon
                                               ),
 
                                               onDismissed: (direction) {
@@ -1408,7 +1408,7 @@ class _EditTripState extends State<EditTrip> {
                                                       // Single Item Deletion
                                                       if (!(item is Gear && item.isPersonalTool))
                                                         IconButton(
-                                                          icon: const Icon(Icons.delete, color: Colors.red),
+                                                          icon:  Icon(Icons.delete, color: Colors.red, size: AppData.text24,),
                                                           onPressed: () {
                                                             setState(() {
                                                               if (loads[index].contains(item)) {
@@ -1616,8 +1616,10 @@ class _EditTripState extends State<EditTrip> {
                             Icon(
                               FontAwesomeIcons.circlePlus,
                               color: AppColors.primaryColor,
+                                size: AppData.text24
+
                             ),
-                            SizedBox(width: 8), // Space between the icon and the text
+                            SizedBox(width: AppData.sizedBox8), // Space between the icon and the text
                             Text(
                               'Add Load',
                               textAlign: TextAlign.center,

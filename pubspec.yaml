@@ -52,6 +52,7 @@ dependencies:
   keyboard_actions: ^4.2.0
   firebase_core: ^3.13.0
   firebase_analytics: ^11.4.5
+  dropdown_button2: ^2.3.9
 
 dev_dependencies:
   flutter_test:

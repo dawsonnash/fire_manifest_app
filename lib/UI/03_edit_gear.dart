@@ -762,7 +762,7 @@ class _EditGearState extends State<EditGear> {
                                     color: AppColors.textColorPrimary,
                                   ),
                                 ),
-                                SizedBox(width: 8),
+                                SizedBox(width: AppData.sizedBox8),
                                 // Toggle Switch
                                 Switch(
                                   value: newHazmatValue,

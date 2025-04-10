@@ -1479,7 +1479,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               },
                             ),
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: AppData.sizedBox8),
                           Expanded(
                             flex: 1,
                             child: TextField(
@@ -1685,7 +1685,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               },
                             ),
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: AppData.sizedBox8),
                           Expanded(
                             flex: 1,
                             child: TextField(
@@ -1816,7 +1816,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               onChanged: null, // Disables manual selection
                             ),
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: AppData.sizedBox8),
                           Expanded(
                             flex: 1,
                             child: TextField(
@@ -2014,7 +2014,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               },
                             ),
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: AppData.sizedBox8),
                           Expanded(
                             flex: 1,
                             child: TextField(
@@ -2581,8 +2581,8 @@ class _QuickManifestState extends State<QuickManifest> {
                                         scale: 1.5,
                                         child: SvgPicture.asset(
                                           'assets/icons/sling_icon.svg', // Your SVG file path
-                                          width: 24, // Adjust size as needed
-                                          height: 24,
+                                          width: AppData.toolsIcon,
+                                          height: AppData.toolsIcon,
                                           colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
                                         ),
                                       )
@@ -2951,6 +2951,7 @@ class _QuickManifestState extends State<QuickManifest> {
                           ),
                           child: DropdownButtonHideUnderline(
                               child: DropdownButton<TripPreference?>(
+
                             value: selectedTripPreference,
                             dropdownColor: AppColors.textFieldColor2,
                             style: TextStyle(
@@ -2959,6 +2960,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               fontWeight: FontWeight.bold,
                             ),
                             iconEnabledColor: AppColors.textColorPrimary,
+                                itemHeight: null,
                             items: [
                               DropdownMenuItem<TripPreference?>(
                                 value: null, // Represents the "None" option

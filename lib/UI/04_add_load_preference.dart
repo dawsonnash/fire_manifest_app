@@ -772,6 +772,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<int>(
+                              itemHeight: null,
                               value: selectedPositionalLoadPreference,
                               hint: Text(
                                 'Choose load preference',
@@ -913,6 +914,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<int>(
+                              itemHeight: null,
                               value: selectedGearLoadPreference,
                               hint: Text(
                                 'Choose load preference',

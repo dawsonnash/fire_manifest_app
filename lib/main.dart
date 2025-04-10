@@ -314,7 +314,7 @@ class _MyHomePageState extends State<MyHomePage> {
               backgroundColor: AppColors.textFieldColor2,
               title: Text(
                 'Save New Loadout',
-                style: TextStyle(color: AppColors.textColorPrimary),
+                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -325,9 +325,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     decoration: InputDecoration(
                       errorText: errorMessage,
                       hintText: "Enter Loadout Name",
-                      hintStyle: TextStyle(color: AppColors.textColorPrimary),
+                      hintStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                     ),
-                    style: TextStyle(color: AppColors.textColorPrimary),
+                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                   ),
                 ],
               ),
@@ -360,7 +360,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.of(context).pop(); // Close input dialog
                     _saveNewLoadout(loadoutName, _jsonFilePath!);
                   },
-                  child: Text("Save", style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
+                  child: Text("Save", style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize)),
                 ),
 
 
@@ -381,11 +381,11 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: AppColors.textFieldColor2,
           title: Text(
             'Unsaved Changes Detected',
-            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: AppData.miniDialogTitleTextSize),
           ),
           content: Text(
             'Importing this loadout will erase any unsaved changes to your current crew loadout. View specific changes by tapping the red Out of Sync icon within the Settings page. Do you want to continue?',
-            style: TextStyle(color: AppColors.textColorPrimary),
+            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
           ),
           actions: [
             TextButton(
@@ -394,7 +394,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true), // Return true
-              child: Text("Continue", style: TextStyle(color: Colors.red)),
+              child: Text("Continue", style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize)),
             ),
           ],
         );

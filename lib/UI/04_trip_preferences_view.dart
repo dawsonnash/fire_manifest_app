@@ -201,11 +201,11 @@ class _TripPreferencesState extends State<TripPreferences> {
                                             backgroundColor: AppColors.textFieldColor2,
                                             title: Text(
                                               'Confirm Deletion',
-                                              style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                              style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
                                             ),
                                             content: Text(
                                               'Are you sure you want to delete this Trip Preference?',
-                                              style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
+                                              style: TextStyle(fontSize: AppData.miniDialogBodyTextSize, color: AppColors.textColorPrimary),
                                             ),
                                             actions: [
                                               TextButton(
@@ -374,7 +374,7 @@ class _TripPreferencesState extends State<TripPreferences> {
                                                   })
                                             ],
                                           ),
-                                          leading: FaIcon(FontAwesomeIcons.fire),
+                                          leading: FaIcon(FontAwesomeIcons.fire, size: AppData.text24, ),
                                         ),
                                       ),
                                     ),
@@ -420,9 +420,9 @@ class _TripPreferencesState extends State<TripPreferences> {
                           children: [
                             Icon(
                               FontAwesomeIcons.circlePlus,
-                              color: AppColors.primaryColor,
+                              color: AppColors.primaryColor, size: AppData.text24,
                             ),
-                            SizedBox(width: 8), // Space between the icon and the text
+                            SizedBox(width: AppData.sizedBox8), // Space between the icon and the text
                             Text(
                               'Trip Preference',
                               textAlign: TextAlign.center,

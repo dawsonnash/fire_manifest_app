@@ -873,7 +873,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                 'Save',
                 style: TextStyle(
                   color: AppColors.textColorSecondary,
-                  fontSize: AppData.text20,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -977,7 +977,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                             color: Colors.red,
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Icon(Icons.delete, color: Colors.black),
+                            child: Icon(Icons.delete, color: Colors.black, size: AppData.text24,),
                           ),
                           confirmDismiss: (direction) async {
                             return await showDialog(
@@ -1002,7 +1002,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                     ),
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(context).pop(true); // Confirm deletion
+                                        Navigator.of(context).pop(true);
                                       },
                                       child: Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: AppData.bottomDialogTextSize)),
                                     ),
@@ -1194,7 +1194,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                             color: Colors.red,
                                             alignment: Alignment.centerRight,
                                             padding: const EdgeInsets.symmetric(horizontal: 20),
-                                            child: Icon(Icons.delete, color: Colors.black),
+                                            child: Icon(Icons.delete, color: Colors.black, size: AppData.text24,),
                                           ),
                                           confirmDismiss: (direction) async {
                                             // Show confirmation dialog
@@ -1205,11 +1205,11 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                   backgroundColor: AppColors.textFieldColor2, // Background color
                                                   title: Text(
                                                     "Confirm Deletion",
-                                                    style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                                    style: TextStyle(fontSize: AppData.miniDialogTitleTextSize,color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
                                                   ),
                                                   content: Text(
                                                     "Are you sure you want to delete this sling?",
-                                                    style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal),
+                                                    style: TextStyle(fontSize: AppData.miniDialogBodyTextSize,color: AppColors.textColorPrimary, fontWeight: FontWeight.normal),
                                                   ),
                                                   actions: [
                                                     TextButton(
@@ -1326,7 +1326,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                     color: Colors.red,
                                                                     alignment: Alignment.centerRight,
                                                                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                                                                    child: Icon(Icons.delete, color: AppColors.textColorSecondary),
+                                                                    child: Icon(Icons.delete, color: AppColors.textColorSecondary, size: AppData.text24,),
                                                                   ),
                                                                   onDismissed: (direction) {
                                                                     setState(() {
@@ -1402,7 +1402,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                             ),
                                                                           ),
                                                                           IconButton(
-                                                                            icon: const Icon(Icons.delete, color: Colors.red),
+                                                                            icon:  Icon(Icons.delete, color: Colors.red, size: AppData.text24,),
                                                                             onPressed: () {
                                                                               setState(() {
                                                                                 if (item is Gear) {
@@ -1602,8 +1602,10 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                             Icon(
                                               FontAwesomeIcons.circlePlus,
                                               color: Colors.green,
+                                                size: AppData.text24
+
                                             ),
-                                            SizedBox(width: 8), // Space between the icon and the text
+                                            SizedBox(width: AppData.sizedBox8), // Space between the icon and the text
                                             Text(
                                               'Add Sling',
                                               textAlign: TextAlign.center,
@@ -1654,8 +1656,10 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                             Icon(
                               FontAwesomeIcons.circlePlus,
                               color: AppColors.primaryColor,
+                                size: AppData.text24
+
                             ),
-                            SizedBox(width: 8), // Space between the icon and the text
+                            SizedBox(width: AppData.sizedBox8), // Space between the icon and the text
                             Text(
                               'Add Load',
                               textAlign: TextAlign.center,

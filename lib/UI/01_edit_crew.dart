@@ -361,7 +361,7 @@ class _EditCrewState extends State<EditCrew> {
                                                     color: AppColors.primaryColor,
                                                     size: AppData.text32, // Adjust size as needed
                                                   ),
-                                                  const SizedBox(width: 8), // Space between the icon and text
+                                                  SizedBox(width: AppData.sizedBox10), // Space between the icon and text
                                                   Text(
                                                     'Add Crew Member',
                                                     style: panelTextStyle,
@@ -405,7 +405,7 @@ class _EditCrewState extends State<EditCrew> {
                                                     color: AppColors.primaryColor,
                                                     size: AppData.text32, // Adjust size as needed
                                                   ),
-                                                  const SizedBox(width: 8), // Space between the icon and text
+                                                  SizedBox(width: AppData.sizedBox10), // Space between the icon and text
                                                   Text(
                                                     'Add Gear',
                                                     style: panelTextStyle,
@@ -458,7 +458,7 @@ class _EditCrewState extends State<EditCrew> {
                                                     color: AppColors.primaryColor,
                                                     size: AppData.text32, // Adjust size as needed
                                                   ),
-                                                  const SizedBox(width: 8), // Space between the icon and text
+                                                  SizedBox(width: AppData.sizedBox10), // Space between the icon and text
                                                   Text(
                                                     'Edit Crew Member',
                                                     style: panelTextStyle,
@@ -500,7 +500,7 @@ class _EditCrewState extends State<EditCrew> {
                                                     color: AppColors.primaryColor,
                                                     size: AppData.text32, // Adjust size as needed
                                                   ),
-                                                  const SizedBox(width: 8), // Space between the icon and text
+                                                  SizedBox(width: AppData.sizedBox10), // Space between the icon and text
                                                   Text(
                                                     'Edit Gear',
                                                     style: panelTextStyle,
@@ -559,10 +559,12 @@ class _EditCrewState extends State<EditCrew> {
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
                                               DropdownButtonFormField<String>(
+                                                itemHeight: null,
+                                                dropdownColor: AppColors.textFieldColor2,
                                                 value: selectedTool,
                                                 decoration: InputDecoration(
                                                   labelText: 'Select a Tool',
-                                                  labelStyle: TextStyle(color: AppColors.textColorPrimary),
+                                                  labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                                   filled: true,
                                                   fillColor: AppColors.textFieldColor2,
                                                   enabledBorder: OutlineInputBorder(
@@ -570,25 +572,39 @@ class _EditCrewState extends State<EditCrew> {
                                                     borderSide: BorderSide(color: AppColors.textColorPrimary, width: 2),
                                                   ),
                                                   focusedBorder: OutlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                      color: AppColors.primaryColor,
-                                                      // Border color when the TextField is focused
-                                                      width: 2.0, // Border width
-                                                    ),
+                                                    borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
                                                     borderRadius: BorderRadius.circular(8.0),
                                                   ),
                                                 ),
-                                                dropdownColor: AppColors.textFieldColor2,
+                                                style: TextStyle(
+                                                  color: AppColors.textColorPrimary,
+                                                  fontSize: AppData.text16,
+                                                  height: 1.2,
+                                                ),
                                                 items: [
                                                   ...personalToolsList.map((tool) {
                                                     return DropdownMenuItem<String>(
                                                       value: tool.name,
-                                                      child: Text(tool.name, style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16)),
+                                                      child: Text(
+                                                        tool.name,
+                                                        style: TextStyle(
+                                                          color: AppColors.textColorPrimary,
+                                                          fontSize: AppData.text16,
+                                                          height: 1.2,
+                                                        ),
+                                                      ),
                                                     );
                                                   }),
                                                   DropdownMenuItem<String>(
                                                     value: '+ New Tool',
-                                                    child: Text('+ New Tool', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16)),
+                                                    child: Text(
+                                                      '+ New Tool',
+                                                      style: TextStyle(
+                                                        color: AppColors.textColorPrimary,
+                                                        fontSize: AppData.text16,
+                                                        height: 1.2,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ],
                                                 onChanged: (value) {
@@ -607,7 +623,7 @@ class _EditCrewState extends State<EditCrew> {
                                                     child: Text(
                                                       'Edit Tool Details',
                                                       style: TextStyle(
-                                                        fontSize: AppData.text18,
+                                                        fontSize: AppData.text16,
                                                         fontWeight: FontWeight.bold,
                                                         color: AppColors.textColorEditToolDetails,
                                                       ),
@@ -624,7 +640,7 @@ class _EditCrewState extends State<EditCrew> {
                                                 decoration: InputDecoration(
                                                   labelText: 'Tool Name',
                                                   labelStyle: TextStyle(
-                                                    color: AppColors.textColorPrimary,
+                                                    color: AppColors.textColorPrimary, fontSize: AppData.text16
                                                   ),
                                                   filled: true,
                                                   fillColor: AppColors.textFieldColor2,
@@ -661,7 +677,7 @@ class _EditCrewState extends State<EditCrew> {
                                                   inputFormatters: [LengthLimitingTextInputFormatter(2), FilteringTextInputFormatter.digitsOnly],
                                                   decoration: InputDecoration(
                                                     labelText: 'Tool Weight (lb)',
-                                                    labelStyle: TextStyle(color: AppColors.textColorPrimary),
+                                                    labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                                     filled: true,
                                                     fillColor: AppColors.textFieldColor2,
                                                     errorText: toolWeightErrorMessage,
@@ -699,7 +715,7 @@ class _EditCrewState extends State<EditCrew> {
                                                     Text(
                                                       'HAZMAT',
                                                       style: TextStyle(
-                                                        fontSize: AppData.text20,
+                                                        fontSize: AppData.text16,
                                                         color: AppColors.textColorPrimary,
                                                       ),
                                                     ),
@@ -711,7 +727,7 @@ class _EditCrewState extends State<EditCrew> {
                                                         color: AppColors.textColorPrimary,
                                                       ),
                                                     ),
-                                                    SizedBox(width: 8),
+                                                    SizedBox(width: AppData.sizedBox8),
                                                     // Toggle Switch
                                                     Switch(
                                                       value: isHazmat,
@@ -1261,8 +1277,8 @@ class _EditCrewState extends State<EditCrew> {
                                           scale: 2,
                                           child: SvgPicture.asset(
                                             'assets/icons/tools_icon.svg', // Your SVG file path
-                                            width: 24, // Adjust size as needed
-                                            height: 24,
+                                            width: AppData.toolsIcon, // Adjust size as needed
+                                            height: AppData.toolsIcon,
                                             colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
                                           ),
                                         ),
@@ -1310,7 +1326,7 @@ class _EditCrewState extends State<EditCrew> {
                                         color: AppColors.primaryColor,
                                         size: AppData.text28, // Adjust size as needed
                                       ),
-                                      const SizedBox(width: 8), // Space between the icon and text
+                                      SizedBox(width: AppData.sizedBox10), // Space between the icon and text
                                       Text(
                                         'Trip Preferences',
                                         style: panelTextStyle,

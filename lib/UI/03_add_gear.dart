@@ -694,7 +694,7 @@ class _AddGearState extends State<AddGear> {
                                           color: AppColors.textColorPrimary,
                                         ),
                                       ),
-                                      SizedBox(width: 8),
+                                      SizedBox(width: AppData.sizedBox8),
                                       // Toggle Switch
                                       Switch(
                                         value: isHazmat,
@@ -752,6 +752,7 @@ class _AddGearState extends State<AddGear> {
                                       ),
                                       child: Center(
                                         child: DropdownButton<String>(
+                                          itemHeight: null,
                                           dropdownColor: AppColors.textFieldColor2,
                                           iconEnabledColor: AppColors.textColorPrimary,
                                           value: selectedGearName,
@@ -997,7 +998,7 @@ class _AddGearState extends State<AddGear> {
                                           color: AppColors.textColorPrimary,
                                         ),
                                       ),
-                                      SizedBox(width: 8),
+                                      SizedBox(width: AppData.sizedBox8),
                                       // Toggle Switch
                                       Switch(
                                         value: isHazmatIRPG,

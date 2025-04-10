@@ -428,6 +428,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<int>(
+                                itemHeight: null,
                                 value: selectedPosition,
                                 hint: Text(
                                   'Primary Position',
@@ -490,7 +491,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                               // Set to null if no tools are available
                                               decoration: InputDecoration(
                                                 labelText: 'Select a Tool',
-                                                labelStyle: TextStyle(color: AppColors.textColorPrimary),
+                                                labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                                 filled: true,
                                                 fillColor: AppColors.textFieldColor2,
                                                 enabledBorder: OutlineInputBorder(
@@ -547,7 +548,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                                 enabled: false, // Non-editable field
                                                 decoration: InputDecoration(
                                                   labelText: 'Tool Weight (lb)',
-                                                  labelStyle: TextStyle(color: AppColors.textColorPrimary),
+                                                  labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                                   filled: true,
                                                   fillColor: AppColors.textFieldColor2,
                                                   disabledBorder: OutlineInputBorder(

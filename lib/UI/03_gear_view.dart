@@ -52,7 +52,7 @@ class _GearViewState extends State<GearView> {
           backgroundColor: AppColors.textFieldColor2,
           title: Text(
             'Confirm Deletion',
-            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize, ),
           ),
           content: Text(
             'Are you sure you want to delete these gear items?',
@@ -340,7 +340,7 @@ class _GearViewState extends State<GearView> {
                                           FontAwesomeIcons.circlePlus,
                                           color: AppColors.primaryColor,
                                         ),
-                                        SizedBox(width: 8), // Space between the icon and the text
+                                        SizedBox(width: AppData.sizedBox8), // Space between the icon and the text
                                         Text(
                                           'Gear',
                                           textAlign: TextAlign.center,
@@ -429,7 +429,7 @@ class _GearViewState extends State<GearView> {
                                     trailing: isSelectionMode
                                         ? null
                                         : IconButton(
-                                            icon: Icon(Icons.edit, color: AppColors.textColorPrimary, size: AppData.text32),
+                                            icon: Icon(Icons.edit, color: AppColors.textColorPrimary, size: AppData.text24),
                                             onPressed: () {
                                               Navigator.push(
                                                 context,
@@ -450,7 +450,7 @@ class _GearViewState extends State<GearView> {
                                             onChanged: (checked) => toggleSelection(gear),
                                             activeColor: AppColors.primaryColor,
                                           )
-                                        : Icon(Icons.work_outline_outlined),
+                                        : Icon(Icons.work_outline_outlined, size: AppData.text24,),
                                   ),
                                 );
                               },

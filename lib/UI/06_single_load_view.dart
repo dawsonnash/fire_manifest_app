@@ -8,6 +8,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
+
 // For exporting to pdf
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -259,9 +260,12 @@ Future<Uint8List> generatePDF(Load load, String manifestForm, bool isExternal, S
                       child: fillFormFieldsOF252(
                         load,
                         isExternal,
-                        i + 1, // Page index (1-based)
-                        paginatedItems.length, // Total pages
-                        paginatedItems[i], // Items on the current page
+                        i + 1,
+                        // Page index (1-based)
+                        paginatedItems.length,
+                        // Total pages
+                        paginatedItems[i],
+                        // Items on the current page
                         helicopterNum,
                         departure,
                         destination,
@@ -636,7 +640,7 @@ pw.Widget fillFormFieldsOF252(
 
         // **Current Date**
         pw.Positioned(
-          left: xOffset + 422 ,
+          left: xOffset + 422,
           top: 21,
           child: pw.Text(
             formattedDate,
@@ -901,7 +905,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.ios_share, size: AppData.text28, color: AppColors.textColorPrimary),
+            icon: Icon(Icons.ios_share, color: AppColors.textColorPrimary),
             // Does this work for android, i dont know
             onPressed: () {
               showDialog(
@@ -1044,8 +1048,8 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                       scale: 1.5,
                                       child: SvgPicture.asset(
                                         'assets/icons/sling_icon.svg', // Your SVG file path
-                                        width: 24,
-                                        height: 24,
+                                        width: AppData.toolsIcon,
+                                        height: AppData.toolsIcon,
                                         colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
                                       ),
                                     ),
@@ -1103,7 +1107,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                 border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
                                               ),
                                               child: ListTile(
-                                                leading: Icon(Icons.link),
+                                                leading: Icon(Icons.link, size: AppData.text24),
                                                 title: Text(
                                                   accoutrement.name,
                                                   overflow: TextOverflow.ellipsis,
@@ -1112,7 +1116,9 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                 ),
                                                 subtitle: Text(
                                                   'Weight: ${accoutrement.weight} lb',
-                                                  style: TextStyle(color: Colors.black),
+                                                  style: TextStyle(color: Colors.black,
+                                                    fontSize: AppData.text18,
+                                                  ),
                                                 ),
                                               ),
                                             );
@@ -1130,7 +1136,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                 border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
                                               ),
                                               child: ListTile(
-                                                leading: Icon(Icons.work_outline_outlined),
+                                                leading: Icon(Icons.work_outline_outlined, size: AppData.text24),
                                                 title: Row(
                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
@@ -1185,7 +1191,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                               ),
                                               child: ListTile(
                                                 iconColor: Colors.black,
-                                                leading: Icon(Icons.inventory_2_outlined),
+                                                leading: Icon(Icons.inventory_2_outlined, size: AppData.text24),
                                                 title: Column(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   mainAxisSize: MainAxisSize.min,
@@ -1208,7 +1214,6 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                                   ],
                                                 ),
                                               ),
-
                                             );
                                           }).toList(),
                                         ),
@@ -1273,7 +1278,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                           ),
                                         ],
                                       ),
-                                      leading: Icon(Icons.person),
+                                      leading: Icon(Icons.person,size: AppData.text24),
                                     ),
                                   ),
                                 );
@@ -1344,7 +1349,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                           ),
                                         ],
                                       ),
-                                      leading: Icon(Icons.work_outline_outlined),
+                                      leading: Icon(Icons.work_outline_outlined,size: AppData.text24),
                                     ),
                                   ),
                                 );
@@ -1359,7 +1364,7 @@ class _SingleLoadViewState extends State<SingleLoadView> {
                                   ),
                                   child: ListTile(
                                     iconColor: Colors.black,
-                                    leading: Icon(Icons.inventory_2_outlined),
+                                    leading: Icon(Icons.inventory_2_outlined, size: AppData.text24),
                                     title: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       mainAxisSize: MainAxisSize.min,
@@ -1455,14 +1460,14 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(6), // Limit to 25 characters
                 ],
-                style: TextStyle(fontSize: AppData.text16,color: AppColors.textColorPrimary),
+                style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
                 controller: _departureController,
-                decoration: InputDecoration(labelText: 'Enter departure:', labelStyle: TextStyle(fontSize: AppData.text16,color: AppColors.textColorPrimary)),
+                decoration: InputDecoration(labelText: 'Enter departure:', labelStyle: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary)),
                 maxLines: 1,
                 // Single-line input
                 textCapitalization: TextCapitalization.words,
@@ -1470,7 +1475,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(16), // Limit to 25 characters
                 ],
-                style: TextStyle(fontSize: AppData.text16,color: AppColors.textColorPrimary),
+                style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
               ),
             ),
             Padding(
@@ -1479,13 +1484,13 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
                 controller: _destinationController,
                 textCapitalization: TextCapitalization.words,
                 // Capitalize only the first character
-                decoration: InputDecoration(labelText: 'Enter destination:', labelStyle: TextStyle(fontSize: AppData.text16,color: AppColors.textColorPrimary)),
+                decoration: InputDecoration(labelText: 'Enter destination:', labelStyle: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary)),
                 maxLines: 1,
                 // Single-line input
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(16), // Limit to 25 characters
                 ],
-                style: TextStyle(fontSize: AppData.text16,color: AppColors.textColorPrimary),
+                style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
               ),
             ),
             Padding(
@@ -1500,7 +1505,7 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(20), // Limit to 25 characters
                 ],
-                style: TextStyle(fontSize: AppData.text16,color: AppColors.textColorPrimary),
+                style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary),
               ),
             ),
             // **Show toggle only if it's an external load**
@@ -1521,11 +1526,17 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
                         segments: [
                           ButtonSegment(
                             value: true,
-                            label: Text("Load", style: TextStyle(color: Colors.black, fontSize: AppData.text16),),
+                            label: Text(
+                              "Load",
+                              style: TextStyle(color: Colors.black, fontSize: AppData.text16),
+                            ),
                           ),
                           ButtonSegment(
                             value: false,
-                            label: Text("Slings", style: TextStyle(color: Colors.black, fontSize: AppData.text16),),
+                            label: Text(
+                              "Slings",
+                              style: TextStyle(color: Colors.black, fontSize: AppData.text16),
+                            ),
                           ),
                         ],
                         selected: {exportAsLoad ?? false},
