@@ -408,7 +408,7 @@ class _AddLoadPreferenceState extends State<AddLoadPreference> with TickerProvid
                                           height: 150,
                                           child: CupertinoPicker(
                                             scrollController: FixedExtentScrollController(initialItem: (selectedGearQuantities[gear] ?? 1) - 1),
-                                            itemExtent: 32.0,
+                                            itemExtent: AppData.text32,
                                             // Height of each item
                                             onSelectedItemChanged: (int value) {
                                               setState(() {

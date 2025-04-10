@@ -324,6 +324,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     inputFormatters: [LengthLimitingTextInputFormatter(30)],
                     decoration: InputDecoration(
                       errorText: errorMessage,
+                      errorStyle: TextStyle(
+                        fontSize: AppData.errorText,
+                        color: Colors.red,
+                      ),
                       hintText: "Enter Loadout Name",
                       hintStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                     ),
@@ -342,7 +346,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                     if (loadoutName.isEmpty) {
                       setDialogState(() {
-                        errorMessage = "Loadout name cannot be empty";
+                        errorMessage = "Name cannot be empty";
                       });
                       return;
                     }
@@ -351,7 +355,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     List<String> existingLoadouts = await CrewLoadoutStorage.getAllLoadoutNames();
                     if (existingLoadouts.contains(loadoutName)) {
                       setDialogState(() {
-                        errorMessage = "Loadout name already exists";
+                        errorMessage = "Name already exists";
                       });
                       return;
                     }
@@ -562,11 +566,11 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: AppColors.textFieldColor2,
           title: Text(
             'Warning',
-            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: AppData.miniDialogTitleTextSize),
           ),
           content: Text(
             'Importing this file will overwrite all existing crew data (Crew Members, Gear, Tools, Trip Preferences). Proceed?',
-            style: TextStyle(color: AppColors.textColorPrimary),
+            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
           ),
           actions: [
             TextButton(

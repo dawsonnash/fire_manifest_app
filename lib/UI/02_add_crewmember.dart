@@ -367,9 +367,9 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                   setState(() {
                                     // Validate the input and set error message
                                     if (weight! > 500) {
-                                      weightErrorMessage = 'Weight must be less than 500.';
+                                      weightErrorMessage = 'Weight must be less than 500';
                                     } else if (weight == 0) {
-                                      weightErrorMessage = 'Weight must be greater than 0.';
+                                      weightErrorMessage = 'Weight must be greater than 0';
                                     } else {
                                       weightErrorMessage = null;
                                     }
@@ -383,6 +383,10 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                     fontSize: AppData.text20,
                                   ),
                                   errorText: weightErrorMessage,
+                                  errorStyle: TextStyle(
+                                    fontSize: AppData.errorText,
+                                    color: Colors.red,
+                                  ),
                                   labelStyle: TextStyle(
                                     color: AppColors.textColorPrimary,
                                     fontSize: AppData.text22,

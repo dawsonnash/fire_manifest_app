@@ -447,7 +447,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                               scrollController: FixedExtentScrollController(
                                                                 initialItem: (selectedGearQuantitiesExternal[gear] ?? 1) - 1,
                                                               ),
-                                                              itemExtent: 32.0,
+                                                              itemExtent: AppData.text32,
                                                               onSelectedItemChanged: (int value) {
                                                                 dialogSetState(() {
                                                                   selectedGearQuantitiesExternal[gear] = value + 1;
@@ -763,7 +763,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                           ),
                                           subtitle: Text(
                                             crew.getPositionTitle(crew.position),
-                                            style: TextStyle(fontStyle: FontStyle.italic, fontSize: AppData.text14, color: AppColors.textColorPrimary),
+                                            style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
                                           ),
                                           value: selectedItems.contains(crew),
                                           onChanged: (bool? isChecked) {
@@ -916,7 +916,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                                   scrollController: FixedExtentScrollController(
                                                                     initialItem: (selectedGearQuantities[gear] ?? 1) - 1,
                                                                   ),
-                                                                  itemExtent: 32.0,
+                                                                  itemExtent: AppData.text32,
                                                                   onSelectedItemChanged: (int value) {
                                                                     dialogSetState(() {
                                                                       selectedGearQuantities[gear] = value + 1;
@@ -2648,6 +2648,10 @@ class _QuickManifestState extends State<QuickManifest> {
                                   fontSize: AppData.text18, // Label font size
                                 ),
                                 errorText: tripNameErrorMessage,
+                                errorStyle: TextStyle(
+                                  fontSize: AppData.errorText,
+                                  color: Colors.red,
+                                ),
                                 filled: true,
                                 fillColor: AppColors.textFieldColor,
                                 enabledBorder: OutlineInputBorder(
@@ -2701,7 +2705,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                     setState(() {
                                       // Validate the input and set error message
                                       if (value == '0') {
-                                        availableSeatsErrorMessage = 'Available seats cannot be 0.';
+                                        availableSeatsErrorMessage = 'Available seats cannot be 0';
                                       } else {
                                         availableSeatsErrorMessage = null;
                                       }
@@ -2714,6 +2718,10 @@ class _QuickManifestState extends State<QuickManifest> {
                                       fontSize: AppData.text18, // Label font size
                                     ),
                                     errorText: availableSeatsErrorMessage,
+                                    errorStyle: TextStyle(
+                                      fontSize: AppData.errorText,
+                                      color: Colors.red,
+                                    ),
                                     filled: true,
                                     fillColor: AppColors.textFieldColor,
                                     enabledBorder: OutlineInputBorder(
@@ -2772,6 +2780,10 @@ class _QuickManifestState extends State<QuickManifest> {
                                       fontSize: AppData.text18, // Label font size
                                     ),
                                     errorText: safetyBufferErrorMessage,
+                                    errorStyle: TextStyle(
+                                      fontSize: AppData.errorText,
+                                      color: Colors.red,
+                                    ),
                                     filled: true,
                                     fillColor: AppColors.textFieldColor,
                                     enabledBorder: OutlineInputBorder(

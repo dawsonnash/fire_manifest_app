@@ -254,6 +254,10 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                               decoration: InputDecoration(
                                 labelText: 'Enter Trip Name',
                                 errorText: tripNameErrorMessage,
+                                errorStyle: TextStyle(
+                                  fontSize: AppData.errorText,
+                                  color: Colors.red,
+                                ),
                                 labelStyle: TextStyle(
                                   color: AppColors.textColorPrimary, // Label color when not focused
                                   fontSize: AppData.text18, // Label font size
@@ -311,7 +315,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                     setState(() {
                                       // Validate the input and set error message
                                       if (value == '0') {
-                                        availableSeatsErrorMessage = 'Available seats cannot be 0.';
+                                        availableSeatsErrorMessage = 'Available seats cannot be 0';
                                       } else {
                                         availableSeatsErrorMessage = null;
                                       }
@@ -324,6 +328,10 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                       fontSize: AppData.text18, // Label font size
                                     ),
                                     errorText: availableSeatsErrorMessage,
+                                    errorStyle: TextStyle(
+                                      fontSize: AppData.errorText,
+                                      color: Colors.red,
+                                    ),
                                     filled: true,
                                     fillColor: AppColors.textFieldColor,
                                     enabledBorder: OutlineInputBorder(
@@ -382,6 +390,10 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                       fontSize: AppData.text18, // Label font size
                                     ),
                                     errorText: safetyBufferErrorMessage,
+                                    errorStyle: TextStyle(
+                                      fontSize: AppData.errorText,
+                                      color: Colors.red,
+                                    ),
                                     filled: true,
                                     fillColor: AppColors.textFieldColor,
                                     enabledBorder: OutlineInputBorder(

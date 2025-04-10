@@ -132,14 +132,15 @@ class AppData {
   static double get text20 => 20 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get text22 => 22 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get text24 => 24 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
-  static double get toolsIcon => 24 * _toolsIconTextScalingFactor * _textOrientationFactor * _userScalingFactor;
-
   static double get text28 => 28 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get text30 => 30 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get text32 => 32 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get text36 => 36 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get text48 => 48 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get appBarText => 24;
+  static double get errorText => 16 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get toolsIcon => 24 * _toolsIconTextScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get loadoutBodyText => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get tabBarTextSize => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get tabBarIconSize => 24 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get bottomDialogTextSize => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;

@@ -370,7 +370,7 @@ class _SettingsState extends State<SettingsView> {
           backgroundColor: AppColors.textFieldColor2,
           title: Text(
             'Loadout Changes',
-            style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: AppData.miniDialogTitleTextSize, color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
           ),
           content: SingleChildScrollView(
             child: Column(
@@ -380,31 +380,31 @@ class _SettingsState extends State<SettingsView> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.people, color: AppColors.textColorPrimary), // Crew icon
+                      Icon(Icons.people, color: AppColors.textColorPrimary, size: AppData.text18), // Crew icon
                       SizedBox(width: 5),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Crew Members", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16, fontWeight: FontWeight.bold)),
+                            Text(" Crew Members", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16, fontWeight: FontWeight.bold)),
                             if (crewChanges["removed"]!.isNotEmpty) ...[
-                              Text("Removed", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                              for (var name in crewChanges["removed"]!) Text('- $name', style: TextStyle(color: AppColors.textColorPrimary)),
+                              Text("Removed", style: TextStyle(fontSize: AppData.loadoutBodyText, color: Colors.red, fontWeight: FontWeight.bold)),
+                              for (var name in crewChanges["removed"]!) Text('- $name', style: TextStyle(fontSize: AppData.loadoutBodyText, color: AppColors.textColorPrimary)),
                               SizedBox(height: 5),
                             ],
                             if (crewChanges["added"]!.isNotEmpty) ...[
-                              Text("Added", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                              for (var name in crewChanges["added"]!) Text('- $name', style: TextStyle(color: AppColors.textColorPrimary)),
+                              Text("Added", style: TextStyle(fontSize: AppData.loadoutBodyText, color: Colors.green, fontWeight: FontWeight.bold)),
+                              for (var name in crewChanges["added"]!) Text('- $name', style: TextStyle(fontSize: AppData.loadoutBodyText, color: AppColors.textColorPrimary)),
                               SizedBox(height: 5),
                             ],
                             if (crewChanges["modified"]!.isNotEmpty) ...[
-                              Text("Modified", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                              Text("Modified", style: TextStyle(fontSize: AppData.loadoutBodyText, color: Colors.orange, fontWeight: FontWeight.bold)),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: crewChanges["modified"]!.map((change) {
                                   return Padding(
                                     padding: EdgeInsets.only(top: AppData.padding8), // Space after each entry
-                                    child: Text(change, style: TextStyle(color: AppColors.textColorPrimary)),
+                                    child: Text(change, style: TextStyle(fontSize: AppData.loadoutBodyText, color: AppColors.textColorPrimary)),
                                   );
                                 }).toList(),
                               ),
@@ -422,31 +422,31 @@ class _SettingsState extends State<SettingsView> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.work_outline, color: Colors.orange), // Gear icon
+                      Icon(Icons.work_outline, color: Colors.orange, size: AppData.text18), // Gear icon
                       SizedBox(width: 5),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Gear", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16, fontWeight: FontWeight.bold)),
+                            Text(" Gear", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16, fontWeight: FontWeight.bold)),
                             if (gearChanges["removed"]!.isNotEmpty) ...[
-                              Text("Removed", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                              Text("Removed", style: TextStyle(fontSize: AppData.loadoutBodyText, color: Colors.red, fontWeight: FontWeight.bold)),
                               for (var name in gearChanges["removed"]!) Text('- $name', style: TextStyle(color: AppColors.textColorPrimary)),
                               SizedBox(height: 5),
                             ],
                             if (gearChanges["added"]!.isNotEmpty) ...[
-                              Text("Added", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                              for (var name in gearChanges["added"]!) Text('- $name', style: TextStyle(color: AppColors.textColorPrimary)),
+                              Text("Added", style: TextStyle(fontSize: AppData.loadoutBodyText, color: Colors.green, fontWeight: FontWeight.bold)),
+                              for (var name in gearChanges["added"]!) Text('- $name', style: TextStyle(fontSize: AppData.loadoutBodyText, color: AppColors.textColorPrimary)),
                               SizedBox(height: 5),
                             ],
                             if (gearChanges["modified"]!.isNotEmpty) ...[
-                              Text("Modified", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                              Text("Modified", style: TextStyle(fontSize: AppData.loadoutBodyText, color: Colors.orange, fontWeight: FontWeight.bold)),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: gearChanges["modified"]!.map((change) {
                                   return Padding(
                                     padding: EdgeInsets.only(top: AppData.padding8), // Space after each entry
-                                    child: Text(change, style: TextStyle(color: AppColors.textColorPrimary)),
+                                    child: Text(change, style: TextStyle(fontSize: AppData.loadoutBodyText, color: AppColors.textColorPrimary)),
                                   );
                                 }).toList(),
                               ),
@@ -463,31 +463,31 @@ class _SettingsState extends State<SettingsView> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.handyman_outlined, color: Colors.blue), // Tool icon
+                      Icon(Icons.handyman_outlined, color: Colors.blue, size: AppData.text18), // Tool icon
                       SizedBox(width: 5),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Tools", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16, fontWeight: FontWeight.bold)),
+                            Text(" Tools", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16, fontWeight: FontWeight.bold)),
                             if (toolChanges["removed"]!.isNotEmpty) ...[
                               Text("Removed", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                              for (var name in toolChanges["removed"]!) Text('- $name', style: TextStyle(color: AppColors.textColorPrimary)),
+                              for (var name in toolChanges["removed"]!) Text('- $name', style: TextStyle(fontSize: AppData.loadoutBodyText, color: AppColors.textColorPrimary)),
                               SizedBox(height: 5),
                             ],
                             if (toolChanges["added"]!.isNotEmpty) ...[
-                              Text("Added", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                              for (var name in toolChanges["added"]!) Text('- $name', style: TextStyle(color: AppColors.textColorPrimary)),
+                              Text("Added", style: TextStyle(fontSize: AppData.loadoutBodyText, color: Colors.green, fontWeight: FontWeight.bold)),
+                              for (var name in toolChanges["added"]!) Text('- $name', style: TextStyle(fontSize: AppData.loadoutBodyText, color: AppColors.textColorPrimary)),
                               SizedBox(height: 5),
                             ],
                             if (toolChanges["modified"]!.isNotEmpty) ...[
-                              Text("Modified", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                              Text("Modified", style: TextStyle(fontSize: AppData.loadoutBodyText, color: Colors.orange, fontWeight: FontWeight.bold)),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: toolChanges["modified"]!.map((change) {
                                   return Padding(
                                     padding: EdgeInsets.only(top: AppData.padding8), // Space after each entry
-                                    child: Text(change, style: TextStyle(color: AppColors.textColorPrimary)),
+                                    child: Text(change, style: TextStyle(fontSize: AppData.loadoutBodyText, color: AppColors.textColorPrimary)),
                                   );
                                 }).toList(),
                               ),
@@ -504,27 +504,27 @@ class _SettingsState extends State<SettingsView> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(FontAwesomeIcons.sliders, color: Colors.purple), // Preferences icon
+                      Icon(FontAwesomeIcons.sliders, color: Colors.purple, size: AppData.text18), // Preferences icon
                       SizedBox(width: AppData.sizedBox8), // Space between icon and text
                       Expanded(
                         // Ensures Column takes up the correct space
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start, // Aligns text to the left
                           children: [
-                            Text("Trip Preferences", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16, fontWeight: FontWeight.bold)),
+                            Text(" Trip Preferences", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16, fontWeight: FontWeight.bold)),
                             if (missingPreferences.isNotEmpty) ...[
-                              Text("Removed", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                              Text(missingPreferences.map((p) => "- $p").join("\n"), style: TextStyle(color: AppColors.textColorPrimary)),
+                              Text("Removed", style: TextStyle(fontSize: AppData.loadoutBodyText, color: Colors.red, fontWeight: FontWeight.bold)),
+                              Text(missingPreferences.map((p) => "- $p").join("\n"), style: TextStyle(fontSize: AppData.loadoutBodyText, color: AppColors.textColorPrimary)),
                               SizedBox(height: 5), // Adds spacing between sections
                             ],
                             if (newPreferences.isNotEmpty) ...[
-                              Text("Added", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                              Text(newPreferences.map((p) => "- $p").join("\n"), style: TextStyle(color: AppColors.textColorPrimary)),
+                              Text("Added", style: TextStyle(fontSize: AppData.loadoutBodyText, color: Colors.green, fontWeight: FontWeight.bold)),
+                              Text(newPreferences.map((p) => "- $p").join("\n"), style: TextStyle(fontSize: AppData.loadoutBodyText, color: AppColors.textColorPrimary)),
                               SizedBox(height: 5),
                             ],
                             if (modifiedPreferences.isNotEmpty) ...[
-                              Text("Modified", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
-                              Text(modifiedPreferences.map((p) => "- $p").join("\n"), style: TextStyle(color: AppColors.textColorPrimary)),
+                              Text("Modified", style: TextStyle(fontSize: AppData.loadoutBodyText, color: Colors.orange, fontWeight: FontWeight.bold)),
+                              Text(modifiedPreferences.map((p) => "- $p").join("\n"), style: TextStyle(fontSize: AppData.loadoutBodyText, color: AppColors.textColorPrimary)),
                             ],
                           ],
                         ),
@@ -540,7 +540,7 @@ class _SettingsState extends State<SettingsView> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text("Close", style: TextStyle(color: AppColors.textColorPrimary)),
+              child: Text("Close", style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.textColorPrimary)),
             ),
           ],
         );
@@ -608,11 +608,11 @@ class _SettingsState extends State<SettingsView> {
           backgroundColor: AppColors.textFieldColor2,
           title: Text(
             'Warning',
-            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: AppData.miniDialogTitleTextSize),
           ),
           content: Text(
             'Importing this file will overwrite all existing crew data (Crew Members, Gear, Tools, Trip Preferences). Proceed?',
-            style: TextStyle(color: AppColors.textColorPrimary),
+            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
           ),
           actions: [
             TextButton(
@@ -660,7 +660,7 @@ class _SettingsState extends State<SettingsView> {
               },
               child: Text(
                 'Confirm',
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
               ),
             ),
           ],
@@ -1101,6 +1101,10 @@ class _SettingsState extends State<SettingsView> {
                     inputFormatters: [LengthLimitingTextInputFormatter(30)],
                     decoration: InputDecoration(
                       errorText: errorMessage,
+                      errorStyle: TextStyle(
+                        fontSize: AppData.errorText,
+                        color: Colors.red,
+                      ),
                       hintText: "Enter Loadout Name",
                       hintStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                     ),
@@ -1126,11 +1130,11 @@ class _SettingsState extends State<SettingsView> {
                       if (nameExists) {
                         if (loadoutName == previousLoadout) {
                           setDialogState(() {
-                            errorMessage = "Loadout name is unchanged";
+                            errorMessage = "Name is unchanged";
                           });
                         } else {
                           setDialogState(() {
-                            errorMessage = "Loadout name already exists";
+                            errorMessage = "Name already exists";
                           });
                         }
 
@@ -1171,7 +1175,7 @@ class _SettingsState extends State<SettingsView> {
                       }
                     } else {
                       setDialogState(() {
-                        errorMessage = "Loadout name cannot be empty";
+                        errorMessage = "Name cannot be empty";
                       });
 
                       Future.delayed(Duration(seconds: 2), () {

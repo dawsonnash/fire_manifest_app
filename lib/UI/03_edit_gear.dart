@@ -616,9 +616,9 @@ class _EditGearState extends State<EditGear> {
                                   setState(() {
                                     // Validate the input and set error message
                                     if (weight! > 500) {
-                                      weightErrorMessage = 'Weight must be less than 500.';
+                                      weightErrorMessage = 'Weight must be less than 500';
                                     } else if (weight == 0) {
-                                      weightErrorMessage = 'Weight must be greater than 0.';
+                                      weightErrorMessage = 'Weight must be greater than 0';
                                     } else {
                                       weightErrorMessage = null;
                                     }
@@ -632,6 +632,10 @@ class _EditGearState extends State<EditGear> {
                                     fontSize: AppData.text20,
                                   ),
                                   errorText: weightErrorMessage,
+                                  errorStyle: TextStyle(
+                                    fontSize: AppData.errorText,
+                                    color: Colors.red,
+                                  ),
                                   labelStyle: TextStyle(
                                     color: AppColors.textColorPrimary,
                                     fontSize: AppData.text22,
@@ -686,7 +690,7 @@ class _EditGearState extends State<EditGear> {
                                   int? weight = int.tryParse(value);
                                   setState(() {
                                     if (weight == 0) {
-                                      quantityErrorMessage = 'Quantity must be greater than 0.';
+                                      quantityErrorMessage = 'Quantity must be greater than 0';
                                     } else {
                                       quantityErrorMessage = null;
                                     }
@@ -700,6 +704,10 @@ class _EditGearState extends State<EditGear> {
                                     fontSize: AppData.text20,
                                   ),
                                   errorText: quantityErrorMessage,
+                                  errorStyle: TextStyle(
+                                    fontSize: AppData.errorText,
+                                    color: Colors.red,
+                                  ),
                                   labelStyle: TextStyle(
                                     color: AppColors.textColorPrimary,
                                     fontSize: AppData.text22,

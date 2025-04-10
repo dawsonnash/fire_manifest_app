@@ -386,7 +386,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                   scrollController: FixedExtentScrollController(
                                                                     initialItem: (selectedGearQuantities[gear] ?? 1) - 1,
                                                                   ),
-                                                                  itemExtent: 32.0,
+                                                                  itemExtent: AppData.text32,
                                                                   onSelectedItemChanged: (int value) {
                                                                     dialogSetState(() {
                                                                       selectedGearQuantities[gear] = value + 1;
@@ -1415,7 +1415,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                                           builder: (BuildContext context, StateSetter setDialogState) {
                                                                                             return AlertDialog(
                                                                                               backgroundColor: AppColors.textFieldColor2,
-                                                                                              title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                                              title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18)),
                                                                                               content: Column(
                                                                                                 mainAxisSize: MainAxisSize.min,
                                                                                                 children: [
@@ -1434,7 +1434,7 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
                                                                                                         child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                                                       ),
                                                                                                     ),
-                                                                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text14),
+                                                                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                                                                                     onChanged: (value) {
                                                                                                       setDialogState(() {
                                                                                                         quantityToRemove = value ?? 1; // Update dialog state

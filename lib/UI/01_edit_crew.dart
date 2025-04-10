@@ -645,6 +645,10 @@ class _EditCrewState extends State<EditCrew> {
                                                   filled: true,
                                                   fillColor: AppColors.textFieldColor2,
                                                   errorText: toolNameErrorMessage,
+                                                  errorStyle: TextStyle(
+                                                    fontSize: AppData.errorText,
+                                                    color: Colors.red,
+                                                  ),
                                                   enabledBorder: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(8),
                                                     borderSide: BorderSide(color: AppColors.textColorPrimary, width: 2),
@@ -681,6 +685,10 @@ class _EditCrewState extends State<EditCrew> {
                                                     filled: true,
                                                     fillColor: AppColors.textFieldColor2,
                                                     errorText: toolWeightErrorMessage,
+                                                    errorStyle: TextStyle(
+                                                      fontSize: AppData.errorText,
+                                                      color: Colors.red,
+                                                    ),
                                                     enabledBorder: OutlineInputBorder(
                                                       borderRadius: BorderRadius.circular(8),
                                                       borderSide: BorderSide(color: AppColors.textColorPrimary, width: 2),

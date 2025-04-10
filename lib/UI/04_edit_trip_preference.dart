@@ -59,7 +59,11 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                 decoration: InputDecoration(
                   labelText: "Trip Preference Name",
                   labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
-                  errorText: errorMessage, // Display error if exists
+                  errorText: errorMessage,
+                  errorStyle: TextStyle(
+                    fontSize: AppData.errorText,
+                    color: Colors.red,
+                  ),// Display error if exists
                 ),
                 style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
               ),
@@ -81,7 +85,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
 
                     if (tripNameExists) {
                       setState(() {
-                        errorMessage = "Trip Preference name already exists";
+                        errorMessage = "Name already exists";
                       });
 
                       // Clear the error message after 2 seconds
@@ -92,7 +96,7 @@ class _EditTripPreferenceState extends State<EditTripPreference> {
                       });
                     } else if (titleController.text.trim().isEmpty) {
                       setState(() {
-                        errorMessage = "Trip Preference name cannot be empty";
+                        errorMessage = "Name cannot be empty";
                       });
 
                       // Clear the error message after 2 seconds

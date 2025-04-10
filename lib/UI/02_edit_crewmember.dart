@@ -543,9 +543,9 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                   setState(() {
                                     // Validate the input and set error message
                                     if (weight! > 500) {
-                                      weightErrorMessage = 'Weight must be less than 500.';
+                                      weightErrorMessage = 'Weight must be less than 500';
                                     } else if (weight == 0) {
-                                      weightErrorMessage = 'Weight must be greater than 0.';
+                                      weightErrorMessage = 'Weight must be greater than 0';
                                     } else {
                                       weightErrorMessage = null;
                                     }
@@ -560,6 +560,10 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                     //fontWeight: FontWeight.bold,
                                   ),
                                   errorText: weightErrorMessage,
+                                  errorStyle: TextStyle(
+                                    fontSize: AppData.errorText,
+                                    color: Colors.red,
+                                  ),
                                   hintText: 'Up to 500 lb',
                                   hintStyle: TextStyle(
                                     color: AppColors.textColorPrimary,
