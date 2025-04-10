@@ -549,7 +549,7 @@ pw.Widget fillFormFieldsOF252(
           top: 22,
           child: pw.Text(
             helicopterNum!,
-            style: pw.TextStyle(fontSize: AppData.text16),
+            style: pw.TextStyle(fontSize: 16),
           ),
         ),
 
@@ -559,7 +559,7 @@ pw.Widget fillFormFieldsOF252(
           top: 58,
           child: pw.Text(
             departure!,
-            style: pw.TextStyle(fontSize: AppData.text16),
+            style: pw.TextStyle(fontSize: 16),
           ),
         ),
 
@@ -569,7 +569,7 @@ pw.Widget fillFormFieldsOF252(
           top: 57,
           child: pw.Text(
             destination!,
-            style: pw.TextStyle(fontSize: AppData.text16),
+            style: pw.TextStyle(fontSize: 16),
           ),
         ),
 

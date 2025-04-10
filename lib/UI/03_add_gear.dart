@@ -780,12 +780,16 @@ class _AddGearState extends State<AddGear> {
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
-                                                  Text(
-                                                    '${item['name']}',
-                                                    style: TextStyle(
-                                                      color: AppColors.textColorPrimary,
-                                                      fontWeight: FontWeight.normal,
-                                                      fontSize: AppData.text18,
+                                                  Expanded(
+                                                    child: Text(
+                                                      '${item['name']}',
+                                                      overflow: TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                      style: TextStyle(
+                                                        color: AppColors.textColorPrimary,
+                                                        fontWeight: FontWeight.normal,
+                                                        fontSize: AppData.text18,
+                                                      ),
                                                     ),
                                                   ),
                                                   Text(
