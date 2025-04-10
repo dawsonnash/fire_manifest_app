@@ -447,7 +447,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                               scrollController: FixedExtentScrollController(
                                                                 initialItem: (selectedGearQuantitiesExternal[gear] ?? 1) - 1,
                                                               ),
-                                                              itemExtent: 32.0,
+                                                              itemExtent: AppData.text32,
                                                               onSelectedItemChanged: (int value) {
                                                                 dialogSetState(() {
                                                                   selectedGearQuantitiesExternal[gear] = value + 1;
@@ -763,7 +763,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                           ),
                                           subtitle: Text(
                                             crew.getPositionTitle(crew.position),
-                                            style: TextStyle(fontStyle: FontStyle.italic, fontSize: AppData.text14, color: AppColors.textColorPrimary),
+                                            style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
                                           ),
                                           value: selectedItems.contains(crew),
                                           onChanged: (bool? isChecked) {
@@ -916,7 +916,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                                                   scrollController: FixedExtentScrollController(
                                                                     initialItem: (selectedGearQuantities[gear] ?? 1) - 1,
                                                                   ),
-                                                                  itemExtent: 32.0,
+                                                                  itemExtent: AppData.text32,
                                                                   onSelectedItemChanged: (int value) {
                                                                     dialogSetState(() {
                                                                       selectedGearQuantities[gear] = value + 1;
@@ -1479,7 +1479,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               },
                             ),
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: AppData.sizedBox8),
                           Expanded(
                             flex: 1,
                             child: TextField(
@@ -1685,7 +1685,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               },
                             ),
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: AppData.sizedBox8),
                           Expanded(
                             flex: 1,
                             child: TextField(
@@ -1816,7 +1816,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               onChanged: null, // Disables manual selection
                             ),
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: AppData.sizedBox8),
                           Expanded(
                             flex: 1,
                             child: TextField(
@@ -2014,7 +2014,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               },
                             ),
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: AppData.sizedBox8),
                           Expanded(
                             flex: 1,
                             child: TextField(
@@ -2581,8 +2581,8 @@ class _QuickManifestState extends State<QuickManifest> {
                                         scale: 1.5,
                                         child: SvgPicture.asset(
                                           'assets/icons/sling_icon.svg', // Your SVG file path
-                                          width: 24, // Adjust size as needed
-                                          height: 24,
+                                          width: AppData.toolsIcon,
+                                          height: AppData.toolsIcon,
                                           colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
                                         ),
                                       )
@@ -2648,6 +2648,10 @@ class _QuickManifestState extends State<QuickManifest> {
                                   fontSize: AppData.text18, // Label font size
                                 ),
                                 errorText: tripNameErrorMessage,
+                                errorStyle: TextStyle(
+                                  fontSize: AppData.errorText,
+                                  color: Colors.red,
+                                ),
                                 filled: true,
                                 fillColor: AppColors.textFieldColor,
                                 enabledBorder: OutlineInputBorder(
@@ -2701,7 +2705,7 @@ class _QuickManifestState extends State<QuickManifest> {
                                     setState(() {
                                       // Validate the input and set error message
                                       if (value == '0') {
-                                        availableSeatsErrorMessage = 'Available seats cannot be 0.';
+                                        availableSeatsErrorMessage = 'Available seats cannot be 0';
                                       } else {
                                         availableSeatsErrorMessage = null;
                                       }
@@ -2714,6 +2718,10 @@ class _QuickManifestState extends State<QuickManifest> {
                                       fontSize: AppData.text18, // Label font size
                                     ),
                                     errorText: availableSeatsErrorMessage,
+                                    errorStyle: TextStyle(
+                                      fontSize: AppData.errorText,
+                                      color: Colors.red,
+                                    ),
                                     filled: true,
                                     fillColor: AppColors.textFieldColor,
                                     enabledBorder: OutlineInputBorder(
@@ -2772,6 +2780,10 @@ class _QuickManifestState extends State<QuickManifest> {
                                       fontSize: AppData.text18, // Label font size
                                     ),
                                     errorText: safetyBufferErrorMessage,
+                                    errorStyle: TextStyle(
+                                      fontSize: AppData.errorText,
+                                      color: Colors.red,
+                                    ),
                                     filled: true,
                                     fillColor: AppColors.textFieldColor,
                                     enabledBorder: OutlineInputBorder(
@@ -2951,6 +2963,7 @@ class _QuickManifestState extends State<QuickManifest> {
                           ),
                           child: DropdownButtonHideUnderline(
                               child: DropdownButton<TripPreference?>(
+
                             value: selectedTripPreference,
                             dropdownColor: AppColors.textFieldColor2,
                             style: TextStyle(
@@ -2959,6 +2972,7 @@ class _QuickManifestState extends State<QuickManifest> {
                               fontWeight: FontWeight.bold,
                             ),
                             iconEnabledColor: AppColors.textColorPrimary,
+                                itemHeight: null,
                             items: [
                               DropdownMenuItem<TripPreference?>(
                                 value: null, // Represents the "None" option

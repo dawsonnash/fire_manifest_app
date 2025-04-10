@@ -340,7 +340,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                     backgroundColor: AppColors.textFieldColor2,
                                     title: Text(
                                       'Confirm Deletion',
-                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
                                     ),
                                     content: Text(
                                       'This crew member data ($oldCrewMemberName) and any positional preference data containing them will be erased!',
@@ -543,9 +543,9 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                   setState(() {
                                     // Validate the input and set error message
                                     if (weight! > 500) {
-                                      weightErrorMessage = 'Weight must be less than 500.';
+                                      weightErrorMessage = 'Weight must be less than 500';
                                     } else if (weight == 0) {
-                                      weightErrorMessage = 'Weight must be greater than 0.';
+                                      weightErrorMessage = 'Weight must be greater than 0';
                                     } else {
                                       weightErrorMessage = null;
                                     }
@@ -560,6 +560,10 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                     //fontWeight: FontWeight.bold,
                                   ),
                                   errorText: weightErrorMessage,
+                                  errorStyle: TextStyle(
+                                    fontSize: AppData.errorText,
+                                    color: Colors.red,
+                                  ),
                                   hintText: 'Up to 500 lb',
                                   hintStyle: TextStyle(
                                     color: AppColors.textColorPrimary,
@@ -606,6 +610,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<int>(
+                                itemHeight: null,
                                 value: selectedPosition,
                                 dropdownColor: AppColors.textFieldColor2,
                                 style: TextStyle(
@@ -661,7 +666,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                               value: personalToolsList.isNotEmpty ? selectedTool : null, // Set to null if no tools are available
                                               decoration: InputDecoration(
                                                 labelText: 'Select a Tool',
-                                                labelStyle: TextStyle(color: AppColors.textColorPrimary),
+                                                labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                                 filled: true,
                                                 fillColor: AppColors.textFieldColor2,
                                                 enabledBorder: OutlineInputBorder(
@@ -717,7 +722,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                                                 enabled: false, // Non-editable field
                                                 decoration: InputDecoration(
                                                   labelText: 'Tool Weight (lb)',
-                                                  labelStyle: TextStyle(color: AppColors.textColorPrimary),
+                                                  labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                                   filled: true,
                                                   fillColor: AppColors.textFieldColor2,
                                                   disabledBorder: OutlineInputBorder(

@@ -181,7 +181,6 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                               isExternalManifest ? "External" : "Internal",
                               style: TextStyle(
                                 fontSize: AppData.text18,
-                                fontWeight: FontWeight.bold,
                                 color: AppColors.textColorPrimary,
                               ),
                             ),
@@ -193,8 +192,8 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                         scale: 1.5,
                                         child: SvgPicture.asset(
                                           'assets/icons/sling_icon.svg', // Your SVG file path
-                                          width: 24, // Adjust size as needed
-                                          height: 24,
+                                          width: AppData.toolsIcon,
+                                          height: AppData.toolsIcon,
                                           colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
                                         ),
                                       )
@@ -203,7 +202,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                         color: AppColors.primaryColor,
                                         size: AppData.text24,
                                       ),
-                                SizedBox(width: 8), // Add spacing between icon and switch
+                                SizedBox(width: isExternalManifest ? 8 : 16), // Add spacing between icon and switch
                                 Switch(
                                   value: isExternalManifest,
                                   activeColor: AppColors.primaryColor,
@@ -225,9 +224,9 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                       SizedBox(height: AppData.spacingStandard),
                       // Enter Trip Name Input Field
                       Padding(
-                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                          padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
                           child: Container(
-
+                            width: AppData.inputFieldWidth,
                             child: TextField(
                               controller: tripNameController,
                               inputFormatters: [
@@ -255,6 +254,10 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                               decoration: InputDecoration(
                                 labelText: 'Enter Trip Name',
                                 errorText: tripNameErrorMessage,
+                                errorStyle: TextStyle(
+                                  fontSize: AppData.errorText,
+                                  color: Colors.red,
+                                ),
                                 labelStyle: TextStyle(
                                   color: AppColors.textColorPrimary, // Label color when not focused
                                   fontSize: AppData.text18, // Label font size
@@ -312,7 +315,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                     setState(() {
                                       // Validate the input and set error message
                                       if (value == '0') {
-                                        availableSeatsErrorMessage = 'Available seats cannot be 0.';
+                                        availableSeatsErrorMessage = 'Available seats cannot be 0';
                                       } else {
                                         availableSeatsErrorMessage = null;
                                       }
@@ -325,6 +328,10 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                       fontSize: AppData.text18, // Label font size
                                     ),
                                     errorText: availableSeatsErrorMessage,
+                                    errorStyle: TextStyle(
+                                      fontSize: AppData.errorText,
+                                      color: Colors.red,
+                                    ),
                                     filled: true,
                                     fillColor: AppColors.textFieldColor,
                                     enabledBorder: OutlineInputBorder(
@@ -383,6 +390,10 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
                                       fontSize: AppData.text18, // Label font size
                                     ),
                                     errorText: safetyBufferErrorMessage,
+                                    errorStyle: TextStyle(
+                                      fontSize: AppData.errorText,
+                                      color: Colors.red,
+                                    ),
                                     filled: true,
                                     fillColor: AppColors.textFieldColor,
                                     enabledBorder: OutlineInputBorder(
@@ -415,7 +426,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
 
                       // Choose Allowable Text Field
                       Padding(
-                        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                        padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
                         child: Container(
                           width: AppData.inputFieldWidth,
                           decoration: BoxDecoration(
@@ -558,7 +569,7 @@ class _DesignNewManifestState extends State<DesignNewManifest> {
 
                       // Choose Allowable Slider
                       Padding(
-                        padding: const EdgeInsets.only(top: 0.0, right: 16.0, left: 16.0),
+                        padding: EdgeInsets.only(left: AppData.padding16, right: AppData.padding16),
                         child: Container(
                           width: AppData.inputFieldWidth,
 

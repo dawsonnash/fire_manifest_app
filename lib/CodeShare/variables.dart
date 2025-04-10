@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -78,6 +79,8 @@ class AppData {
   static double get _scalingFactorSizedBox => (screenWidth / 400).clamp(0.9, 2);
   static double get _heightScalingFactor => (screenHeight / 800).clamp(0.9, 1.5);
   static double get _textScalingFactor => (screenWidth / 400).clamp(0.95, 1.75); // Normalized to 400 dp width
+  static double get _toolsIconTextScalingFactor => (screenWidth / 400).clamp(1, 1.6); // Try not to go below 1.2 for iPads
+
   static double get _textOrientationFactor => isLandscape ? 0.9 : 1.0;
   static double get checkboxScalingFactor => (screenWidth / 400).clamp(0.9, 1.2);
 
@@ -101,7 +104,7 @@ class AppData {
   static double get quickGuideContentHeight => 45 + quickGuideContentTextSize;
 
   // **Dynamic Spacing
-
+  static double sizedBox8 = 8.0 * _scalingFactorSizedBox;
   static double sizedBox10 = 10.0 * _scalingFactorSizedBox;
   static double spacingStandard = 12.0 * _scalingFactorSizedBox;
   static double sizedBox16 = 16.0 * _scalingFactorSizedBox;
@@ -135,6 +138,9 @@ class AppData {
   static double get text36 => 36 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get text48 => 48 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get appBarText => 24;
+  static double get errorText => 16 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get toolsIcon => 24 * _toolsIconTextScalingFactor * _textOrientationFactor * _userScalingFactor;
+  static double get loadoutBodyText => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get tabBarTextSize => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get tabBarIconSize => 24 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;
   static double get bottomDialogTextSize => 14 * _textScalingFactor * _textOrientationFactor * _userScalingFactor;

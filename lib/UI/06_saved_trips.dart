@@ -110,7 +110,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                     backgroundColor: AppColors.textFieldColor2,
                                     title: Text(
                                       'Confirm Deletion',
-                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
+                                      style: TextStyle(fontSize: AppData.miniDialogTitleTextSize, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
                                     ),
                                     content: Text(
                                       'Are you sure you want to delete all trips?',
@@ -352,7 +352,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                                           maxLines: 1,
                                                         ),
                                                       ),
-                                                      const SizedBox(width: 8),
+                                                       SizedBox(width: AppData.sizedBox8),
                                                       Text(
                                                         '•',
                                                         style: TextStyle(
@@ -360,7 +360,7 @@ class _SavedTripsState extends State<SavedTripsView> {
                                                           color: AppColors.textColorPrimary,
                                                         ),
                                                       ),
-                                                      const SizedBox(width: 8),
+                                                       SizedBox(width: AppData.sizedBox8),
                                                       Text(
                                                         formatTimestamp(trip.timestamp),
                                                         style: TextStyle(
@@ -406,19 +406,26 @@ class _SavedTripsState extends State<SavedTripsView> {
                                           ],
                                         ),
                                         leading: trip.isExternal!
-                                            ? Transform.scale(
-                                                scale: 1.5,
-                                                child: SvgPicture.asset(
-                                                  'assets/icons/sling_icon.svg', // Your SVG file path
-                                                  width: 24, // Adjust size as needed
-                                                  height: 24,
-                                                  colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
+                                            ? Padding(
+                                          padding:  EdgeInsets.only(right: AppData.padding8),
+                                              child: Transform.scale(
+                                                  scale: 1.5,
+                                                  child: SvgPicture.asset(
+                                                    'assets/icons/sling_icon.svg', // Your SVG file path
+                                                    width: AppData.toolsIcon,
+                                                    height: AppData.toolsIcon,
+                                                    colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn), // Apply color dynamically
+                                                  ),
                                                 ),
-                                              )
-                                            : Icon(
-                                                FontAwesomeIcons.helicopter,
-                                                color: AppColors.primaryColor,
-                                              ),
+                                            )
+                                            : Padding(
+                                              padding:  EdgeInsets.only(right: AppData.padding8),
+                                              child: Icon(
+                                                  FontAwesomeIcons.helicopter,
+                                                  color: AppColors.primaryColor,
+                                                                                        size: AppData.text24,
+                                                ),
+                                            ),
                                       ),
                                     ),
                                   ),

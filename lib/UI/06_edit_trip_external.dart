@@ -382,7 +382,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                   scrollController: FixedExtentScrollController(
                                                                     initialItem: (selectedGearQuantities[gear] ?? 1) - 1,
                                                                   ),
-                                                                  itemExtent: 32.0,
+                                                                  itemExtent: AppData.text32,
                                                                   onSelectedItemChanged: (int value) {
                                                                     dialogSetState(() {
                                                                       selectedGearQuantities[gear] = value + 1;
@@ -904,7 +904,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                 'Save',
                 style: TextStyle(
                   color: AppColors.textColorSecondary,
-                  fontSize: AppData.text20,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1008,7 +1008,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                             color: Colors.red,
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Icon(Icons.delete, color: Colors.black),
+                            child: Icon(Icons.delete, color: Colors.black, size: AppData.text24,),
                           ),
                           confirmDismiss: (direction) async {
                             return await showDialog(
@@ -1018,7 +1018,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                   backgroundColor: AppColors.textFieldColor2,
                                   title: Text(
                                     "Confirm Deletion",
-                                    style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                    style: TextStyle(fontSize: AppData.miniDialogTitleTextSize, color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
                                   ),
                                   content: Text(
                                     "Are you sure you want to delete Load #${loadIndex + 1}?",
@@ -1225,7 +1225,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                             color: Colors.red,
                                             alignment: Alignment.centerRight,
                                             padding: const EdgeInsets.symmetric(horizontal: 20),
-                                            child: Icon(Icons.delete, color: Colors.black),
+                                            child: Icon(Icons.delete, color: Colors.black, size: AppData.text24,),
                                           ),
                                           confirmDismiss: (direction) async {
                                             // Show confirmation dialog
@@ -1237,11 +1237,11 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                   // Background color
                                                   title: Text(
                                                     "Confirm Deletion",
-                                                    style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                                    style: TextStyle(fontSize: AppData.miniDialogTitleTextSize, color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
                                                   ),
                                                   content: Text(
                                                     "Are you sure you want to delete this sling?",
-                                                    style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal),
+                                                    style: TextStyle(fontSize: AppData.miniDialogBodyTextSize,color: AppColors.textColorPrimary, fontWeight: FontWeight.normal),
                                                   ),
                                                   actions: [
                                                     TextButton(
@@ -1255,7 +1255,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                     ),
                                                     TextButton(
                                                       onPressed: () {
-                                                        Navigator.of(context).pop(true); // Confirm deletion
+                                                        Navigator.of(context).pop(true);
                                                       },
                                                       child: Text(
                                                         "Delete",
@@ -1361,7 +1361,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                     color: Colors.red,
                                                                     alignment: Alignment.centerRight,
                                                                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                                                                    child: Icon(Icons.delete, color: AppColors.textColorSecondary),
+                                                                    child: Icon(Icons.delete, color: AppColors.textColorSecondary, size: AppData.text24,),
                                                                   ),
                                                                   onDismissed: (direction) {
                                                                     setState(() {
@@ -1437,7 +1437,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                             ),
                                                                           ),
                                                                           IconButton(
-                                                                            icon: const Icon(Icons.delete, color: Colors.red),
+                                                                            icon: Icon(Icons.delete, color: Colors.red, size: AppData.text24,),
                                                                             onPressed: () {
                                                                               setState(() {
                                                                                 if (item is Gear) {
@@ -1450,7 +1450,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                                           builder: (BuildContext context, StateSetter setDialogState) {
                                                                                             return AlertDialog(
                                                                                               backgroundColor: AppColors.textFieldColor2,
-                                                                                              title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary)),
+                                                                                              title: Text('Remove ${item.name}', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18)),
                                                                                               content: Column(
                                                                                                 mainAxisSize: MainAxisSize.min,
                                                                                                 children: [
@@ -1469,7 +1469,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                                                                                         child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                                                       ),
                                                                                                     ),
-                                                                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text14),
+                                                                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                                                                                     onChanged: (value) {
                                                                                                       setDialogState(() {
                                                                                                         quantityToRemove = value ?? 1; // Update dialog state
@@ -1639,8 +1639,10 @@ class _EditTripExternalState extends State<EditTripExternal> {
                                             Icon(
                                               FontAwesomeIcons.circlePlus,
                                               color: Colors.green,
+                                                size: AppData.text24
+
                                             ),
-                                            SizedBox(width: 8),
+                                            SizedBox(width: AppData.sizedBox8),
                                             // Space between the icon and the text
                                             Text(
                                               'Add Sling',
@@ -1693,8 +1695,10 @@ class _EditTripExternalState extends State<EditTripExternal> {
                             Icon(
                               FontAwesomeIcons.circlePlus,
                               color: AppColors.primaryColor,
+                                size: AppData.text24
+
                             ),
-                            SizedBox(width: 8),
+                            SizedBox(width: AppData.sizedBox8),
                             // Space between the icon and the text
                             Text(
                               'Add Load',

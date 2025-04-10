@@ -314,7 +314,7 @@ class _MyHomePageState extends State<MyHomePage> {
               backgroundColor: AppColors.textFieldColor2,
               title: Text(
                 'Save New Loadout',
-                style: TextStyle(color: AppColors.textColorPrimary),
+                style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -324,10 +324,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     inputFormatters: [LengthLimitingTextInputFormatter(30)],
                     decoration: InputDecoration(
                       errorText: errorMessage,
+                      errorStyle: TextStyle(
+                        fontSize: AppData.errorText,
+                        color: Colors.red,
+                      ),
                       hintText: "Enter Loadout Name",
-                      hintStyle: TextStyle(color: AppColors.textColorPrimary),
+                      hintStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                     ),
-                    style: TextStyle(color: AppColors.textColorPrimary),
+                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
                   ),
                 ],
               ),
@@ -342,7 +346,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                     if (loadoutName.isEmpty) {
                       setDialogState(() {
-                        errorMessage = "Loadout name cannot be empty";
+                        errorMessage = "Name cannot be empty";
                       });
                       return;
                     }
@@ -351,7 +355,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     List<String> existingLoadouts = await CrewLoadoutStorage.getAllLoadoutNames();
                     if (existingLoadouts.contains(loadoutName)) {
                       setDialogState(() {
-                        errorMessage = "Loadout name already exists";
+                        errorMessage = "Name already exists";
                       });
                       return;
                     }
@@ -360,7 +364,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.of(context).pop(); // Close input dialog
                     _saveNewLoadout(loadoutName, _jsonFilePath!);
                   },
-                  child: Text("Save", style: TextStyle(color: AppColors.saveButtonAllowableWeight)),
+                  child: Text("Save", style: TextStyle(color: AppColors.saveButtonAllowableWeight, fontSize: AppData.bottomDialogTextSize)),
                 ),
 
 
@@ -381,11 +385,11 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: AppColors.textFieldColor2,
           title: Text(
             'Unsaved Changes Detected',
-            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: AppData.miniDialogTitleTextSize),
           ),
           content: Text(
             'Importing this loadout will erase any unsaved changes to your current crew loadout. View specific changes by tapping the red Out of Sync icon within the Settings page. Do you want to continue?',
-            style: TextStyle(color: AppColors.textColorPrimary),
+            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
           ),
           actions: [
             TextButton(
@@ -394,7 +398,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true), // Return true
-              child: Text("Continue", style: TextStyle(color: Colors.red)),
+              child: Text("Continue", style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize)),
             ),
           ],
         );
@@ -562,11 +566,11 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: AppColors.textFieldColor2,
           title: Text(
             'Warning',
-            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: AppData.miniDialogTitleTextSize),
           ),
           content: Text(
             'Importing this file will overwrite all existing crew data (Crew Members, Gear, Tools, Trip Preferences). Proceed?',
-            style: TextStyle(color: AppColors.textColorPrimary),
+            style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
           ),
           actions: [
             TextButton(

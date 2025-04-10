@@ -341,7 +341,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                   scrollController: FixedExtentScrollController(
                                                                     initialItem: (selectedGearQuantities[gear] ?? 1) - 1,
                                                                   ),
-                                                                  itemExtent: 32.0,
+                                                                  itemExtent: AppData.text32,
                                                                   onSelectedItemChanged: (int value) {
                                                                     dialogSetState(() {
                                                                       selectedGearQuantities[gear] = value + 1;
@@ -890,7 +890,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                 'Save',
                 style: TextStyle(
                   color: AppColors.textColorSecondary,
-                  fontSize: AppData.text20,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -988,7 +988,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                             color: Colors.red,
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Icon(Icons.delete, color: Colors.black),
+                            child: Icon(Icons.delete, color: Colors.black, size: AppData.text24,),
                           ),
                           confirmDismiss: (direction) async {
                             return await showDialog(
@@ -998,7 +998,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                   backgroundColor: AppColors.textFieldColor2,
                                   title: Text(
                                     "Confirm Deletion",
-                                    style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
+                                    style: TextStyle(fontSize: AppData.miniDialogTitleTextSize,color: AppColors.textColorPrimary, fontWeight: FontWeight.bold),
                                   ),
                                   content: Text(
                                     "Are you sure you want to delete Load #${index + 1}?",
@@ -1261,7 +1261,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                 // Red background for delete action
                                                 alignment: Alignment.centerRight,
                                                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                                                child: Icon(Icons.delete, color: AppColors.textColorSecondary), // Trash icon
+                                                child: Icon(Icons.delete, color: AppColors.textColorSecondary, size: AppData.text24,), // Trash icon
                                               ),
 
                                               onDismissed: (direction) {
@@ -1378,7 +1378,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                       // Single Item Deletion
                                                       if (!(item is Gear && item.isPersonalTool))
                                                         IconButton(
-                                                          icon: const Icon(Icons.delete, color: Colors.red),
+                                                          icon:  Icon(Icons.delete, color: Colors.red, size: AppData.text24,),
                                                           onPressed: () {
                                                             setState(() {
                                                               if (loads[index].contains(item)) {
@@ -1411,7 +1411,7 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                                                                                         child: Text('${index + 1}', style: TextStyle(color: AppColors.textColorPrimary)),
                                                                                       ),
                                                                                     ),
-                                                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text14),
+                                                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                                                                     onChanged: (value) {
                                                                                       setDialogState(() {
                                                                                         quantityToRemove = value ?? 1; // Update dialog state
@@ -1586,8 +1586,9 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
                             Icon(
                               FontAwesomeIcons.circlePlus,
                               color: AppColors.primaryColor,
+                              size: AppData.text24
                             ),
-                            SizedBox(width: 8), // Space between the icon and the text
+                            SizedBox(width: AppData.sizedBox8), // Space between the icon and the text
                             Text(
                               'Add Load',
                               textAlign: TextAlign.center,

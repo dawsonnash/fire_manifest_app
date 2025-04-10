@@ -367,9 +367,9 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                   setState(() {
                                     // Validate the input and set error message
                                     if (weight! > 500) {
-                                      weightErrorMessage = 'Weight must be less than 500.';
+                                      weightErrorMessage = 'Weight must be less than 500';
                                     } else if (weight == 0) {
-                                      weightErrorMessage = 'Weight must be greater than 0.';
+                                      weightErrorMessage = 'Weight must be greater than 0';
                                     } else {
                                       weightErrorMessage = null;
                                     }
@@ -383,6 +383,10 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                     fontSize: AppData.text20,
                                   ),
                                   errorText: weightErrorMessage,
+                                  errorStyle: TextStyle(
+                                    fontSize: AppData.errorText,
+                                    color: Colors.red,
+                                  ),
                                   labelStyle: TextStyle(
                                     color: AppColors.textColorPrimary,
                                     fontSize: AppData.text22,
@@ -428,6 +432,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<int>(
+                                itemHeight: null,
                                 value: selectedPosition,
                                 hint: Text(
                                   'Primary Position',
@@ -490,7 +495,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                               // Set to null if no tools are available
                                               decoration: InputDecoration(
                                                 labelText: 'Select a Tool',
-                                                labelStyle: TextStyle(color: AppColors.textColorPrimary),
+                                                labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                                 filled: true,
                                                 fillColor: AppColors.textFieldColor2,
                                                 enabledBorder: OutlineInputBorder(
@@ -547,7 +552,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                                 enabled: false, // Non-editable field
                                                 decoration: InputDecoration(
                                                   labelText: 'Tool Weight (lb)',
-                                                  labelStyle: TextStyle(color: AppColors.textColorPrimary),
+                                                  labelStyle: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text16),
                                                   filled: true,
                                                   fillColor: AppColors.textFieldColor2,
                                                   disabledBorder: OutlineInputBorder(
