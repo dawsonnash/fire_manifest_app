@@ -561,30 +561,33 @@ class _QuickManifestState extends State<QuickManifest> {
                 ),
                 TextButton(
                   onPressed: () {
-                    if (selectedItemsExternal.isEmpty) {
-                      // Select all items again
-                      selectedItemsExternal = [
-                        ...gearListExternal,
-                      ];
-                      selectedGearQuantitiesExternal = {
-                        for (var gear in gearListExternal) gear: gear.quantity,
-                      };
+                    setState(() {
+                      if (selectedItemsExternal.isEmpty) {
+                        // Select all items again
+                        selectedItemsExternal = [
+                          ...gearListExternal,
+                        ];
+                        selectedGearQuantitiesExternal = {
+                          for (var gear in gearListExternal) gear: gear.quantity,
+                        };
 
-                      // Update trip lists to reflect the selection
-                      thisTripGearListExternal = gearListExternal.map((gear) => gear.copyWith()).toList();
-                    } else {
-                      // Update thisTripGearListExternal with only selected gear items and quantities
-                      thisTripGearListExternal = selectedItemsExternal.whereType<Gear>().map((gear) {
-                        final selectedQuantity = selectedGearQuantitiesExternal[gear] ?? 1; // Get selected quantity
-                        return Gear(
-                          name: gear.name,
-                          quantity: selectedQuantity,
-                          weight: gear.weight,
-                          isPersonalTool: gear.isPersonalTool,
-                          isHazmat: gear.isHazmat,
-                        );
-                      }).toList();
-                    }
+                        // Update trip lists to reflect the selection
+                        thisTripGearListExternal = gearListExternal.map((gear) => gear.copyWith()).toList();
+                      } else {
+                        // Update thisTripGearListExternal with only selected gear items and quantities
+                        thisTripGearListExternal = selectedItemsExternal.whereType<Gear>().map((gear) {
+                          final selectedQuantity = selectedGearQuantitiesExternal[gear] ?? 1; // Get selected quantity
+                          return Gear(
+                            name: gear.name,
+                            quantity: selectedQuantity,
+                            weight: gear.weight,
+                            isPersonalTool: gear.isPersonalTool,
+                            isHazmat: gear.isHazmat,
+                          );
+                        }).toList();
+                      }
+
+                    });
                     // Close the dialog
                     Navigator.of(context).pop();
                   },
@@ -1034,35 +1037,38 @@ class _QuickManifestState extends State<QuickManifest> {
                 ),
                 TextButton(
                   onPressed: () {
-                    if (selectedItems.isEmpty) {
-                      // Select all items again
-                      selectedItems = [
-                        ...crewList,
-                        ...gearList,
-                      ];
-                      selectedGearQuantities = {
-                        for (var gear in gearList) gear: gear.quantity,
-                      };
+                    setState(() {
+                      if (selectedItems.isEmpty) {
+                        // Select all items again
+                        selectedItems = [
+                          ...crewList,
+                          ...gearList,
+                        ];
+                        selectedGearQuantities = {
+                          for (var gear in gearList) gear: gear.quantity,
+                        };
 
-                      // Update trip lists to reflect the selection
-                      thisTripCrewMemberList = crewList.map((crew) => crew.copy()).toList();
-                      thisTripGearList = gearList.map((gear) => gear.copyWith()).toList();
-                    } else {
-                      // Update thisTripCrewMemberList with only selected crew members
-                      thisTripCrewMemberList = selectedItems.whereType<CrewMember>().toList();
+                        // Update trip lists to reflect the selection
+                        thisTripCrewMemberList = crewList.map((crew) => crew.copy()).toList();
+                        thisTripGearList = gearList.map((gear) => gear.copyWith()).toList();
+                      } else {
+                        // Update thisTripCrewMemberList with only selected crew members
+                        thisTripCrewMemberList = selectedItems.whereType<CrewMember>().toList();
 
-                      // Update thisTripGearList with only selected gear items and quantities
-                      thisTripGearList = selectedItems.whereType<Gear>().map((gear) {
-                        final selectedQuantity = selectedGearQuantities[gear] ?? 1; // Get selected quantity
-                        return Gear(
-                          name: gear.name,
-                          quantity: selectedQuantity,
-                          weight: gear.weight,
-                          isPersonalTool: gear.isPersonalTool,
-                          isHazmat: gear.isHazmat,
-                        );
-                      }).toList();
-                    }
+                        // Update thisTripGearList with only selected gear items and quantities
+                        thisTripGearList = selectedItems.whereType<Gear>().map((gear) {
+                          final selectedQuantity = selectedGearQuantities[gear] ?? 1; // Get selected quantity
+                          return Gear(
+                            name: gear.name,
+                            quantity: selectedQuantity,
+                            weight: gear.weight,
+                            isPersonalTool: gear.isPersonalTool,
+                            isHazmat: gear.isHazmat,
+                          );
+                        }).toList();
+                      }
+                    });
+
                     // Close the dialog
                     Navigator.of(context).pop();
                   },
