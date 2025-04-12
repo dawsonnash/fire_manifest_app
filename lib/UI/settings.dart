@@ -1164,10 +1164,10 @@ class _SettingsState extends State<SettingsView> {
                             name: 'crew_loadout_built',
 
                             parameters: {
-                              'loadout_name': loadoutName,
+                              'loadout_name': loadoutName.trim(),
                               'isEmptyCrew': isEmptyCrew ? 'yes' : 'no',
-                              'crew_crewmember_length': crew.crewMembers.length,
-                              'crew_gear_length': crew.gear.length,
+                              'crew_crewmember_length': crew.crewMembers.length.toString(),
+                              'crew_gear_length': crew.gear.length.toString(),
                             },
                           );
                         }

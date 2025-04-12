@@ -586,7 +586,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 FirebaseAnalytics.instance.logEvent(
                   name: 'crewDataFile_imported',
                   parameters: {
-                    'file_name': filePath,
+                    'file_name': filePath.trim(),
                   },
                 );
               },

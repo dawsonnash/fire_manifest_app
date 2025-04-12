@@ -1011,9 +1011,9 @@ class _EditCrewState extends State<EditCrew> {
                                                         FirebaseAnalytics.instance.logEvent(
                                                           name: 'tool_added',
                                                           parameters: {
-                                                            'tool_name': newTool.name,
-                                                            'tool_weight': newTool.weight,
-                                                            'tool_quantity': newTool.quantity,
+                                                            'tool_name': newTool.name.trim(),
+                                                            'tool_weight': newTool.weight.toString(),
+                                                            'tool_quantity': newTool.quantity.toString(),
                                                             'tool_isHazmat': newTool.isHazmat ? 'true' : 'false',
                                                           },
                                                         );

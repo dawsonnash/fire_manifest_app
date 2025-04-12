@@ -132,7 +132,7 @@ class _AddTripPreferenceState extends State<AddTripPreference> {
                     FirebaseAnalytics.instance.logEvent(
                       name: 'tripPreference_created',
                       parameters: {
-                        'tripPreference_name': tripPreference.tripPreferenceName,
+                        'tripPreference_name': tripPreference.tripPreferenceName.trim(),
                       },
                     );
                   },

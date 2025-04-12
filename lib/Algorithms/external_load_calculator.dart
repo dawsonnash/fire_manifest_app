@@ -895,12 +895,12 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, int safetyB
       name: 'external_load_calculation_error',
       parameters: {
         'type': 'Unallocated gear',
-        'trip_name': trip.tripName,
-        'total_weight': totalWeight,
-        'trip_allowable': trip.allowable,
-        'trip_safety_buffer': trip.safetyBuffer,
-        'num_loads': numLoads,
-        'num_unallocated_items': unallocatedGear.length,
+        'trip_name': trip.tripName.trim(),
+        'total_weight': totalWeight.toString(),
+        'trip_allowable': trip.allowable.toString(),
+        'trip_safety_buffer': trip.safetyBuffer.toString(),
+        'num_loads': numLoads.toString(),
+        'num_unallocated_items': unallocatedGear.length.toString(),
       },
     );
   }
@@ -913,14 +913,14 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, int safetyB
         (Route<dynamic> route) => false, // This clears all the previous routes
   );
   final Map<String, Object> slingWeightParams = {
-    'trip_name': trip.tripName,
-    'trip_allowable': trip.allowable,
-    'trip_safety_buffer': trip.safetyBuffer,
-    'trip_num_loads': numLoads,
-    'num_12x12_nets': cargoNet12x12.quantity,
-    'num_20x20_nets': cargoNet20x20.quantity,
-    'num_lead_lines': leadLine.quantity,
-    'num_swivels': swivel.quantity,
+    'trip_name': trip.tripName.trim(),
+    'trip_allowable': trip.allowable.toString(),
+    'trip_safety_buffer': trip.safetyBuffer.toString(),
+    'trip_num_loads': numLoads.toString(),
+    'num_12x12_nets': cargoNet12x12.quantity.toString(),
+    'num_20x20_nets': cargoNet20x20.quantity.toString(),
+    'num_lead_lines': leadLine.quantity.toString(),
+    'num_swivels': swivel.quantity.toString(),
   };
 
 // Add sling weights
@@ -940,10 +940,10 @@ Future<void> externalLoadCalculator(BuildContext context, Trip trip, int safetyB
     FirebaseAnalytics.instance.logEvent(
     name: 'load_accoutrement_weight_change',
     parameters: {
-      'weight_12x12_nets': cargoNet12x12.weight,
-      'weight_20x20_nets': cargoNet20x20.weight,
-      'weight_lead_lines': leadLine.weight,
-      'weight_swivels': swivel.weight,
+      'weight_12x12_nets': cargoNet12x12.weight.toString(),
+      'weight_20x20_nets': cargoNet20x20.weight.toString(),
+      'weight_lead_lines': leadLine.weight.toString(),
+      'weight_swivels': swivel.weight.toString(),
     },
   );
   }

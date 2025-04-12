@@ -797,10 +797,10 @@ class _BuildYourOwnManifestState extends State<BuildYourOwnManifest> {
     FirebaseAnalytics.instance.logEvent(
       name: 'internal_trip_built',
       parameters: {
-        'trip_name': widget.trip.tripName,
-        'trip_allowable': widget.trip.allowable,
-        'trip_available_seats': widget.trip.availableSeats,
-        'num_loads': widget.trip.loads.length,
+        'trip_name': widget.trip.tripName.trim(),
+        'trip_allowable': widget.trip.allowable.toString(),
+        'trip_available_seats': widget.trip.availableSeats.toString(),
+        'num_loads': widget.trip.loads.length.toString(),
         'all_crew_used': allCrewUsed ? 'yes' : 'no',
       },
     );

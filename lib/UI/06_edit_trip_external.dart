@@ -806,10 +806,10 @@ class _EditTripExternalState extends State<EditTripExternal> {
     selectedIndexNotifier.value = 1; // Switch to "Saved Trips" tab
 
     final Map<String, Object> slingWeightParams = {
-      'trip_name': widget.trip.tripName,
-      'trip_allowable': widget.trip.allowable,
-      'trip_safety_buffer': widget.trip.safetyBuffer,
-      'trip_num_loads': widget.trip.loads.length,
+      'trip_name': widget.trip.tripName.trim(),
+      'trip_allowable': widget.trip.allowable.toString(),
+      'trip_safety_buffer': widget.trip.safetyBuffer.toString(),
+      'trip_num_loads': widget.trip.loads.length.toString(),
     };
 
     // Add sling weights
@@ -817,7 +817,7 @@ class _EditTripExternalState extends State<EditTripExternal> {
       final load = widget.trip.loads[i];
       for (int j = 0; j < (load.slings?.length ?? 0); j++) {
         final sling = load.slings![j];
-        slingWeightParams['load_${i + 1}_sling_${j + 1}_weight'] = sling.weight;
+        slingWeightParams['load_${i + 1}_sling_${j + 1}_weight'] = sling.weight.toString();
       }
     }
     FirebaseAnalytics.instance.logEvent(

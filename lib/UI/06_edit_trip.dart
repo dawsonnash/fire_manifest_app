@@ -819,15 +819,15 @@ class _EditTripState extends State<EditTrip> {
 
 
     final Map<String, Object> analyticsParams = {
-      'trip_name': widget.trip.tripName,
-      'trip_allowable': widget.trip.allowable,
-      'trip_available_seats': widget.trip.availableSeats,
-      'num_loads': widget.trip.loads.length,
+      'trip_name': widget.trip.tripName.trim(),
+      'trip_allowable': widget.trip.allowable.toString(),
+      'trip_available_seats': widget.trip.availableSeats.toString(),
+      'num_loads': widget.trip.loads.length.toString(),
     };
 
-// Add load weights dynamically
+    // Add load weights dynamically
     for (int i = 0; i < widget.trip.loads.length; i++) {
-      analyticsParams['load_${i + 1}_weight'] = widget.trip.loads[i].weight;
+      analyticsParams['load_${i + 1}_weight'] = widget.trip.loads[i].weight.toString();
     }
 
     FirebaseAnalytics.instance.logEvent(

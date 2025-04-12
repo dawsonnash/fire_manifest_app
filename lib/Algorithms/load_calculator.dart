@@ -700,16 +700,16 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
     FirebaseAnalytics.instance.logEvent(
       name: 'internal_load_calculation_error',
       parameters: {
-        'trip_name': trip.tripName,
-        'total_weight': trip.totalCrewWeight!,
-        'trip_allowable': trip.allowable,
-        'trip_available_seats': trip.availableSeats,
+        'trip_name': trip.tripName.trim(),
+        'total_weight': trip.totalCrewWeight!.toString(),
+        'trip_allowable': trip.allowable.toString(),
+        'trip_available_seats': trip.availableSeats.toString(),
         'tripPreferenceUsed' : tripPreferenceUsed ? 'true' : 'false',
-        'num_loads': numLoads,
-        'num_unallocated_crewmembers': crewMembersCopy.length,
-        'num_unallocated_gear': gearCopy.length,
-        'num_duplicate_crewmembers': duplicateCrew.length,
-        'num_duplicate_gear': duplicateGear.length,
+        'num_loads': numLoads.toString(),
+        'num_unallocated_crewmembers': crewMembersCopy.length.toString(),
+        'num_unallocated_gear': gearCopy.length.toString(),
+        'num_duplicate_crewmembers': duplicateCrew.length.toString(),
+        'num_duplicate_gear': duplicateGear.length.toString(),
       },
     );
   }
@@ -724,11 +724,11 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
         (Route<dynamic> route) => false, // This clears all the previous routes
   );
   final Map<String, Object> analyticsParams = {
-    'trip_name': trip.tripName,
-    'trip_allowable': trip.allowable,
-    'trip_available_seats': trip.availableSeats,
+    'trip_name': trip.tripName.trim(),
+    'trip_allowable': trip.allowable.toString(),
+    'trip_available_seats': trip.availableSeats.toString(),
     'tripPreferenceUsed': tripPreferenceUsed ? 'true' : 'false',
-    'num_loads': numLoads,
+    'num_loads': numLoads.toString(),
   };
 
 // Add load weights dynamically

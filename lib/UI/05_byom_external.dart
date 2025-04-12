@@ -787,10 +787,10 @@ class _BuildYourOwnManifestExternalState extends State<BuildYourOwnManifestExter
       name: 'external_trip_built',
 
       parameters: {
-        'trip_name': widget.trip.tripName,
-        'trip_allowable': widget.trip.allowable,
-        'safety_buffer': widget.trip.safetyBuffer,
-        'num_loads': widget.trip.loads.length,
+        'trip_name': widget.trip.tripName.trim(),
+        'trip_allowable': widget.trip.allowable.toString(),
+        'safety_buffer': widget.trip.safetyBuffer.toString(),
+        'num_loads': widget.trip.loads.length.toString(),
       },
     );
   }

@@ -338,9 +338,9 @@ class _AddGearState extends State<AddGear> {
     FirebaseAnalytics.instance.logEvent(
       name: 'gear_added',
       parameters: {
-        'gear_name': newGearItem.name,
-        'gear_weight': newGearItem.weight,
-        'gear_quantity': newGearItem.quantity,
+        'gear_name': newGearItem.name.trim(),
+        'gear_weight': newGearItem.weight.toString(),
+        'gear_quantity': newGearItem.quantity.toString(),
         'gear_isHazmat': newGearItem.isHazmat ? 'true' : 'false',
       },
     );

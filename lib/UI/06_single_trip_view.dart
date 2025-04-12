@@ -672,10 +672,10 @@ class _AdditionalInfoDialogState extends State<AdditionalInfoDialog> {
               name: 'trip_exported_OF252',
               parameters: {
                 'trip_type': widget.isExternal ? 'external' : 'internal',
-                'helicopter_number': helicopterNum.isNotEmpty ? helicopterNum : 'unspecified',
-                'departure_location': departure.isNotEmpty ? departure : 'unspecified',
-                'destination_location': destination.isNotEmpty ? destination : 'unspecified',
-                'manifest_preparer': manifestPreparer.isNotEmpty ? manifestPreparer : 'unspecified',
+                'helicopter_number': helicopterNum.isNotEmpty ? helicopterNum.toString() : 'unspecified',
+                'departure_location': departure.isNotEmpty ? departure.toString() : 'unspecified',
+                'destination_location': destination.isNotEmpty ? destination.toString() : 'unspecified',
+                'manifest_preparer': manifestPreparer.isNotEmpty ? manifestPreparer.toString() : 'unspecified',
               },
             );
           },
