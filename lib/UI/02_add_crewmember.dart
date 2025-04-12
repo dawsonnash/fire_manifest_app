@@ -193,6 +193,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
     FirebaseAnalytics.instance.logEvent(
       name: 'crewmember_added',
       parameters: {
+        'crew_member' : newCrewMember.name,
         'position_title': newCrewMember.getPositionTitle(newCrewMember.position),
       },
     );

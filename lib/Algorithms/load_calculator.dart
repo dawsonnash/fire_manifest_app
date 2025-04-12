@@ -424,40 +424,47 @@ Future<void> loadCalculator(BuildContext context, Trip trip, TripPreference? tri
                 loadIndex = (loadIndex + 1) % loads.length;
               }
             }
-          }
-          break;
+            }
+            break;
+        }
       }
+    }
+
+  // Start remainder filling at the least-filled load (by number of personnel)
+  int loadIndex = 0;
+  int minCrew = loads.first.loadPersonnel.length;
+  for (int i = 1; i < loads.length; i++) {
+    if (loads[i].loadPersonnel.length < minCrew) {
+      minCrew = loads[i].loadPersonnel.length;
+      loadIndex = i;
     }
   }
 
-  // Filling in the remainder of crew members and gear
-  int loadIndex = 0; // To track current load index
-
   bool noMoreCrewCanBeAdded = false;
-  bool noMoreGearCanBeAdded = false;
+    bool noMoreGearCanBeAdded = false;
 
-  while ((crewMembersCopy.isNotEmpty && !noMoreCrewCanBeAdded) ||
-      (gearCopy.isNotEmpty && !noMoreGearCanBeAdded)) {
-    Load currentLoad = loads[loadIndex];
-    num currentLoadWeight = currentLoad.weight;
+    while ((crewMembersCopy.isNotEmpty && !noMoreCrewCanBeAdded) ||
+        (gearCopy.isNotEmpty && !noMoreGearCanBeAdded)) {
+      Load currentLoad = loads[loadIndex];
+      num currentLoadWeight = currentLoad.weight;
 
-    bool itemAdded = false;
+      bool itemAdded = false;
 
-    // Add remaining crew members not covered by positional preferences
-    if (crewMembersCopy.isNotEmpty &&
-        currentLoadWeight + crewMembersCopy.first.totalCrewMemberWeight <=
-            maxLoadWeight &&
-        currentLoad.loadPersonnel.length < availableSeats) {
-      var firstCrewMember = crewMembersCopy.first;
-      currentLoadWeight += firstCrewMember.totalCrewMemberWeight;
-      currentLoad.loadPersonnel.add(CrewMember(
-        name: firstCrewMember.name,
-        flightWeight: firstCrewMember.flightWeight,
-        position: firstCrewMember.position,
-        personalTools: firstCrewMember.personalTools?.map((tool) {
-          return Gear(
-            name: tool.name,
-            weight: tool.weight,
+      // Add remaining crew members not covered by positional preferences
+      if (crewMembersCopy.isNotEmpty &&
+          currentLoadWeight + crewMembersCopy.first.totalCrewMemberWeight <=
+              maxLoadWeight &&
+          currentLoad.loadPersonnel.length < availableSeats) {
+        var firstCrewMember = crewMembersCopy.first;
+        currentLoadWeight += firstCrewMember.totalCrewMemberWeight;
+        currentLoad.loadPersonnel.add(CrewMember(
+          name: firstCrewMember.name,
+          flightWeight: firstCrewMember.flightWeight,
+          position: firstCrewMember.position,
+          personalTools: firstCrewMember.personalTools?.map((tool) {
+            return Gear(
+              name: tool.name,
+              weight: tool.weight,
             quantity: tool.quantity,
             isPersonalTool: tool.isPersonalTool,
               isHazmat: tool.isHazmat
