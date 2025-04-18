@@ -785,6 +785,16 @@ class _SettingsState extends State<SettingsView> {
     );
   }
 
+  Future<void> _launchDiscord() async {
+    final Uri url = Uri.parse('https://discord.gg/DxC5DTw2db');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $url';
+    }
+    FirebaseAnalytics.instance.logEvent(
+      name: 'discord_launched',
+    );
+  }
+
   Future<void> _launchPrivacyPolicy() async {
     final Uri url = Uri.parse('https://dawsonnash.github.io/fire_manifesting_policies/');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
@@ -1511,6 +1521,10 @@ class _SettingsState extends State<SettingsView> {
                         TextButton(
                           onPressed: _launchYouTube,
                           child: Text('Video Tutorials', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: AppData.text18)),
+                        ),
+                        TextButton(
+                          onPressed: _launchDiscord,
+                          child: Text('Support Chat', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: AppData.text18)),
                         ),
                         TextButton(
                           onPressed: _reportBugs,
