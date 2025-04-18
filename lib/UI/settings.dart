@@ -557,34 +557,31 @@ class _SettingsState extends State<SettingsView> {
     });
   }
 
-  Future<void> exportCrewData() async {
+  Future<void> exportCrewData(BuildContext context) async {
     try {
-      // Convert crew and saved preferences to JSON
       Map<String, dynamic> exportData = {
         "crew": crew.toJson(),
         "savedPreferences": savedPreferences.toJson(),
       };
 
       String jsonData = jsonEncode(exportData);
-      // Get directory for temporary storage
-      Directory directory = await getApplicationDocumentsDirectory();
-
-      // Get the current date in "dd_MMM" format
+      Directory directory = await getTemporaryDirectory(); // works better for iOS
       String formattedDate = DateFormat('MMM_dd').format(DateTime.now());
-
-      // Construct the file path with date suffix
       String filePath = '${directory.path}/CrewData_$formattedDate.json';
 
-      // Write JSON data to file
       File file = File(filePath);
       await file.writeAsString(jsonData);
 
-      // Share the file
-      Share.shareXFiles([XFile(filePath)]);
+      final box = context.findRenderObject() as RenderBox?;
+      Share.shareXFiles(
+        [XFile(filePath)],
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      );
     } catch (e) {
       print('Error exporting data: $e');
     }
   }
+
 
   void selectFileForImport() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -778,6 +775,25 @@ class _SettingsState extends State<SettingsView> {
     );
   }
 
+  Future<void> _launchYouTube() async {
+    final Uri url = Uri.parse('https://www.youtube.com/playlist?list=PLc8D3YhNsr58uuDv_btNFiVRVgxtz0_5L');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $url';
+    }
+    FirebaseAnalytics.instance.logEvent(
+      name: 'video_tutorials_opened',
+    );
+  }
+
+  Future<void> _launchPrivacyPolicy() async {
+    final Uri url = Uri.parse('https://dawsonnash.github.io/fire_manifesting_policies/');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $url';
+    }
+    FirebaseAnalytics.instance.logEvent(
+      name: 'privacy_policy_viewed',
+    );
+  }
   Future<void> _reportBugs() async {
     final TextEditingController feedbackController = TextEditingController();
 
@@ -1054,7 +1070,7 @@ class _SettingsState extends State<SettingsView> {
                         },
                       );
                     } else {
-                      exportCrewData();
+                      exportCrewData(context);
                       FirebaseAnalytics.instance.logEvent(
                         name: 'crewDataFile_exported',
                       );
@@ -1491,6 +1507,10 @@ class _SettingsState extends State<SettingsView> {
                             );
                           },
                           child: Text('Quick Guide', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: AppData.text18)),
+                        ),
+                        TextButton(
+                          onPressed: _launchYouTube,
+                          child: Text('Video Tutorials', style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: AppData.text18)),
                         ),
                         TextButton(
                           onPressed: _reportBugs,
@@ -2577,51 +2597,13 @@ class _SettingsState extends State<SettingsView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TextButton(
-                            onPressed: () {
-                              // Log which section was clicked
-                              FirebaseAnalytics.instance.logEvent(
-                                name: 'privacy_policy_reviewed',
-                              );
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    backgroundColor: AppColors.textFieldColor2, // Dark grey background
-                                    title: Text(
-                                      'Privacy Policy',
-                                      style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal),
-                                    ),
-                                    content: SingleChildScrollView(
-                                      child: Text(
-                                        "This app collects and uses certain types of data to improve user experience, performance, and reliability. This includes information such as app preferences, crash reports, and general usage analytics (e.g., screen views, button taps, and feature interactions). These analytics help to understand which features of the app are being used so improvements can made and bugs fixed more efficiently.\n\n"
-                                            "No personally identifying information is collected unless you explicitly provide it (such as entering a name or crew label). Your data created within this app is not sold or shared with any third parties.\n\n"
-                                            "All data is handled securely and is used solely for the purpose of making the app better and more reliable for the wildland fire community.\n\n"
-                                            "Having agreed, you have confirmed that you have read and agreed to this privacy policy and consent to the app's data collection practices.\n\n"
-                                            "For questions regarding the privacy policy or data collection, please contact dev@firemanifesting.com.",
-                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18),
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(); // Close the dialog
-
-                                        },
-                                        child: Text(
-                                          'Close',
-                                          style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
+                            onPressed: _launchPrivacyPolicy,
                             child: Text(
                               'Privacy Policy',
                               style: TextStyle(color: Colors.white, fontSize: AppData.text18),
                             ),
                           ),
+
                         ],
                       ),
                     ),

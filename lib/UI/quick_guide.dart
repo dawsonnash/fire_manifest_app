@@ -304,7 +304,7 @@ class _QuickGuideState extends State<QuickGuide> {
                         Center(
                           child: Image.asset(
                             'assets/images/quick_guide/quick_guide_overview.png',
-                            width: AppData.quickGuideImageWidth,
+                            width: MediaQuery.of(context).size.width * 0.9,
                             fit: BoxFit.contain,
                           ),
                         ),

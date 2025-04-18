@@ -55,9 +55,9 @@
 		<string>This app does not record audio or need microphone access.</string>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
-		<key>UISupportedInterfaceOrientations</key>
-        <array>
-            <string>UIInterfaceOrientationPortrait</string>
-        </array>
+        <key>UIFileSharingEnabled</key>
+        <true/>
+        <key>LSSupportsOpeningDocumentsInPlace</key>
+        <true/>
 	</dict>
 </plist>
