@@ -79,6 +79,8 @@ class AppData {
   static double get _scalingFactorSizedBox => (screenWidth / 400).clamp(0.9, 2);
   static double get _heightScalingFactor => (screenHeight / 800).clamp(0.9, 1.5);
   static double get _textScalingFactor => (screenWidth / 400).clamp(0.95, 1.75); // Normalized to 400 dp width
+  static double get tabletScalingFactor => (screenWidth / 400).clamp(0.95, 1.75); // Normalized to 400 dp width
+
   static double get _toolsIconTextScalingFactor => (screenWidth / 400).clamp(1, 1.6); // Try not to go below 1.2 for iPads
 
   static double get _textOrientationFactor => isLandscape ? 0.9 : 1.0;

@@ -974,150 +974,153 @@ class _SettingsState extends State<SettingsView> {
     );
   }
 
-  void importExportDialog() {
-    showDialog(
+  void importExportBottomSheet() {
+    int selectedIndex = 0;
+
+    showModalBottomSheet(
       context: context,
+      backgroundColor: AppColors.textFieldColor2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (BuildContext context) {
-        int selectedIndex = 0; // Initial selection index
-
-        return StatefulBuilder(builder: (context, setState) {
-          return AlertDialog(
-            backgroundColor: AppColors.textFieldColor2,
-            title: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Row(
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'Select an option',
-                    style: TextStyle(
-                      fontSize: AppData.miniDialogTitleTextSize,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textColorPrimary,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.info_outline, // Info icon
-                      color: Colors.white,
-                      size: AppData.text18, // Adjust size if needed
-                    ),
-                    onPressed: () {
-                      // Show an info dialog or tooltip when clicked
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            backgroundColor: AppColors.textFieldColor2,
-                            title: Text(
-                              "Crew Sharing",
-                              style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal, fontSize: AppData.miniDialogTitleTextSize),
-                            ),
-                            content: SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min, // Prevents excessive height
-                                children: [
-                                  Text("Crew sharing allows you to share your crew data (Crew Members, Gear, and Tools) with other users. To share:\n",
-                                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
-                                  Text(
-                                      "1. For exporting, select the 'Export' option, save to your files, and then send to the  other user. If on iOS, this can be done directly through Air Drop, but must still be saved to your files. The exported file will be be titled CrewData along with today's date and will have a .json extension.\n",
-                                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
-                                  Text("2. For importing, select the 'Import' option and find the CrewData JSON file in your files.", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
-                                ],
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(); // Close the dialog
-                                },
-                                child: Text(
-                                  "OK",
-                                  style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Select an Option',
+                          style: TextStyle(
+                            fontSize: AppData.miniDialogTitleTextSize,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textColorPrimary,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.info_outline, color: Colors.white, size: AppData.text24),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                backgroundColor: AppColors.textFieldColor2,
+                                title: Text(
+                                  "Crew Sharing",
+                                  style: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: AppData.miniDialogTitleTextSize,
+                                  ),
                                 ),
-                              ),
-                            ],
+                                content: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "Crew sharing allows you to share your crew data (Crew Members, Gear, and Tools) with other users. To share:\n",
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
+                                      ),
+                                      Text(
+                                        "1. For exporting, select 'Export'. If on iOS, the file will appear in your share sheet and can be saved or AirDropped.\n",
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
+                                      ),
+                                      Text(
+                                        "2. For importing, select 'Import' and choose the CrewData JSON file from your Files.",
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    child: Text("OK", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize)),
+                                  ),
+                                ],
+                              );
+                            },
                           );
                         },
-                      );
-                    },
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 120 * AppData.tabletScalingFactor,
+                    child: CupertinoPicker(
+                      itemExtent: 50 * AppData.tabletScalingFactor,
+                      onSelectedItemChanged: (int index) {
+                        setState(() => selectedIndex = index);
+                      },
+                      children:  [
+                        Center(child: Text('Export', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text20))),
+                        Center(child: Text('Import', style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text20))),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 60),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.cancelButton),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.of(context).pop(); // Close modal first
+                          await Future.delayed(Duration(milliseconds: 100)); // Allow frame to settle
+
+                          if (selectedIndex == 0) {
+                            if (crew.crewMembers.isEmpty && crew.gear.isEmpty) {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: AppColors.textFieldColor2,
+                                    title: Text("No crew to export", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize)),
+                                    content: Text("There are no Crew Members or Gear in your inventory.",
+                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(context).pop(),
+                                        child: Text("OK", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize)),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                              return;
+                            } else {
+                              await exportCrewData();
+                              FirebaseAnalytics.instance.logEvent(name: 'crewDataFile_exported');
+                            }
+                          } else {
+                            selectFileForImport();
+                          }
+                        },
+                        child: Text(
+                          selectedIndex == 0 ? 'Export' : 'Import',
+                          style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ),
-            content: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.15, // Dynamic height
-              child: CupertinoPicker(
-                itemExtent: 50, // Height of each item in the picker
-                onSelectedItemChanged: (int index) {
-                  setState(() {
-                    selectedIndex = index;
-                  });
-                },
-                children: [
-                  Center(child: Text('Export', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary))),
-                  Center(child: Text('Import', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary))),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.cancelButton),
-                ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  if (selectedIndex == 0) {
-                    if (crew.crewMembers.isEmpty && crew.gear.isEmpty) {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            backgroundColor: AppColors.textFieldColor2,
-                            title: Text(
-                              "No crew to export",
-                              style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
-                            ),
-                            content: Text(
-                              "There are no Crew Members or Gear in your inventory.",
-                              style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text("OK", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize)),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                      return;
-                    } else {
-                      await exportCrewData();
-                      FirebaseAnalytics.instance.logEvent(name: 'crewDataFile_exported');
-                    }
-                  } else {
-                    selectFileForImport();
-                  }
-
-                  // Safe to close now
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  selectedIndex == 0 ? 'Export' : 'Import',
-                  style: TextStyle(fontSize: AppData.bottomDialogTextSize, color: AppColors.saveButtonAllowableWeight),
-                ),
-              ),
-            ],
-          );
-        });
+            );
+          },
+        );
       },
     );
   }
@@ -2545,13 +2548,11 @@ class _SettingsState extends State<SettingsView> {
                   Row(
                     children: [
                       IconButton(
-                          onPressed: importExportDialog,
-                          icon: Icon(
-                            Icons.people_outline_rounded,
-                            color: Colors.white, size: AppData.text20
-                          )),
+                        onPressed: importExportBottomSheet,
+                        icon: Icon(Icons.people_outline_rounded, color: Colors.white, size: AppData.text20),
+                      ),
                       TextButton(
-                        onPressed: importExportDialog,
+                        onPressed: importExportBottomSheet,
                         child: Text('Crew Sharing', style: TextStyle(color: Colors.white, fontSize: AppData.text18)),
                       ),
                     ],
