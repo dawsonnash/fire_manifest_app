@@ -64,6 +64,9 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsState extends State<SettingsView> {
+
+  final GlobalKey _scaffoldKey = GlobalKey();
+
   late bool isDarkMode;
   late bool enableBackgroundImage;
   late double textScale;
@@ -557,7 +560,7 @@ class _SettingsState extends State<SettingsView> {
     });
   }
 
-  Future<void> exportCrewData(BuildContext context) async {
+  Future<void> exportCrewData() async {
     try {
       Map<String, dynamic> exportData = {
         "crew": crew.toJson(),
@@ -565,25 +568,26 @@ class _SettingsState extends State<SettingsView> {
       };
 
       String jsonData = jsonEncode(exportData);
-      Directory directory = await getTemporaryDirectory(); // works better for iOS
+      Directory directory = await getTemporaryDirectory();
       String formattedDate = DateFormat('MMM_dd').format(DateTime.now());
       String filePath = '${directory.path}/CrewData_$formattedDate.json';
 
       File file = File(filePath);
       await file.writeAsString(jsonData);
 
-      // Delay allows layout to stabilize (fixes iPad bug)
       await Future.delayed(Duration(milliseconds: 100));
 
-      final box = context.findRenderObject() as RenderBox?;
-      if (box != null) {
-        Share.shareXFiles(
-          [XFile(filePath)],
-          sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
-        );
-      } else {
-        Share.shareXFiles([XFile(filePath)]);
-      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final RenderBox? box = _scaffoldKey.currentContext?.findRenderObject() as RenderBox?;
+        if (box != null && box.hasSize) {
+          Share.shareXFiles(
+            [XFile(filePath)],
+            sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
+          );
+        } else {
+          Share.shareXFiles([XFile(filePath)]);
+        }
+      });
     } catch (e) {
       print('Error exporting data: $e');
     }
@@ -1096,7 +1100,7 @@ class _SettingsState extends State<SettingsView> {
                       );
                       return;
                     } else {
-                      await exportCrewData(context);
+                      await exportCrewData();
                       FirebaseAnalytics.instance.logEvent(name: 'crewDataFile_exported');
                     }
                   } else {
@@ -1448,6 +1452,7 @@ class _SettingsState extends State<SettingsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: _scaffoldKey,
       appBar: AppBar(
         title: Center(
           child: Text(
