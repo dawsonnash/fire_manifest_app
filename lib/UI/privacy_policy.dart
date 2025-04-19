@@ -89,41 +89,81 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                           SingleChildScrollView(
                             controller: _scrollController,
                             padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              "This app collects and uses certain types of data to improve user experience, performance, and reliability. This includes information such as app preferences, crash reports, and general usage analytics (e.g., screen views, button taps, and feature interactions). These analytics help to understand which features of the app are being used so improvements can be made and bugs fixed more efficiently.\n\n"
-                                  "No personally identifying information is collected unless you explicitly provide it (such as entering a name or crew label). Your data created within this app is not sold or shared with any third parties.\n\n"
-                                  "All data is handled securely and is used solely for the purpose of making the app better and more reliable for the wildland fire community.\n\n"
-                                  "By continuing, you confirm that you have read and agree to this privacy policy and consent to the app's data collection practices.\n\n"
-                                  "For questions regarding the privacy policy or data collection, please contact dev@firemanifesting.com.",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: AppData.text16,
-                              ),
+                            child: RichText(
+                              text: TextSpan(
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: AppData.text18,
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: 'Privacy Policy\n',
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  TextSpan(
+                                    text: 'Last updated: April 18, 2025\n',
+                                  ),
+                                  TextSpan(
+                                    text: 'Version: ${privacyTermsVersionDisplayMap[currentPrivacyVersion]}\n\n',
+                                  ),
 
+                                  TextSpan(
+                                    text:
+                                    'This app collects and uses certain types of data to improve user experience, performance, and reliability. This includes information such as app preferences, crash reports, and general usage analytics (e.g., screen views, button taps, and feature interactions). These analytics help to understand which features of the app are being used so improvements can be made and bugs fixed more efficiently.\n\n',
+                                  ),
+                                  TextSpan(
+                                    text:
+                                    'No personally identifying information is collected unless you explicitly provide it (such as entering a name or crew label). Your data created within this app is not sold or shared with any third parties.\n\n',
+                                  ),
+                                  TextSpan(
+                                    text:
+                                    'All data is handled securely and is used solely for the purpose of making the app better and more reliable for the wildland fire community.\n\n',
+                                  ),
+                                  TextSpan(
+                                    text:
+                                    'By continuing, you confirm that you have read and agree to this privacy policy and consent to the app\'s data collection practices.\n\n',
+                                  ),
+                                  TextSpan(
+                                    text:
+                                    'For questions regarding the privacy policy or data collection, please contact dev@firemanifesting.com.',
+                                  ),
+                                ],
+                              ),
                             ),
+
                           ),
 
                         ],
                       ),
                     ),
-                    if (_showScrollIndicator)
-                      Padding(
-                        padding: EdgeInsets.only(top: 8),
-                        child: Padding(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.keyboard_arrow_down,
-                                size: 30,
-                                color: Colors.black.withValues(alpha: 0.6),
-                              ),
-                              Text(' More', style: TextStyle(fontSize: AppData.text16, color: Colors.black),)
-                            ],
-                          ),
+                    AnimatedSwitcher(
+                      duration: Duration(milliseconds: 200),
+                      switchInCurve: Curves.easeOut,
+                      switchOutCurve: Curves.easeIn,
+                      child: _showScrollIndicator
+                          ? Padding(
+                        key: ValueKey(true),
+                        padding: const EdgeInsets.only(top: 8, bottom: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.keyboard_arrow_down,
+                              size: 30,
+                              color: Colors.black.withOpacity(0.6),
+                            ),
+                            Text(
+                              ' More',
+                              style: TextStyle(fontSize: AppData.text18, color: Colors.black),
+                            ),
+                          ],
                         ),
+                      )
+                          : SizedBox(
+                        key: ValueKey(false),
+                        height: AppData.screenWidth > 600 ? 60 : 48, // Matches visual height of padding + row
                       ),
+                    ),
                     Row(
                       children: [
                         Transform.scale(
@@ -148,7 +188,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                             'I agree to the privacy policy',
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: AppData.text16,
+                              fontSize: AppData.text18,
                               // fontWeight: FontWeight.bold
                             ),
                           ),

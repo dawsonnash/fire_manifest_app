@@ -572,11 +572,18 @@ class _SettingsState extends State<SettingsView> {
       File file = File(filePath);
       await file.writeAsString(jsonData);
 
+      // Delay allows layout to stabilize (fixes iPad bug)
+      await Future.delayed(Duration(milliseconds: 100));
+
       final box = context.findRenderObject() as RenderBox?;
-      Share.shareXFiles(
-        [XFile(filePath)],
-        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
-      );
+      if (box != null) {
+        Share.shareXFiles(
+          [XFile(filePath)],
+          sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
+        );
+      } else {
+        Share.shareXFiles([XFile(filePath)]);
+      }
     } catch (e) {
       print('Error exporting data: $e');
     }
@@ -804,6 +811,17 @@ class _SettingsState extends State<SettingsView> {
       name: 'privacy_policy_viewed',
     );
   }
+
+  Future<void> _launchTermsAndConditions() async {
+    final Uri url = Uri.parse('https://dawsonnash.github.io/fire_manifesting_policies/terms');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $url';
+    }
+    FirebaseAnalytics.instance.logEvent(
+      name: 'terms_and_conditions_viewed',
+    );
+  }
+
   Future<void> _reportBugs() async {
     final TextEditingController feedbackController = TextEditingController();
 
@@ -1033,8 +1051,8 @@ class _SettingsState extends State<SettingsView> {
                   });
                 },
                 children: [
-                  Center(child: Text('Export', style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary))),
-                  Center(child: Text('Import', style: TextStyle(fontSize: AppData.text16, color: AppColors.textColorPrimary))),
+                  Center(child: Text('Export', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary))),
+                  Center(child: Text('Import', style: TextStyle(fontSize: AppData.text18, color: AppColors.textColorPrimary))),
                 ],
               ),
             ),
@@ -1049,10 +1067,7 @@ class _SettingsState extends State<SettingsView> {
                 ),
               ),
               TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-
-                  // Export
+                onPressed: () async {
                   if (selectedIndex == 0) {
                     if (crew.crewMembers.isEmpty && crew.gear.isEmpty) {
                       showDialog(
@@ -1062,34 +1077,34 @@ class _SettingsState extends State<SettingsView> {
                             backgroundColor: AppColors.textFieldColor2,
                             title: Text(
                               "No crew to export",
-                              style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.miniDialogTitleTextSize, ),
+                              style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogTitleTextSize),
                             ),
-                            content: Text("There are no Crew Members or Gear in your inventory.", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize)),
+                            content: Text(
+                              "There are no Crew Members or Gear in your inventory.",
+                              style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize),
+                            ),
                             actions: [
                               TextButton(
                                 onPressed: () {
-                                  Navigator.of(context).pop(); // Close the dialog
+                                  Navigator.of(context).pop();
                                 },
-                                child: Text(
-                                  "OK",
-                                  style: TextStyle(color: AppColors.textColorPrimary,  fontSize: AppData.bottomDialogTextSize, ),
-                                ),
+                                child: Text("OK", style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize)),
                               ),
                             ],
                           );
                         },
                       );
+                      return;
                     } else {
-                      exportCrewData(context);
-                      FirebaseAnalytics.instance.logEvent(
-                        name: 'crewDataFile_exported',
-                      );
+                      await exportCrewData(context);
+                      FirebaseAnalytics.instance.logEvent(name: 'crewDataFile_exported');
                     }
-                  }
-                  // Import
-                  else {
+                  } else {
                     selectFileForImport();
                   }
+
+                  // Safe to close now
+                  Navigator.of(context).pop();
                 },
                 child: Text(
                   selectedIndex == 0 ? 'Export' : 'Import',
@@ -2555,45 +2570,7 @@ class _SettingsState extends State<SettingsView> {
                         children: [
                           TextButton(
                             onPressed: () {
-                              // Log which section was clicked
-                              FirebaseAnalytics.instance.logEvent(
-                                name: 'terms_and_conditions_reviewed',
-                              );
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    backgroundColor: AppColors.textFieldColor2, // Dark grey background
-                                    title: Text(
-                                      'Terms and Conditions',
-                                      style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.normal),
-                                    ),
-                                    content: SingleChildScrollView(
-                                      child: Text(
-                                        'This application is designed to assist wildland fire personnel in creating detailed manifests for internal and external aviation operations. '
-                                            'The calculations and information provided and generated by this app are for INFORMATIONAL PURPOSES ONLY and should not be solely relied upon for ANY operational, legal, safety, or decision-making purpose.\n\n'
-                                            'While reasonable efforts have been made to ensure accuracy in weight calculations, the developers, distributors, and associated entities make no warranties, express or implied, regarding the reliability, completeness, or correctness of the data generated. '
-                                            'Users assume full responsibility for independently verifying and validating all outputs before use.\n\n'
-                                            'By checking the box for agreement, you have expressly acknowledged and agreed that the developers and associated entities shall not be held liable for any direct, indirect, incidental, consequential, or special damages, including but not limited to financial loss, injury, or regulatory non-compliance, arising from or related to the use or misuse of this application. '
-                                            'Continued use constitutes acceptance of these terms and an agreement to waive any claims against the developers or associated parties.',
-                                        style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.text18),
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(); // Close the dialog
-
-                                        },
-                                        child: Text(
-                                          'Close',
-                                          style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.bottomDialogTextSize),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
+                              _launchTermsAndConditions();
                             },
                             child: Text(
                               'Terms and Conditions',
