@@ -560,8 +560,19 @@ class _SettingsState extends State<SettingsView> {
     });
   }
 
-  Future<void> exportCrewData() async {
+  Future<void> exportCrewData(BuildContext context) async {
     try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => Center(
+          child: CircularProgressIndicator(
+            color: AppColors.fireColor,
+          ),
+        ),
+      );
+
       Map<String, dynamic> exportData = {
         "crew": crew.toJson(),
         "savedPreferences": savedPreferences.toJson(),
@@ -575,21 +586,26 @@ class _SettingsState extends State<SettingsView> {
       File file = File(filePath);
       await file.writeAsString(jsonData);
 
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(Duration(milliseconds: 200)); // Allow UI settle
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final RenderBox? box = _scaffoldKey.currentContext?.findRenderObject() as RenderBox?;
-        if (box != null && box.hasSize) {
-          Share.shareXFiles(
-            [XFile(filePath)],
-            sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
-          );
-        } else {
-          Share.shareXFiles([XFile(filePath)]);
-        }
-      });
+      // Dismiss loading indicator
+      Navigator.of(context, rootNavigator: true).pop();
+
+      final Size screenSize = MediaQuery.of(context).size;
+      final Rect shareOrigin = Rect.fromLTWH(
+        0,
+        0,
+        screenSize.width,
+        screenSize.height / 2,
+      );
+
+      Share.shareXFiles(
+        [XFile(filePath)],
+        sharePositionOrigin: shareOrigin,
+      );
     } catch (e) {
       print('Error exporting data: $e');
+      Navigator.of(context, rootNavigator: true).pop(); // make sure dialog closes on error
     }
   }
 
@@ -974,7 +990,7 @@ class _SettingsState extends State<SettingsView> {
     );
   }
 
-  void importExportBottomSheet() {
+  void importExportBottomSheet(BuildContext parentContext) {
     int selectedIndex = 0;
 
     showModalBottomSheet(
@@ -1084,7 +1100,7 @@ class _SettingsState extends State<SettingsView> {
                           if (selectedIndex == 0) {
                             if (crew.crewMembers.isEmpty && crew.gear.isEmpty) {
                               showDialog(
-                                context: context,
+                                context: parentContext,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
                                     backgroundColor: AppColors.textFieldColor2,
@@ -1102,7 +1118,7 @@ class _SettingsState extends State<SettingsView> {
                               );
                               return;
                             } else {
-                              await exportCrewData();
+                              await exportCrewData(parentContext);
                               FirebaseAnalytics.instance.logEvent(name: 'crewDataFile_exported');
                             }
                           } else {
@@ -2548,11 +2564,11 @@ class _SettingsState extends State<SettingsView> {
                   Row(
                     children: [
                       IconButton(
-                        onPressed: importExportBottomSheet,
+                        onPressed: () => importExportBottomSheet(context),
                         icon: Icon(Icons.people_outline_rounded, color: Colors.white, size: AppData.text20),
                       ),
                       TextButton(
-                        onPressed: importExportBottomSheet,
+                        onPressed: () => importExportBottomSheet(context),
                         child: Text('Crew Sharing', style: TextStyle(color: Colors.white, fontSize: AppData.text18)),
                       ),
                     ],
