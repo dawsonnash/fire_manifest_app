@@ -25,6 +25,7 @@ import 'Data/crew.dart';
 import 'Data/crewMemberList.dart';
 import 'Data/crew_loadout.dart';
 import 'Data/customItem.dart';
+import 'Data/custom_position.dart';
 import 'Data/gear_preferences.dart';
 import 'Data/load.dart';
 import 'Data/load_accoutrements.dart';
@@ -82,6 +83,7 @@ void main() async {
   Hive.registerAdapter(PositionalPreferenceAdapter());
   Hive.registerAdapter(GearPreferenceAdapter());
   Hive.registerAdapter(LoadAccoutrementAdapter());
+  Hive.registerAdapter(CustomPositionAdapter());
 
   // Open a Hive boxes to store objects
   await Hive.openBox<Gear>('gearBox');
@@ -93,6 +95,7 @@ void main() async {
   await Hive.openBox<TripPreference>('tripPreferenceBox');
   await Hive.openBox<Gear>('personalToolsBox');
   await Hive.openBox<LoadAccoutrement>('loadAccoutrementBox');
+  await Hive.openBox<CustomPosition>('customPositionsBox');
 
   // Load data from Hive
   await crew.loadCrewDataFromHive();

@@ -26,6 +26,7 @@ import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
 import '../Data/crew_loadout.dart';
 import '../Data/crewmember.dart';
+import '../Data/custom_position.dart';
 import '../Data/gear.dart';
 
 class SettingsView extends StatefulWidget {
@@ -172,8 +173,11 @@ class _SettingsState extends State<SettingsView> {
         changes.add("\n-- ${saved.flightWeight} → ${current.flightWeight} lb");
       }
       if (current.position != saved.position) {
-        changes.add("\n-- ${positionMap[saved.position]} → ${positionMap[current.position]}");
+        changes.add(
+            "\n-- ${saved.getPositionTitle(saved.position)} → ${current.getPositionTitle(current.position)}"
+        );
       }
+
 
       // Check tool differences
       Map<String, List<String>> toolChanges = _getToolDifferences(current.personalTools ?? [], saved.personalTools ?? []);
@@ -576,6 +580,8 @@ class _SettingsState extends State<SettingsView> {
       Map<String, dynamic> exportData = {
         "crew": crew.toJson(),
         "savedPreferences": savedPreferences.toJson(),
+        "customPositions": Hive.box<CustomPosition>('customPositionsBox').values.map((pos) => pos.toJson()).toList(),
+
       };
 
       String jsonData = jsonEncode(exportData);
@@ -712,6 +718,21 @@ class _SettingsState extends State<SettingsView> {
         return;
       }
 
+      // Before importing crew data — handle custom positions
+      if (jsonData.containsKey("customPositions")) {
+        var customBox = Hive.box<CustomPosition>('customPositionsBox');
+        List<dynamic> importedCustomPositions = jsonData["customPositions"];
+
+        for (var posJson in importedCustomPositions) {
+          CustomPosition pos = CustomPosition.fromJson(posJson);
+
+          // Only add if code not already exists (prevents duplicates)
+          bool alreadyExists = customBox.values.any((p) => p.code == pos.code);
+          if (!alreadyExists) {
+            await customBox.add(pos);
+          }
+        }
+      }
       // Import Crew Data
       Crew importedCrew = Crew.fromJson(jsonData["crew"]);
 
@@ -1261,6 +1282,9 @@ class _SettingsState extends State<SettingsView> {
 
   Future<void> _saveNewLoadout(String loadoutName, bool isEmptyCrew) async {
     String timestamp = DateFormat('EEE, dd MMM yy, h:mm a').format(DateTime.now());
+    // Export all custom positions to JSON
+    var customPositionsBox = Hive.box<CustomPosition>('customPositionsBox');
+    List<Map<String, dynamic>> customPositionsJson = customPositionsBox.values.map((pos) => pos.toJson()).toList();
 
     Map<String, dynamic> loadoutData = isEmptyCrew
         ? {
@@ -1273,12 +1297,15 @@ class _SettingsState extends State<SettingsView> {
             "savedPreferences": {
               "tripPreferences": [] // Empty trip preferences list
             },
-            "lastSaved": timestamp,
+      "customPositions": customPositionsJson,
+
+      "lastSaved": timestamp,
           }
         : {
             "crew": crew.toJson(),
             "savedPreferences": savedPreferences.toJson(),
-            "lastSaved": timestamp,
+      "customPositions": customPositionsJson,
+      "lastSaved": timestamp,
           };
 
     await CrewLoadoutStorage.saveLoadout(loadoutName, loadoutData);
@@ -1395,6 +1422,22 @@ class _SettingsState extends State<SettingsView> {
 
   Future<void> _applyLoadout(String loadoutName, Map<String, dynamic> loadoutData) async {
     try {
+
+      // First add custom positions if they dont already exist
+      if (loadoutData.containsKey("customPositions")) {
+        List<dynamic> importedCustomPositions = loadoutData["customPositions"];
+        var customBox = Hive.box<CustomPosition>('customPositionsBox');
+
+        for (var posJson in importedCustomPositions) {
+          CustomPosition importedPosition = CustomPosition.fromJson(posJson);
+
+          bool exists = customBox.values.any((existing) => existing.code == importedPosition.code);
+          if (!exists) {
+            await customBox.add(importedPosition);
+          }
+        }
+      }
+
       // Convert JSON back to objects
       Crew importedCrew = Crew.fromJson(loadoutData["crew"]);
       SavedPreferences importedPreferences = SavedPreferences.fromJson(loadoutData["savedPreferences"]);

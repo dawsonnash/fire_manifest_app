@@ -11,6 +11,7 @@ import '../../Data/crew.dart';
 import '../../Data/crewmember.dart';
 import '../CodeShare/keyboardActions.dart';
 import '../CodeShare/variables.dart';
+import '../Data/custom_position.dart';
 import '../Data/gear.dart';
 
 class EditCrewmember extends StatefulWidget {
@@ -275,6 +276,341 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     );
 
     Navigator.of(context).pop();
+  }
+
+  Future<void> _showAddNewPositionDialog() async {
+    TextEditingController newPositionController = TextEditingController();
+    String? errorMessage;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.textFieldColor2,
+              title: Text(
+                'Add New Position',
+                style: TextStyle(
+                  color: AppColors.textColorPrimary,
+                  fontSize: AppData.miniDialogTitleTextSize,
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: newPositionController,
+                    textCapitalization: TextCapitalization.words,
+                    inputFormatters: [LengthLimitingTextInputFormatter(30)],
+                    decoration: InputDecoration(
+                      errorText: errorMessage,
+                      errorStyle: TextStyle(
+                        fontSize: AppData.errorText,
+                        color: Colors.red,
+                      ),
+                      hintText: "Enter Position Name",
+                      hintStyle: TextStyle(
+                        color: AppColors.textColorPrimary,
+                        fontSize: AppData.miniDialogBodyTextSize,
+                      ),
+                    ),
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: AppColors.cancelButton,
+                      fontSize: AppData.bottomDialogTextSize,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    String newTitle = newPositionController.text.trim();
+
+                    if (newTitle.isEmpty) {
+                      setDialogState(() {
+                        errorMessage = "Cannot be empty";
+                      });
+                      return;
+                    }
+
+                    bool alreadyExists = positionMap.values.any((val) => val.toLowerCase() == newTitle.toLowerCase()) ||
+                        Hive.box<CustomPosition>('customPositionsBox')
+                            .values
+                            .any((pos) => pos.title.toLowerCase() == newTitle.toLowerCase());
+
+                    if (alreadyExists) {
+                      setDialogState(() {
+                        errorMessage = "Position already exists";
+                      });
+                      return;
+                    }
+
+                    await CustomPosition.addPosition(newTitle);
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    "Add",
+                    style: TextStyle(
+                      color: AppColors.saveButtonAllowableWeight,
+                      fontSize: AppData.bottomDialogTextSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _confirmDeletePosition(int code, String title) async {
+    List<String> affectedCrew = crew.crewMembers
+        .where((member) => member.position == code)
+        .map((member) => member.name)
+        .toList();
+
+    bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.textFieldColor2,
+          title: Text(
+            'Delete Position',
+            style: TextStyle(
+              color: AppColors.textColorPrimary,
+              fontSize: AppData.miniDialogTitleTextSize,
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Are you sure you want to delete "$title"?',
+                  style: TextStyle(
+                    color: AppColors.textColorPrimary,
+                    fontSize: AppData.miniDialogBodyTextSize,
+                  ),
+                ),
+                SizedBox(height:  AppData.sizedBox10),
+
+                if (affectedCrew.isNotEmpty) ...[
+                  Text(
+                    'The following crew member(s) will need to be updated to a new position:',
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                  SizedBox(height: AppData.sizedBox8),
+
+                  // Use normal Column instead of ListView
+                  ...affectedCrew.map((name) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2.0),
+                    child: Text(
+                      '- $name',
+                      style: TextStyle(
+                        color: AppColors.textColorPrimary,
+                        fontSize: AppData.miniDialogBodyTextSize,
+                      ),
+                    ),
+                  )),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: AppColors.cancelButton,
+                  fontSize: AppData.bottomDialogTextSize,
+                ),
+              ),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            TextButton(
+              child: Text(
+                'Delete',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: AppData.bottomDialogTextSize,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(true);  // First: return true to original caller
+                Navigator.of(context).pop();      // Second: close parent modal if needed
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm == true) {
+      for (var member in crew.crewMembers) {
+        if (member.position == code) {
+          member.position = 26;
+          member.save();
+        }
+      }
+      await CustomPosition.deletePosition(code);
+      widget.onUpdate();
+      setState(() {});
+    }
+  }
+
+  void _showPositionSelector() {
+    TextEditingController searchController = TextEditingController();
+    List<MapEntry<int, String>> allPositions = [
+      ...positionMap.entries.where((entry) => entry.key != 26),
+      ...Hive.box<CustomPosition>('customPositionsBox').values.map((custom) => MapEntry(custom.code, custom.title))
+    ];
+
+    List<MapEntry<int, String>> filteredPositions = List.from(allPositions);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.textFieldColor2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            void _filterPositions(String query) {
+              setState(() {
+                filteredPositions = allPositions
+                    .where((entry) => entry.value.toLowerCase().contains(query.toLowerCase()))
+                    .toList();
+              });
+            }
+
+            return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                ),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.75,  // Keep modal 75% screen height
+                  child: Column(
+                    children: [
+
+                      // Search Bar
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: TextField(
+                          controller: searchController,
+                          onChanged: _filterPositions,
+                          decoration: InputDecoration(
+                            hintText: 'Search positions...',
+                            filled: true,
+                            fillColor: AppColors.textFieldColor,
+                            prefixIcon: Icon(Icons.search, size: AppData.text18, color: Colors.white),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.white.withOpacity(0.8), width: 2),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                            ),
+                            hintStyle: TextStyle(
+                              color: AppColors.textColorPrimary.withOpacity(0.5),
+                              fontSize: AppData.text20,
+                            ),
+                          ),
+                          style: TextStyle(
+                            color: AppColors.textColorPrimary,
+                            fontSize: AppData.text22,
+                          ),
+                        ),
+                      ),
+
+                      Expanded(
+                        child: Scrollbar(
+                          thumbVisibility: true,
+                          child: ListView(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            children: [
+
+                              ...filteredPositions.map((entry) {
+                                bool isCustom = entry.key < 0;
+                                return ListTile(
+                                  title: Text(
+                                    entry.value,
+                                    style: TextStyle(fontSize: AppData.text22, color: AppColors.textColorPrimary),
+                                  ),
+                                  trailing: isCustom
+                                      ? IconButton(
+                                    icon: Icon(Icons.delete, size: AppData.text22, color: Colors.red),
+                                    onPressed: () => _confirmDeletePosition(entry.key, entry.value),
+                                  )
+                                      : null,
+                                  onTap: () {
+                                    setState(() {
+                                      selectedPosition = entry.key;
+                                      _checkInput();
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                );
+                              }),
+
+                              Divider(),
+
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: ListTile(
+                                    title: Text(
+                                      '+ Add New',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: AppData.text22,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    onTap: () async {
+                                      Navigator.pop(context);
+                                      await _showAddNewPositionDialog();
+                                      setState(() {});
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -608,30 +944,19 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                               borderRadius: BorderRadius.circular(12.0),
                               border: Border.all(color: AppColors.borderPrimary, width: 2.0),
                             ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<int>(
-                                itemHeight: null,
-                                value: selectedPosition,
-                                dropdownColor: AppColors.textFieldColor2,
-                                style: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: AppData.text22,
+                            child: GestureDetector(
+                              onTap: () => _showPositionSelector(),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                                child: Text(
+                                  selectedPosition != null
+                                      ? getPositionTitleFromCode(selectedPosition!)
+                                      : 'Primary Position',
+                                  style: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontSize: AppData.text22,
+                                  ),
                                 ),
-                                iconEnabledColor: AppColors.textColorPrimary,
-                                items: positionMap.entries.map((entry) {
-                                  return DropdownMenuItem<int>(
-                                    value: entry.key,
-                                    child: Text(entry.value),
-                                  );
-                                }).toList(),
-                                onChanged: (int? newValue) {
-                                  if (newValue != null) {
-                                    setState(() {
-                                      selectedPosition = newValue;
-                                      _checkInput();
-                                    });
-                                  }
-                                },
                               ),
                             ),
                           ),
