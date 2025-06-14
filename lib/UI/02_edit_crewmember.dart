@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:fire_app/Data/saved_preferences.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -364,6 +365,30 @@ class _EditCrewmemberState extends State<EditCrewmember> {
 
                     await CustomPosition.addPosition(newTitle);
                     Navigator.of(context).pop();
+                    // Show successful save popup
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Center(
+                          child: Text(
+                            'Position Saved!',
+                            // Maybe change look
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: AppData.text32,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        duration: const Duration(seconds: 1),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                    FirebaseAnalytics.instance.logEvent(
+                      name: 'custom_position_added',
+                      parameters: {
+                        'position_title': newTitle,
+                      },
+                    );
                   },
                   child: Text(
                     "Add",
@@ -388,7 +413,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
         .map((member) => member.name)
         .toList();
 
-    bool? confirm = await showDialog<bool>(
+    await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -404,26 +429,15 @@ class _EditCrewmemberState extends State<EditCrewmember> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Are you sure you want to delete "$title"?',
-                  style: TextStyle(
-                    color: AppColors.textColorPrimary,
-                    fontSize: AppData.miniDialogBodyTextSize,
-                  ),
-                ),
-                SizedBox(height:  AppData.sizedBox10),
-
                 if (affectedCrew.isNotEmpty) ...[
                   Text(
-                    'The following crew member(s) will need to be updated to a new position:',
+                    'Cannot delete "$title" while it is assigned to the following crew member(s):',
                     style: TextStyle(
                       color: AppColors.textColorPrimary,
                       fontSize: AppData.miniDialogBodyTextSize,
                     ),
                   ),
                   SizedBox(height: AppData.sizedBox8),
-
-                  // Use normal Column instead of ListView
                   ...affectedCrew.map((name) => Padding(
                     padding: const EdgeInsets.symmetric(vertical: 2.0),
                     child: Text(
@@ -434,6 +448,22 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                       ),
                     ),
                   )),
+                  SizedBox(height: AppData.sizedBox10),
+                  Text(
+                    'Please update these crew members to a different position before deleting.',
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                ] else ...[
+                  Text(
+                    'Are you sure you want to delete "$title"?',
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
                 ],
               ],
             ),
@@ -441,7 +471,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
           actions: [
             TextButton(
               child: Text(
-                'Cancel',
+                'Close',
                 style: TextStyle(
                   color: AppColors.cancelButton,
                   fontSize: AppData.bottomDialogTextSize,
@@ -449,35 +479,54 @@ class _EditCrewmemberState extends State<EditCrewmember> {
               ),
               onPressed: () => Navigator.of(context).pop(false),
             ),
-            TextButton(
-              child: Text(
-                'Delete',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: AppData.bottomDialogTextSize,
+            if (affectedCrew.isEmpty)
+              TextButton(
+                child: Text(
+                  'Delete',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: AppData.bottomDialogTextSize,
+                  ),
                 ),
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                    Navigator.of(context).pop();
+                    // Show successful deletion popup
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Center(
+                          child: Text(
+                            'Position Deleted!',
+                            // Maybe change look
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: AppData.text32,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        duration: const Duration(seconds: 1),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    FirebaseAnalytics.instance.logEvent(
+                      name: 'custom_position_deleted',
+                      parameters: {
+                        'position_title': title,
+                      },
+                    );
+                  }
               ),
-              onPressed: () {
-                Navigator.of(context).pop(true);  // First: return true to original caller
-                Navigator.of(context).pop();      // Second: close parent modal if needed
-              },
-            ),
           ],
         );
       },
-    );
-
-    if (confirm == true) {
-      for (var member in crew.crewMembers) {
-        if (member.position == code) {
-          member.position = 26;
-          member.save();
-        }
+    ).then((confirm) async {
+      if (confirm == true) {
+        await CustomPosition.deletePosition(code);
+        widget.onUpdate();
+        setState(() {});
       }
-      await CustomPosition.deletePosition(code);
-      widget.onUpdate();
-      setState(() {});
-    }
+    });
   }
 
   void _showPositionSelector() {

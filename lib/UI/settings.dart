@@ -152,34 +152,60 @@ class _SettingsState extends State<SettingsView> {
     return setEquals(aCrewNames, bCrewNames) && setEquals(aGearNames, bGearNames);
   }
 
-  Map<String, List<String>> _getCrewMemberDifferences(List<CrewMember> currentList, List<CrewMember> savedList) {
+  Map<String, List<String>> _getCrewMemberDifferences(
+      List<CrewMember> currentList,
+      List<CrewMember> savedList,
+      Map<int, String> currentCustomPositionsMap,
+      Map<int, String> savedCustomPositionsMap
+      ) {
     List<String> removed = [];
     List<String> added = [];
     List<String> modified = [];
 
+    // Helper function to get title from both standard + custom positions
+    String getTitle(int code, Map<int, String> customMap) {
+      if (positionMap.containsKey(code)) {
+        return positionMap[code]!;
+      } else if (customMap.containsKey(code)) {
+        return customMap[code]!;
+      }
+      return "Unknown Position (code $code)";
+    }
+
+
     for (var saved in savedList) {
+
       var current = currentList.firstWhere(
-        (c) => c.name == saved.name, // Match by name
+            (c) => c.name == saved.name,
         orElse: () => CrewMember(name: "", flightWeight: -1, position: -1, personalTools: []),
       );
 
       if (current.name.isEmpty) {
-        removed.add(saved.name); // Store only the name for removed crew
+        removed.add(saved.name);
         continue;
       }
 
       List<String> changes = [];
+
       if (current.flightWeight != saved.flightWeight) {
         changes.add("\n-- ${saved.flightWeight} → ${current.flightWeight} lb");
       }
-      if (current.position != saved.position) {
-        changes.add(
-            "\n-- ${saved.getPositionTitle(saved.position)} → ${current.getPositionTitle(current.position)}"
-        );
+
+
+      String savedTitle = getTitle(saved.position, savedCustomPositionsMap);
+      String currentTitle = getTitle(current.position, currentCustomPositionsMap);
+
+      print("saved.position: ${saved.position}, savedTitle: '$savedTitle'");
+      print("current.position: ${current.position}, currentTitle: '$currentTitle'");
+
+      bool positionChanged = current.position != saved.position;
+      bool positionTitleChanged = savedTitle != currentTitle;
+
+      if (positionChanged || positionTitleChanged) {
+        changes.add("\n-- $savedTitle → $currentTitle");
       }
 
-
-      // Check tool differences
+      // Tool differences (keep as-is)
       Map<String, List<String>> toolChanges = _getToolDifferences(current.personalTools ?? [], saved.personalTools ?? []);
       List<String> toolSummary = [];
 
@@ -199,10 +225,10 @@ class _SettingsState extends State<SettingsView> {
       }
     }
 
-    // Detect **new crew members**
+    // New crew members check
     for (var current in currentList) {
       if (!savedList.any((saved) => saved.name == current.name)) {
-        added.add(current.name); // Store only the name for new crew
+        added.add(current.name);
       }
     }
 
@@ -314,21 +340,28 @@ class _SettingsState extends State<SettingsView> {
       return;
     }
 
-    // Convert saved crew and preferences to JSON
+    // Include custom positions
     String lastSavedCrewJson = jsonEncode(lastSavedData["crew"]);
     String lastSavedPreferencesJson = jsonEncode(lastSavedData["savedPreferences"]);
+    String lastSavedCustomPositionsJson = jsonEncode(lastSavedData["customPositions"]);
 
-    // Convert current crew and preferences to JSON
     Map<String, dynamic> currentCrewData = {
       "crew": crew.toJson(),
       "savedPreferences": savedPreferences.toJson(),
+      "customPositions": Hive.box<CustomPosition>('customPositionsBox')
+          .values
+          .map((pos) => pos.toJson())
+          .toList(),
     };
+
     String currentCrewJson = jsonEncode(currentCrewData["crew"]);
     String currentPreferencesJson = jsonEncode(currentCrewData["savedPreferences"]);
+    String currentCustomPositionsJson = jsonEncode(currentCrewData["customPositions"]);
 
-    // Compare Crew and Preferences JSONs
     setState(() {
-      isOutOfSync = (lastSavedCrewJson != currentCrewJson) || (lastSavedPreferencesJson != currentPreferencesJson);
+      isOutOfSync = (lastSavedCrewJson != currentCrewJson) ||
+          (lastSavedPreferencesJson != currentPreferencesJson) ||
+          (lastSavedCustomPositionsJson != currentCustomPositionsJson);
     });
   }
 
@@ -338,6 +371,18 @@ class _SettingsState extends State<SettingsView> {
     if (lastSavedData == null) {
       return;
     }
+
+    // Build current custom positions map from Hive
+    Map<int, String> currentCustomPositionsMap = {
+      for (var pos in Hive.box<CustomPosition>('customPositionsBox').values)
+        pos.code: pos.title
+    };
+
+    // Build saved custom positions map from loaded JSON
+    Map<int, String> savedCustomPositionsMap = {
+      for (var pos in (lastSavedData["customPositions"] ?? []) as List)
+        pos['code']: pos['title']
+    };
 
     // Extract saved and current data
     List<CrewMember> savedCrew = (lastSavedData["crew"]["crewMembers"] as List).map((json) => CrewMember.fromJson(json)).toList();
@@ -353,7 +398,12 @@ class _SettingsState extends State<SettingsView> {
     List<TripPreference> currentTripPreferences = savedPreferences.tripPreferences;
 
     // Compare Differences
-    Map<String, List<String>> crewChanges = _getCrewMemberDifferences(currentCrew, savedCrew);
+    Map<String, List<String>> crewChanges = _getCrewMemberDifferences(
+        currentCrew,
+        savedCrew,
+        currentCustomPositionsMap,
+        savedCustomPositionsMap
+    );
     Map<String, List<String>> gearChanges = _getGearDifferences(currentGear, savedGear);
     Map<String, List<String>> toolChanges = _getToolDifferences(currentTools, savedTools);
 
@@ -1351,9 +1401,14 @@ class _SettingsState extends State<SettingsView> {
   Future<void> _updateCurrentLoadout(String loadoutName) async {
     String timestamp = DateFormat('EEE, dd MMM yy, h:mm a').format(DateTime.now());
 
+    // Export all custom positions to JSON
+    var customPositionsBox = Hive.box<CustomPosition>('customPositionsBox');
+    List<Map<String, dynamic>> customPositionsJson = customPositionsBox.values.map((pos) => pos.toJson()).toList();
+
     Map<String, dynamic> loadoutData = {
       "crew": crew.toJson(),
       "savedPreferences": savedPreferences.toJson(),
+      "customPositions": customPositionsJson,
       "lastSaved": timestamp, // Update timestamp
     };
     await CrewLoadoutStorage.saveLoadout(loadoutName, loadoutData);
