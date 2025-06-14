@@ -96,6 +96,8 @@ void main() async {
   await Hive.openBox<Gear>('personalToolsBox');
   await Hive.openBox<LoadAccoutrement>('loadAccoutrementBox');
   await Hive.openBox<CustomPosition>('customPositionsBox');
+  await Hive.openBox('appDataBox');
+
 
   // Load data from Hive
   await crew.loadCrewDataFromHive();

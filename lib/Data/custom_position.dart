@@ -16,7 +16,6 @@ class CustomPosition extends HiveObject {
     required this.title,
   });
 
-  // JSON serialization (optional but good to keep for export/import later)
   Map<String, dynamic> toJson() {
     return {
       'code': code,
@@ -31,26 +30,32 @@ class CustomPosition extends HiveObject {
     );
   }
 
-  // Static convenience function to add a position
+  // KEY to store persistent counter inside Hive
+  static const String _counterKey = 'custom_position_counter';
+
+  // Static convenience function to add af position
   static Future<void> addPosition(String title) async {
     final box = Hive.box<CustomPosition>('customPositionsBox');
-    int nextCode = -1;
-    if (box.isNotEmpty) {
-      int minCode = box.values.map((e) => e.code).reduce((a, b) => a < b ? a : b);
-      nextCode = minCode - 1;
-    }
+    final counterBox = Hive.box('appDataBox');
+
+    // Get last counter value or initialize to 0
+    int lastCode = counterBox.get(_counterKey, defaultValue: 0);
+
+    // Decrement (always goes lower)
+    int nextCode = lastCode - 1;
+
+    // Save new counter value
+    await counterBox.put(_counterKey, nextCode);
+
+    // Add new position with unique code
     await box.add(CustomPosition(code: nextCode, title: title));
   }
 
   static Future<void> deletePosition(int codeToDelete) async {
     final box = Hive.box<CustomPosition>('customPositionsBox');
-    final CustomPosition? target = box.values.firstWhereOrNull(
-          (pos) => pos.code == codeToDelete,
-    );
+    final target = box.values.firstWhereOrNull((pos) => pos.code == codeToDelete);
     if (target != null) {
       await target.delete();
     }
   }
-
-
 }

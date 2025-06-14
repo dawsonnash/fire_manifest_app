@@ -162,7 +162,6 @@ class _SettingsState extends State<SettingsView> {
     List<String> added = [];
     List<String> modified = [];
 
-    // Helper function to get title from both standard + custom positions
     String getTitle(int code, Map<int, String> customMap) {
       if (positionMap.containsKey(code)) {
         return positionMap[code]!;
@@ -172,9 +171,7 @@ class _SettingsState extends State<SettingsView> {
       return "Unknown Position (code $code)";
     }
 
-
     for (var saved in savedList) {
-
       var current = currentList.firstWhere(
             (c) => c.name == saved.name,
         orElse: () => CrewMember(name: "", flightWeight: -1, position: -1, personalTools: []),
@@ -191,12 +188,10 @@ class _SettingsState extends State<SettingsView> {
         changes.add("\n-- ${saved.flightWeight} → ${current.flightWeight} lb");
       }
 
-
+      // Always cross reference the saved positions using saved map, and current positions using saved map too
+      // (use saved map for both sides)
       String savedTitle = getTitle(saved.position, savedCustomPositionsMap);
       String currentTitle = getTitle(current.position, currentCustomPositionsMap);
-
-      print("saved.position: ${saved.position}, savedTitle: '$savedTitle'");
-      print("current.position: ${current.position}, currentTitle: '$currentTitle'");
 
       bool positionChanged = current.position != saved.position;
       bool positionTitleChanged = savedTitle != currentTitle;
@@ -205,7 +200,7 @@ class _SettingsState extends State<SettingsView> {
         changes.add("\n-- $savedTitle → $currentTitle");
       }
 
-      // Tool differences (keep as-is)
+      // Check tool differences
       Map<String, List<String>> toolChanges = _getToolDifferences(current.personalTools ?? [], saved.personalTools ?? []);
       List<String> toolSummary = [];
 
@@ -225,7 +220,6 @@ class _SettingsState extends State<SettingsView> {
       }
     }
 
-    // New crew members check
     for (var current in currentList) {
       if (!savedList.any((saved) => saved.name == current.name)) {
         added.add(current.name);
@@ -236,6 +230,26 @@ class _SettingsState extends State<SettingsView> {
       "removed": removed,
       "added": added,
       "modified": modified,
+    };
+  }
+
+  Map<String, List<String>> _getCustomPositionDifferences(
+      Map<int, String> currentCustomPositionsMap,
+      Map<int, String> savedCustomPositionsMap
+      ) {
+    List<String> removed = [];
+    List<String> added = [];
+
+    // Compare titles directly
+    Set<String> savedTitles = savedCustomPositionsMap.values.toSet();
+    Set<String> currentTitles = currentCustomPositionsMap.values.toSet();
+
+    removed = savedTitles.difference(currentTitles).toList();
+    added = currentTitles.difference(savedTitles).toList();
+
+    return {
+      "removed": removed,
+      "added": added,
     };
   }
 
@@ -340,28 +354,14 @@ class _SettingsState extends State<SettingsView> {
       return;
     }
 
-    // Include custom positions
     String lastSavedCrewJson = jsonEncode(lastSavedData["crew"]);
     String lastSavedPreferencesJson = jsonEncode(lastSavedData["savedPreferences"]);
-    String lastSavedCustomPositionsJson = jsonEncode(lastSavedData["customPositions"]);
 
-    Map<String, dynamic> currentCrewData = {
-      "crew": crew.toJson(),
-      "savedPreferences": savedPreferences.toJson(),
-      "customPositions": Hive.box<CustomPosition>('customPositionsBox')
-          .values
-          .map((pos) => pos.toJson())
-          .toList(),
-    };
-
-    String currentCrewJson = jsonEncode(currentCrewData["crew"]);
-    String currentPreferencesJson = jsonEncode(currentCrewData["savedPreferences"]);
-    String currentCustomPositionsJson = jsonEncode(currentCrewData["customPositions"]);
+    String currentCrewJson = jsonEncode(crew.toJson());
+    String currentPreferencesJson = jsonEncode(savedPreferences.toJson());
 
     setState(() {
-      isOutOfSync = (lastSavedCrewJson != currentCrewJson) ||
-          (lastSavedPreferencesJson != currentPreferencesJson) ||
-          (lastSavedCustomPositionsJson != currentCustomPositionsJson);
+      isOutOfSync = (lastSavedCrewJson != currentCrewJson) || (lastSavedPreferencesJson != currentPreferencesJson);
     });
   }
 
@@ -383,6 +383,8 @@ class _SettingsState extends State<SettingsView> {
       for (var pos in (lastSavedData["customPositions"] ?? []) as List)
         pos['code']: pos['title']
     };
+
+
 
     // Extract saved and current data
     List<CrewMember> savedCrew = (lastSavedData["crew"]["crewMembers"] as List).map((json) => CrewMember.fromJson(json)).toList();
@@ -664,7 +666,6 @@ class _SettingsState extends State<SettingsView> {
       Navigator.of(context, rootNavigator: true).pop(); // make sure dialog closes on error
     }
   }
-
 
   void selectFileForImport() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -2382,6 +2383,54 @@ class _SettingsState extends State<SettingsView> {
                                                   content: Text(
                                                     'Starting a new empty crew will erase any recent changes made to your current crew loadout.'
                                                     'This action is irreversible. Proceed?',
+                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize,),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(false); // Return false to cancel
+                                                      },
+                                                      child: Text(
+                                                        'Cancel',
+                                                        style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
+                                                      ),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(true); // Return true to confirm
+                                                      },
+                                                      child: Text(
+                                                        'Confirm',
+                                                        style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+
+                                            // If the user cancels, restore the previous selection
+                                            if (confirmed == false || confirmed == null) {
+                                              setState(() {
+                                                selectedLoadout = previousLoadout;
+                                              });
+                                              return;
+                                            }
+                                          }
+                                          if((previousLoadout == null && (crew.crewMembers.isNotEmpty || crew.gear.isNotEmpty))){
+                                            // Ask for confirmation before switching
+                                            bool? confirmed = await showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  backgroundColor: AppColors.textFieldColor2,
+                                                  title: Text(
+                                                    'Confirm Start Empty Crew',
+                                                    style: TextStyle(fontSize: AppData.miniDialogTitleTextSize,color: Colors.red, fontWeight: FontWeight.bold),
+                                                  ),
+                                                  content: Text(
+                                                    'Starting a new empty crew will erase any recent changes made to your current crew data, which is not stored in a loadout. '
+                                                        'This action is irreversible. Proceed?',
                                                     style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize,),
                                                   ),
                                                   actions: [

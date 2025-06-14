@@ -364,6 +364,15 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                     }
 
                     await CustomPosition.addPosition(newTitle);
+
+                    // After adding, log all existing custom positions:
+                    final box = Hive.box<CustomPosition>('customPositionsBox');
+                    print("==== Current Custom Positions ====");
+                    for (var pos in box.values) {
+                      print("Title: '${pos.title}', Code: ${pos.code}");
+                    }
+                    print("===================================");
+
                     Navigator.of(context).pop();
                     // Show successful save popup
                     ScaffoldMessenger.of(context).showSnackBar(
