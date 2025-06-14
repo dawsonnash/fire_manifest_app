@@ -187,18 +187,24 @@ class _EditCrewmemberState extends State<EditCrewmember> {
     final isNameValid = nameController.text.isNotEmpty;
     final isFlightWeightValid = flightWeightController.text.isNotEmpty && int.tryParse(flightWeightController.text) != null;
     final isNameChanged = nameController.text != oldCrewMemberName;
-    final isFlightWeightChanged = int.tryParse(flightWeightController.text) != null && // Ensure valid input
-        int.parse(flightWeightController.text) > 0 && // Greater than zero
-        int.parse(flightWeightController.text) < 500 && // Less than 500
+    final isFlightWeightChanged = int.tryParse(flightWeightController.text) != null &&
+        int.parse(flightWeightController.text) > 0 &&
+        int.parse(flightWeightController.text) < 500 &&
         int.parse(flightWeightController.text) != oldCrewMemberFlightWeight;
-    final isPositionChanged = (selectedPosition ?? -1) != oldCrewMemberPosition; // Assuming -1 as an invalid/initial value
+
+    // Updated position logic
+    final bool wasUndefined = oldCrewMemberPosition == 26;
+    final bool isNowDefined = (selectedPosition != null && selectedPosition != 26);
+    final bool isPositionChanged = ((selectedPosition ?? -1) != oldCrewMemberPosition) || (wasUndefined && isNowDefined);
 
     final areToolsChanged = !compareLists(oldCrewMemberTools.cast<Gear>(), addedTools);
 
     setState(() {
-      isSaveButtonEnabled = (isNameValid && isFlightWeightValid) && (isNameChanged || isFlightWeightChanged || isPositionChanged || areToolsChanged);
+      isSaveButtonEnabled = (isNameValid && isFlightWeightValid) &&
+          (isNameChanged || isFlightWeightChanged || isPositionChanged || areToolsChanged);
     });
   }
+
 
   // Local function to save user input. The contoller automatically tracks/saves the variable from the textfield
   void saveData() {
@@ -612,6 +618,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

@@ -114,9 +114,17 @@ class _CrewmembersViewState extends State<CrewmembersView> {
     );
   }
 
+  List<String> getUndefinedCrewNames() {
+    return crewmemberList
+        .where((member) => member.position == 26)
+        .map((member) => member.name)
+        .toList();
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    List<CrewMember> sortedCrewMemberList = sortCrewListByPosition(crewmemberList);
+    List<CrewMember> sortedCrewMemberList = sortCrewListAlphabetically(crewmemberList);
 
     TextStyle panelTextStyle = TextStyle(
       fontSize: AppData.text22,
@@ -286,6 +294,28 @@ class _CrewmembersViewState extends State<CrewmembersView> {
             color: Colors.white.withValues(alpha: 0.05),
             child: Column(
               children: [
+                // Undefined position banner
+                Builder(
+                  builder: (_) {
+                    final undefinedNames = getUndefinedCrewNames();
+                    if (undefinedNames.isEmpty) return SizedBox.shrink();
+                    return Container(
+                      width: double.infinity,
+                      color: Colors.red,
+                      padding: EdgeInsets.all(8),
+                      child: Text(
+                        'Undefined Position: ${undefinedNames.join(', ')}',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: AppData.text18,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
+                ),
+
                 Expanded(
                   child: Stack(
                     children: [

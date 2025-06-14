@@ -153,6 +153,12 @@ List<CrewMember> sortCrewListByPosition(List<CrewMember> crewList) {
 
 }
 
+List<CrewMember> sortCrewListAlphabetically(List<CrewMember> crewList) {
+  // Sort alphabetically by name only
+  crewList.sort((a, b) => a.name.compareTo(b.name));
+  return crewList;
+}
+
 String getPositionTitleFromCode(int positionCode) {
   if (positionCode >= 0) {
     return positionMap[positionCode] ?? 'Undefined';
