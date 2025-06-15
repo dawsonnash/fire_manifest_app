@@ -306,6 +306,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                     if (newPosition != null) {
                       setState(() {
                         selectedPosition = newPosition.code;
+                        _checkInput();
                       });
                     }
                     Navigator.of(context).pop();
@@ -467,6 +468,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
         await CustomPosition.deletePosition(code);
         setState(() {
           selectedPosition = null;
+          _checkInput();
         });
       }
     });
