@@ -199,7 +199,7 @@ class _SettingsState extends State<SettingsView> {
       bool positionChanged = current.position != saved.position;
       bool positionTitleChanged = savedTitle.toLowerCase() != currentTitle.toLowerCase();
 
-      if (positionTitleChanged || positionChanged) {
+      if (positionTitleChanged) {
         changes.add("\n-- $savedTitle → $currentTitle");
       }
 
