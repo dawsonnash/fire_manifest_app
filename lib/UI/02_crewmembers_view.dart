@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 
 import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
+import '../Data/custom_position.dart';
 
 class CrewmembersView extends StatefulWidget {
   const CrewmembersView({super.key});
@@ -115,11 +116,25 @@ class _CrewmembersViewState extends State<CrewmembersView> {
   }
 
   List<String> getUndefinedCrewNames() {
-    return crewmemberList
-        .where((member) => member.position == 26)
-        .map((member) => member.name)
-        .toList();
+    final customPositionsMap = {
+      for (var pos in Hive.box<CustomPosition>('customPositionsBox').values)
+        pos.code: pos.title
+    };
+
+    return crewmemberList.where((member) {
+      if (member.position == 26) return true;
+
+      String title;
+      if (positionMap.containsKey(member.position)) {
+        title = positionMap[member.position]!;
+      } else {
+        title = customPositionsMap[member.position] ?? "Undefined";
+      }
+
+      return title == "Undefined";
+    }).map((member) => member.name).toList();
   }
+
 
 
   @override
@@ -318,8 +333,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
 
                 Expanded(
                   child: Stack(
-                    children: [
-                      crewmemberList.isEmpty
+                    children: [crewmemberList.isEmpty
                           ? Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(

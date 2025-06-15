@@ -1478,38 +1478,45 @@ class _SettingsState extends State<SettingsView> {
 
   Future<void> _applyLoadout(String loadoutName, Map<String, dynamic> loadoutData) async {
     try {
+      final customBox = Hive.box<CustomPosition>('customPositionsBox');
 
-      // First add custom positions if they dont already exist
-      if (loadoutData.containsKey("customPositions")) {
-        List<dynamic> importedCustomPositions = loadoutData["customPositions"];
-        var customBox = Hive.box<CustomPosition>('customPositionsBox');
-
-        for (var posJson in importedCustomPositions) {
-          CustomPosition importedPosition = CustomPosition.fromJson(posJson);
-
-          bool exists = customBox.values.any((existing) => existing.code == importedPosition.code);
-          if (!exists) {
-            await customBox.add(importedPosition);
-          }
-        }
-      }
-
-      // Convert JSON back to objects
+      // Step 1 — Convert crew and preferences from JSON
       Crew importedCrew = Crew.fromJson(loadoutData["crew"]);
       SavedPreferences importedPreferences = SavedPreferences.fromJson(loadoutData["savedPreferences"]);
 
-      // Save the last selected loadout persistently
+      // Step 2 — Extract all custom positions originally saved
+      List<dynamic> importedCustomPositions = loadoutData["customPositions"] ?? [];
+
+      // Build a map of saved custom positions for easy lookup by code
+      Map<int, String> savedCustomPositionsMap = {
+        for (var posJson in importedCustomPositions)
+          CustomPosition.fromJson(posJson).code: CustomPosition.fromJson(posJson).title
+      };
+
+      // Step 3 — Build set of position codes actually used by crew members
+      Set<int> usedCustomCodes = importedCrew.crewMembers
+          .where((member) => member.position < 0)  // Only custom positions (negative codes)
+          .map((member) => member.position)
+          .toSet();
+
+      // Step 4 — For every used custom code, verify if it exists in Hive. If not, re-create it
+      for (var code in usedCustomCodes) {
+        bool exists = customBox.values.any((existing) => existing.code == code);
+        if (!exists && savedCustomPositionsMap.containsKey(code)) {
+          await customBox.add(CustomPosition(code: code, title: savedCustomPositionsMap[code]!));
+        }
+      }
+
+      // Step 5 — Clear and replace all local data as usual
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('last_selected_loadout', loadoutName);
 
-      // Clear existing data
       await Hive.box<CrewMember>('crewmemberBox').clear();
       await Hive.box<Gear>('gearBox').clear();
       await Hive.box<Gear>('personalToolsBox').clear();
       await Hive.box<TripPreference>('tripPreferenceBox').clear();
       savedPreferences.deleteAllTripPreferences();
 
-      // Save new Crew Data
       var crewMemberBox = Hive.box<CrewMember>('crewmemberBox');
       for (var member in importedCrew.crewMembers) {
         await crewMemberBox.add(member);
@@ -1525,23 +1532,17 @@ class _SettingsState extends State<SettingsView> {
         await personalToolsBox.add(tool);
       }
 
-      // Save new Trip Preferences
       var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
       for (var tripPref in importedPreferences.tripPreferences) {
         await tripPreferenceBox.add(tripPref);
       }
       savedPreferences.tripPreferences = tripPreferenceBox.values.toList();
 
-      // Reload data from Hive
       await crew.loadCrewDataFromHive();
       await savedPreferences.loadPreferencesFromHive();
-
-      // Update last saved timestamp
       await _loadLastSavedTimestamp(loadoutName);
-
-      // Re-check sync status after applying the loadout
       await _checkSyncStatus(loadoutName);
-      // Update state
+
       setState(() {
         selectedLoadout = loadoutName;
       });

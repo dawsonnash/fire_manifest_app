@@ -422,13 +422,11 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                   onPressed: () {
                     Navigator.of(context).pop(true);
                     Navigator.of(context).pop();
-                    // Show successful deletion popup
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Center(
                           child: Text(
                             'Position Deleted!',
-                            // Maybe change look
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: AppData.text32,
@@ -454,7 +452,9 @@ class _AddCrewmemberState extends State<AddCrewmember> {
     ).then((confirm) async {
       if (confirm == true) {
         await CustomPosition.deletePosition(code);
-        setState(() {});
+        setState(() {
+          selectedPosition = null;
+        });
       }
     });
   }
