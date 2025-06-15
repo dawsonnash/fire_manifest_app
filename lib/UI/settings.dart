@@ -1636,6 +1636,362 @@ class _SettingsState extends State<SettingsView> {
     await _applyLoadout(loadoutName, loadoutData);
   }
 
+  Future<void> _showAddNewPositionDialog() async {
+    TextEditingController newPositionController = TextEditingController();
+    String? errorMessage;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.textFieldColor2,
+              title: Text(
+                'Add New Position',
+                style: TextStyle(
+                  color: AppColors.textColorPrimary,
+                  fontSize: AppData.miniDialogTitleTextSize,
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: newPositionController,
+                    textCapitalization: TextCapitalization.words,
+                    inputFormatters: [LengthLimitingTextInputFormatter(30)],
+                    decoration: InputDecoration(
+                      errorText: errorMessage,
+                      errorStyle: TextStyle(
+                        fontSize: AppData.errorText,
+                        color: Colors.red,
+                      ),
+                      hintText: "Enter Position Name",
+                      hintStyle: TextStyle(
+                        color: AppColors.textColorPrimary,
+                        fontSize: AppData.miniDialogBodyTextSize,
+                      ),
+                    ),
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: AppColors.cancelButton,
+                      fontSize: AppData.bottomDialogTextSize,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    String newTitle = newPositionController.text.trim();
+
+                    if (newTitle.isEmpty) {
+                      setDialogState(() {
+                        errorMessage = "Cannot be empty";
+                      });
+                      return;
+                    }
+
+                    bool alreadyExists = positionMap.values.any((val) => val.toLowerCase() == newTitle.toLowerCase()) ||
+                        Hive.box<CustomPosition>('customPositionsBox')
+                            .values
+                            .any((pos) => pos.title.toLowerCase() == newTitle.toLowerCase());
+
+                    if (alreadyExists) {
+                      setDialogState(() {
+                        errorMessage = "Position already exists";
+                      });
+                      return;
+                    }
+
+                    await CustomPosition.addPosition(newTitle);
+                    Navigator.of(context).pop();
+                    // Show successful save popup
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Center(
+                          child: Text(
+                            'Position Saved!',
+                            // Maybe change look
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: AppData.text32,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        duration: const Duration(seconds: 1),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                    FirebaseAnalytics.instance.logEvent(
+                      name: 'custom_position_added',
+                      parameters: {
+                        'position_title': newTitle,
+                      },
+                    );
+                  },
+                  child: Text(
+                    "Add",
+                    style: TextStyle(
+                      color: AppColors.saveButtonAllowableWeight,
+                      fontSize: AppData.bottomDialogTextSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _confirmDeletePosition(int code, String title) async {
+    List<String> affectedCrew = crew.crewMembers
+        .where((member) => member.position == code)
+        .map((member) => member.name)
+        .toList();
+
+    bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.textFieldColor2,
+          title: Text(
+            'Delete Position',
+            style: TextStyle(
+              color: AppColors.textColorPrimary,
+              fontSize: AppData.miniDialogTitleTextSize,
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (affectedCrew.isNotEmpty) ...[
+                  Text(
+                    'Cannot delete "$title" while it is assigned to the following crew member(s):',
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                  SizedBox(height: AppData.sizedBox8),
+                  ...affectedCrew.map((name) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2.0),
+                    child: Text(
+                      '- $name',
+                      style: TextStyle(
+                        color: AppColors.textColorPrimary,
+                        fontSize: AppData.miniDialogBodyTextSize,
+                      ),
+                    ),
+                  )),
+                  SizedBox(height: AppData.sizedBox10),
+                  Text(
+                    'Please update these crew members to a different position before deleting.',
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                ] else ...[
+                  Text(
+                    'Are you sure you want to delete "$title"?',
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text(
+                'Close',
+                style: TextStyle(
+                  color: AppColors.cancelButton,
+                  fontSize: AppData.bottomDialogTextSize,
+                ),
+              ),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            if (affectedCrew.isEmpty)
+              TextButton(
+                child: Text(
+                  'Delete',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: AppData.bottomDialogTextSize,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                  Navigator.of(context).pop();
+
+                },
+              ),
+          ],
+        );
+      },
+    );
+
+    if (confirm == true) {
+      await CustomPosition.deletePosition(code);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Center(
+            child: Text(
+              'Position Deleted!',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: AppData.text32,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Colors.red,
+        ),
+      );
+
+      FirebaseAnalytics.instance.logEvent(
+        name: 'custom_position_deleted',
+        parameters: {
+          'position_title': title,
+        },
+      );
+    }
+  }
+
+  void _showPositionSelector() {
+    TextEditingController searchController = TextEditingController();
+    List<MapEntry<int, String>> allPositions = [
+      ...Hive.box<CustomPosition>('customPositionsBox').values.map((custom) => MapEntry(custom.code, custom.title))
+    ];
+
+    List<MapEntry<int, String>> filteredPositions = List.from(allPositions);
+
+    showModalBottomSheet(
+      context: context,
+    //  isScrollControlled: true,
+      backgroundColor: AppColors.textFieldColor2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            void _filterPositions(String query) {
+              setState(() {
+                filteredPositions = allPositions
+                    .where((entry) => entry.value.toLowerCase().contains(query.toLowerCase()))
+                    .toList();
+              });
+            }
+
+            return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                ),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.75,  // Keep modal 75% screen height
+                  child: Column(
+                    children: [
+
+                      // Title Section
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          'Custom Positions',
+                          style: TextStyle(
+                            fontSize: AppData.text28,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textColorPrimary,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Divider(),
+                      ),
+                      Expanded(
+                        child: Scrollbar(
+                          thumbVisibility: true,
+                          child: ListView(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            children: [
+
+                              ...filteredPositions.map((entry) {
+                                bool isCustom = entry.key < 0;
+                                return ListTile(
+                                  title: Text(
+                                    entry.value,
+                                    style: TextStyle(fontSize: AppData.text22, color: AppColors.textColorPrimary),
+                                  ),
+                                  trailing: isCustom
+                                      ? IconButton(
+                                    icon: Icon(Icons.delete, size: AppData.text22, color: Colors.red),
+                                    onPressed: () => _confirmDeletePosition(entry.key, entry.value),
+                                  )
+                                      : null,
+                                );
+                              }),
+
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: ListTile(
+                                    title: Text(
+                                      '+ Add New',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: AppData.text22,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    onTap: () async {
+                                      Navigator.pop(context);
+                                      await _showAddNewPositionDialog();
+                                      setState(() {});
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -2065,6 +2421,13 @@ class _SettingsState extends State<SettingsView> {
                                           ),
                                         ),
                                       ],
+                                    ),
+                                    ListTile(
+                                      title: Text(
+                                        'Custom Positions',
+                                        style: TextStyle(color: Colors.white, fontSize: AppData.text18),
+                                      ),
+                                      onTap: () => _showPositionSelector(),
                                     ),
                                   ],
                                 ),
