@@ -4,7 +4,7 @@
 [https://apps.apple.com/us/app/fire-manifesting-app/id6738597221?uo=2](https://apps.apple.com/us/app/fire-manifesting-app/id6738597221?uo=2)  
 
 **Download on Google Play:**  
-(coming soon)
+https://play.google.com/store/apps/details?id=com.dawsonnash.firemanifest&hl=en_US
 
 ---
 
@@ -12,4 +12,4 @@ The **Fire Manifesting App** is a tool designed to streamline the process of cre
 
 The Fire Manifesting App is developed and owned by **Gridline Tech LLC**.
 
-For any questions or feedback, please contact [dev@firemanifesting.com](mailto:dev@firemanifesting.com).
+For any questions or feedback, please contact [dev@gridlinetechnology.com](mailto:dev@gridlinetechnology.com).

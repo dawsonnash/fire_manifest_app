@@ -125,7 +125,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                                   ),
                                   TextSpan(
                                     text:
-                                    'For questions regarding the privacy policy or data collection, please contact dev@firemanifesting.com.',
+                                    'For questions regarding the privacy policy or data collection, please contact dev@gridlinetechnology.com.',
                                   ),
                                 ],
                               ),

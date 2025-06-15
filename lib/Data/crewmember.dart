@@ -2,6 +2,7 @@ import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 import 'crew.dart';
+import 'custom_position.dart';
 import 'gear.dart';
 
 part 'crewmember.g.dart';
@@ -57,7 +58,7 @@ class CrewMember extends HiveObject {
   int get hashCode => id.hashCode;
 
   String getPositionTitle(int positionCode) {
-    return positionMap[positionCode] ?? 'Unknown Position';
+    return getPositionTitleFromCode(positionCode);
   }
 
   // Convert CrewMember to JSON
@@ -91,6 +92,9 @@ class CrewMember extends HiveObject {
       id: id, // Keep the same ID for the copy
     );
   }
+
+
+
 }
 
 List<Gear> getAllGearItems() {
@@ -129,7 +133,7 @@ const Map<int, String> positionMap = {
   23: 'Supply',
   24: 'Tool Manager',
   25: '6-man',
-  26: 'Other', // User defined
+  26: 'Undefined', // User defined
 };
 
 List<CrewMember> sortCrewListByPosition(List<CrewMember> crewList) {
@@ -145,5 +149,25 @@ List<CrewMember> sortCrewListByPosition(List<CrewMember> crewList) {
   });
 
   return crewList;
+
+
 }
 
+List<CrewMember> sortCrewListAlphabetically(List<CrewMember> crewList) {
+  crewList.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+  return crewList;
+}
+
+
+String getPositionTitleFromCode(int positionCode) {
+  if (positionCode >= 0) {
+    return positionMap[positionCode] ?? 'Undefined';
+  } else {
+    final box = Hive.box<CustomPosition>('customPositionsBox');
+    final customPosition = box.values.firstWhere(
+          (pos) => pos.code == positionCode,
+      orElse: () => CustomPosition(code: positionCode, title: 'Undefined'),
+    );
+    return customPosition.title;
+  }
+}

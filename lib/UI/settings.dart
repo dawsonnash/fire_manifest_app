@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math' as math; // Import this at the top of your file
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/Data/trip_preferences.dart';
@@ -26,6 +27,7 @@ import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
 import '../Data/crew_loadout.dart';
 import '../Data/crewmember.dart';
+import '../Data/custom_position.dart';
 import '../Data/gear.dart';
 
 class SettingsView extends StatefulWidget {
@@ -151,28 +153,54 @@ class _SettingsState extends State<SettingsView> {
     return setEquals(aCrewNames, bCrewNames) && setEquals(aGearNames, bGearNames);
   }
 
-  Map<String, List<String>> _getCrewMemberDifferences(List<CrewMember> currentList, List<CrewMember> savedList) {
+  Map<String, List<String>> _getCrewMemberDifferences(
+      List<CrewMember> currentList,
+      List<CrewMember> savedList,
+      Map<int, String> currentCustomPositionsMap,
+      Map<int, String> savedCustomPositionsMap
+      ) {
     List<String> removed = [];
     List<String> added = [];
     List<String> modified = [];
 
+    String getTitle(int code, Map<int, String> customMap) {
+      if (positionMap.containsKey(code)) {
+        return positionMap[code]!;
+      } else if (customMap.containsKey(code)) {
+        return customMap[code]!;
+      }
+      return "Unknown Position (code $code)";
+    }
+
     for (var saved in savedList) {
       var current = currentList.firstWhere(
-        (c) => c.name == saved.name, // Match by name
+            (c) => c.name == saved.name,
         orElse: () => CrewMember(name: "", flightWeight: -1, position: -1, personalTools: []),
       );
 
       if (current.name.isEmpty) {
-        removed.add(saved.name); // Store only the name for removed crew
+        removed.add(saved.name);
         continue;
       }
 
       List<String> changes = [];
+
       if (current.flightWeight != saved.flightWeight) {
         changes.add("\n-- ${saved.flightWeight} → ${current.flightWeight} lb");
       }
-      if (current.position != saved.position) {
-        changes.add("\n-- ${positionMap[saved.position]} → ${positionMap[current.position]}");
+
+      // Always cross reference the saved positions using saved map, and current positions using saved map too
+      // (use saved map for both sides)
+      String savedTitle = getTitle(saved.position, savedCustomPositionsMap);
+      String currentTitle = getTitle(current.position, currentCustomPositionsMap);
+
+      print("[DEBUG] ${saved.name} - Saved Pos Code: ${saved.position} (${savedTitle}), Current Pos Code: ${current.position} (${currentTitle})");
+
+      bool positionChanged = current.position != saved.position;
+      bool positionTitleChanged = savedTitle.toLowerCase() != currentTitle.toLowerCase();
+
+      if (positionTitleChanged) {
+        changes.add("\n-- $savedTitle → $currentTitle");
       }
 
       // Check tool differences
@@ -195,10 +223,9 @@ class _SettingsState extends State<SettingsView> {
       }
     }
 
-    // Detect **new crew members**
     for (var current in currentList) {
       if (!savedList.any((saved) => saved.name == current.name)) {
-        added.add(current.name); // Store only the name for new crew
+        added.add(current.name);
       }
     }
 
@@ -208,6 +235,7 @@ class _SettingsState extends State<SettingsView> {
       "modified": modified,
     };
   }
+
 
   Map<String, List<String>> _getGearDifferences(List<Gear> currentList, List<Gear> savedList) {
     List<String> removed = [];
@@ -300,9 +328,35 @@ class _SettingsState extends State<SettingsView> {
     };
   }
 
+  Map<String, dynamic> normalizeCrewDataForComparison(Crew crew, Map<int, String> combinedPositionMap) {
+    List<Map<String, dynamic>> normalizedMembers = crew.crewMembers.map((member) {
+      String positionTitle;
+      if (positionMap.containsKey(member.position)) {
+        positionTitle = positionMap[member.position]!;
+      } else if (combinedPositionMap.containsKey(member.position)) {
+        positionTitle = combinedPositionMap[member.position]!;
+      } else {
+        positionTitle = "Unknown";
+      }
+
+      return {
+        "name": member.name,
+        "flightWeight": member.flightWeight,
+        "positionTitle": positionTitle.toLowerCase().trim(),  // <--- normalize capitalization too
+        "personalTools": member.personalTools?.map((p) => p.toJson()).toList() ?? [],
+      };
+    }).toList();
+
+    return {
+      "crewMembers": normalizedMembers,
+      "gear": crew.gear.map((g) => g.toJson()).toList(),
+      "personalTools": crew.personalTools.map((g) => g.toJson()).toList(),
+      "totalCrewWeight": crew.totalCrewWeight
+    };
+  }
+
   Future<void> _checkSyncStatus(String loadoutName) async {
     Map<String, dynamic>? lastSavedData = await CrewLoadoutStorage.loadLoadout(loadoutName);
-
     if (lastSavedData == null) {
       setState(() {
         isOutOfSync = true;
@@ -310,21 +364,37 @@ class _SettingsState extends State<SettingsView> {
       return;
     }
 
-    // Convert saved crew and preferences to JSON
-    String lastSavedCrewJson = jsonEncode(lastSavedData["crew"]);
-    String lastSavedPreferencesJson = jsonEncode(lastSavedData["savedPreferences"]);
+    // Merge both saved and current position maps into a unified code->title map
+    final combinedCustomPositionsMap = <int, String>{};
 
-    // Convert current crew and preferences to JSON
-    Map<String, dynamic> currentCrewData = {
-      "crew": crew.toJson(),
-      "savedPreferences": savedPreferences.toJson(),
-    };
-    String currentCrewJson = jsonEncode(currentCrewData["crew"]);
-    String currentPreferencesJson = jsonEncode(currentCrewData["savedPreferences"]);
+    // Add saved custom positions
+    for (var pos in (lastSavedData["customPositions"] ?? [])) {
+      combinedCustomPositionsMap[pos['code'] as int] = pos['title'] as String;
+    }
 
-    // Compare Crew and Preferences JSONs
+    // Add current Hive custom positions (overwrites if same code exists, doesn't matter)
+    for (var pos in Hive.box<CustomPosition>('customPositionsBox').values) {
+      combinedCustomPositionsMap[pos.code] = pos.title;
+    }
+
+    // Use the same map for both sides:
+    String lastSavedCrewJson = jsonEncode(
+        normalizeCrewDataForComparison(Crew.fromJson(lastSavedData["crew"]), combinedCustomPositionsMap)
+    );
+
+    String currentCrewJson = jsonEncode(
+        normalizeCrewDataForComparison(crew, combinedCustomPositionsMap)
+    );
+
+    String lastSavedPreferencesJson = jsonEncode(
+        SavedPreferences.fromJson(lastSavedData["savedPreferences"]).toJson()
+    );
+
+    String currentPreferencesJson = jsonEncode(savedPreferences.toJson());
+
     setState(() {
-      isOutOfSync = (lastSavedCrewJson != currentCrewJson) || (lastSavedPreferencesJson != currentPreferencesJson);
+      isOutOfSync = (lastSavedCrewJson != currentCrewJson) ||
+          (lastSavedPreferencesJson != currentPreferencesJson);
     });
   }
 
@@ -334,6 +404,20 @@ class _SettingsState extends State<SettingsView> {
     if (lastSavedData == null) {
       return;
     }
+
+    // Build current custom positions map from Hive
+    Map<int, String> currentCustomPositionsMap = {
+      for (var pos in Hive.box<CustomPosition>('customPositionsBox').values)
+        pos.code: pos.title
+    };
+
+    // Build saved custom positions map from loaded JSON
+    Map<int, String> savedCustomPositionsMap = {
+      for (var pos in (lastSavedData["customPositions"] ?? []) as List)
+        pos['code']: pos['title']
+    };
+
+
 
     // Extract saved and current data
     List<CrewMember> savedCrew = (lastSavedData["crew"]["crewMembers"] as List).map((json) => CrewMember.fromJson(json)).toList();
@@ -349,7 +433,12 @@ class _SettingsState extends State<SettingsView> {
     List<TripPreference> currentTripPreferences = savedPreferences.tripPreferences;
 
     // Compare Differences
-    Map<String, List<String>> crewChanges = _getCrewMemberDifferences(currentCrew, savedCrew);
+    Map<String, List<String>> crewChanges = _getCrewMemberDifferences(
+        currentCrew,
+        savedCrew,
+        currentCustomPositionsMap,
+        savedCustomPositionsMap
+    );
     Map<String, List<String>> gearChanges = _getGearDifferences(currentGear, savedGear);
     Map<String, List<String>> toolChanges = _getToolDifferences(currentTools, savedTools);
 
@@ -576,6 +665,8 @@ class _SettingsState extends State<SettingsView> {
       Map<String, dynamic> exportData = {
         "crew": crew.toJson(),
         "savedPreferences": savedPreferences.toJson(),
+        "customPositions": Hive.box<CustomPosition>('customPositionsBox').values.map((pos) => pos.toJson()).toList(),
+
       };
 
       String jsonData = jsonEncode(exportData);
@@ -608,7 +699,6 @@ class _SettingsState extends State<SettingsView> {
       Navigator.of(context, rootNavigator: true).pop(); // make sure dialog closes on error
     }
   }
-
 
   void selectFileForImport() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -695,30 +785,74 @@ class _SettingsState extends State<SettingsView> {
 
   void importCrewData(PlatformFile file, Function updateUI) async {
     try {
-      // Read file contents
       String jsonString = await File(file.path!).readAsString();
       Map<String, dynamic> jsonData = jsonDecode(jsonString);
 
-      // Validate required fields
       if (!jsonData.containsKey("crew") || !jsonData.containsKey("savedPreferences")) {
         showErrorDialog("Invalid JSON format. Missing required fields.");
-        FirebaseAnalytics.instance.logEvent(
-          name: 'import_error',
-
-          parameters: {
-            'error_message': "Invalid JSON format. Missing required fields.",
-          },
-        );
         return;
       }
 
-      // Import Crew Data
+      // Build imported custom positions map (code -> title)
+      Map<int, String> importedCustomPositionsMap = {};
+      if (jsonData.containsKey("customPositions")) {
+        List<dynamic> importedCustomPositions = jsonData["customPositions"];
+        for (var posJson in importedCustomPositions) {
+          CustomPosition pos = CustomPosition.fromJson(posJson);
+          importedCustomPositionsMap[pos.code] = pos.title;
+        }
+      }
+
+      // Build remap dictionary for codes
+      Map<int, int> importedCodeToNewCode = {};
+      var customBox = Hive.box<CustomPosition>('customPositionsBox');
+
+      // Deserialize crew data
       Crew importedCrew = Crew.fromJson(jsonData["crew"]);
 
-      // Import Trip Preferences (SavedPreferences)
+      // Iterate through crew to process custom positions
+      for (var member in importedCrew.crewMembers) {
+        int code = member.position;
+
+        if (positionMap.containsKey(code)) {
+          // Standard position, no remap needed
+          continue;
+        }
+
+        // This is a custom position
+        String? title = importedCustomPositionsMap[code];
+
+        if (title == null) {
+          showErrorDialog("Error: Missing custom position title for code $code");
+          return;
+        }
+
+        // See if we already have this title
+        var existing = customBox.values.firstWhereOrNull(
+                (p) => p.title.toLowerCase() == title.toLowerCase()
+        );
+
+        if (existing != null) {
+          importedCodeToNewCode[code] = existing.code;
+        } else {
+          await CustomPosition.addPosition(title);
+          var newPosition = customBox.values.firstWhere((p) => p.title == title);
+          importedCodeToNewCode[code] = newPosition.code;
+        }
+      }
+
+      // Apply remapped codes
+      for (var member in importedCrew.crewMembers) {
+        if (importedCodeToNewCode.containsKey(member.position)) {
+          member.position = importedCodeToNewCode[member.position]!;
+        }
+      }
+
+      // Import preferences as usual
       SavedPreferences importedSavedPreferences = SavedPreferences.fromJson(jsonData["savedPreferences"]);
 
       updateUI();
+
       // Clear old data
       await Hive.box<CrewMember>('crewmemberBox').clear();
       await Hive.box<Gear>('gearBox').clear();
@@ -726,7 +860,6 @@ class _SettingsState extends State<SettingsView> {
       await Hive.box<TripPreference>('tripPreferenceBox').clear();
       savedPreferences.deleteAllTripPreferences();
 
-      // Save Crew Data
       var crewMemberBox = Hive.box<CrewMember>('crewmemberBox');
       for (var member in importedCrew.crewMembers) {
         await crewMemberBox.add(member);
@@ -742,33 +875,21 @@ class _SettingsState extends State<SettingsView> {
         await personalToolsBox.add(tool);
       }
 
-      // Save Trip Preferences to Hive
       var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
       for (var tripPref in importedSavedPreferences.tripPreferences) {
         await tripPreferenceBox.add(tripPref);
       }
       savedPreferences.tripPreferences = tripPreferenceBox.values.toList();
 
-      // Reload data from Hive
       await crew.loadCrewDataFromHive();
       await savedPreferences.loadPreferencesFromHive();
 
-      //Check sync status after import**
       if (selectedLoadout != null) {
         await _checkSyncStatus(selectedLoadout!);
       }
       setState(() {});
-
-      //Crew Name
     } catch (e) {
       showErrorDialog("Unexpected error during import: $e");
-      FirebaseAnalytics.instance.logEvent(
-        name: 'import_error',
-
-        parameters: {
-          'error_message': "$e",
-        },
-      );
     }
   }
 
@@ -888,7 +1009,7 @@ class _SettingsState extends State<SettingsView> {
 
                   final Uri emailUri = Uri(
                     scheme: 'mailto',
-                    path: 'dev@firemanifesting.com', // Replace with your email address
+                    path: 'dev@gridlinetechnology.com', // Replace with your email address
                     query: 'subject=$subject&body=$body',
                   );
 
@@ -962,7 +1083,7 @@ class _SettingsState extends State<SettingsView> {
 
                   final Uri emailUri = Uri(
                     scheme: 'mailto',
-                    path: 'dev@firemanifesting.com', // Replace with your email address
+                    path: 'dev@gridlinetechnology.com', // Replace with your email address
                     query: 'subject=$subject&body=$body',
                   );
 
@@ -1261,6 +1382,9 @@ class _SettingsState extends State<SettingsView> {
 
   Future<void> _saveNewLoadout(String loadoutName, bool isEmptyCrew) async {
     String timestamp = DateFormat('EEE, dd MMM yy, h:mm a').format(DateTime.now());
+    // Export all custom positions to JSON
+    var customPositionsBox = Hive.box<CustomPosition>('customPositionsBox');
+    List<Map<String, dynamic>> customPositionsJson = customPositionsBox.values.map((pos) => pos.toJson()).toList();
 
     Map<String, dynamic> loadoutData = isEmptyCrew
         ? {
@@ -1273,12 +1397,15 @@ class _SettingsState extends State<SettingsView> {
             "savedPreferences": {
               "tripPreferences": [] // Empty trip preferences list
             },
-            "lastSaved": timestamp,
+      "customPositions": customPositionsJson,
+
+      "lastSaved": timestamp,
           }
         : {
             "crew": crew.toJson(),
             "savedPreferences": savedPreferences.toJson(),
-            "lastSaved": timestamp,
+      "customPositions": customPositionsJson,
+      "lastSaved": timestamp,
           };
 
     await CrewLoadoutStorage.saveLoadout(loadoutName, loadoutData);
@@ -1324,9 +1451,14 @@ class _SettingsState extends State<SettingsView> {
   Future<void> _updateCurrentLoadout(String loadoutName) async {
     String timestamp = DateFormat('EEE, dd MMM yy, h:mm a').format(DateTime.now());
 
+    // Export all custom positions to JSON
+    var customPositionsBox = Hive.box<CustomPosition>('customPositionsBox');
+    List<Map<String, dynamic>> customPositionsJson = customPositionsBox.values.map((pos) => pos.toJson()).toList();
+
     Map<String, dynamic> loadoutData = {
       "crew": crew.toJson(),
       "savedPreferences": savedPreferences.toJson(),
+      "customPositions": customPositionsJson,
       "lastSaved": timestamp, // Update timestamp
     };
     await CrewLoadoutStorage.saveLoadout(loadoutName, loadoutData);
@@ -1395,22 +1527,66 @@ class _SettingsState extends State<SettingsView> {
 
   Future<void> _applyLoadout(String loadoutName, Map<String, dynamic> loadoutData) async {
     try {
-      // Convert JSON back to objects
+      // Build imported custom positions map (code -> title)
+      Map<int, String> importedCustomPositionsMap = {};
+      if (loadoutData.containsKey("customPositions")) {
+        List<dynamic> importedCustomPositions = loadoutData["customPositions"];
+        for (var posJson in importedCustomPositions) {
+          CustomPosition pos = CustomPosition.fromJson(posJson);
+          importedCustomPositionsMap[pos.code] = pos.title;
+        }
+      }
+
+      // Deserialize crew and preferences
       Crew importedCrew = Crew.fromJson(loadoutData["crew"]);
       SavedPreferences importedPreferences = SavedPreferences.fromJson(loadoutData["savedPreferences"]);
 
-      // Save the last selected loadout persistently
+      // Build remap dictionary for codes
+      Map<int, int> importedCodeToNewCode = {};
+      var customBox = Hive.box<CustomPosition>('customPositionsBox');
+
+      for (var member in importedCrew.crewMembers) {
+        int code = member.position;
+
+        if (positionMap.containsKey(code)) {
+          // standard position, no remap
+          continue;
+        }
+
+        String? title = importedCustomPositionsMap[code];
+        if (title == null) continue; // safety check
+
+        var existing = customBox.values.firstWhereOrNull(
+                (p) => p.title.toLowerCase() == title.toLowerCase()
+        );
+
+        if (existing != null) {
+          importedCodeToNewCode[code] = existing.code;
+        } else {
+          await CustomPosition.addPosition(title);
+          var newPosition = customBox.values.firstWhere((p) => p.title == title);
+          importedCodeToNewCode[code] = newPosition.code;
+        }
+      }
+
+      // Apply remapped codes
+      for (var member in importedCrew.crewMembers) {
+        if (importedCodeToNewCode.containsKey(member.position)) {
+          member.position = importedCodeToNewCode[member.position]!;
+        }
+      }
+
+      // Save last selected loadout
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('last_selected_loadout', loadoutName);
 
-      // Clear existing data
+      // Clear & save data
       await Hive.box<CrewMember>('crewmemberBox').clear();
       await Hive.box<Gear>('gearBox').clear();
       await Hive.box<Gear>('personalToolsBox').clear();
       await Hive.box<TripPreference>('tripPreferenceBox').clear();
       savedPreferences.deleteAllTripPreferences();
 
-      // Save new Crew Data
       var crewMemberBox = Hive.box<CrewMember>('crewmemberBox');
       for (var member in importedCrew.crewMembers) {
         await crewMemberBox.add(member);
@@ -1426,23 +1602,17 @@ class _SettingsState extends State<SettingsView> {
         await personalToolsBox.add(tool);
       }
 
-      // Save new Trip Preferences
       var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
       for (var tripPref in importedPreferences.tripPreferences) {
         await tripPreferenceBox.add(tripPref);
       }
       savedPreferences.tripPreferences = tripPreferenceBox.values.toList();
 
-      // Reload data from Hive
       await crew.loadCrewDataFromHive();
       await savedPreferences.loadPreferencesFromHive();
-
-      // Update last saved timestamp
       await _loadLastSavedTimestamp(loadoutName);
-
-      // Re-check sync status after applying the loadout
       await _checkSyncStatus(loadoutName);
-      // Update state
+
       setState(() {
         selectedLoadout = loadoutName;
       });
@@ -1464,6 +1634,362 @@ class _SettingsState extends State<SettingsView> {
     await prefs.setString('last_selected_loadout', loadoutName); // Save the selection persistently
 
     await _applyLoadout(loadoutName, loadoutData);
+  }
+
+  Future<void> _showAddNewPositionDialog() async {
+    TextEditingController newPositionController = TextEditingController();
+    String? errorMessage;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.textFieldColor2,
+              title: Text(
+                'Add New Position',
+                style: TextStyle(
+                  color: AppColors.textColorPrimary,
+                  fontSize: AppData.miniDialogTitleTextSize,
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: newPositionController,
+                    textCapitalization: TextCapitalization.words,
+                    inputFormatters: [LengthLimitingTextInputFormatter(30)],
+                    decoration: InputDecoration(
+                      errorText: errorMessage,
+                      errorStyle: TextStyle(
+                        fontSize: AppData.errorText,
+                        color: Colors.red,
+                      ),
+                      hintText: "Enter Position Name",
+                      hintStyle: TextStyle(
+                        color: AppColors.textColorPrimary,
+                        fontSize: AppData.miniDialogBodyTextSize,
+                      ),
+                    ),
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: AppColors.cancelButton,
+                      fontSize: AppData.bottomDialogTextSize,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    String newTitle = newPositionController.text.trim();
+
+                    if (newTitle.isEmpty) {
+                      setDialogState(() {
+                        errorMessage = "Cannot be empty";
+                      });
+                      return;
+                    }
+
+                    bool alreadyExists = positionMap.values.any((val) => val.toLowerCase() == newTitle.toLowerCase()) ||
+                        Hive.box<CustomPosition>('customPositionsBox')
+                            .values
+                            .any((pos) => pos.title.toLowerCase() == newTitle.toLowerCase());
+
+                    if (alreadyExists) {
+                      setDialogState(() {
+                        errorMessage = "Position already exists";
+                      });
+                      return;
+                    }
+
+                    await CustomPosition.addPosition(newTitle);
+                    Navigator.of(context).pop();
+                    // Show successful save popup
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Center(
+                          child: Text(
+                            'Position Saved!',
+                            // Maybe change look
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: AppData.text32,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        duration: const Duration(seconds: 1),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                    FirebaseAnalytics.instance.logEvent(
+                      name: 'custom_position_added',
+                      parameters: {
+                        'position_title': newTitle,
+                      },
+                    );
+                  },
+                  child: Text(
+                    "Add",
+                    style: TextStyle(
+                      color: AppColors.saveButtonAllowableWeight,
+                      fontSize: AppData.bottomDialogTextSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _confirmDeletePosition(int code, String title) async {
+    List<String> affectedCrew = crew.crewMembers
+        .where((member) => member.position == code)
+        .map((member) => member.name)
+        .toList();
+
+    bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.textFieldColor2,
+          title: Text(
+            'Delete Position',
+            style: TextStyle(
+              color: AppColors.textColorPrimary,
+              fontSize: AppData.miniDialogTitleTextSize,
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (affectedCrew.isNotEmpty) ...[
+                  Text(
+                    'Cannot delete "$title" while it is assigned to the following crew member(s):',
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                  SizedBox(height: AppData.sizedBox8),
+                  ...affectedCrew.map((name) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2.0),
+                    child: Text(
+                      '- $name',
+                      style: TextStyle(
+                        color: AppColors.textColorPrimary,
+                        fontSize: AppData.miniDialogBodyTextSize,
+                      ),
+                    ),
+                  )),
+                  SizedBox(height: AppData.sizedBox10),
+                  Text(
+                    'Please update these crew members to a different position before deleting.',
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                ] else ...[
+                  Text(
+                    'Are you sure you want to delete "$title"?',
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text(
+                'Close',
+                style: TextStyle(
+                  color: AppColors.cancelButton,
+                  fontSize: AppData.bottomDialogTextSize,
+                ),
+              ),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            if (affectedCrew.isEmpty)
+              TextButton(
+                child: Text(
+                  'Delete',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: AppData.bottomDialogTextSize,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                  Navigator.of(context).pop();
+
+                },
+              ),
+          ],
+        );
+      },
+    );
+
+    if (confirm == true) {
+      await CustomPosition.deletePosition(code);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Center(
+            child: Text(
+              'Position Deleted!',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: AppData.text32,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Colors.red,
+        ),
+      );
+
+      FirebaseAnalytics.instance.logEvent(
+        name: 'custom_position_deleted',
+        parameters: {
+          'position_title': title,
+        },
+      );
+    }
+  }
+
+  void _showPositionSelector() {
+    TextEditingController searchController = TextEditingController();
+    List<MapEntry<int, String>> allPositions = [
+      ...Hive.box<CustomPosition>('customPositionsBox').values.map((custom) => MapEntry(custom.code, custom.title))
+    ];
+
+    List<MapEntry<int, String>> filteredPositions = List.from(allPositions);
+
+    showModalBottomSheet(
+      context: context,
+    //  isScrollControlled: true,
+      backgroundColor: AppColors.textFieldColor2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            void _filterPositions(String query) {
+              setState(() {
+                filteredPositions = allPositions
+                    .where((entry) => entry.value.toLowerCase().contains(query.toLowerCase()))
+                    .toList();
+              });
+            }
+
+            return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom + AppData.padding16,
+                ),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.75,  // Keep modal 75% screen height
+                  child: Column(
+                    children: [
+
+                      // Title Section
+                      Padding(
+                        padding:  EdgeInsets.all(AppData.padding16),
+                        child: Text(
+                          'Custom Positions',
+                          style: TextStyle(
+                            fontSize: AppData.text28,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textColorPrimary,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: AppData.padding16),
+                        child: Divider(),
+                      ),
+                      Expanded(
+                        child: Scrollbar(
+                          thumbVisibility: true,
+                          child: ListView(
+                            padding: EdgeInsets.symmetric(horizontal: AppData.padding16),
+                            children: [
+
+                              ...filteredPositions.map((entry) {
+                                bool isCustom = entry.key < 0;
+                                return ListTile(
+                                  title: Text(
+                                    entry.value,
+                                    style: TextStyle(fontSize: AppData.text22, color: AppColors.textColorPrimary),
+                                  ),
+                                  trailing: isCustom
+                                      ? IconButton(
+                                    icon: Icon(Icons.delete, size: AppData.text22, color: Colors.red),
+                                    onPressed: () => _confirmDeletePosition(entry.key, entry.value),
+                                  )
+                                      : null,
+                                );
+                              }),
+
+                              Padding(
+                                padding:  EdgeInsets.symmetric(vertical: AppData.padding8),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: ListTile(
+                                    title: Text(
+                                      '+ Add New',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: AppData.text22,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    onTap: () async {
+                                      Navigator.pop(context);
+                                      await _showAddNewPositionDialog();
+                                      setState(() {});
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   final FocusNode _focusNode = FocusNode();
@@ -1896,6 +2422,13 @@ class _SettingsState extends State<SettingsView> {
                                         ),
                                       ],
                                     ),
+                                    ListTile(
+                                      title: Text(
+                                        'Custom Positions',
+                                        style: TextStyle(color: Colors.white, fontSize: AppData.text18),
+                                      ),
+                                      onTap: () => _showPositionSelector(),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -2284,6 +2817,54 @@ class _SettingsState extends State<SettingsView> {
                                                   content: Text(
                                                     'Starting a new empty crew will erase any recent changes made to your current crew loadout.'
                                                     'This action is irreversible. Proceed?',
+                                                    style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize,),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(false); // Return false to cancel
+                                                      },
+                                                      child: Text(
+                                                        'Cancel',
+                                                        style: TextStyle(color: AppColors.cancelButton, fontSize: AppData.bottomDialogTextSize),
+                                                      ),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(true); // Return true to confirm
+                                                      },
+                                                      child: Text(
+                                                        'Confirm',
+                                                        style: TextStyle(color: Colors.red, fontSize: AppData.bottomDialogTextSize),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+
+                                            // If the user cancels, restore the previous selection
+                                            if (confirmed == false || confirmed == null) {
+                                              setState(() {
+                                                selectedLoadout = previousLoadout;
+                                              });
+                                              return;
+                                            }
+                                          }
+                                          if((previousLoadout == null && (crew.crewMembers.isNotEmpty || crew.gear.isNotEmpty))){
+                                            // Ask for confirmation before switching
+                                            bool? confirmed = await showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  backgroundColor: AppColors.textFieldColor2,
+                                                  title: Text(
+                                                    'Confirm Start Empty Crew',
+                                                    style: TextStyle(fontSize: AppData.miniDialogTitleTextSize,color: Colors.red, fontWeight: FontWeight.bold),
+                                                  ),
+                                                  content: Text(
+                                                    'Starting a new empty crew will erase any recent changes made to your current crew data, which is not stored in a loadout. '
+                                                        'This action is irreversible. Proceed?',
                                                     style: TextStyle(color: AppColors.textColorPrimary, fontSize: AppData.miniDialogBodyTextSize,),
                                                   ),
                                                   actions: [

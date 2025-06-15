@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 
 import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
+import '../Data/custom_position.dart';
 
 class CrewmembersView extends StatefulWidget {
   const CrewmembersView({super.key});
@@ -114,9 +115,31 @@ class _CrewmembersViewState extends State<CrewmembersView> {
     );
   }
 
+  List<String> getUndefinedCrewNames() {
+    final customPositionsMap = {
+      for (var pos in Hive.box<CustomPosition>('customPositionsBox').values)
+        pos.code: pos.title
+    };
+
+    return crewmemberList.where((member) {
+      if (member.position == 26) return true;
+
+      String title;
+      if (positionMap.containsKey(member.position)) {
+        title = positionMap[member.position]!;
+      } else {
+        title = customPositionsMap[member.position] ?? "Undefined";
+      }
+
+      return title == "Undefined";
+    }).map((member) => member.name).toList();
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
-    List<CrewMember> sortedCrewMemberList = sortCrewListByPosition(crewmemberList);
+    List<CrewMember> sortedCrewMemberList = sortCrewListAlphabetically(crewmemberList);
 
     TextStyle panelTextStyle = TextStyle(
       fontSize: AppData.text22,
@@ -286,10 +309,31 @@ class _CrewmembersViewState extends State<CrewmembersView> {
             color: Colors.white.withValues(alpha: 0.05),
             child: Column(
               children: [
+                // Undefined position banner
+                Builder(
+                  builder: (_) {
+                    final undefinedNames = getUndefinedCrewNames();
+                    if (undefinedNames.isEmpty) return SizedBox.shrink();
+                    return Container(
+                      width: double.infinity,
+                      color: Colors.red,
+                      padding: EdgeInsets.all(8),
+                      child: Text(
+                        'Undefined Position: ${undefinedNames.join(', ')}',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: AppData.text18,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
+                ),
+
                 Expanded(
                   child: Stack(
-                    children: [
-                      crewmemberList.isEmpty
+                    children: [crewmemberList.isEmpty
                           ? Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
@@ -392,17 +436,23 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                               ),
                                               Row(
                                                 children: [
-                                                  Text(
-                                                    ' ${crewMember.getPositionTitle(crewMember.position)}'
-                                                    '${(crewMember.personalTools?.isNotEmpty ?? false) ? ' • ' : ''}', // Conditionally add the dot
-                                                    style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
+                                                  Container(
+                                                    constraints: BoxConstraints(maxWidth: 150),  // <-- Adjust width as needed
+                                                    child: Text(
+                                                      '${crewMember.getPositionTitle(crewMember.position)}'
+                                                          '${(crewMember.personalTools?.isNotEmpty ?? false) ? ' •' : ''}',
+                                                      style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
+                                                      overflow: TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                    ),
                                                   ),
+                                                  SizedBox(width: 8),  // Small gap between position and tools
                                                   Expanded(
                                                     child: Text(
                                                       (crewMember.personalTools ?? []).map((gearItem) => gearItem.name).join(', '),
                                                       style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
-                                                      maxLines: 1,
                                                       overflow: TextOverflow.ellipsis,
+                                                      maxLines: 1,
                                                     ),
                                                   ),
                                                 ],
@@ -412,6 +462,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                         ),
                                       ],
                                     ),
+
                                     trailing: isSelectionMode
                                         ? null
                                         : IconButton(

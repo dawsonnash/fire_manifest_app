@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +13,7 @@ import '../CodeShare/variables.dart';
 import '../Data/crew.dart';
 import '../Data/crewmember.dart';
 import '../Data/gear.dart';
+import '../Data/custom_position.dart';
 
 class AddCrewmember extends StatefulWidget {
   const AddCrewmember({super.key});
@@ -93,19 +95,19 @@ class _AddCrewmemberState extends State<AddCrewmember> {
 
     // Find the selected tool in the personalToolsList
     final Gear selectedGear = personalToolsList.firstWhere(
-      (tool) => tool.name == toolName,
+          (tool) => tool.name == toolName,
       orElse: () => Gear(name: toolName, weight: toolWeight, quantity: 1, isPersonalTool: true, isHazmat: false),
     );
 
     // Check for duplicate tool names
     final bool isDuplicate = addedTools?.any(
           (tool) => tool.name.toLowerCase() == toolName.toLowerCase(),
-        ) ??
+    ) ??
         false;
 
     if (isDuplicate) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+        SnackBar(
           content: Center(
             child: Text(
               'Tool Already Added',
@@ -143,7 +145,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
 
     if (crewMemberNameExists) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+        SnackBar(
           content: Center(
             child: Text(
               'Crew member name already used!',
@@ -215,6 +217,400 @@ class _AddCrewmemberState extends State<AddCrewmember> {
     setState(() {}); // Rebuild UI to reflect changes
   }
 
+  Future<void> _showAddNewPositionDialog() async {
+    TextEditingController newPositionController = TextEditingController();
+    String? errorMessage;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.textFieldColor2,
+              title: Text(
+                'Add New Position',
+                style: TextStyle(
+                  color: AppColors.textColorPrimary,
+                  fontSize: AppData.miniDialogTitleTextSize,
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: newPositionController,
+                    textCapitalization: TextCapitalization.words,
+                    inputFormatters: [LengthLimitingTextInputFormatter(30)],
+                    decoration: InputDecoration(
+                      errorText: errorMessage,
+                      errorStyle: TextStyle(
+                        fontSize: AppData.errorText,
+                        color: Colors.red,
+                      ),
+                      hintText: "Enter Position Name",
+                      hintStyle: TextStyle(
+                        color: AppColors.textColorPrimary,
+                        fontSize: AppData.miniDialogBodyTextSize,
+                      ),
+                    ),
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: AppColors.cancelButton,
+                      fontSize: AppData.bottomDialogTextSize,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    String newTitle = newPositionController.text.trim();
+
+                    if (newTitle.isEmpty) {
+                      setDialogState(() {
+                        errorMessage = "Cannot be empty";
+                      });
+                      return;
+                    }
+
+                    bool alreadyExists = positionMap.values.any((val) => val.toLowerCase() == newTitle.toLowerCase()) ||
+                        Hive.box<CustomPosition>('customPositionsBox')
+                            .values
+                            .any((pos) => pos.title.toLowerCase() == newTitle.toLowerCase());
+
+                    if (alreadyExists) {
+                      setDialogState(() {
+                        errorMessage = "Position already exists";
+                      });
+                      return;
+                    }
+
+                    await CustomPosition.addPosition(newTitle);
+
+                    // After adding, find the newly added position in Hive:
+                    final customBox = Hive.box<CustomPosition>('customPositionsBox');
+                    final newPosition = customBox.values.firstWhereOrNull(
+                          (pos) => pos.title.toLowerCase() == newTitle.toLowerCase(),
+                    );
+
+                    if (newPosition != null) {
+                      setState(() {
+                        selectedPosition = newPosition.code;
+                      });
+                    }
+                    Navigator.of(context).pop();
+                    // Show successful save popup
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Center(
+                          child: Text(
+                            'Position Saved!',
+                            // Maybe change look
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: AppData.text32,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        duration: const Duration(seconds: 1),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                    FirebaseAnalytics.instance.logEvent(
+                      name: 'custom_position_added',
+                      parameters: {
+                        'position_title': newTitle,
+                      },
+                    );
+                  },
+                  child: Text(
+                    "Add",
+                    style: TextStyle(
+                      color: AppColors.saveButtonAllowableWeight,
+                      fontSize: AppData.bottomDialogTextSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _confirmDeletePosition(int code, String title) async {
+    List<String> affectedCrew = crew.crewMembers
+        .where((member) => member.position == code)
+        .map((member) => member.name)
+        .toList();
+
+    await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.textFieldColor2,
+          title: Text(
+            'Delete Position',
+            style: TextStyle(
+              color: AppColors.textColorPrimary,
+              fontSize: AppData.miniDialogTitleTextSize,
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (affectedCrew.isNotEmpty) ...[
+                  Text(
+                    'Cannot delete "$title" while it is assigned to the following crew member(s):',
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                  SizedBox(height: AppData.sizedBox8),
+                  ...affectedCrew.map((name) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2.0),
+                    child: Text(
+                      '- $name',
+                      style: TextStyle(
+                        color: AppColors.textColorPrimary,
+                        fontSize: AppData.miniDialogBodyTextSize,
+                      ),
+                    ),
+                  )),
+                  SizedBox(height: AppData.sizedBox10),
+                  Text(
+                    'Please update these crew members to a different position before deleting.',
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                ] else ...[
+                  Text(
+                    'Are you sure you want to delete "$title"?',
+                    style: TextStyle(
+                      color: AppColors.textColorPrimary,
+                      fontSize: AppData.miniDialogBodyTextSize,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text(
+                'Close',
+                style: TextStyle(
+                  color: AppColors.cancelButton,
+                  fontSize: AppData.bottomDialogTextSize,
+                ),
+              ),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            if (affectedCrew.isEmpty)
+              TextButton(
+                  child: Text(
+                    'Delete',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: AppData.bottomDialogTextSize,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Center(
+                          child: Text(
+                            'Position Deleted!',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: AppData.text32,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        duration: const Duration(seconds: 1),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    FirebaseAnalytics.instance.logEvent(
+                      name: 'custom_position_deleted',
+                      parameters: {
+                        'position_title': title,
+                      },
+                    );
+                  }
+              ),
+          ],
+        );
+      },
+    ).then((confirm) async {
+      if (confirm == true) {
+        await CustomPosition.deletePosition(code);
+        setState(() {
+          selectedPosition = null;
+        });
+      }
+    });
+  }
+
+  void _showPositionSelector() {
+    TextEditingController searchController = TextEditingController();
+    List<MapEntry<int, String>> allPositions = [
+      ...positionMap.entries.where((entry) => entry.key != 26),
+      ...Hive.box<CustomPosition>('customPositionsBox').values.map((custom) => MapEntry(custom.code, custom.title))
+    ];
+
+    List<MapEntry<int, String>> filteredPositions = List.from(allPositions);
+
+    showModalBottomSheet(
+      context: context,
+       isScrollControlled: true,
+      backgroundColor: AppColors.textFieldColor2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            void _filterPositions(String query) {
+              setState(() {
+                filteredPositions = allPositions
+                    .where((entry) => entry.value.toLowerCase().contains(query.toLowerCase()))
+                    .toList();
+              });
+            }
+
+            return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom + AppData.padding16,
+                ),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.75,  // Keep modal 75% screen height
+                  child: Column(
+                    children: [
+
+                      // Search Bar
+                      Padding(
+                        padding:  EdgeInsets.all(AppData.padding16),
+                        child: TextField(
+                          controller: searchController,
+                          onChanged: _filterPositions,
+                          decoration: InputDecoration(
+                            hintText: 'Search positions...',
+                            filled: true,
+                            fillColor: AppColors.textFieldColor,
+                            prefixIcon: Icon(Icons.search, size: AppData.text18, color: Colors.white),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.white.withOpacity(0.8), width: 2),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                            ),
+                            hintStyle: TextStyle(
+                              color: AppColors.textColorPrimary.withOpacity(0.5),
+                              fontSize: AppData.text20,
+                            ),
+                          ),
+                          style: TextStyle(
+                            color: AppColors.textColorPrimary,
+                            fontSize: AppData.text22,
+                          ),
+                        ),
+                      ),
+
+                      Expanded(
+                        child: Scrollbar(
+                          thumbVisibility: true,
+                          child: ListView(
+                            padding: EdgeInsets.symmetric(horizontal: AppData.padding16),
+                            children: [
+
+                              ...filteredPositions.map((entry) {
+                                bool isCustom = entry.key < 0;
+                                return ListTile(
+                                  title: Text(
+                                    entry.value,
+                                    style: TextStyle(fontSize: AppData.text22, color: AppColors.textColorPrimary),
+                                  ),
+                                  trailing: isCustom
+                                      ? IconButton(
+                                    icon: Icon(Icons.delete, size: AppData.text22, color: Colors.red),
+                                    onPressed: () => _confirmDeletePosition(entry.key, entry.value),
+                                  )
+                                      : null,
+                                  onTap: () {
+                                    setState(() {
+                                      selectedPosition = entry.key;
+                                      _checkInput();
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                );
+                              }),
+
+                              Divider(),
+
+                              Padding(
+                                padding:  EdgeInsets.symmetric(vertical: AppData.padding8),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: ListTile(
+                                    title: Text(
+                                      '+ Add New',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: AppData.text22,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    onTap: () async {
+                                      Navigator.pop(context);
+                                      await _showAddNewPositionDialog();
+                                      setState(() {});
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Main theme button style
@@ -269,34 +665,34 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                     color: AppColors.isDarkMode ? Colors.black : Colors.transparent, // Background color for dark mode
                     child: AppColors.isDarkMode
                         ? (AppColors.enableBackgroundImage
-                            ? Stack(
-                                children: [
-                                  ImageFiltered(
-                                    imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
-                                    child: Image.asset(
-                                      'assets/images/logo1.png',
-                                      fit: BoxFit.cover, // Cover the entire background
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                    ),
-                                  ),
-                                  Container(
-                                    color: AppColors.logoImageOverlay, // Semi-transparent overlay
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                  ),
-                                ],
-                              )
-                            : null) // No image if background is disabled
-                        : ImageFiltered(
-                            imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
-                            child: Image.asset(
-                              'assets/images/logo1.png',
-                              fit: BoxFit.cover, // Cover the entire background
-                              width: double.infinity,
-                              height: double.infinity,
-                            ),
+                        ? Stack(
+                      children: [
+                        ImageFiltered(
+                          imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+                          child: Image.asset(
+                            'assets/images/logo1.png',
+                            fit: BoxFit.cover, // Cover the entire background
+                            width: double.infinity,
+                            height: double.infinity,
                           ),
+                        ),
+                        Container(
+                          color: AppColors.logoImageOverlay, // Semi-transparent overlay
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      ],
+                    )
+                        : null) // No image if background is disabled
+                        : ImageFiltered(
+                      imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Always display in light mode
+                      child: Image.asset(
+                        'assets/images/logo1.png',
+                        fit: BoxFit.cover, // Cover the entire background
+                        width: double.infinity,
+                        height: double.infinity,
+                      ),
+                    ),
                   ),
                   Container(
                     width: double.infinity,
@@ -431,37 +827,19 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                               borderRadius: BorderRadius.circular(12.0),
                               border: Border.all(color: AppColors.borderPrimary, width: 2.0),
                             ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<int>(
-                                itemHeight: null,
-                                value: selectedPosition,
-                                hint: Text(
-                                  'Primary Position',
+                            child: GestureDetector(
+                              onTap: () => _showPositionSelector(),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                                child: Text(
+                                  selectedPosition != null
+                                      ? getPositionTitleFromCode(selectedPosition!)
+                                      : 'Primary Position',
                                   style: TextStyle(
                                     color: AppColors.textColorPrimary,
                                     fontSize: AppData.text22,
                                   ),
                                 ),
-                                dropdownColor: AppColors.textFieldColor2,
-                                style: TextStyle(
-                                  color: AppColors.textColorPrimary,
-                                  fontSize: AppData.text22,
-                                ),
-                                iconEnabledColor: AppColors.textColorPrimary,
-                                items: positionMap.entries.map((entry) {
-                                  return DropdownMenuItem<int>(
-                                    value: entry.key,
-                                    child: Text(entry.value),
-                                  );
-                                }).toList(),
-                                onChanged: (int? newValue) {
-                                  if (newValue != null) {
-                                    setState(() {
-                                      selectedPosition = newValue;
-                                      _checkInput();
-                                    });
-                                  }
-                                },
                               ),
                             ),
                           ),
@@ -514,31 +892,31 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                                               dropdownColor: AppColors.textFieldColor2,
                                               items: personalToolsList.isNotEmpty
                                                   ? personalToolsList.map((tool) {
-                                                      return DropdownMenuItem<String>(
-                                                        value: tool.name,
-                                                        child: Text(tool.name),
-                                                      );
-                                                    }).toList()
+                                                return DropdownMenuItem<String>(
+                                                  value: tool.name,
+                                                  child: Text(tool.name),
+                                                );
+                                              }).toList()
                                                   : [
-                                                      DropdownMenuItem<String>(
-                                                        value: null,
-                                                        child: Text(
-                                                          'No tools available',
-                                                          style: TextStyle(color: Colors.grey), // Optional styling for "No tools" message
-                                                        ),
-                                                      ),
-                                                    ],
+                                                DropdownMenuItem<String>(
+                                                  value: null,
+                                                  child: Text(
+                                                    'No tools available',
+                                                    style: TextStyle(color: Colors.grey), // Optional styling for "No tools" message
+                                                  ),
+                                                ),
+                                              ],
                                               onChanged: personalToolsList.isNotEmpty
                                                   ? (value) {
-                                                      setState(() {
-                                                        // Select existing tool and update weight
-                                                        selectedTool = value;
-                                                        final selectedGear = personalToolsList.firstWhere((tool) => tool.name == value);
-                                                        toolWeightController.text = selectedGear.weight.toString();
-                                                        toolNameController.text = selectedGear.name;
-                                                        isHazmatTool = selectedGear.isHazmat; // Correctly update isHazmatTool
-                                                      });
-                                                    }
+                                                setState(() {
+                                                  // Select existing tool and update weight
+                                                  selectedTool = value;
+                                                  final selectedGear = personalToolsList.firstWhere((tool) => tool.name == value);
+                                                  toolWeightController.text = selectedGear.weight.toString();
+                                                  toolNameController.text = selectedGear.name;
+                                                  isHazmatTool = selectedGear.isHazmat; // Correctly update isHazmatTool
+                                                });
+                                              }
                                                   : null,
                                               // Disable dropdown if no tools are available
                                               style: TextStyle(
