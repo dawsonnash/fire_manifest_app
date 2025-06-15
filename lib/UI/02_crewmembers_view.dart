@@ -436,17 +436,23 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                               ),
                                               Row(
                                                 children: [
-                                                  Text(
-                                                    ' ${crewMember.getPositionTitle(crewMember.position)}'
-                                                    '${(crewMember.personalTools?.isNotEmpty ?? false) ? ' • ' : ''}', // Conditionally add the dot
-                                                    style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
+                                                  Container(
+                                                    constraints: BoxConstraints(maxWidth: 150),  // <-- Adjust width as needed
+                                                    child: Text(
+                                                      '${crewMember.getPositionTitle(crewMember.position)}'
+                                                          '${(crewMember.personalTools?.isNotEmpty ?? false) ? ' •' : ''}',
+                                                      style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
+                                                      overflow: TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                    ),
                                                   ),
+                                                  SizedBox(width: 8),  // Small gap between position and tools
                                                   Expanded(
                                                     child: Text(
                                                       (crewMember.personalTools ?? []).map((gearItem) => gearItem.name).join(', '),
                                                       style: TextStyle(fontSize: AppData.text14, color: AppColors.textColorPrimary),
-                                                      maxLines: 1,
                                                       overflow: TextOverflow.ellipsis,
+                                                      maxLines: 1,
                                                     ),
                                                   ),
                                                 ],
@@ -456,6 +462,7 @@ class _CrewmembersViewState extends State<CrewmembersView> {
                                         ),
                                       ],
                                     ),
+
                                     trailing: isSelectionMode
                                         ? null
                                         : IconButton(

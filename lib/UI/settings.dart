@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math' as math; // Import this at the top of your file
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:fire_app/Data/trip_preferences.dart';
@@ -196,7 +197,7 @@ class _SettingsState extends State<SettingsView> {
       bool positionChanged = current.position != saved.position;
       bool positionTitleChanged = savedTitle != currentTitle;
 
-      if (positionChanged || positionTitleChanged) {
+      if (positionTitleChanged || positionChanged) {
         changes.add("\n-- $savedTitle → $currentTitle");
       }
 
@@ -233,25 +234,6 @@ class _SettingsState extends State<SettingsView> {
     };
   }
 
-  Map<String, List<String>> _getCustomPositionDifferences(
-      Map<int, String> currentCustomPositionsMap,
-      Map<int, String> savedCustomPositionsMap
-      ) {
-    List<String> removed = [];
-    List<String> added = [];
-
-    // Compare titles directly
-    Set<String> savedTitles = savedCustomPositionsMap.values.toSet();
-    Set<String> currentTitles = currentCustomPositionsMap.values.toSet();
-
-    removed = savedTitles.difference(currentTitles).toList();
-    added = currentTitles.difference(savedTitles).toList();
-
-    return {
-      "removed": removed,
-      "added": added,
-    };
-  }
 
   Map<String, List<String>> _getGearDifferences(List<Gear> currentList, List<Gear> savedList) {
     List<String> removed = [];
@@ -344,9 +326,41 @@ class _SettingsState extends State<SettingsView> {
     };
   }
 
+  Map<String, dynamic> normalizeCrewDataForComparison(Crew crew) {
+    final customPositionsMap = {
+      for (var pos in Hive.box<CustomPosition>('customPositionsBox').values)
+        pos.code: pos.title
+    };
+
+    List<Map<String, dynamic>> normalizedMembers = crew.crewMembers.map((member) {
+      // Always resolve title by code (whether standard or custom)
+      String positionTitle;
+      if (positionMap.containsKey(member.position)) {
+        positionTitle = positionMap[member.position]!;
+      } else if (customPositionsMap.containsKey(member.position)) {
+        positionTitle = customPositionsMap[member.position]!;
+      } else {
+        positionTitle = "Unknown";
+      }
+
+      return {
+        "name": member.name,
+        "flightWeight": member.flightWeight,
+        "positionTitle": positionTitle,  // ✅ Only title kept
+        "personalTools": member.personalTools?.map((p) => p.toJson()).toList() ?? [],
+      };
+    }).toList();
+
+    return {
+      "crewMembers": normalizedMembers,
+      "gear": crew.gear.map((g) => g.toJson()).toList(),
+      "personalTools": crew.personalTools.map((g) => g.toJson()).toList(),
+      "totalCrewWeight": crew.totalCrewWeight
+    };
+  }
+
   Future<void> _checkSyncStatus(String loadoutName) async {
     Map<String, dynamic>? lastSavedData = await CrewLoadoutStorage.loadLoadout(loadoutName);
-
     if (lastSavedData == null) {
       setState(() {
         isOutOfSync = true;
@@ -354,14 +368,21 @@ class _SettingsState extends State<SettingsView> {
       return;
     }
 
-    String lastSavedCrewJson = jsonEncode(lastSavedData["crew"]);
-    String lastSavedPreferencesJson = jsonEncode(lastSavedData["savedPreferences"]);
+    String lastSavedCrewJson = jsonEncode(
+        normalizeCrewDataForComparison(Crew.fromJson(lastSavedData["crew"]))
+    );
+    String currentCrewJson = jsonEncode(
+        normalizeCrewDataForComparison(crew)
+    );
 
-    String currentCrewJson = jsonEncode(crew.toJson());
+    String lastSavedPreferencesJson = jsonEncode(
+        SavedPreferences.fromJson(lastSavedData["savedPreferences"]).toJson()
+    );
     String currentPreferencesJson = jsonEncode(savedPreferences.toJson());
 
     setState(() {
-      isOutOfSync = (lastSavedCrewJson != currentCrewJson) || (lastSavedPreferencesJson != currentPreferencesJson);
+      isOutOfSync = (lastSavedCrewJson != currentCrewJson) ||
+          (lastSavedPreferencesJson != currentPreferencesJson);
     });
   }
 
@@ -752,45 +773,74 @@ class _SettingsState extends State<SettingsView> {
 
   void importCrewData(PlatformFile file, Function updateUI) async {
     try {
-      // Read file contents
       String jsonString = await File(file.path!).readAsString();
       Map<String, dynamic> jsonData = jsonDecode(jsonString);
 
-      // Validate required fields
       if (!jsonData.containsKey("crew") || !jsonData.containsKey("savedPreferences")) {
         showErrorDialog("Invalid JSON format. Missing required fields.");
-        FirebaseAnalytics.instance.logEvent(
-          name: 'import_error',
-
-          parameters: {
-            'error_message': "Invalid JSON format. Missing required fields.",
-          },
-        );
         return;
       }
 
-      // Before importing crew data — handle custom positions
+      // Build imported custom positions map (code -> title)
+      Map<int, String> importedCustomPositionsMap = {};
       if (jsonData.containsKey("customPositions")) {
-        var customBox = Hive.box<CustomPosition>('customPositionsBox');
         List<dynamic> importedCustomPositions = jsonData["customPositions"];
-
         for (var posJson in importedCustomPositions) {
           CustomPosition pos = CustomPosition.fromJson(posJson);
-
-          // Only add if code not already exists (prevents duplicates)
-          bool alreadyExists = customBox.values.any((p) => p.code == pos.code);
-          if (!alreadyExists) {
-            await customBox.add(pos);
-          }
+          importedCustomPositionsMap[pos.code] = pos.title;
         }
       }
-      // Import Crew Data
+
+      // Build remap dictionary for codes
+      Map<int, int> importedCodeToNewCode = {};
+      var customBox = Hive.box<CustomPosition>('customPositionsBox');
+
+      // Deserialize crew data
       Crew importedCrew = Crew.fromJson(jsonData["crew"]);
 
-      // Import Trip Preferences (SavedPreferences)
+      // Iterate through crew to process custom positions
+      for (var member in importedCrew.crewMembers) {
+        int code = member.position;
+
+        if (positionMap.containsKey(code)) {
+          // Standard position, no remap needed
+          continue;
+        }
+
+        // This is a custom position
+        String? title = importedCustomPositionsMap[code];
+
+        if (title == null) {
+          showErrorDialog("Error: Missing custom position title for code $code");
+          return;
+        }
+
+        // See if we already have this title
+        var existing = customBox.values.firstWhereOrNull(
+                (p) => p.title.toLowerCase() == title.toLowerCase()
+        );
+
+        if (existing != null) {
+          importedCodeToNewCode[code] = existing.code;
+        } else {
+          await CustomPosition.addPosition(title);
+          var newPosition = customBox.values.firstWhere((p) => p.title == title);
+          importedCodeToNewCode[code] = newPosition.code;
+        }
+      }
+
+      // Apply remapped codes
+      for (var member in importedCrew.crewMembers) {
+        if (importedCodeToNewCode.containsKey(member.position)) {
+          member.position = importedCodeToNewCode[member.position]!;
+        }
+      }
+
+      // Import preferences as usual
       SavedPreferences importedSavedPreferences = SavedPreferences.fromJson(jsonData["savedPreferences"]);
 
       updateUI();
+
       // Clear old data
       await Hive.box<CrewMember>('crewmemberBox').clear();
       await Hive.box<Gear>('gearBox').clear();
@@ -798,7 +848,6 @@ class _SettingsState extends State<SettingsView> {
       await Hive.box<TripPreference>('tripPreferenceBox').clear();
       savedPreferences.deleteAllTripPreferences();
 
-      // Save Crew Data
       var crewMemberBox = Hive.box<CrewMember>('crewmemberBox');
       for (var member in importedCrew.crewMembers) {
         await crewMemberBox.add(member);
@@ -814,33 +863,21 @@ class _SettingsState extends State<SettingsView> {
         await personalToolsBox.add(tool);
       }
 
-      // Save Trip Preferences to Hive
       var tripPreferenceBox = Hive.box<TripPreference>('tripPreferenceBox');
       for (var tripPref in importedSavedPreferences.tripPreferences) {
         await tripPreferenceBox.add(tripPref);
       }
       savedPreferences.tripPreferences = tripPreferenceBox.values.toList();
 
-      // Reload data from Hive
       await crew.loadCrewDataFromHive();
       await savedPreferences.loadPreferencesFromHive();
 
-      //Check sync status after import**
       if (selectedLoadout != null) {
         await _checkSyncStatus(selectedLoadout!);
       }
       setState(() {});
-
-      //Crew Name
     } catch (e) {
       showErrorDialog("Unexpected error during import: $e");
-      FirebaseAnalytics.instance.logEvent(
-        name: 'import_error',
-
-        parameters: {
-          'error_message': "$e",
-        },
-      );
     }
   }
 
@@ -1478,39 +1515,60 @@ class _SettingsState extends State<SettingsView> {
 
   Future<void> _applyLoadout(String loadoutName, Map<String, dynamic> loadoutData) async {
     try {
-      final customBox = Hive.box<CustomPosition>('customPositionsBox');
-
-      // Step 1 — Convert crew and preferences from JSON
-      Crew importedCrew = Crew.fromJson(loadoutData["crew"]);
-      SavedPreferences importedPreferences = SavedPreferences.fromJson(loadoutData["savedPreferences"]);
-
-      // Step 2 — Extract all custom positions originally saved
-      List<dynamic> importedCustomPositions = loadoutData["customPositions"] ?? [];
-
-      // Build a map of saved custom positions for easy lookup by code
-      Map<int, String> savedCustomPositionsMap = {
-        for (var posJson in importedCustomPositions)
-          CustomPosition.fromJson(posJson).code: CustomPosition.fromJson(posJson).title
-      };
-
-      // Step 3 — Build set of position codes actually used by crew members
-      Set<int> usedCustomCodes = importedCrew.crewMembers
-          .where((member) => member.position < 0)  // Only custom positions (negative codes)
-          .map((member) => member.position)
-          .toSet();
-
-      // Step 4 — For every used custom code, verify if it exists in Hive. If not, re-create it
-      for (var code in usedCustomCodes) {
-        bool exists = customBox.values.any((existing) => existing.code == code);
-        if (!exists && savedCustomPositionsMap.containsKey(code)) {
-          await customBox.add(CustomPosition(code: code, title: savedCustomPositionsMap[code]!));
+      // Build imported custom positions map (code -> title)
+      Map<int, String> importedCustomPositionsMap = {};
+      if (loadoutData.containsKey("customPositions")) {
+        List<dynamic> importedCustomPositions = loadoutData["customPositions"];
+        for (var posJson in importedCustomPositions) {
+          CustomPosition pos = CustomPosition.fromJson(posJson);
+          importedCustomPositionsMap[pos.code] = pos.title;
         }
       }
 
-      // Step 5 — Clear and replace all local data as usual
+      // Deserialize crew and preferences
+      Crew importedCrew = Crew.fromJson(loadoutData["crew"]);
+      SavedPreferences importedPreferences = SavedPreferences.fromJson(loadoutData["savedPreferences"]);
+
+      // Build remap dictionary for codes
+      Map<int, int> importedCodeToNewCode = {};
+      var customBox = Hive.box<CustomPosition>('customPositionsBox');
+
+      for (var member in importedCrew.crewMembers) {
+        int code = member.position;
+
+        if (positionMap.containsKey(code)) {
+          // standard position, no remap
+          continue;
+        }
+
+        String? title = importedCustomPositionsMap[code];
+        if (title == null) continue; // safety check
+
+        var existing = customBox.values.firstWhereOrNull(
+                (p) => p.title.toLowerCase() == title.toLowerCase()
+        );
+
+        if (existing != null) {
+          importedCodeToNewCode[code] = existing.code;
+        } else {
+          await CustomPosition.addPosition(title);
+          var newPosition = customBox.values.firstWhere((p) => p.title == title);
+          importedCodeToNewCode[code] = newPosition.code;
+        }
+      }
+
+      // Apply remapped codes
+      for (var member in importedCrew.crewMembers) {
+        if (importedCodeToNewCode.containsKey(member.position)) {
+          member.position = importedCodeToNewCode[member.position]!;
+        }
+      }
+
+      // Save last selected loadout
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('last_selected_loadout', loadoutName);
 
+      // Clear & save data
       await Hive.box<CrewMember>('crewmemberBox').clear();
       await Hive.box<Gear>('gearBox').clear();
       await Hive.box<Gear>('personalToolsBox').clear();

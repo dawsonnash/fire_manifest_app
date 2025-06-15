@@ -154,10 +154,10 @@ List<CrewMember> sortCrewListByPosition(List<CrewMember> crewList) {
 }
 
 List<CrewMember> sortCrewListAlphabetically(List<CrewMember> crewList) {
-  // Sort alphabetically by name only
-  crewList.sort((a, b) => a.name.compareTo(b.name));
+  crewList.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
   return crewList;
 }
+
 
 String getPositionTitleFromCode(int positionCode) {
   if (positionCode >= 0) {
