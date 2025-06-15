@@ -194,8 +194,10 @@ class _SettingsState extends State<SettingsView> {
       String savedTitle = getTitle(saved.position, savedCustomPositionsMap);
       String currentTitle = getTitle(current.position, currentCustomPositionsMap);
 
+      print("[DEBUG] ${saved.name} - Saved Pos Code: ${saved.position} (${savedTitle}), Current Pos Code: ${current.position} (${currentTitle})");
+
       bool positionChanged = current.position != saved.position;
-      bool positionTitleChanged = savedTitle != currentTitle;
+      bool positionTitleChanged = savedTitle.toLowerCase() != currentTitle.toLowerCase();
 
       if (positionTitleChanged || positionChanged) {
         changes.add("\n-- $savedTitle → $currentTitle");
@@ -326,19 +328,13 @@ class _SettingsState extends State<SettingsView> {
     };
   }
 
-  Map<String, dynamic> normalizeCrewDataForComparison(Crew crew) {
-    final customPositionsMap = {
-      for (var pos in Hive.box<CustomPosition>('customPositionsBox').values)
-        pos.code: pos.title
-    };
-
+  Map<String, dynamic> normalizeCrewDataForComparison(Crew crew, Map<int, String> combinedPositionMap) {
     List<Map<String, dynamic>> normalizedMembers = crew.crewMembers.map((member) {
-      // Always resolve title by code (whether standard or custom)
       String positionTitle;
       if (positionMap.containsKey(member.position)) {
         positionTitle = positionMap[member.position]!;
-      } else if (customPositionsMap.containsKey(member.position)) {
-        positionTitle = customPositionsMap[member.position]!;
+      } else if (combinedPositionMap.containsKey(member.position)) {
+        positionTitle = combinedPositionMap[member.position]!;
       } else {
         positionTitle = "Unknown";
       }
@@ -346,7 +342,7 @@ class _SettingsState extends State<SettingsView> {
       return {
         "name": member.name,
         "flightWeight": member.flightWeight,
-        "positionTitle": positionTitle,  // ✅ Only title kept
+        "positionTitle": positionTitle.toLowerCase().trim(),  // <--- normalize capitalization too
         "personalTools": member.personalTools?.map((p) => p.toJson()).toList() ?? [],
       };
     }).toList();
@@ -368,16 +364,32 @@ class _SettingsState extends State<SettingsView> {
       return;
     }
 
+    // Merge both saved and current position maps into a unified code->title map
+    final combinedCustomPositionsMap = <int, String>{};
+
+    // Add saved custom positions
+    for (var pos in (lastSavedData["customPositions"] ?? [])) {
+      combinedCustomPositionsMap[pos['code'] as int] = pos['title'] as String;
+    }
+
+    // Add current Hive custom positions (overwrites if same code exists, doesn't matter)
+    for (var pos in Hive.box<CustomPosition>('customPositionsBox').values) {
+      combinedCustomPositionsMap[pos.code] = pos.title;
+    }
+
+    // Use the same map for both sides:
     String lastSavedCrewJson = jsonEncode(
-        normalizeCrewDataForComparison(Crew.fromJson(lastSavedData["crew"]))
+        normalizeCrewDataForComparison(Crew.fromJson(lastSavedData["crew"]), combinedCustomPositionsMap)
     );
+
     String currentCrewJson = jsonEncode(
-        normalizeCrewDataForComparison(crew)
+        normalizeCrewDataForComparison(crew, combinedCustomPositionsMap)
     );
 
     String lastSavedPreferencesJson = jsonEncode(
         SavedPreferences.fromJson(lastSavedData["savedPreferences"]).toJson()
     );
+
     String currentPreferencesJson = jsonEncode(savedPreferences.toJson());
 
     setState(() {
@@ -997,7 +1009,7 @@ class _SettingsState extends State<SettingsView> {
 
                   final Uri emailUri = Uri(
                     scheme: 'mailto',
-                    path: 'dev@firemanifesting.com', // Replace with your email address
+                    path: 'dev@gridlinetechnology.com', // Replace with your email address
                     query: 'subject=$subject&body=$body',
                   );
 
@@ -1071,7 +1083,7 @@ class _SettingsState extends State<SettingsView> {
 
                   final Uri emailUri = Uri(
                     scheme: 'mailto',
-                    path: 'dev@firemanifesting.com', // Replace with your email address
+                    path: 'dev@gridlinetechnology.com', // Replace with your email address
                     query: 'subject=$subject&body=$body',
                   );
 

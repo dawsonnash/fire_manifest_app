@@ -986,7 +986,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> {
                                   'These terms shall be governed by the laws of the United States and the State of Alaska.\n\n'
                                   ),
 
-                                  TextSpan(text: 'For questions regarding these terms, please contact dev@firemanifesting.com.'),
+                                  TextSpan(text: 'For questions regarding these terms, please contact dev@gridlinetechnology.com.'),
                                 ],
                               ),
                             ),
