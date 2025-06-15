@@ -375,6 +375,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                     if (newPosition != null) {
                       setState(() {
                         selectedPosition = newPosition.code;
+                        _checkInput();
                       });
                     }
                     Navigator.of(context).pop();
