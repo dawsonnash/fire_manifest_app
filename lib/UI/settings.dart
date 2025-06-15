@@ -1907,7 +1907,7 @@ class _SettingsState extends State<SettingsView> {
             return SafeArea(
               child: Padding(
                 padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + AppData.padding16,
                 ),
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.75,  // Keep modal 75% screen height
@@ -1916,7 +1916,7 @@ class _SettingsState extends State<SettingsView> {
 
                       // Title Section
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding:  EdgeInsets.all(AppData.padding16),
                         child: Text(
                           'Custom Positions',
                           style: TextStyle(
@@ -1927,14 +1927,14 @@ class _SettingsState extends State<SettingsView> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        padding: EdgeInsets.symmetric(horizontal: AppData.padding16),
                         child: Divider(),
                       ),
                       Expanded(
                         child: Scrollbar(
                           thumbVisibility: true,
                           child: ListView(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            padding: EdgeInsets.symmetric(horizontal: AppData.padding16),
                             children: [
 
                               ...filteredPositions.map((entry) {
@@ -1954,7 +1954,7 @@ class _SettingsState extends State<SettingsView> {
                               }),
 
                               Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                padding:  EdgeInsets.symmetric(vertical: AppData.padding8),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: Colors.green,

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -295,6 +296,18 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                     }
 
                     await CustomPosition.addPosition(newTitle);
+
+                    // After adding, find the newly added position in Hive:
+                    final customBox = Hive.box<CustomPosition>('customPositionsBox');
+                    final newPosition = customBox.values.firstWhereOrNull(
+                          (pos) => pos.title.toLowerCase() == newTitle.toLowerCase(),
+                    );
+
+                    if (newPosition != null) {
+                      setState(() {
+                        selectedPosition = newPosition.code;
+                      });
+                    }
                     Navigator.of(context).pop();
                     // Show successful save popup
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -489,7 +502,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
             return SafeArea(
               child: Padding(
                 padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + AppData.padding16,
                 ),
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.75,  // Keep modal 75% screen height
@@ -498,7 +511,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
 
                       // Search Bar
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding:  EdgeInsets.all(AppData.padding16),
                         child: TextField(
                           controller: searchController,
                           onChanged: _filterPositions,
@@ -531,7 +544,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                         child: Scrollbar(
                           thumbVisibility: true,
                           child: ListView(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            padding: EdgeInsets.symmetric(horizontal: AppData.padding16),
                             children: [
 
                               ...filteredPositions.map((entry) {
@@ -560,7 +573,7 @@ class _AddCrewmemberState extends State<AddCrewmember> {
                               Divider(),
 
                               Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                padding:  EdgeInsets.symmetric(vertical: AppData.padding8),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: Colors.green,

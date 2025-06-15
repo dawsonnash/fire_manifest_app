@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:fire_app/Data/saved_preferences.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
@@ -365,14 +366,17 @@ class _EditCrewmemberState extends State<EditCrewmember> {
 
                     await CustomPosition.addPosition(newTitle);
 
-                    // After adding, log all existing custom positions:
-                    final box = Hive.box<CustomPosition>('customPositionsBox');
-                    print("==== Current Custom Positions ====");
-                    for (var pos in box.values) {
-                      print("Title: '${pos.title}', Code: ${pos.code}");
-                    }
-                    print("===================================");
+                    // After adding, find the newly added position in Hive:
+                    final customBox = Hive.box<CustomPosition>('customPositionsBox');
+                    final newPosition = customBox.values.firstWhereOrNull(
+                          (pos) => pos.title.toLowerCase() == newTitle.toLowerCase(),
+                    );
 
+                    if (newPosition != null) {
+                      setState(() {
+                        selectedPosition = newPosition.code;
+                      });
+                    }
                     Navigator.of(context).pop();
                     // Show successful save popup
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -568,7 +572,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
             return SafeArea(
               child: Padding(
                 padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + AppData.padding16,
                 ),
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.75,  // Keep modal 75% screen height
@@ -577,7 +581,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
 
                       // Search Bar
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding:  EdgeInsets.all(AppData.padding16),
                         child: TextField(
                           controller: searchController,
                           onChanged: _filterPositions,
@@ -610,7 +614,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                         child: Scrollbar(
                           thumbVisibility: true,
                           child: ListView(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            padding: EdgeInsets.symmetric(horizontal: AppData.padding16),
                             children: [
 
                               ...filteredPositions.map((entry) {
@@ -639,7 +643,7 @@ class _EditCrewmemberState extends State<EditCrewmember> {
                               Divider(),
 
                               Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                padding:  EdgeInsets.symmetric(vertical: AppData.padding16),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: Colors.green,
